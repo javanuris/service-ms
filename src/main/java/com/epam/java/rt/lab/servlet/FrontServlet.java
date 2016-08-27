@@ -14,11 +14,11 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
- * semasy
+ * Service Management System
  */
 @WebServlet(urlPatterns = "/servlet/*")
 public class FrontServlet extends HttpServlet {
-//    private static final Logger logger = LoggerFactory.getLogger(FrontServlet.class);
+    private static final Logger logger = LoggerFactory.getLogger(FrontServlet.class);
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

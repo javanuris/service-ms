@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * semasy
+ * Service Management System
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)

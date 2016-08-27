@@ -9,10 +9,10 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * semasy
+ * Service Management System
  */
 public class ActionFactory {
-//    private static final Logger logger = LoggerFactory.getLogger(ActionFactory.class);
+    private static final Logger logger = LoggerFactory.getLogger(ActionFactory.class);
     private static final Map<String, Action> actionMap = new HashMap<>();
     private static final Lock actionMapLock = new ReentrantLock();
 

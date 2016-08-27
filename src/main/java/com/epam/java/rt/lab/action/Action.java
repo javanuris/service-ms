@@ -4,7 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * semasy
+ * Service Management System
  */
 public interface Action {
     void execute(HttpServletRequest req, HttpServletResponse resp) throws ActionException;

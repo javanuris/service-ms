@@ -4,7 +4,7 @@ import java.io.PrintStream;
 import java.io.PrintWriter;
 
 /**
- * semasy
+ * Service Management System
  */
 public class ActionException extends Exception {
     public ActionException() {

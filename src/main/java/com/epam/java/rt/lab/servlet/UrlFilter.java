@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
 /**
- * semasy
+ * Service Management System
  */
 @WebFilter(urlPatterns = "/*", dispatcherTypes = DispatcherType.REQUEST)
 public class UrlFilter implements Filter {
