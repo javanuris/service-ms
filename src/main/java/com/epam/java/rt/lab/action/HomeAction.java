@@ -7,6 +7,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Service Management System
@@ -18,8 +20,13 @@ public class HomeAction implements Action {
     @Override
     public void execute(HttpServletRequest req, HttpServletResponse resp) throws ActionException {
         try {
-            logger.debug("HomeAction");
-            req.getRequestDispatcher(req.getContextPath().concat("/WEB-INF/jsp/home.jsp")).forward(req, resp);
+            List<NavComponent> navArray = new ArrayList<>();
+            navArray.add(new NavComponent("active", "nav.users", "#"));
+            navArray.add(new NavComponent("", "nav.persons", "/persons"));
+            navArray.add(new NavComponent("", "nav.services", "/services"));
+            logger.debug("/WEB-INF/jsp/home.jsp");
+            req.getSession().setAttribute("navArray", navArray);
+            req.getRequestDispatcher("/WEB-INF/jsp/home.jsp").forward(req, resp);
         } catch (ServletException | IOException e) {
             throw new ActionException(e.getMessage());
         }

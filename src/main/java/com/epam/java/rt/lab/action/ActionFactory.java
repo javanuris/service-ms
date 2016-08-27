@@ -22,7 +22,7 @@ public class ActionFactory {
         String actionPathAndName = actionPath.substring(0, actionNamePoint)
                 .concat(actionPath.substring(actionNamePoint, actionNamePoint + 1).toUpperCase())
                 .concat(actionPath.substring(actionNamePoint + 1)).concat("Action");
-        System.out.println(actionPathAndName);
+        logger.debug(actionPathAndName);
         Action action = ActionFactory.actionMap.get(actionPathAndName);
         if (action != null) return action;
         if (ActionFactory.actionMapLock.tryLock()) {

@@ -1,6 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="tags" tagdir="/WEB-INF/tags" %>
-<tags:generic>
+<tags:template>
     <jsp:attribute name="title">Service MS</jsp:attribute>
     <jsp:attribute name="header">
         HEADER
@@ -11,4 +11,4 @@
     <jsp:body>
         BODY
     </jsp:body>
-</tags:generic>
+</tags:template>
