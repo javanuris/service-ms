@@ -20,12 +20,8 @@ public class ProfileAction implements Action {
     @Override
     public void execute(HttpServletRequest req, HttpServletResponse resp) throws ActionException {
         try {
-            List<NavComponent> navArray = new ArrayList<>();
-            navArray.add(new NavComponent("active", "nav.users", "#"));
-            navArray.add(new NavComponent("", "nav.persons", "/persons"));
-            navArray.add(new NavComponent("", "nav.services", "/services"));
             logger.debug("/WEB-INF/jsp/profile.jsp");
-            req.getSession().setAttribute("navArray", navArray);
+//            req.getSession().setAttribute("navArray", navArray);
             req.getRequestDispatcher("/WEB-INF/jsp/profile.jsp").forward(req, resp);
         } catch (ServletException | IOException e) {
             throw new ActionException(e.getMessage());
