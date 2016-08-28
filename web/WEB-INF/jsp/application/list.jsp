@@ -1,8 +1,8 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="tags" tagdir="/WEB-INF/tags" %>
 <tags:layout>
-    <jsp:attribute name="title">Execution</jsp:attribute>
+    <jsp:attribute name="title">navbar.application.list</jsp:attribute>
     <jsp:body>
-        execution
+        application
     </jsp:body>
 </tags:layout>
