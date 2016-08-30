@@ -22,7 +22,7 @@ public class ViewAction implements Action {
     public void execute(HttpServletRequest req, HttpServletResponse resp) throws ActionException {
         try {
             logger.debug("/WEB-INF/jsp/profile/view.jsp");
-//            req.getSession().setAttribute("navArray", navArray);
+            req.getSession().setAttribute("navbarCurrent", "/profile/view");
             req.getRequestDispatcher("/WEB-INF/jsp/profile/view.jsp").forward(req, resp);
         } catch (ServletException | IOException e) {
             throw new ActionException(e.getMessage());

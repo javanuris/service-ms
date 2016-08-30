@@ -23,8 +23,7 @@ public class ListAction implements Action {
     public void execute(HttpServletRequest req, HttpServletResponse resp) throws ActionException {
         try {
             logger.debug("/WEB-INF/jsp/service/list.jsp");
-            req.getSession().setAttribute("navbar", NavbarComponent.getNavbarItemArray());
-            req.getSession().setAttribute("navbarActive", 2);
+            req.getSession().setAttribute("navbarCurrent", "/service/list");
             req.getRequestDispatcher("/WEB-INF/jsp/service/list.jsp").forward(req, resp);
         } catch (ServletException | IOException e) {
             throw new ActionException(e.getMessage());

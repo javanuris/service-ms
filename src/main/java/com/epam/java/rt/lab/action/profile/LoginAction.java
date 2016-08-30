@@ -4,6 +4,7 @@ import com.epam.java.rt.lab.action.Action;
 import com.epam.java.rt.lab.action.ActionException;
 import com.epam.java.rt.lab.action.WebAction;
 import com.epam.java.rt.lab.component.FormComponent;
+import com.epam.java.rt.lab.component.NavbarComponent;
 import com.epam.java.rt.lab.entity.rbac.Login;
 import com.epam.java.rt.lab.entity.rbac.User;
 import com.epam.java.rt.lab.service.LoginService;
@@ -62,6 +63,7 @@ public class LoginAction implements Action {
                         User user = UserService.getUser(login);
                         if (user == null) throw new ActionException("profile.login.message.user-not-found");
                         req.getSession().setAttribute("user", user);
+                        req.getSession().setAttribute("navbar", NavbarComponent.getNavbarItemArray(user.getRole()));
                         logger.debug("REDIRECTING");
                         String next = (String) req.getAttribute("next");
                         if (next == null) next = "/";
