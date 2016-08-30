@@ -2,7 +2,7 @@ package com.epam.java.rt.lab.action.employee;
 
 import com.epam.java.rt.lab.action.Action;
 import com.epam.java.rt.lab.action.ActionException;
-import com.epam.java.rt.lab.action.NavbarComponent;
+import com.epam.java.rt.lab.component.NavbarComponent;
 import com.epam.java.rt.lab.action.WebAction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +23,7 @@ public class ListAction implements Action {
     public void execute(HttpServletRequest req, HttpServletResponse resp) throws ActionException {
         try {
             logger.debug("/WEB-INF/jsp/employee/list.jsp");
-            req.getSession().setAttribute("navbar", NavbarComponent.getNavArray());
+            req.getSession().setAttribute("navbar", NavbarComponent.getNavbarItemArray());
             req.getSession().setAttribute("navbarActive", 3);
             req.getRequestDispatcher("/WEB-INF/jsp/employee/list.jsp").forward(req, resp);
         } catch (ServletException | IOException e) {
