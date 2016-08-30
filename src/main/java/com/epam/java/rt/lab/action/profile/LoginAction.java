@@ -28,6 +28,13 @@ public class LoginAction implements Action {
     @Override
     public void execute(HttpServletRequest req, HttpServletResponse resp) throws ActionException {
         try {
+            req.setAttribute("navbarCurrent", req.getContextPath().concat("/profile/login"));
+            if (req.getSession().getAttribute("user") != null) {
+                logger.debug("REDIRECTING");
+                resp.sendRedirect("/profile/view");
+                logger.debug("REDIRECTED");
+                return;
+            }
             FormComponent formComponent = (FormComponent) req.getSession().getAttribute("loginForm");
             if (req.getMethod().equals("GET")) {
                 logger.debug("GET");
@@ -36,14 +43,14 @@ public class LoginAction implements Action {
                 } else {
                     formComponent = new FormComponent("login", "/profile/login",
                             new FormComponent.FormItem
-                                    ("profile.login.form.email", "input", "profile.login.form.email", ""),
+                                    ("profile.login.email", "input", "profile.login.email", ""),
                             new FormComponent.FormItem
-                                    ("profile.login.form.password", "password", "profile.login.form.password", ""),
+                                    ("profile.login.password", "password", "profile.login.password", ""),
                             new FormComponent.FormItem
-                                    ("profile.login.form.submit", "submit", "profile.login.form.submit", ""));
+                                    ("profile.login.form-submit", "submit", "profile.login.form-submit", ""));
                     req.getSession().setAttribute("loginForm", formComponent);
-                    req.getRequestDispatcher("/WEB-INF/jsp/profile/login.jsp").forward(req, resp);
                 }
+                req.getRequestDispatcher("/WEB-INF/jsp/profile/login.jsp").forward(req, resp);
             } else if (req.getMethod().equals("POST")) {
                 logger.debug("POST");
                 for (FormComponent.FormItem formItem : formComponent.getFormItemArray())
@@ -63,7 +70,7 @@ public class LoginAction implements Action {
                         User user = UserService.getUser(login);
                         if (user == null) throw new ActionException("profile.login.message.user-not-found");
                         req.getSession().setAttribute("user", user);
-                        req.getSession().setAttribute("navbar", NavbarComponent.getNavbarItemArray(user.getRole()));
+                        req.getSession().setAttribute("navbarItemArray", NavbarComponent.getNavbarItemArray(user.getRole()));
                         logger.debug("REDIRECTING");
                         String next = (String) req.getAttribute("next");
                         if (next == null) next = "/";

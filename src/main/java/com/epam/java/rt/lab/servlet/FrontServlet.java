@@ -33,5 +33,4 @@ public class FrontServlet extends HttpServlet {
         }
     }
 
-
 }

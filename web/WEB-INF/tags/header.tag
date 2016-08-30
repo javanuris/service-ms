@@ -11,28 +11,48 @@
             </a>
         </div>
         <div class="collapse navbar-collapse" id="app-navbar-collapse" aria-expanded="false">
-            <c:if test="${sessionScope.navbar != null}">
+            <c:set var="current" value="${requestScope.navbarCurrent}"/>
+            <c:if test="${sessionScope.navbarItemArray != null}">
                 <ul class="nav navbar-nav">
-                    <c:set var="active" value="${sessionScope.navbarActive}"/>
-                    <c:set var="index" value="0"/>
-                    <c:forEach var="item" items="${sessionScope.navbar}">
+                    <c:forEach var="item" items="${sessionScope.navbarItemArray}">
                         <c:choose>
-                            <c:when test="${active==index}"><li class="active"></c:when>
-                            <c:otherwise><li></c:otherwise>
+                            <c:when test="${current.equals(item.link)}">
+                                <li class="active"><a href="#">${item.name}</a></li>
+                            </c:when>
+                            <c:otherwise>
+                                <li><a href="${item.link}">${item.name}</a></li>
+                            </c:otherwise>
                         </c:choose>
-                            <a href="${item.link}">${item.name}</a>
-                        </li>
-                        <c:set var="index" value="${index+1}"/>
                     </c:forEach>
                 </ul>
             </c:if>
             <ul class="nav navbar-nav navbar-right">
                 <c:if test="${sessionScope.user != null}">
-                    <li><a href="/profile">user.name</a></li>
-                    <li><a href="/profile"><span class="glyphicon glyphicon-log-out" aria-hidden="true"></span></a></li>
+                    <c:choose>
+                        <c:when test="${current.equals(pageContext.request.contextPath.concat('/profile/view'))}">
+                            <li><a href="#">${sessionScope.user.name}</a></li>
+                        </c:when>
+                        <c:otherwise>
+                            <li><a href="${pageContext.request.contextPath}/profile/view">${sessionScope.user.name}</a></li>
+                        </c:otherwise>
+                    </c:choose>
+                    <li><a href="${pageContext.request.contextPath}/profile/logout">
+                        <span class="glyphicon glyphicon-log-out" aria-hidden="true"></span>
+                    </a></li>
                 </c:if>
                 <c:if test="${sessionScope.user == null}">
-                    <li><a href="/login"><span class="glyphicon glyphicon-log-in" aria-hidden="true"></span></a></li>
+                    <c:choose>
+                        <c:when test="${current.equals(pageContext.request.contextPath.concat('/profile/login'))}">
+                            <li><a href="#">
+                                <span class="glyphicon glyphicon-log-in" aria-hidden="true"></span>
+                            </a></li>
+                        </c:when>
+                        <c:otherwise>
+                            <li><a href="${pageContext.request.contextPath}/profile/login">
+                                <span class="glyphicon glyphicon-log-in" aria-hidden="true"></span>
+                            </a></li>
+                        </c:otherwise>
+                    </c:choose>
                 </c:if>
             </ul>
         </div>
