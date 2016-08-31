@@ -1,6 +1,5 @@
 package com.epam.java.rt.lab.servlet;
 
-import com.epam.java.rt.lab.component.ErrorComponent;
 import com.epam.java.rt.lab.entity.rbac.Role;
 import com.epam.java.rt.lab.entity.rbac.User;
 import com.epam.java.rt.lab.service.UserService;

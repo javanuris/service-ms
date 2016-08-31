@@ -20,7 +20,7 @@ public class FormValidator {
 
     }
 
-    public static boolean validate (FormComponent.FormItem[] formItemArray) {
+    public static boolean validate(FormComponent.FormItem[] formItemArray) {
         try {
             List<FormItemValidator> formItemValidatorList;
             for (FormComponent.FormItem formItem : formItemArray) {
@@ -61,7 +61,7 @@ public class FormValidator {
         }
         return null;
     }
-    
+
     public static Long validateLong(FormComponent.FormItem formItem) {
         try {
             Long value = Long.valueOf(formItem.getValue());
@@ -81,7 +81,7 @@ public class FormValidator {
         }
         return null;
     }
-    
+
     public static Double validateDouble(FormComponent.FormItem formItem) {
         try {
             Double value = Double.valueOf(formItem.getValue());
