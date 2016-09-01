@@ -1,5 +1,6 @@
 package com.epam.java.rt.lab.servlet;
 
+import com.epam.java.rt.lab.component.NavbarComponent;
 import com.epam.java.rt.lab.entity.rbac.User;
 import com.epam.java.rt.lab.service.UserService;
 import org.slf4j.Logger;
@@ -34,13 +35,21 @@ public class RBACFilter implements Filter {
             logger.debug("TRYING TO GET USER FROM COOKIE");
             Cookie rememberUserCookie = ResponseCookie.getCookie(req, UserService.getRememberCookieName());
             if (rememberUserCookie != null) user = UserService.getRememberUser(rememberUserCookie.getValue());
+            if (user != null) {
+                req.getSession().setAttribute("user", user);
+                req.getSession().setAttribute("navbarItemArray", NavbarComponent.getNavbarItemArray(user.getRole()));
+            }
             logger.debug("USER FROM COOKIE ({})", user);
         }
         logger.debug("user = {}", user);
         if (user == null) {
+            logger.debug("ANONYMOUS URI = {}", UserService.getAnonymous().getRole().getUriList());
             if (UserService.getAnonymous().getRole().getUriList().contains(req.getPathInfo())) {
+                logger.debug("CONTAINS {}", req.getPathInfo());
                 filterChain.doFilter(servletRequest, servletResponse);
+                logger.debug("REDIRECT (SHOULD BE NULL) {}", req.getSession().getAttribute("redirect"));
             } else {
+                logger.debug("NEED TO REDIRECT");
                 req.getSession().setAttribute("redirect", req.getContextPath().concat(req.getPathInfo()));
                 req.getRequestDispatcher("/servlet/profile/login").forward(servletRequest, servletResponse);
             }

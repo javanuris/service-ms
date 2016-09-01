@@ -22,13 +22,14 @@ public class LogoutAction implements Action {
     @Override
     public void execute(HttpServletRequest req, HttpServletResponse resp) throws ActionException {
         try {
+            logger.debug("LOGOUT");
             req.getSession().removeAttribute("user");
             req.getSession().removeAttribute("navbarItemArray");
             req.removeAttribute("navbarCurrent");
-            ResponseCookie.setCookie(resp, UserService.getRememberCookieName(), null, 0, req.getContextPath());
+            ResponseCookie.setCookie(resp, UserService.getRememberCookieName(), null, 0, req.getContextPath().concat("/"));
             resp.setHeader("Cache-Control", "no-cache");
             logger.debug("REDIRECTING ({})", req.getContextPath());
-            resp.sendRedirect(req.getContextPath());
+            resp.sendRedirect(req.getContextPath().concat("/"));
         } catch (IOException e) {
             throw new ActionException(e.getMessage());
         }

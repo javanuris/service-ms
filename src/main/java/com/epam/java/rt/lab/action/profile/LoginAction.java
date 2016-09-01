@@ -84,11 +84,11 @@ public class LoginAction implements Action {
                                     resp,
                                     UserService.getRememberCookieName(),
                                     UserService.setRememberUser(user),
-                                    2592000, req.getContextPath());
+                                    2592000, req.getContextPath().concat("/"));
                         }
                         String redirect = (String) req.getSession().getAttribute("redirect");
                         req.getSession().removeAttribute("redirect");
-                        if (redirect == null) redirect = req.getContextPath();
+                        if (redirect == null) redirect = req.getContextPath().concat("/");
                         logger.debug("REDIRECTING ({})", redirect);
                         resp.sendRedirect(redirect);
                         logger.debug("REDIRECTED");
