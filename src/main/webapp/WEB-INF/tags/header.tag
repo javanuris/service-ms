@@ -1,4 +1,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@attribute name="navbarCurrent" type="java.lang.String" %>
 <%@tag pageEncoding="UTF-8" %>
 <nav class="navbar navbar-default navbar-fixed-top navbar-inverse" style="background-color: RGBA(75, 75, 75, 25);">
     <div class="container-fluid">
@@ -7,20 +9,19 @@
                 <span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span>
             </button>
             <a class="navbar-brand" href="/" style="padding: 10px;">
-                <img alt="Brand" src="${pageContext.request.contextPath}/static/brand.png" style="width: 30px; height: 30px;">
+                <img alt="Brand" src="<c:url value="/static/brand.png"/>" style="width: 30px; height: 30px;">
             </a>
         </div>
         <div class="collapse navbar-collapse" id="app-navbar-collapse" aria-expanded="false">
-            <c:set var="current" value="${requestScope.navbarCurrent}"/>
             <c:if test="${sessionScope.navbarItemArray != null}">
                 <ul class="nav navbar-nav">
                     <c:forEach var="item" items="${sessionScope.navbarItemArray}">
                         <c:choose>
-                            <c:when test="${current.equals(item.link)}">
-                                <li class="active"><a href="#">${item.name}</a></li>
+                            <c:when test="${navbarCurrent.equals(item.link)}">
+                                <li class="active"><a href="#"><fmt:message bundle="${ui}" key="${item.name}"/></a></li>
                             </c:when>
                             <c:otherwise>
-                                <li><a href="${item.link}">${item.name}</a></li>
+                                <li><a href="${item.link}"><fmt:message bundle="${ui}" key="${item.name}"/></a></li>
                             </c:otherwise>
                         </c:choose>
                     </c:forEach>
@@ -29,11 +30,11 @@
             <ul class="nav navbar-nav navbar-right">
                 <c:if test="${sessionScope.user != null}">
                     <c:choose>
-                        <c:when test="${current.equals(pageContext.request.contextPath.concat('/profile/view'))}">
+                        <c:when test="${navbarCurrent.equals('/profile/view')}">
                             <li><a href="#">${sessionScope.user.name}</a></li>
                         </c:when>
                         <c:otherwise>
-                            <li><a href="${pageContext.request.contextPath}/profile/view">${sessionScope.user.name}</a></li>
+                            <li><a href="${pageContext.request.contextPath}/profile/login">${sessionScope.user.name}</a></li>
                         </c:otherwise>
                     </c:choose>
                     <li><a href="${pageContext.request.contextPath}/profile/logout">
@@ -42,7 +43,7 @@
                 </c:if>
                 <c:if test="${sessionScope.user == null}">
                     <c:choose>
-                        <c:when test="${current.equals(pageContext.request.contextPath.concat('/profile/login'))}">
+                        <c:when test="${navbarCurrent.equals('/profile/login')}">
                             <li><a href="#">
                                 <span class="glyphicon glyphicon-log-in" aria-hidden="true"></span>
                             </a></li>

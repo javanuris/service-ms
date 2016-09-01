@@ -9,6 +9,7 @@ import com.epam.java.rt.lab.entity.rbac.Login;
 import com.epam.java.rt.lab.entity.rbac.User;
 import com.epam.java.rt.lab.service.LoginService;
 import com.epam.java.rt.lab.service.UserService;
+import com.epam.java.rt.lab.servlet.ResponseCookie;
 import com.epam.java.rt.lab.util.FormValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +18,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Enumeration;
 
 /**
  * Service Management System
@@ -28,7 +30,6 @@ public class LoginAction implements Action {
     @Override
     public void execute(HttpServletRequest req, HttpServletResponse resp) throws ActionException {
         try {
-            req.setAttribute("navbarCurrent", req.getContextPath().concat("/profile/login"));
             if (req.getSession().getAttribute("user") != null) {
                 logger.debug("REDIRECTING");
                 resp.sendRedirect("/profile/view");
@@ -39,15 +40,20 @@ public class LoginAction implements Action {
             if (req.getMethod().equals("GET")) {
                 logger.debug("GET");
                 if (formComponent != null) {
-                    for (FormComponent.FormItem formItem : formComponent.getFormItemArray()) formItem.setValue("");
+                    for (FormComponent.FormItem formItem : formComponent.getFormItemArray()) {
+                        formItem.setValue("");
+                        formItem.setValidationMessageArray(null);
+                    }
                 } else {
                     formComponent = new FormComponent("login", "/profile/login",
                             new FormComponent.FormItem
-                                    ("profile.login.email", "input", "profile.login.email", ""),
+                                    ("profile.login.email.label", "input", "profile.login.email.label", ""),
                             new FormComponent.FormItem
-                                    ("profile.login.password", "password", "profile.login.password", ""),
+                                    ("profile.login.password.label", "password", "profile.login.password.label", ""),
                             new FormComponent.FormItem
-                                    ("profile.login.form-submit", "submit", "profile.login.form-submit", ""));
+                                    ("profile.login.remember.label", "checkbox", "profile.login.remember.label", ""),
+                            new FormComponent.FormItem
+                                    ("profile.login.submit.label", "submit", "profile.login.submit.label", ""));
                     req.getSession().setAttribute("loginForm", formComponent);
                 }
                 req.getRequestDispatcher("/WEB-INF/jsp/profile/login.jsp").forward(req, resp);
@@ -62,8 +68,8 @@ public class LoginAction implements Action {
                             formComponent.getFormItemArray()[1].getValue());
                     if (login == null) {
                         logger.debug("DENIED");
-                        String[] validationMessageArray = {"profile.login.message.access-denied"};
-                        formComponent.getFormItemArray()[2].setValidationMessageArray(validationMessageArray);
+                        String[] validationMessageArray = {"profile.login.submit.error-auth"};
+                        formComponent.getFormItemArray()[3].setValidationMessageArray(validationMessageArray);
                     } else {
                         logger.debug("GRANTED");
                         req.getSession().removeAttribute("loginForm");
@@ -71,10 +77,20 @@ public class LoginAction implements Action {
                         if (user == null) throw new ActionException("profile.login.message.user-not-found");
                         req.getSession().setAttribute("user", user);
                         req.getSession().setAttribute("navbarItemArray", NavbarComponent.getNavbarItemArray(user.getRole()));
-                        logger.debug("REDIRECTING");
-                        String next = (String) req.getAttribute("next");
-                        if (next == null) next = "/";
-                        resp.sendRedirect(next);
+                        logger.debug("REMEMBER = {}", formComponent.getFormItemArray()[2].getValue());
+                        if (formComponent.getFormItemArray()[2].getValue() != null) {
+                            logger.debug("REMEMBERING USER");
+                            ResponseCookie.setCookie(
+                                    resp,
+                                    UserService.getRememberCookieName(),
+                                    UserService.setRememberUser(user),
+                                    2592000, req.getContextPath());
+                        }
+                        String redirect = (String) req.getSession().getAttribute("redirect");
+                        req.getSession().removeAttribute("redirect");
+                        if (redirect == null) redirect = req.getContextPath();
+                        logger.debug("REDIRECTING ({})", redirect);
+                        resp.sendRedirect(redirect);
                         logger.debug("REDIRECTED");
                         return;
                     }

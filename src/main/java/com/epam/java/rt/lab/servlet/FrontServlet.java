@@ -29,6 +29,7 @@ public class FrontServlet extends HttpServlet {
                 ActionFactory.getAction(req.getPathInfo()).execute(req, resp);
             }
         } catch (ActionException e) {
+            logger.error("ActionException", e);
             throw new ServletException(e.getMessage());
         }
     }

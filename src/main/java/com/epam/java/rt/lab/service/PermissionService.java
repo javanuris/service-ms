@@ -27,6 +27,7 @@ public class PermissionService {
         return uriList;
     }
 
+    @Deprecated
     public static List<String> getAnonymous() {
         List<Permission> permissionList = new ArrayList<>();
         permissionList.add(new Permission(1L, "/"));

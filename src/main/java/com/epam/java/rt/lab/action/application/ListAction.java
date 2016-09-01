@@ -23,7 +23,9 @@ public class ListAction implements Action {
     public void execute(HttpServletRequest req, HttpServletResponse resp) throws ActionException {
         try {
             logger.debug("/WEB-INF/jsp/application/list.jsp");
-            req.setAttribute("navbarCurrent", req.getContextPath().concat("/application/list"));
+            req.getSession().removeAttribute("user");
+            req.getSession().removeAttribute("navbarItemArray");
+            req.removeAttribute("navbarCurrent");
             req.getRequestDispatcher("/WEB-INF/jsp/application/list.jsp").forward(req, resp);
         } catch (ServletException | IOException e) {
             throw new ActionException(e.getMessage());

@@ -19,6 +19,7 @@ public class RoleService {
         return role;
     }
 
+    @Deprecated
     public static Role getAnonymous() {
         return new Role(2L, "anonymous", PermissionService.getAnonymous());
     }

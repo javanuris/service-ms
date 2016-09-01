@@ -20,7 +20,6 @@ public class HomeAction implements Action {
     public void execute(HttpServletRequest req, HttpServletResponse resp) throws ActionException {
         try {
             logger.debug("/WEB-INF/jsp/home.jsp");
-            req.setAttribute("navbarCurrent", req.getContextPath().concat("/"));
             req.getRequestDispatcher("/WEB-INF/jsp/home.jsp").forward(req, resp);
         } catch (ServletException | IOException e) {
             throw new ActionException(e.getMessage());
