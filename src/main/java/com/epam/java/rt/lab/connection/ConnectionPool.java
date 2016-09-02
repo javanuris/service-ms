@@ -1,18 +1,19 @@
 package com.epam.java.rt.lab.connection;
 
-import com.epam.java.rt.lab.component.NavbarComponent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.sql.DataSource;
 import java.io.*;
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * service-ms
@@ -23,8 +24,9 @@ public class ConnectionPool implements DataSource {
     private static String databaseUsername;
     private static String databasePassword;
     private static int databaseMaxConnections;
-    private static Semaphore maxConnectionsSemaphore;
+    private Semaphore connectionsSemaphore;
     private BlockingQueue<PooledConnection> availableConnectionsQueue;
+    private AtomicInteger grantedConnections = new AtomicInteger();
 
     private ConnectionPool() {
     }
@@ -38,10 +40,11 @@ public class ConnectionPool implements DataSource {
     }
 
     public void resetProperties(String fileName) throws ConnectionException {
+        String databaseUrl = null;
+        String databaseUsername = null;
+        String databasePassword = null;
+        String databaseMaxConnections = null;
         try {
-            databaseUrl = null;
-            databaseUsername = null;
-            databasePassword = null;
             InputStream inputStream = ConnectionPool.class.getClassLoader().getResourceAsStream(fileName);
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
             String readLine;
@@ -55,29 +58,59 @@ public class ConnectionPool implements DataSource {
                 } else if (partArray[0].equals("database.password")) {
                     databasePassword = partArray[1];
                 } else if (partArray[0].equals("database.max-connection")) {
-                    databaseMaxConnections = Integer.valueOf(partArray[1]);
-                    maxConnectionsSemaphore = new Semaphore(databaseMaxConnections);
-                    availableConnectionsQueue = new ArrayBlockingQueue<>(databaseMaxConnections);
+                    databaseMaxConnections = partArray[1];
                 }
             }
         } catch (IOException e) {
             throw new ConnectionException(e.getMessage());
         }
         if (databaseUrl == null || databaseUsername == null || databasePassword == null ||
-                databaseMaxConnections == 0)
+                databaseMaxConnections == null)
             throw new ConnectionException("Database properties error");
+        while (!shutdown(10000)) ;
+        ConnectionPool.databaseUrl = databaseUrl;
+        ConnectionPool.databaseUsername = databaseUsername;
+        ConnectionPool.databasePassword = databasePassword;
+        ConnectionPool.databaseMaxConnections = Integer.valueOf(databaseMaxConnections);
+        this.availableConnectionsQueue = new ArrayBlockingQueue<>(ConnectionPool.databaseMaxConnections);
+        this.connectionsSemaphore = new Semaphore(ConnectionPool.databaseMaxConnections);
+    }
+
+    public boolean shutdown(long millis) throws ConnectionException {
+        logger.debug("Shutdown initiated");
+        try {
+            connectionsSemaphore = new Semaphore(0);
+            long timeoutMillis = System.currentTimeMillis() + millis;
+            while (System.currentTimeMillis() < timeoutMillis) {
+                if (grantedConnections.get() == 0) break;
+                Thread.sleep(100);
+            }
+            return grantedConnections.get() == 0;
+        } catch (InterruptedException e) {
+            throw new ConnectionException("Shutdown sleep timed out");
+        }
+    }
+
+    public void releaseConnection(PooledConnection pooledConnection) throws ConnectionException {
+        try {
+            availableConnectionsQueue.offer(pooledConnection, 100, TimeUnit.MILLISECONDS);
+            connectionsSemaphore.release();
+        } catch (InterruptedException e) {
+            throw new ConnectionException(e.getMessage());
+        }
     }
 
     @Override
     public Connection getConnection() throws SQLException {
         try {
-            if (maxConnectionsSemaphore.tryAcquire(100, TimeUnit.MILLISECONDS)) {
-                if (availableConnectionsQueue.size() == 0)
-                return availableConnectionsQueue.poll(100, TimeUnit.MILLISECONDS);
+            if (connectionsSemaphore.tryAcquire(100, TimeUnit.MILLISECONDS)) {
+                PooledConnection pooledConnection = availableConnectionsQueue.poll(100, TimeUnit.MILLISECONDS);
+                pooledConnection = new PooledConnection
+                        (DriverManager.getConnection(databaseUrl, databaseUsername, databasePassword));
+                return pooledConnection;
             }
         } catch (InterruptedException e) {
-            logger.error("Get connection interrupted" , e);
-            throw new SQLException();
+            throw new SQLException(e.getMessage());
         }
         return null;
     }
@@ -86,29 +119,6 @@ public class ConnectionPool implements DataSource {
     public Connection getConnection(String username, String password) throws SQLException {
         throw new UnsupportedOperationException
                 ("Get connection should be requested with predefined in properties username and password");
-    }
-
-    void releaseConnection(PooledConnection pooledConnection) throws SQLException {
-//        try {
-//            this.availableConnectionQueue.offer(pooledConnection, 100, TimeUnit.MILLISECONDS);
-//            this.grantedConnectionQueue.remove(pooledConnection);
-//            logger.info("Granted connection released (total granted: {}, total available: {})",
-//                    this.grantedConnectionQueue.size(), this.availableConnectionQueue.size());
-//
-//        } catch (InterruptedException e) {
-//            logger.error("Release connection interrupted" , e);
-//            throw new SQLException();
-//        }
-    }
-
-    public void shutdown() {
-//        logger.info("Shutdown initiated");
-//        this.shutdownPool.set(true);
-//        PooledConnection pooledConnection;
-//        do {
-//            pooledConnection = this.availableConnectionQueue.poll();
-//        }
-//        while (this.grantedConnectionQueue.size() > 0);
     }
 
     @Override
