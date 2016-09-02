@@ -9,17 +9,17 @@ public class Login extends BaseEntity {
     private String email;
     private String password;
     private int attemptLeft;
-    private boolean active;
+    private int status;
 
     public Login() {
     }
 
-    public Login(Long id, String email, String password, int attemptLeft, boolean active) {
+    public Login(Long id, String email, String password, int attemptLeft, int status) {
         super(id);
         this.email = email;
         this.password = password;
         this.attemptLeft = attemptLeft;
-        this.active = active;
+        this.status = status;
     }
 
     public Long getId() {
@@ -54,11 +54,11 @@ public class Login extends BaseEntity {
         this.attemptLeft = attemptLeft;
     }
 
-    public boolean isActive() {
-        return active;
+    public int getStatus() {
+        return status;
     }
 
-    public void setActive(boolean active) {
-        this.active = active;
+    public void setStatus(int status) {
+        this.status = status;
     }
 }

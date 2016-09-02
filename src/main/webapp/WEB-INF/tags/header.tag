@@ -18,7 +18,7 @@
                     <c:forEach var="item" items="${sessionScope.navbarItemArray}">
                         <c:choose>
                             <c:when test="${navbarCurrent.equals(item.link)}">
-                                <li class="active"><a href="#"><fmt:message bundle="${ui}" key="${item.name}"/></a></li>
+                                <li class="status"><a href="#"><fmt:message bundle="${ui}" key="${item.name}"/></a></li>
                             </c:when>
                             <c:otherwise>
                                 <li><a href="${item.link}"><fmt:message bundle="${ui}" key="${item.name}"/></a></li>

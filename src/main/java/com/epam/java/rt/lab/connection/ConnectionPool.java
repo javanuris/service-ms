@@ -57,7 +57,7 @@ public class ConnectionPool implements DataSource {
                     databaseUsername = partArray[1];
                 } else if (partArray[0].equals("database.password")) {
                     databasePassword = partArray[1];
-                } else if (partArray[0].equals("database.max-connection")) {
+                } else if (partArray[0].equals("database.max-connections")) {
                     databaseMaxConnections = partArray[1];
                 }
             }
