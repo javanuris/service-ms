@@ -4,8 +4,12 @@ import com.epam.java.rt.lab.connection.ConnectionException;
 import com.epam.java.rt.lab.connection.ConnectionPool;
 import com.epam.java.rt.lab.dao.Dao;
 import com.epam.java.rt.lab.dao.DaoException;
+import com.epam.java.rt.lab.dao.h2.H2JdbcDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.sql.Connection;
+import java.sql.SQLException;
 
 /**
  * service-ms
@@ -17,7 +21,7 @@ public class H2DaoFactory extends DaoFactory {
     private H2DaoFactory() {
     }
 
-    public static H2DaoFactory getInstance() throws DaoException {
+    public static DaoFactory getInstance() throws DaoException {
         try {
             if (connectionPool == null) {
                 H2DaoFactory instance = InstanceHolder.INSTANCE;
@@ -31,13 +35,24 @@ public class H2DaoFactory extends DaoFactory {
     }
 
     @Override
+    public Connection getConnection() throws SQLException {
+        return connectionPool.getConnection();
+    }
+
+    @Override
+    public void releaseConnection(Connection connection) throws ConnectionException {
+        connectionPool.releaseConnection(connection);
+    }
+
+    @Override
     public Dao getJdbcDao(String entityName) throws DaoException {
         try {
-            if (DaoFactory.getDbmsName() == null) throw new DaoException("DBMS not defined");
-            Class<Dao> entityClass = (Class<Dao>) Class.forName
-                    (DaoFactory.getDbmsName().concat("Jdbc").concat(entityName).concat("Dao"));
-            return entityClass.newInstance();
+            String jdbcClassName = H2JdbcDao.class.getPackage().getName().concat(".")
+                    .concat("H2Jdbc").concat(entityName).concat("Dao");
+            logger.debug("jdbcDao = {}", jdbcClassName);
+            return (Dao) Class.forName(jdbcClassName).newInstance();
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+            logger.debug("Exception", e);
             throw new DaoException(e.getMessage());
         }
     }

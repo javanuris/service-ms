@@ -5,6 +5,8 @@ import com.epam.java.rt.lab.action.ActionException;
 import com.epam.java.rt.lab.action.WebAction;
 import com.epam.java.rt.lab.component.FormComponent;
 import com.epam.java.rt.lab.component.NavbarComponent;
+import com.epam.java.rt.lab.connection.ConnectionException;
+import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.entity.rbac.Login;
 import com.epam.java.rt.lab.entity.rbac.User;
 import com.epam.java.rt.lab.service.LoginService;
@@ -18,6 +20,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Enumeration;
 
 /**
@@ -63,7 +66,8 @@ public class LoginAction implements Action {
                     formItem.setValue(req.getParameter(formItem.getLabel()));
                 if (FormValidator.validate(formComponent.getFormItemArray())) {
                     logger.debug("VALID");
-                    Login login = LoginService.getLogin(
+                    LoginService loginService = new LoginService();
+                    Login login = loginService.getLogin(
                             formComponent.getFormItemArray()[0].getValue(),
                             formComponent.getFormItemArray()[1].getValue());
                     if (login == null) {
@@ -98,7 +102,7 @@ public class LoginAction implements Action {
                 logger.debug("NOT VALID");
                 req.getRequestDispatcher("/WEB-INF/jsp/profile/login.jsp").forward(req, resp);
             }
-        } catch (ServletException | IOException e) {
+        } catch (ServletException | IOException | ConnectionException | DaoException | SQLException e) {
             throw new ActionException(e.getMessage());
         }
     }

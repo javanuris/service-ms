@@ -1,60 +1,53 @@
 package com.epam.java.rt.lab.dao.factory;
 
-import com.epam.java.rt.lab.connection.ConnectionPool;
+import com.epam.java.rt.lab.connection.ConnectionException;
 import com.epam.java.rt.lab.dao.Dao;
 import com.epam.java.rt.lab.dao.DaoException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.Properties;
 
 /**
  * service-ms
  */
 public abstract class DaoFactory {
     private static final Logger logger = LoggerFactory.getLogger(DaoFactory.class);
-    private static String dbmsName = null;
-    private static Class<DaoFactory> factoryClass = null;
+    private static DaoFactory factory = null;
 
-    public static DaoFactory createDaoFactory() throws DaoException {
-        try {
-            if (factoryClass == null) DaoFactory.resetProperties("database.properties");
-            return factoryClass.newInstance();
-        } catch (IllegalAccessException | InstantiationException e) {
-            throw new DaoException(e.getMessage());
-        }
+    public static DaoFactory getDaoFactory() throws DaoException {
+        if (factory == null) DaoFactory.resetProperties("database.properties");
+        return factory;
     }
 
     public static void resetProperties(String fileName) throws DaoException {
         try {
-            InputStream inputStream = ConnectionPool.class.getClassLoader().getResourceAsStream(fileName);
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-            String readLine;
-            String[] partArray;
-            String factoryClassName = null;
-            while ((readLine = bufferedReader.readLine()) != null) {
-                partArray = readLine.split("=");
-                if (partArray[0].equals("database.management-system")) {
-                    factoryClassName = DaoFactory.class
-                            .getPackage().getName().concat(".").concat(partArray[1]).concat("DaoFactory");
-                    break;
-                }
-            }
+            Properties properties = new Properties();
+            properties.load(DaoFactory.class.getClassLoader().getResourceAsStream(fileName));
+            String factoryClassName = DaoFactory.class.getPackage().getName().concat(".")
+                    .concat(properties.getProperty("database.management-system.name")).concat("DaoFactory");
             logger.debug("factoryClassName = {}", factoryClassName);
             if (factoryClassName == null) throw new DaoException("Database properties error");
-            DaoFactory.factoryClass = (Class<DaoFactory>) Class.forName(factoryClassName);
-        } catch (IOException | ClassNotFoundException e) {
+            Method method = Class.forName(factoryClassName).getMethod("getInstance");
+            logger.debug("method = {}", method.getName());
+            DaoFactory.factory = (DaoFactory) method.invoke(null);
+            logger.debug("factory = {}", factory.getClass().getName());
+        } catch (IOException | ClassNotFoundException |
+                NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+            logger.debug("Reset Properties Exception", e);
             throw new DaoException(e.getMessage());
         }
     }
 
-    public static String getDbmsName() {
-        return dbmsName;
-    }
-
     public abstract Dao getJdbcDao(String entityName) throws DaoException;
+
+    public abstract Connection getConnection() throws SQLException;
+
+    public abstract void releaseConnection(Connection connection) throws ConnectionException;
 
 }

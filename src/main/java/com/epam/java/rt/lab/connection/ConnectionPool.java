@@ -9,6 +9,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
+import java.util.Properties;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Semaphore;
@@ -40,40 +41,28 @@ public class ConnectionPool implements DataSource {
     }
 
     public void resetProperties(String fileName) throws ConnectionException {
-        String databaseUrl = null;
-        String databaseUsername = null;
-        String databasePassword = null;
-        String databaseMaxConnections = null;
         try {
-            InputStream inputStream = ConnectionPool.class.getClassLoader().getResourceAsStream(fileName);
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-            String readLine;
-            String[] partArray;
-            while ((readLine = bufferedReader.readLine()) != null) {
-                partArray = readLine.split("=");
-                if (partArray[0].equals("database.url")) {
-                    databaseUrl = partArray[1];
-                } else if (partArray[0].equals("database.username")) {
-                    databaseUsername = partArray[1];
-                } else if (partArray[0].equals("database.password")) {
-                    databasePassword = partArray[1];
-                } else if (partArray[0].equals("database.max-connections")) {
-                    databaseMaxConnections = partArray[1];
-                }
-            }
-        } catch (IOException e) {
+            Properties properties = new Properties();
+            properties.load(ConnectionPool.class.getClassLoader().getResourceAsStream(fileName));
+            String databaseClass = properties.getProperty("database.management-system.class");
+            String databaseUrl = properties.getProperty("database.url");
+            String databaseUsername = properties.getProperty("database.username");
+            String databasePassword = properties.getProperty("database.password");
+            String databaseMaxConnections = properties.getProperty("database.max-connections");
+            if (databaseUrl == null || databaseUsername == null || databasePassword == null ||
+                    databaseMaxConnections == null)
+                throw new ConnectionException("Database properties error");
+            while (!shutdown(10000)) ;
+            ConnectionPool.databaseUrl = databaseUrl;
+            ConnectionPool.databaseUsername = databaseUsername;
+            ConnectionPool.databasePassword = databasePassword;
+            ConnectionPool.databaseMaxConnections = Integer.valueOf(databaseMaxConnections);
+            Class.forName(databaseClass);
+            this.availableConnectionsQueue = new ArrayBlockingQueue<>(ConnectionPool.databaseMaxConnections);
+            this.connectionsSemaphore = new Semaphore(ConnectionPool.databaseMaxConnections);
+        } catch (IOException | ClassNotFoundException e) {
             throw new ConnectionException(e.getMessage());
         }
-        if (databaseUrl == null || databaseUsername == null || databasePassword == null ||
-                databaseMaxConnections == null)
-            throw new ConnectionException("Database properties error");
-        while (!shutdown(10000)) ;
-        ConnectionPool.databaseUrl = databaseUrl;
-        ConnectionPool.databaseUsername = databaseUsername;
-        ConnectionPool.databasePassword = databasePassword;
-        ConnectionPool.databaseMaxConnections = Integer.valueOf(databaseMaxConnections);
-        this.availableConnectionsQueue = new ArrayBlockingQueue<>(ConnectionPool.databaseMaxConnections);
-        this.connectionsSemaphore = new Semaphore(ConnectionPool.databaseMaxConnections);
     }
 
     public boolean shutdown(long millis) throws ConnectionException {
@@ -91,9 +80,9 @@ public class ConnectionPool implements DataSource {
         }
     }
 
-    public void releaseConnection(PooledConnection pooledConnection) throws ConnectionException {
+    public void releaseConnection(Connection connection) throws ConnectionException {
         try {
-            availableConnectionsQueue.offer(pooledConnection, 100, TimeUnit.MILLISECONDS);
+            availableConnectionsQueue.offer((PooledConnection) connection, 100, TimeUnit.MILLISECONDS);
             connectionsSemaphore.release();
         } catch (InterruptedException e) {
             throw new ConnectionException(e.getMessage());

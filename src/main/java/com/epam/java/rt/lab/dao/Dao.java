@@ -1,12 +1,19 @@
 package com.epam.java.rt.lab.dao;
 
 import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
  * service-ms
  */
-public interface Dao<T> {
+public interface Dao {
+
+    void close() throws DaoException;
+
+    <T> T first() throws SQLException;
+
     //CRUD
-    <E> T getBy(Connection connection, String columnName, E value) throws DaoException;
+    <T> Dao find(Connection connection, String columnName, T value) throws DaoException;
 
 }

@@ -11,7 +11,7 @@ public abstract class BaseService {
     private DaoFactory factory;
 
     public BaseService() throws DaoException {
-        factory = DaoFactory.createDaoFactory();
+        factory = DaoFactory.getDaoFactory();
     }
 
     public Dao getJdbcDao() throws DaoException {
