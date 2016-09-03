@@ -2,6 +2,7 @@ package com.epam.java.rt.lab.entity.rbac;
 
 import com.epam.java.rt.lab.entity.BaseEntity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -9,7 +10,7 @@ import java.util.List;
  */
 public class Role extends BaseEntity {
     private String name;
-    private List<String> uriList;
+    private List<String> uriList = new ArrayList<>();
 
     public Role() {
     }

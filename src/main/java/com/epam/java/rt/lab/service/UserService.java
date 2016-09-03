@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 
@@ -28,7 +29,7 @@ public class UserService extends BaseService {
     }
 
     public User getUser(Login login) throws DaoException, SQLException, ConnectionException {
-        logger.debug("getLogin");
+        logger.debug("getUser");
         Dao jdbcDao = null;
         Connection connection = null;
         try {
@@ -37,7 +38,10 @@ public class UserService extends BaseService {
             connection = DaoFactory.getDaoFactory().getConnection();
             User user = jdbcDao.find(connection, "login_id", login.getId()).first();
             if (user == null) return null;
-            logger.debug("user.name = {}", user.getName ());
+            user.setLogin(login);
+            user.setRole((new RoleService()).getRole(jdbcDao.getResultSet().getLong("role_id")));
+            logger.debug("user.name = {}, login = {}, role = {}",
+                    user.getName(), user.getLogin().getEmail(), user.getRole().getName());
             return user;
         } finally {
             if (connection != null) DaoFactory.getDaoFactory().releaseConnection(connection);

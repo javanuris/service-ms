@@ -13,6 +13,8 @@ public interface Dao {
 
     <T> T first() throws SQLException;
 
+    ResultSet getResultSet() throws SQLException;
+
     //CRUD
     <T> Dao find(Connection connection, String columnName, T value) throws DaoException;
 
