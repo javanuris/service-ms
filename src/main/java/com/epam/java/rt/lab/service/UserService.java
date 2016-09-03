@@ -1,28 +1,48 @@
 package com.epam.java.rt.lab.service;
 
+import com.epam.java.rt.lab.connection.ConnectionException;
+import com.epam.java.rt.lab.dao.Dao;
+import com.epam.java.rt.lab.dao.DaoException;
+import com.epam.java.rt.lab.dao.factory.DaoFactory;
 import com.epam.java.rt.lab.entity.rbac.Login;
 import com.epam.java.rt.lab.entity.rbac.Permission;
 import com.epam.java.rt.lab.entity.rbac.Role;
 import com.epam.java.rt.lab.entity.rbac.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.*;
 
 /**
  * service-ms
  */
-public class UserService {
+public class UserService extends BaseService {
+    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
     private static final UUID REMEMBER_COOKIE_NAME = UUID.randomUUID();
     private static Map<UUID, User> rememberUserMap = new HashMap<>();
 
+    public UserService() throws DaoException {
+        super();
+    }
 
-    public static User getUser(Login login) {
-        User user = new User();
-        user.setId(1L);
-        user.setFirstName("Rollan");
-        user.setMiddleName("M.");
-        user.setLastName("TAIGULOV");
-        user.setRole(RoleService.getRole(user));
-        return user;
+    public User getUser(Login login) throws DaoException, SQLException, ConnectionException {
+        logger.debug("getLogin");
+        Dao jdbcDao = null;
+        Connection connection = null;
+        try {
+            jdbcDao = super.getJdbcDao();
+            logger.debug("jdbcDao = {}", jdbcDao.getClass().getSimpleName());
+            connection = DaoFactory.getDaoFactory().getConnection();
+            User user = jdbcDao.find(connection, "login_id", login.getId()).first();
+            if (user == null) return null;
+            logger.debug("user.name = {}", user.getName ());
+            return user;
+        } finally {
+            if (connection != null) DaoFactory.getDaoFactory().releaseConnection(connection);
+            if (jdbcDao != null) jdbcDao.close();
+        }
     }
 
     public static User getAnonymous() {

@@ -77,7 +77,8 @@ public class LoginAction implements Action {
                     } else {
                         logger.debug("GRANTED");
                         req.getSession().removeAttribute("loginForm");
-                        User user = UserService.getUser(login);
+                        UserService userService = new UserService();
+                        User user = userService.getUser(login);
                         if (user == null) throw new ActionException("profile.login.message.user-not-found");
                         req.getSession().setAttribute("user", user);
                         req.getSession().setAttribute("navbarItemArray", NavbarComponent.getNavbarItemArray(user.getRole()));

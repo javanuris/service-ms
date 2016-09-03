@@ -23,18 +23,19 @@ public class LoginService extends BaseService {
 
     public Login getLogin(String email, String password) throws DaoException, SQLException, ConnectionException {
         logger.debug("getLogin");
+        Dao jdbcDao = null;
         Connection connection = null;
         try {
-            Dao jdbcDao = super.getJdbcDao();
+            jdbcDao = super.getJdbcDao();
             logger.debug("jdbcDao = {}", jdbcDao.getClass().getSimpleName());
             connection = DaoFactory.getDaoFactory().getConnection();
             Login login = jdbcDao.find(connection, "email", email).first();
+            if (login == null || !login.getPassword().equals(password)) return null;
             logger.debug("login.email = {}", login.getEmail());
-            DaoFactory.getDaoFactory().releaseConnection(connection);
-            jdbcDao.close();
             return login;
         } finally {
             if (connection != null) DaoFactory.getDaoFactory().releaseConnection(connection);
+            if (jdbcDao != null) jdbcDao.close();
         }
     }
 
