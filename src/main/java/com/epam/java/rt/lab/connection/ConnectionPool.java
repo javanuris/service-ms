@@ -93,15 +93,32 @@ public class ConnectionPool implements DataSource {
     public Connection getConnection() throws SQLException {
         try {
             if (connectionsSemaphore.tryAcquire(100, TimeUnit.MILLISECONDS)) {
-                PooledConnection pooledConnection = availableConnectionsQueue.poll(100, TimeUnit.MILLISECONDS);
-                pooledConnection = new PooledConnection
-                        (DriverManager.getConnection(databaseUrl, databaseUsername, databasePassword));
-                return pooledConnection;
+                PooledConnection pooledConnection;
+                if (availableConnectionsQueue.size() == 0) {
+                    pooledConnection = new PooledConnection
+                            (DriverManager.getConnection(databaseUrl, databaseUsername, databasePassword));
+                } else {
+                    pooledConnection = availableConnectionsQueue.poll(100, TimeUnit.MILLISECONDS);
+                }
+                return prepareConnection(pooledConnection);
             }
         } catch (InterruptedException e) {
             throw new SQLException(e.getMessage());
         }
         return null;
+    }
+
+    private Connection prepareConnection(Connection connection) throws SQLException {
+        if (!connection.isValid(10)) {
+            throw new SQLException("Invalid connection error");
+        } else {
+            if (!connection.getAutoCommit()) {
+                connection.rollback();
+                connection.setAutoCommit(true);
+            }
+            if (connection.isReadOnly()) connection.setReadOnly(false);
+        }
+        return connection;
     }
 
     @Override
