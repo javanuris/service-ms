@@ -1,4 +1,4 @@
-package com.epam.java.rt.lab.dao.h2;
+package com.epam.java.rt.lab.dao.h2error;
 
 import com.epam.java.rt.lab.dao.Dao;
 import com.epam.java.rt.lab.dao.DaoException;

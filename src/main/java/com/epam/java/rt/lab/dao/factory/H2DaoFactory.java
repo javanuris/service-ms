@@ -4,7 +4,7 @@ import com.epam.java.rt.lab.connection.ConnectionException;
 import com.epam.java.rt.lab.connection.ConnectionPool;
 import com.epam.java.rt.lab.dao.Dao;
 import com.epam.java.rt.lab.dao.DaoException;
-import com.epam.java.rt.lab.dao.h2.H2JdbcDao;
+import com.epam.java.rt.lab.dao.h2error.H2JdbcDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
