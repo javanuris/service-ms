@@ -45,13 +45,20 @@ public class H2DaoFactory extends DaoFactory {
     }
 
     @Override
-    public Dao getJdbcDao(String entityName) throws DaoException {
+    public Dao getJdbcDao(String entityName, Connection connection) throws DaoException {
         try {
             String jdbcClassName = H2JdbcDao.class.getPackage().getName().concat(".")
                     .concat("H2Jdbc").concat(entityName).concat("Dao");
             logger.debug("jdbcDao = {}", jdbcClassName);
-            return (Dao) Class.forName(jdbcClassName).newInstance();
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+            Dao jdbcDao = (Dao) Class.forName(jdbcClassName).newInstance();
+            if (connection == null) {
+                jdbcDao.setConnection(ConnectionPool.getInstance().getConnection());
+            } else {
+                jdbcDao.setConnection(connection);
+            }
+            return jdbcDao;
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException |
+                ConnectionException | SQLException e) {
             logger.debug("Exception", e);
             throw new DaoException(e.getMessage());
         }

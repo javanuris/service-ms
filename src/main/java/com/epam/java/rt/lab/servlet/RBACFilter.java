@@ -1,6 +1,8 @@
 package com.epam.java.rt.lab.servlet;
 
 import com.epam.java.rt.lab.component.NavbarComponent;
+import com.epam.java.rt.lab.connection.ConnectionException;
+import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.entity.rbac.User;
 import com.epam.java.rt.lab.service.UserService;
 import org.slf4j.Logger;
@@ -12,6 +14,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.sql.SQLException;
 
 /**
  * Service Management System
@@ -43,15 +46,19 @@ public class RBACFilter implements Filter {
         }
         logger.debug("user = {}", user);
         if (user == null) {
-            logger.debug("ANONYMOUS URI = {}", UserService.getAnonymous().getRole().getUriList());
-            if (UserService.getAnonymous().getRole().getUriList().contains(req.getPathInfo())) {
-                logger.debug("CONTAINS {}", req.getPathInfo());
-                filterChain.doFilter(servletRequest, servletResponse);
-                logger.debug("REDIRECT (SHOULD BE NULL) {}", req.getSession().getAttribute("redirect"));
-            } else {
-                logger.debug("NEED TO REDIRECT");
-                req.getSession().setAttribute("redirect", req.getContextPath().concat(req.getPathInfo()));
-                req.getRequestDispatcher("/servlet/profile/login").forward(servletRequest, servletResponse);
+            try {
+                logger.debug("ANONYMOUS URI = {}", UserService.getAnonymous().getRole().getUriList());
+                if (UserService.getAnonymous().getRole().getUriList().contains(req.getPathInfo())) {
+                    logger.debug("CONTAINS {}", req.getPathInfo());
+                    filterChain.doFilter(servletRequest, servletResponse);
+                    logger.debug("REDIRECT (SHOULD BE NULL) {}", req.getSession().getAttribute("redirect"));
+                } else {
+                    logger.debug("NEED TO REDIRECT");
+                    req.getSession().setAttribute("redirect", req.getContextPath().concat(req.getPathInfo()));
+                    req.getRequestDispatcher("/servlet/profile/login").forward(servletRequest, servletResponse);
+                }
+            } catch (ConnectionException | DaoException | SQLException e) {
+                throw new ServletException(e.getMessage());
             }
         } else {
             if (user.getRole().getUriList().contains(req.getPathInfo())) {

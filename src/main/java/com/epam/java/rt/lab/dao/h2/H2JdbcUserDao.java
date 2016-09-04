@@ -2,7 +2,6 @@ package com.epam.java.rt.lab.dao.h2;
 
 import com.epam.java.rt.lab.dao.Dao;
 import com.epam.java.rt.lab.dao.DaoException;
-import com.epam.java.rt.lab.entity.rbac.Login;
 import com.epam.java.rt.lab.entity.rbac.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,4 +33,5 @@ public class H2JdbcUserDao extends H2JdbcDao implements Dao {
         user.setLastName(resultSet.getString("last_name"));
         return user;
     }
+
 }

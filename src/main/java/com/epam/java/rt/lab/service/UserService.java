@@ -5,16 +5,15 @@ import com.epam.java.rt.lab.dao.Dao;
 import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.dao.factory.DaoFactory;
 import com.epam.java.rt.lab.entity.rbac.Login;
-import com.epam.java.rt.lab.entity.rbac.Permission;
-import com.epam.java.rt.lab.entity.rbac.Role;
 import com.epam.java.rt.lab.entity.rbac.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * service-ms
@@ -28,29 +27,50 @@ public class UserService extends BaseService {
         super();
     }
 
-    public User getUser(Login login) throws DaoException, SQLException, ConnectionException {
+    private Long loginId(Login login) {
+        if (login == null) return null;
+        return login.getId();
+    }
+
+    User getUser(Login login, Connection connection) throws DaoException, SQLException, ConnectionException {
         logger.debug("getUser");
-        Dao jdbcDao = null;
-        Connection connection = null;
+        Dao userDao = null;
         try {
-            jdbcDao = super.getJdbcDao();
-            logger.debug("jdbcDao = {}", jdbcDao.getClass().getSimpleName());
-            connection = DaoFactory.getDaoFactory().getConnection();
-            User user = jdbcDao.find(connection, "login_id", login.getId()).first();
+            userDao = super.getJdbcDao(connection);
+            logger.debug("userDao = {}", userDao.getClass().getSimpleName());
+            User user = userDao.query("*").filter("login_id", loginId(login)).first();
             if (user == null) return null;
             user.setLogin(login);
-            user.setRole((new RoleService()).getRole(jdbcDao.getResultSet().getLong("role_id")));
+            user.setRole((new RoleService())
+                    .getRole(userDao.getResultSet().getLong("role_id"), connection));
             logger.debug("user.name = {}, login = {}, role = {}",
-                    user.getName(), user.getLogin().getEmail(), user.getRole().getName());
+                    user.getName(), user.getLogin(), user.getRole().getName());
             return user;
         } finally {
-            if (connection != null) DaoFactory.getDaoFactory().releaseConnection(connection);
-            if (jdbcDao != null) jdbcDao.close();
+            if (userDao != null) userDao.close();
         }
     }
 
-    public static User getAnonymous() {
-        return new User(2L, "anonymous", "", "", null, RoleService.getAnonymous());
+    public User getUser(Login login) throws DaoException, SQLException, ConnectionException {
+        logger.debug("getUser");
+        Connection connection = null;
+        try {
+            connection = DaoFactory.getDaoFactory().getConnection();
+            return getUser(login, connection);
+        } finally {
+            if (connection != null) DaoFactory.getDaoFactory().releaseConnection(connection);
+        }
+    }
+
+    public static User getAnonymous() throws DaoException, SQLException, ConnectionException {
+        logger.debug("getAnonymous");
+        Connection connection = null;
+        try {
+            connection = DaoFactory.getDaoFactory().getConnection();
+            return (new UserService()).getUser(null, connection);
+        } finally {
+            if (connection != null) DaoFactory.getDaoFactory().releaseConnection(connection);
+        }
     }
 
     public static String getRememberCookieName() {

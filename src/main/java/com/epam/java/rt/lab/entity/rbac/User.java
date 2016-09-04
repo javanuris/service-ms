@@ -73,6 +73,10 @@ public class User extends BaseEntity {
     }
 
     public String getName() {
-        return firstName.concat(" ").concat(lastName);
+        String name = "";
+        if (firstName != null) name = name.concat(" ").concat(firstName);
+        if (middleName != null) name = name.concat(" ").concat(middleName);
+        if (lastName != null) name = name.concat(" ").concat(lastName);
+        return name.substring(1);
     }
 }

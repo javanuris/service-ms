@@ -2,20 +2,35 @@ package com.epam.java.rt.lab.dao;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.util.List;
 
 /**
  * service-ms
  */
 public interface Dao {
 
+    void setConnection(Connection connection);
+
+    Connection getConnection();
+
     void close() throws DaoException;
 
-    <T> T first() throws SQLException;
+    Dao query(String... fieldNameArray) throws DaoException;
 
-    ResultSet getResultSet() throws SQLException;
+    <T> Dao filter(String fieldName, T fieldValue) throws DaoException;
 
-    //CRUD
-    <T> Dao find(Connection connection, String columnName, T value) throws DaoException;
+    Dao join(String tableName) throws DaoException;
+
+    Dao join(String tableName, String alias) throws DaoException;
+
+    Dao on(String fieldName, String compareFieldName) throws DaoException;
+
+    Dao execute() throws DaoException;
+
+    <T> T first() throws DaoException;
+
+    <T> List<T> all() throws DaoException;
+
+    ResultSet getResultSet() throws DaoException;
 
 }

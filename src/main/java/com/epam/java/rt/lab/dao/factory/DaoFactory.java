@@ -44,7 +44,7 @@ public abstract class DaoFactory {
         }
     }
 
-    public abstract Dao getJdbcDao(String entityName) throws DaoException;
+    public abstract Dao getJdbcDao(String entityName, Connection connection) throws DaoException;
 
     public abstract Connection getConnection() throws SQLException;
 

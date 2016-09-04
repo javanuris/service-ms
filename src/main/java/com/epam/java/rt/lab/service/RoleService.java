@@ -5,7 +5,6 @@ import com.epam.java.rt.lab.dao.Dao;
 import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.dao.factory.DaoFactory;
 import com.epam.java.rt.lab.entity.rbac.Role;
-import com.epam.java.rt.lab.entity.rbac.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,31 +23,31 @@ public class RoleService extends BaseService {
         super();
     }
 
-    public Role getRole(Long id) throws DaoException, SQLException, ConnectionException {
+    Role getRole(Long id, Connection connection) throws DaoException, SQLException, ConnectionException {
         logger.debug("getRole");
-        Dao jdbcDao = null;
-        Connection connection = null;
+        Dao roleDao = null;
         try {
-            jdbcDao = super.getJdbcDao();
-            logger.debug("jdbcDao = {}", jdbcDao.getClass().getSimpleName());
-            connection = DaoFactory.getDaoFactory().getConnection();
-            Role role = jdbcDao.find(connection, "id", id).first();
+            roleDao = super.getJdbcDao(connection);
+            logger.debug("roleDao = {}", roleDao.getClass().getSimpleName());
+            Role role = roleDao.query("*").filter("id", id).first();
             if (role == null) return null;
+            PermissionService permissionService = new PermissionService();
+            role.setUriList(permissionService.getUriList(permissionService.getPermissionList(role.getId(), connection)));
             return role;
         } finally {
-            if (connection != null) DaoFactory.getDaoFactory().releaseConnection(connection);
-            if (jdbcDao != null) jdbcDao.close();
+            if (roleDao != null) roleDao.close();
         }
     }
 
-    public Role getRole(User user) {
-
-
-        Role role = new Role();
-        role.setId(1L);
-        role.setName("admin");
-        role.setUriList(PermissionService.getPermissionUriList(role));
-        return role;
+    public Role getRole(Long id) throws DaoException, SQLException, ConnectionException {
+        logger.debug("getRole({})", id);
+        Connection connection = null;
+        try {
+            connection = DaoFactory.getDaoFactory().getConnection();
+            return getRole(id, connection);
+        } finally {
+            if (connection != null) DaoFactory.getDaoFactory().releaseConnection(connection);
+        }
     }
 
     @Deprecated

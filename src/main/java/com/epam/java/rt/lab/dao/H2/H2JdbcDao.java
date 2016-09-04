@@ -2,7 +2,9 @@ package com.epam.java.rt.lab.dao.h2;
 
 import com.epam.java.rt.lab.dao.Dao;
 import com.epam.java.rt.lab.dao.DaoException;
-import com.epam.java.rt.lab.entity.rbac.Login;
+import com.epam.java.rt.lab.dao.h2.sql.Option;
+import com.epam.java.rt.lab.dao.h2.sql.Query;
+import com.epam.java.rt.lab.dao.h2.sql.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,9 +14,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.sql.*;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * service-ms
@@ -22,29 +22,45 @@ import java.util.Properties;
 public abstract class H2JdbcDao implements Dao {
     private static final Logger logger = LoggerFactory.getLogger(H2JdbcDao.class);
     private static Map<Type, Method> preparedStatementMethodMap = new HashMap<>();
+    private static String daoSelect;
+    private static String daoWhere;
     private static String daoCreate;
     private static String daoReadBy;
+    private static String daoReadJoin;
     private static String daoUpdate;
     private static String daoDelete;
-    private PreparedStatement preparedStatement;
+    private String sql = null;
+    private Query sqlQuery = null;
+    private Connection connection = null;
+    private PreparedStatement preparedStatement = null;
 
     public void resetProperties() throws DaoException {
-        if (daoCreate == null || daoReadBy == null || daoUpdate == null || daoDelete == null)
-            resetProperties("h2crud.properties");
+        if (daoSelect == null || daoWhere == null ||
+                daoCreate == null || daoReadBy == null || daoReadJoin == null || daoUpdate == null || daoDelete == null)
+            resetProperties("h2sql.properties");
     }
 
     public void resetProperties(String fileName) throws DaoException {
         try {
             Properties properties = new Properties();
             properties.load(H2JdbcDao.class.getClassLoader().getResourceAsStream(fileName));
+            Query.resetProperties(properties);
+
+            String daoSelect = properties.getProperty("dao.select");
+            String daoWhere = properties.getProperty("dao.where");
             String daoCreate = properties.getProperty("dao.create");
             String daoReadBy = properties.getProperty("dao.read.by");
+            String daoReadJoin = properties.getProperty("dao.read.join");
             String daoUpdate = properties.getProperty("dao.update");
             String daoDelete = properties.getProperty("dao.delete");
-            if (daoCreate == null || daoReadBy == null || daoUpdate == null || daoDelete == null)
+            if (daoSelect == null || daoWhere == null ||
+                    daoCreate == null || daoReadBy == null || daoReadJoin == null || daoUpdate == null || daoDelete == null)
                 throw new DaoException("h2 database CRUD properties error");
+            H2JdbcDao.daoSelect = daoSelect;
+            H2JdbcDao.daoWhere = daoWhere;
             H2JdbcDao.daoCreate = daoCreate;
             H2JdbcDao.daoReadBy = daoReadBy;
+            H2JdbcDao.daoReadJoin = daoReadJoin;
             H2JdbcDao.daoUpdate = daoUpdate;
             H2JdbcDao.daoDelete = daoDelete;
             setPreparedStatementMethodMap();
@@ -85,10 +101,6 @@ public abstract class H2JdbcDao implements Dao {
         }
     }
 
-    static String getDaoReadBy() {
-        return daoReadBy;
-    }
-
     static Method getPreparedStatementMethod(Type valueType) {
         return preparedStatementMethodMap.get(valueType);
     }
@@ -96,6 +108,16 @@ public abstract class H2JdbcDao implements Dao {
     abstract String getEntityTableName();
 
     abstract Object getEntity(ResultSet resultSet) throws SQLException;
+
+    @Override
+    public void setConnection(Connection connection) {
+        this.connection = connection;
+    }
+
+    @Override
+    public Connection getConnection() {
+        return connection;
+    }
 
     @Override
     public void close() throws DaoException {
@@ -107,42 +129,109 @@ public abstract class H2JdbcDao implements Dao {
     }
 
     @Override
-    public ResultSet getResultSet() throws SQLException {
-        if (preparedStatement == null) return null;
-        return preparedStatement.getResultSet();
+    public ResultSet getResultSet() throws DaoException {
+        try {
+            if (sqlQuery != null) executeQuery();
+            if (preparedStatement == null) throw new DaoException("Result set not defined");
+            return preparedStatement.getResultSet();
+        } catch (SQLException e) {
+            throw new DaoException(e.getMessage());
+        }
     }
 
     @Override
-    public <T> T first() throws SQLException {
+    public Dao query(String... fieldNameArray) throws DaoException {
+        logger.debug("query > {}", fieldNameArray.toString());
+        sqlQuery = new Query();
+        sqlQuery.setTableName(getEntityTableName());
+        for (String column : fieldNameArray) sqlQuery.addColumn(column);
+        return this;
+    }
+
+    @Override
+    public <T> Dao filter(String fieldName, T fieldValue) throws DaoException {
+        logger.debug("filter > {}, {}", fieldName, fieldValue);
+        if (fieldValue == null) {
+            sqlQuery.addWhere(new Option(fieldName, null));
+        } else {
+            sqlQuery.addWhere(new Option(fieldName), new Value(fieldValue));
+        }
+        return this;
+    }
+
+    @Override
+    public Dao join(String tableName) throws DaoException {
+        sqlQuery.addJoin(tableName);
+        return this;
+    }
+
+    @Override
+    public Dao join(String tableName, String alias) throws DaoException {
+        sqlQuery.addJoin(tableName, alias);
+        return this;
+    }
+
+    @Override
+    public Dao on(String fieldName, String compareFieldName) throws DaoException {
+        sqlQuery.addOn(new Option(fieldName, compareFieldName));
+        return this;
+    }
+
+    private void executeQuery() throws DaoException {
+        logger.debug("executeQuery > {}", sqlQuery.create());
         try {
-            if (preparedStatement == null) return null;
-            ResultSet resultSet = preparedStatement.getResultSet();
+            if (sqlQuery != null) {
+                if (preparedStatement != null) preparedStatement.close();
+                preparedStatement = connection.prepareStatement(sqlQuery.create());
+                int index = 1;
+                Method method;
+                for (Value value : sqlQuery.getValueList()) {
+                    method = H2JdbcDao.getPreparedStatementMethod(value.get().getClass());
+                    if (method == null) throw new DaoException("Prepared statement method not found");
+                    method.invoke(preparedStatement, index, value.get());
+                    index++;
+                }
+                preparedStatement.executeQuery();
+                sqlQuery = null;
+            }
+        } catch (IllegalAccessException | SQLException | InvocationTargetException e) {
+            throw new DaoException(e.getMessage());
+        }
+    }
+
+    @Override
+    public Dao execute() throws DaoException {
+        logger.debug("execute >");
+        executeQuery();
+        return this;
+    }
+
+    @Override
+    public <T> T first() throws DaoException {
+        try {
+            ResultSet resultSet = getResultSet();
             logger.debug("resultSet = {}", resultSet);
             if (resultSet == null || !resultSet.first()) return null;
             return (T) getEntity(resultSet);
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DaoException(e.getMessage());
         }
-        return null;
     }
 
     @Override
-    public <T> Dao find(Connection connection, String fieldName, T fieldValue) throws DaoException {
-        logger.debug("find > {}, {}", fieldName, fieldValue);
+    public <T> List<T> all() throws DaoException {
         try {
-            String sql = H2JdbcDao.getDaoReadBy();
-            sql = sql.replaceFirst("\\?", "*");
-            sql = sql.replaceFirst("\\?", getEntityTableName());
-            sql = sql.replaceFirst("\\?", fieldName.concat(" = ?"));
-            logger.debug("sql = {}", sql);
-            if (preparedStatement != null) preparedStatement.close();
-            preparedStatement = connection.prepareStatement(sql);
-            Method method = H2JdbcDao.getPreparedStatementMethod(fieldValue.getClass());
-            if (method == null) throw new DaoException("Prepared statement method not found");
-            method.invoke(preparedStatement, 1, fieldValue);
-            preparedStatement.executeQuery();
-            return this;
-        } catch (SQLException | InvocationTargetException | IllegalAccessException e) {
+            ResultSet resultSet = getResultSet();
+            logger.debug("resultSet = {}", resultSet);
+            if (resultSet == null) return null;
+            List<T> entityList = new ArrayList<T>();
+            T entity;
+            while(resultSet.next()) {
+                entity = (T) getEntity(resultSet);
+                entityList.add(entity);
+            }
+            return entityList;
+        } catch (SQLException e) {
             throw new DaoException(e.getMessage());
         }
     }
