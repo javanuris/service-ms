@@ -1,10 +1,10 @@
-package com.epam.java.rt.lab.dao.h2error;
+package com.epam.java.rt.lab.dao.h2;
 
 import com.epam.java.rt.lab.dao.Dao;
 import com.epam.java.rt.lab.dao.DaoException;
-import com.epam.java.rt.lab.dao.h2error.sql.Option;
-import com.epam.java.rt.lab.dao.h2error.sql.Query;
-import com.epam.java.rt.lab.dao.h2error.sql.Value;
+import com.epam.java.rt.lab.dao.h2.sql.Option;
+import com.epam.java.rt.lab.dao.h2.sql.Query;
+import com.epam.java.rt.lab.dao.h2.sql.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,7 +55,7 @@ public abstract class H2JdbcDao implements Dao {
             String daoDelete = properties.getProperty("dao.delete");
             if (daoSelect == null || daoWhere == null ||
                     daoCreate == null || daoReadBy == null || daoReadJoin == null || daoUpdate == null || daoDelete == null)
-                throw new DaoException("h2error database CRUD properties error");
+                throw new DaoException("h2 database CRUD properties error");
             H2JdbcDao.daoSelect = daoSelect;
             H2JdbcDao.daoWhere = daoWhere;
             H2JdbcDao.daoCreate = daoCreate;
