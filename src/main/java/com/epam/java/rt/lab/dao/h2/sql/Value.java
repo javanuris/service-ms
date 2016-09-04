@@ -1,4 +1,4 @@
-package com.epam.java.rt.lab.dao.H2.sql;
+package com.epam.java.rt.lab.dao.h2.sql;
 
 /**
  * service-ms
