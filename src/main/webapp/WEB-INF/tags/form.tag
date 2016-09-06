@@ -11,9 +11,18 @@
                         <div class="alert alert-danger"><fmt:message bundle="${ui}" key="${message}"/></div>
                     </c:forEach>
                 </c:if>
-                <button type="${item.type}" class="btn btn-default col-xs-12" id="${item.label}">
-                    <fmt:message bundle="${ui}" key="${item.label}"/>
-                </button>
+                <c:choose>
+                    <c:when test="${item.type.equals('submit')}">
+                        <button type="${item.type}" class="btn btn-default col-xs-12" id="${item.label}">
+                            <fmt:message bundle="${ui}" key="${item.label}"/>
+                        </button>
+                    </c:when>
+                    <c:when test="${item.type.equals('button')}">
+                        <a href="${item.value}" role="${item.type}" class="btn btn-default col-xs-12" id="${item.label}">
+                            <fmt:message bundle="${ui}" key="${item.label}"/>
+                        </a>
+                    </c:when>
+                </c:choose>
             </c:when>
             <c:when test="${item.type.equals('checkbox')}">
                 <div class="form-group">

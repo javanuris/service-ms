@@ -77,10 +77,10 @@ public class LoginAction implements Action {
                     } else {
                         logger.debug("GRANTED");
                         req.getSession().removeAttribute("loginForm");
-                        UserService userService = new UserService();
-                        User user = userService.getUser(login);
+                        User user = (new UserService()).getUser(login);
                         if (user == null) throw new ActionException("profile.login.message.user-not-found");
-                        req.getSession().setAttribute("user", user);
+                        req.getSession().setAttribute("userId", user.getId());
+                        req.getSession().setAttribute("userName", user.getName());
                         req.getSession().setAttribute("navbarItemArray", NavbarComponent.getNavbarItemArray(user.getRole()));
                         logger.debug("REMEMBER = {}", formComponent.getFormItemArray()[2].getValue());
                         if (formComponent.getFormItemArray()[2].getValue() != null) {
@@ -88,7 +88,7 @@ public class LoginAction implements Action {
                             ResponseCookie.setCookie(
                                     resp,
                                     UserService.getRememberCookieName(),
-                                    UserService.setRememberUser(user),
+                                    UserService.setRememberUserId(user.getId()),
                                     2592000, req.getContextPath().concat("/"));
                         }
                         String redirect = (String) req.getSession().getAttribute("redirect");

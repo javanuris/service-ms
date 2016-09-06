@@ -23,6 +23,7 @@ public class UrlFilter implements Filter {
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)
             throws IOException, ServletException {
+        servletRequest.setAttribute("debugMode", true);
         String requestURI = ((HttpServletRequest) servletRequest).getRequestURI()
                 .substring(((HttpServletRequest) servletRequest).getContextPath().length());
         logger.debug(requestURI);

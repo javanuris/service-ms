@@ -48,4 +48,31 @@ public class LoginService extends BaseService {
         }
     }
 
+    Login getLogin(Long id, Connection connection)
+            throws DaoException, SQLException, ConnectionException {
+        logger.debug("getLogin");
+        Dao jdbcDao = null;
+        try {
+            jdbcDao = super.getJdbcDao(connection);
+            logger.debug("jdbcDao = {}", jdbcDao.getClass().getSimpleName());
+            Login login = jdbcDao.query("*").filter("id", id).first();
+            if (login == null) return null;
+            logger.debug("login.email = {}", login.getEmail());
+            return login;
+        } finally {
+            if (jdbcDao != null) jdbcDao.close();
+        }
+    }
+
+    public Login getLogin(Long id) throws DaoException, SQLException, ConnectionException {
+        logger.debug("getLogin");
+        Connection connection = null;
+        try {
+            connection = DaoFactory.getDaoFactory().getConnection();
+            return getLogin(id, connection);
+        } finally {
+            if (connection != null) DaoFactory.getDaoFactory().releaseConnection(connection);
+        }
+    }
+
 }

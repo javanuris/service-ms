@@ -32,44 +32,49 @@ public class RBACFilter implements Filter {
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)
             throws IOException, ServletException {
         logger.debug("RBAC");
-        HttpServletRequest req = (HttpServletRequest) servletRequest;
-        User user = (User) req.getSession().getAttribute("user");
-        if (user == null) {
-            logger.debug("TRYING TO GET USER FROM COOKIE");
-            Cookie rememberUserCookie = ResponseCookie.getCookie(req, UserService.getRememberCookieName());
-            if (rememberUserCookie != null) user = UserService.getRememberUser(rememberUserCookie.getValue());
-            if (user != null) {
-                req.getSession().setAttribute("user", user);
-                req.getSession().setAttribute("navbarItemArray", NavbarComponent.getNavbarItemArray(user.getRole()));
-            }
-            logger.debug("USER FROM COOKIE ({})", user);
-        }
-        logger.debug("user = {}", user);
-        if (user == null) {
-            try {
-                logger.debug("ANONYMOUS URI = {}", UserService.getAnonymous().getRole().getUriList());
-                if (UserService.getAnonymous().getRole().getUriList().contains(req.getPathInfo())) {
-                    logger.debug("CONTAINS {}", req.getPathInfo());
-                    filterChain.doFilter(servletRequest, servletResponse);
-                    logger.debug("REDIRECT (SHOULD BE NULL) {}", req.getSession().getAttribute("redirect"));
-                } else {
-                    logger.debug("NEED TO REDIRECT");
-                    req.getSession().setAttribute("redirect", req.getContextPath().concat(req.getPathInfo()));
-                    req.getRequestDispatcher("/servlet/profile/login").forward(servletRequest, servletResponse);
+        try {
+            HttpServletRequest req = (HttpServletRequest) servletRequest;
+            Long userId = (Long) req.getSession().getAttribute("userId");
+            if (userId == null) {
+                logger.debug("TRYING TO GET USER FROM COOKIE");
+                Cookie rememberUserCookie = ResponseCookie.getCookie(req, UserService.getRememberCookieName());
+                if (rememberUserCookie != null) userId = UserService.getRememberUserId(rememberUserCookie.getValue());
+                if (userId != null) {
+                    req.getSession().setAttribute("userId", userId);
+                    User user = (new UserService()).getUser(userId);
+                    req.getSession().setAttribute("navbarItemArray", NavbarComponent.getNavbarItemArray(user.getRole()));
+                    logger.debug("USER FROM COOKIE ({})", user);
                 }
-            } catch (ConnectionException | DaoException | SQLException e) {
-                throw new ServletException(e.getMessage());
             }
-        } else {
-            if (user.getRole().getUriList().contains(req.getPathInfo())) {
-                filterChain.doFilter(servletRequest, servletResponse);
+            if (userId == null) {
+                try {
+                    logger.debug("ANONYMOUS URI = {}", UserService.getAnonymous().getRole().getUriList());
+                    if (UserService.getAnonymous().getRole().getUriList().contains(req.getPathInfo())) {
+                        logger.debug("CONTAINS {}", req.getPathInfo());
+                        filterChain.doFilter(servletRequest, servletResponse);
+                        logger.debug("REDIRECT (SHOULD BE NULL) {}", req.getSession().getAttribute("redirect"));
+                    } else {
+                        logger.debug("NEED TO REDIRECT");
+                        req.getSession().setAttribute("redirect", req.getContextPath().concat(req.getPathInfo()));
+                        req.getRequestDispatcher("/servlet/profile/login").forward(servletRequest, servletResponse);
+                    }
+                } catch (ConnectionException | DaoException | SQLException e) {
+                    throw new ServletException(e.getMessage());
+                }
             } else {
-                if (req.getPathInfo().equals("/profile/login")) {
-                    ((HttpServletResponse) servletResponse).sendRedirect("/profile/view");
+                User user = (new UserService()).getUser(userId);
+                if (user.getRole().getUriList().contains(req.getPathInfo())) {
+                    filterChain.doFilter(servletRequest, servletResponse);
                 } else {
-                    ((HttpServletResponse) servletResponse).sendError(403);
+                    if (req.getPathInfo().equals("/profile/login")) {
+                        ((HttpServletResponse) servletResponse).sendRedirect("/profile/view");
+                    } else {
+                        ((HttpServletResponse) servletResponse).sendError(403);
+                    }
                 }
             }
+        } catch (DaoException | SQLException | ConnectionException e) {
+            throw new ServletException(e.getMessage());
         }
     }
 

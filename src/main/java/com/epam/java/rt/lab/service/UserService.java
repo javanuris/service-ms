@@ -21,7 +21,7 @@ import java.util.UUID;
 public class UserService extends BaseService {
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
     private static final UUID REMEMBER_COOKIE_NAME = UUID.randomUUID();
-    private static Map<UUID, User> rememberUserMap = new HashMap<>();
+    private static Map<UUID, Long> rememberUserIdMap = new HashMap<>();
 
     public UserService() throws DaoException {
         super();
@@ -67,7 +67,38 @@ public class UserService extends BaseService {
         Connection connection = null;
         try {
             connection = DaoFactory.getDaoFactory().getConnection();
-            return (new UserService()).getUser(null, connection);
+            return (new UserService()).getUser((Login) null, connection);
+        } finally {
+            if (connection != null) DaoFactory.getDaoFactory().releaseConnection(connection);
+        }
+    }
+
+    User getUser(Long id, Connection connection) throws DaoException, SQLException, ConnectionException {
+        logger.debug("getUser");
+        Dao userDao = null;
+        try {
+            userDao = super.getJdbcDao(connection);
+            logger.debug("userDao = {}", userDao.getClass().getSimpleName());
+            User user = userDao.query("*").filter("id", id).first();
+            if (user == null) return null;
+            user.setLogin((new LoginService()
+                    .getLogin(userDao.getResultSet().getLong("login_id"), connection)));
+            user.setRole((new RoleService())
+                    .getRole(userDao.getResultSet().getLong("role_id"), connection));
+            logger.debug("user.name = {}, login = {}, role = {}",
+                    user.getName(), user.getLogin(), user.getRole().getName());
+            return user;
+        } finally {
+            if (userDao != null) userDao.close();
+        }
+    }
+
+    public User getUser(Long id) throws DaoException, SQLException, ConnectionException {
+        logger.debug("getUser");
+        Connection connection = null;
+        try {
+            connection = DaoFactory.getDaoFactory().getConnection();
+            return getUser(id, connection);
         } finally {
             if (connection != null) DaoFactory.getDaoFactory().releaseConnection(connection);
         }
@@ -77,23 +108,23 @@ public class UserService extends BaseService {
         return UserService.REMEMBER_COOKIE_NAME.toString();
     }
 
-    public static String setRememberUser(User user) {
-        if (rememberUserMap.containsValue(user)) {
-            for (Map.Entry<UUID, User> entry : rememberUserMap.entrySet()) {
-                if (entry.getValue() == user) {
-                    rememberUserMap.remove(entry.getKey());
+    public static String setRememberUserId(Long id) {
+        if (rememberUserIdMap.containsValue(id)) {
+            for (Map.Entry<UUID, Long> entry : rememberUserIdMap.entrySet()) {
+                if (entry.getValue() == id) {
+                    rememberUserIdMap.remove(entry.getKey());
                     break;
                 }
             }
         }
         UUID uuid = UUID.randomUUID();
-        while (rememberUserMap.containsKey(uuid)) uuid = UUID.randomUUID();
-        rememberUserMap.put(uuid, user);
+        while (rememberUserIdMap.containsKey(uuid)) uuid = UUID.randomUUID();
+        rememberUserIdMap.put(uuid, id);
         return uuid.toString();
     }
 
-    public static User getRememberUser(String rememberCookieValue) {
-        return rememberUserMap.get(UUID.fromString(rememberCookieValue));
+    public static Long getRememberUserId(String rememberCookieValue) {
+        return rememberUserIdMap.get(UUID.fromString(rememberCookieValue));
     }
 
 }

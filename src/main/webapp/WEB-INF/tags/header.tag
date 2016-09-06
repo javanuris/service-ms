@@ -28,20 +28,20 @@
                 </ul>
             </c:if>
             <ul class="nav navbar-nav navbar-right">
-                <c:if test="${sessionScope.user != null}">
+                <c:if test="${sessionScope.userId != null}">
                     <c:choose>
                         <c:when test="${navbarCurrent.equals('/profile/view')}">
-                            <li><a href="#">${sessionScope.user.name}</a></li>
+                            <li><a href="#">${sessionScope.userName}</a></li>
                         </c:when>
                         <c:otherwise>
-                            <li><a href="${pageContext.request.contextPath}/profile/login">${sessionScope.user.name}</a></li>
+                            <li><a href="${pageContext.request.contextPath}/profile/view">${sessionScope.userName}</a></li>
                         </c:otherwise>
                     </c:choose>
                     <li><a href="${pageContext.request.contextPath}/profile/logout">
                         <span class="glyphicon glyphicon-log-out" aria-hidden="true"></span>
                     </a></li>
                 </c:if>
-                <c:if test="${sessionScope.user == null}">
+                <c:if test="${sessionScope.userId == null}">
                     <c:choose>
                         <c:when test="${navbarCurrent.equals('/profile/login')}">
                             <li><a href="#">
