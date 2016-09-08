@@ -31,4 +31,9 @@ public class H2JdbcRoleDao extends H2JdbcDao implements Dao {
         role.setName(resultSet.getString("name"));
         return role;
     }
+
+    @Override
+    <T> T getValue(Object entity, String columnName) throws DaoException {
+        return null;
+    }
 }

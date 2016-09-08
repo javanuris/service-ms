@@ -33,4 +33,8 @@ public interface Dao {
 
     ResultSet getResultSet() throws DaoException;
 
+    Dao update(String... fieldNameArray) throws DaoException;
+
+    <T> Dao set(T entity) throws DaoException;
+
 }

@@ -34,4 +34,21 @@ public class H2JdbcLoginDao extends H2JdbcDao implements Dao {
         login.setStatus(resultSet.getInt("status"));
         return login;
     }
+
+    @Override
+    <T> T getValue(Object entity, String columnName) throws DaoException {
+        Login login = (Login) entity;
+        if (columnName.equals("id")) {
+            return (T) login.getId();
+        } else if (columnName.equals("email")) {
+            return (T) login.getEmail();
+        } else if (columnName.equals("password")) {
+            return (T) login.getPassword();
+        } else if (columnName.equals("attempt_left")) {
+            return (T) Integer.valueOf(login.getAttemptLeft());
+        } else if (columnName.equals("status")) {
+            return (T) Integer.valueOf(login.getStatus());
+        }
+        throw new DaoException("Field assigned to column");
+    }
 }

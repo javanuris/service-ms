@@ -1,10 +1,10 @@
 package com.epam.java.rt.lab.dao.h2;
 
+import com.epam.java.rt.lab.action.ActionException;
 import com.epam.java.rt.lab.dao.Dao;
 import com.epam.java.rt.lab.dao.DaoException;
-import com.epam.java.rt.lab.dao.h2.sql.Option;
-import com.epam.java.rt.lab.dao.h2.sql.Query;
-import com.epam.java.rt.lab.dao.h2.sql.Value;
+import com.epam.java.rt.lab.dao.h2.sql.*;
+import com.epam.java.rt.lab.dao.h2.sql.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,6 +22,7 @@ import java.util.*;
 public abstract class H2JdbcDao implements Dao {
     private static final Logger logger = LoggerFactory.getLogger(H2JdbcDao.class);
     private static Map<Type, Method> preparedStatementMethodMap = new HashMap<>();
+    enum QueryType {SELECT, UPDATE};
     private static String daoSelect;
     private static String daoWhere;
     private static String daoCreate;
@@ -29,7 +30,7 @@ public abstract class H2JdbcDao implements Dao {
     private static String daoReadJoin;
     private static String daoUpdate;
     private static String daoDelete;
-    private String sql = null;
+    private QueryType queryType = null;
     private Query sqlQuery = null;
     private Connection connection = null;
     private PreparedStatement preparedStatement = null;
@@ -131,7 +132,7 @@ public abstract class H2JdbcDao implements Dao {
     @Override
     public ResultSet getResultSet() throws DaoException {
         try {
-            if (sqlQuery != null) executeQuery();
+            if (sqlQuery != null) executeSqlQuery();
             if (preparedStatement == null) throw new DaoException("Result set not defined");
             return preparedStatement.getResultSet();
         } catch (SQLException e) {
@@ -142,6 +143,7 @@ public abstract class H2JdbcDao implements Dao {
     @Override
     public Dao query(String... fieldNameArray) throws DaoException {
         logger.debug("query > {}", fieldNameArray.toString());
+        queryType = QueryType.SELECT;
         sqlQuery = new Query();
         sqlQuery.setTableName(getEntityTableName());
         for (String column : fieldNameArray) sqlQuery.addColumn(column);
@@ -177,21 +179,32 @@ public abstract class H2JdbcDao implements Dao {
         return this;
     }
 
-    private void executeQuery() throws DaoException {
-        logger.debug("executeQuery > {}", sqlQuery.create());
+    private void setPreparedStatementValues()
+            throws InvocationTargetException, IllegalAccessException, DaoException {
+        int index = 1;
+        Method method;
+        for (Value value : sqlQuery.getValueList()) {
+            method = H2JdbcDao.getPreparedStatementMethod(value.get().getClass());
+            if (method == null) throw new DaoException("Prepared statement method not found");
+            method.invoke(preparedStatement, index, value.get());
+            index++;
+        }
+    }
+
+    private void executeSqlQuery() throws DaoException {
         try {
             if (sqlQuery != null) {
                 if (preparedStatement != null) preparedStatement.close();
-                preparedStatement = connection.prepareStatement(sqlQuery.create());
-                int index = 1;
-                Method method;
-                for (Value value : sqlQuery.getValueList()) {
-                    method = H2JdbcDao.getPreparedStatementMethod(value.get().getClass());
-                    if (method == null) throw new DaoException("Prepared statement method not found");
-                    method.invoke(preparedStatement, index, value.get());
-                    index++;
+                if (queryType == QueryType.SELECT) {
+                    preparedStatement = connection.prepareStatement(sqlQuery.select());
+                    setPreparedStatementValues();
+                    preparedStatement.executeQuery();
+                } else if (queryType == QueryType.UPDATE){
+                    preparedStatement = connection.prepareStatement(sqlQuery.update());
+                    setPreparedStatementValues();
+                    if (preparedStatement.executeUpdate() != 1)
+                        throw new DaoException("No data updated");
                 }
-                preparedStatement.executeQuery();
                 sqlQuery = null;
             }
         } catch (IllegalAccessException | SQLException | InvocationTargetException e) {
@@ -202,7 +215,7 @@ public abstract class H2JdbcDao implements Dao {
     @Override
     public Dao execute() throws DaoException {
         logger.debug("execute >");
-        executeQuery();
+        executeSqlQuery();
         return this;
     }
 
@@ -234,6 +247,26 @@ public abstract class H2JdbcDao implements Dao {
         } catch (SQLException e) {
             throw new DaoException(e.getMessage());
         }
+    }
+
+    @Override
+    public Dao update(String... fieldNameArray) throws DaoException {
+        queryType = QueryType.UPDATE;
+        sqlQuery = new Query();
+        sqlQuery.setTableName(getEntityTableName());
+        for (String column : fieldNameArray) sqlQuery.addColumn(column);
+        return this;
+    }
+
+    abstract <T> T getValue(Object entity, String columnName) throws DaoException;
+
+    @Override
+    public <T> Dao set(T entity) throws DaoException {
+        for (String setItem : sqlQuery.getColumnList()) {
+            sqlQuery.addSet(new Set(setItem));
+            sqlQuery.addValue(new Value(getValue(entity, setItem)));
+        }
+        return this;
     }
 
 }

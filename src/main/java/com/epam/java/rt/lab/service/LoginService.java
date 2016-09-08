@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
@@ -71,6 +72,24 @@ public class LoginService extends BaseService {
             connection = DaoFactory.getDaoFactory().getConnection();
             return getLogin(id, connection);
         } finally {
+            if (connection != null) DaoFactory.getDaoFactory().releaseConnection(connection);
+        }
+    }
+
+    public int updatePassword(Login login)
+            throws DaoException, SQLException, ConnectionException {
+        logger.debug("updateLogin");
+        Connection connection = null;
+        Dao jdbcDao = null;
+        try {
+            connection = DaoFactory.getDaoFactory().getConnection();
+            jdbcDao = super.getJdbcDao(connection);
+            logger.debug("jdbcDao = {}", jdbcDao.getClass().getSimpleName());
+            ResultSet resultSet = jdbcDao.update("password").set(login).execute().getResultSet();
+            resultSet.last();
+            return resultSet.getRow();
+        } finally {
+            if (jdbcDao != null) jdbcDao.close();
             if (connection != null) DaoFactory.getDaoFactory().releaseConnection(connection);
         }
     }

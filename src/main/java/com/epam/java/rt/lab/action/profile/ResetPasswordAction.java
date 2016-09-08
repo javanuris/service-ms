@@ -68,38 +68,22 @@ public class ResetPasswordAction implements Action {
                     formItem.setValue(req.getParameter(formItem.getLabel()));
                 if (FormValidator.validate(formComponent.getFormItemArray())) {
                     logger.debug("VALID");
-                    LoginService loginService = new LoginService();
-                    Login login = loginService.getLogin(
-                            formComponent.getFormItemArray()[0].getValue(),
-                            formComponent.getFormItemArray()[1].getValue());
+                    if (!formComponent.getFormItemArray()[0].getValue().equals(formComponent.getFormItemArray()[1].getValue())) {
+                        String[] validationMessageArray = {"profile.reset-password.confirm.error-not-equal"};
+                        formComponent.getFormItemArray()[1].setValidationMessageArray(validationMessageArray);
+                        return;
+                    }
+                    User user = new UserService().getUser((Long) req.getSession().getAttribute("userId"));
+                    Login  login = new LoginService().getLogin(user.getLogin().getEmail(), formComponent.getFormItemArray()[2].getValue());
                     if (login == null) {
                         logger.debug("DENIED");
-                        String[] validationMessageArray = {"profile.login.submit.error-auth"};
+                        String[] validationMessageArray = {"profile.reset-password.submit.error-reset-password"};
                         formComponent.getFormItemArray()[3].setValidationMessageArray(validationMessageArray);
                     } else {
                         logger.debug("GRANTED");
-                        req.getSession().removeAttribute("profileForm");
-                        User user = (new UserService()).getUser(login);
-                        if (user == null) throw new ActionException("profile.login.message.user-not-found");
-                        req.getSession().setAttribute("userId", user.getId());
-                        req.getSession().setAttribute("userName", user.getName());
-                        req.getSession().setAttribute("navbarItemArray", NavbarComponent.getNavbarItemArray(user.getRole()));
-                        logger.debug("REMEMBER = {}", formComponent.getFormItemArray()[2].getValue());
-                        if (formComponent.getFormItemArray()[2].getValue() != null) {
-                            logger.debug("REMEMBERING USER");
-                            ResponseCookie.setCookie(
-                                    resp,
-                                    UserService.getRememberCookieName(),
-                                    UserService.setRememberUserId(user.getId()),
-                                    2592000, req.getContextPath().concat("/"));
-                        }
-                        String redirect = (String) req.getSession().getAttribute("redirect");
-                        req.getSession().removeAttribute("redirect");
-                        req.getSession().removeAttribute("loginForm");
-                        if (redirect == null) redirect = req.getContextPath().concat("/");
-                        logger.debug("REDIRECTING ({})", redirect);
-                        resp.sendRedirect(redirect);
-                        logger.debug("REDIRECTED");
+                        req.getSession().removeAttribute("resetPasswordForm");
+                        login.setPassword(formComponent.getFormItemArray()[0].getValue());
+                        resp.sendRedirect(req.getContextPath().concat("/profile/view"));
                         return;
                     }
                 }

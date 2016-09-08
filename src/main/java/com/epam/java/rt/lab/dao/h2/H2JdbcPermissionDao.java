@@ -31,4 +31,9 @@ public class H2JdbcPermissionDao extends H2JdbcDao implements Dao {
         permission.setUri(resultSet.getString("uri"));
         return permission;
     }
+
+    @Override
+    <T> T getValue(Object entity, String columnName) throws DaoException {
+        return null;
+    }
 }

@@ -34,4 +34,8 @@ public class H2JdbcUserDao extends H2JdbcDao implements Dao {
         return user;
     }
 
+    @Override
+    <T> T getValue(Object entity, String columnName) throws DaoException {
+        return null;
+    }
 }

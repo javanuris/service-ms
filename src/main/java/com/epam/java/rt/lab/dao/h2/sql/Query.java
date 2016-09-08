@@ -14,12 +14,15 @@ public class Query {
     private static String daoFrom;
     private static String daoJoin;
     private static String daoWhere;
+    private static String daoUpdate;
+    private static String daoSet;
     private List<String> columnList = new ArrayList<>();
     private String tableName;
     private List<String> joinList = new ArrayList<>();
     private List<String> onList = new ArrayList<>();
     private List<String> whereList = new ArrayList<>();
     private List<Value> valueList = new ArrayList<>();
+    private List<String> setList = new ArrayList<>();
 
     public Query() {
     }
@@ -29,6 +32,8 @@ public class Query {
         daoFrom = properties.getProperty("dao.from");
         daoJoin = properties.getProperty("dao.join");
         daoWhere = properties.getProperty("dao.where");
+        daoUpdate = properties.getProperty("dao.update");
+        daoSet = properties.getProperty("dao.set");
     }
 
     public void setTableName(String tableName) throws DaoException {
@@ -85,7 +90,13 @@ public class Query {
         return result;
     }
 
-    public String create() throws DaoException {
+    public void addSet(Set set) throws DaoException {
+        if (tableName == null || columnList.size() == 0)
+            throw new DaoException("Query not initialized");
+        setList.add(set.toString());
+    }
+
+    public String select() throws DaoException {
         if (tableName == null || columnList.size() == 0)
             throw new DaoException("Query not initialized");
         StringBuilder sql = new StringBuilder();
@@ -104,8 +115,24 @@ public class Query {
         return sql.toString();
     }
 
+    public String update() throws DaoException {
+        if (tableName == null || columnList.size() == 0)
+            throw new DaoException("Query not initialized");
+        StringBuilder sql = new StringBuilder();
+        sql.append(daoUpdate).append(" \"").append(tableName).append("\"");
+        if (setList.size() > 0)
+            sql.append(" ").append(daoSet).append(" ").append(listToString(setList, ", "));
+        System.out.println(sql.toString());
+        return sql.toString();
+    }
+
+    public void addValue(Value value) {
+        valueList.add(value);
+    }
+
     public List<Value> getValueList() {
         return valueList;
     }
 
+    public List<String> getColumnList() { return columnList; }
 }
