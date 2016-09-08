@@ -31,7 +31,7 @@
                 <c:if test="${sessionScope.userId != null}">
                     <c:choose>
                         <c:when test="${navbarCurrent.equals('/profile/view')}">
-                            <li><a href="#">${sessionScope.userName}</a></li>
+                            <li class="active"><a href="#">${sessionScope.userName}</a></li>
                         </c:when>
                         <c:otherwise>
                             <li><a href="${pageContext.request.contextPath}/profile/view">${sessionScope.userName}</a></li>

@@ -24,27 +24,21 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 /**
- * Service Management System
+ * service-ms
  */
 @WebAction
-public class LoginAction implements Action {
+public class ResetPasswordAction implements Action {
     private static final Logger logger = LoggerFactory.getLogger(LoginAction.class);
 
     @Override
     public void execute(HttpServletRequest req, HttpServletResponse resp) throws ActionException {
+        FormComponent formComponent = (FormComponent) req.getSession().getAttribute("resetPasswordForm");
         try {
-            if (req.getSession().getAttribute("user") != null) {
-                logger.debug("REDIRECTING");
-                resp.sendRedirect("/profile/view");
-                logger.debug("REDIRECTED");
-                return;
-            }
-            FormComponent formComponent = (FormComponent) req.getSession().getAttribute("loginForm");
             if (req.getMethod().equals("GET")) {
                 logger.debug("GET");
-                if (UrlParameter.getUrlParameter(req, "register", null) != null) {
-                    req.getSession().removeAttribute("loginForm");
-                    resp.sendRedirect("/profile/register");
+                if (UrlParameter.getUrlParameter(req, "cancel", null) != null) {
+                    req.getSession().removeAttribute("resetPasswordForm");
+                    resp.sendRedirect("/profile/view");
                     return;
                 }
                 if (formComponent != null) {
@@ -53,22 +47,21 @@ public class LoginAction implements Action {
                         formItem.setValidationMessageArray(null);
                     }
                 } else {
-                    formComponent = new FormComponent("login", "/profile/login".concat
-                            (UrlParameter.combineUrlParameterFromAttribute(req, "redirect")),
+                    formComponent = new FormComponent("reset-password", "/profile/reset-password",
                             new FormComponent.FormItem
-                                    ("profile.login.email.label", "input", "profile.login.email.label", ""),
+                                    ("profile.reset-password.password.label", "password", "profile.reset-password.password.label", ""),
                             new FormComponent.FormItem
-                                    ("profile.login.password.label", "password", "profile.login.password.label", ""),
+                                    ("profile.reset-password.confirm.label", "password", "profile.reset-password.confirm.label", ""),
                             new FormComponent.FormItem
-                                    ("profile.login.remember.label", "checkbox", "profile.login.remember.label", ""),
+                                    ("profile.reset-password.old.label", "password", "profile.reset-password.old.label", ""),
                             new FormComponent.FormItem
-                                    ("profile.login.submit.label", "submit", "", ""),
+                                    ("profile.reset-password.submit.label", "submit", "", ""),
                             new FormComponent.FormItem
-                                    ("profile.login.register.label", "button", req.getContextPath().concat("/profile/login")
-                                            .concat(UrlParameter.combineUrlParameter(new UrlParameter.UrlParameterBuilder("register", "true"))), ""));
-                    req.getSession().setAttribute("loginForm", formComponent);
+                                    ("profile.reset-password.cancel.label", "button", req.getContextPath().concat("/profile/reset-password")
+                                            .concat(UrlParameter.combineUrlParameter(new UrlParameter.UrlParameterBuilder("cancel", "true"))), ""));
+                    req.getSession().setAttribute("resetPasswordForm", formComponent);
                 }
-                req.getRequestDispatcher("/WEB-INF/jsp/profile/login.jsp").forward(req, resp);
+                req.getRequestDispatcher("/WEB-INF/jsp/profile/reset-password.jsp").forward(req, resp);
             } else if (req.getMethod().equals("POST")) {
                 logger.debug("POST");
                 for (FormComponent.FormItem formItem : formComponent.getFormItemArray())
@@ -85,7 +78,7 @@ public class LoginAction implements Action {
                         formComponent.getFormItemArray()[3].setValidationMessageArray(validationMessageArray);
                     } else {
                         logger.debug("GRANTED");
-                        req.getSession().removeAttribute("loginForm");
+                        req.getSession().removeAttribute("profileForm");
                         User user = (new UserService()).getUser(login);
                         if (user == null) throw new ActionException("profile.login.message.user-not-found");
                         req.getSession().setAttribute("userId", user.getId());
@@ -100,7 +93,10 @@ public class LoginAction implements Action {
                                     UserService.setRememberUserId(user.getId()),
                                     2592000, req.getContextPath().concat("/"));
                         }
-                        String redirect = UrlParameter.getUrlParameter(req, "redirect", "/");
+                        String redirect = (String) req.getSession().getAttribute("redirect");
+                        req.getSession().removeAttribute("redirect");
+                        req.getSession().removeAttribute("loginForm");
+                        if (redirect == null) redirect = req.getContextPath().concat("/");
                         logger.debug("REDIRECTING ({})", redirect);
                         resp.sendRedirect(redirect);
                         logger.debug("REDIRECTED");
@@ -114,5 +110,4 @@ public class LoginAction implements Action {
             throw new ActionException(e.getMessage());
         }
     }
-
 }

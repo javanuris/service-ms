@@ -2,7 +2,7 @@
 <%@ taglib prefix="tags" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <tags:template>
-    <jsp:attribute name="title">title.profile.login</jsp:attribute>
+    <jsp:attribute name="title">title.profile.reset-password</jsp:attribute>
     <jsp:attribute name="navbarCurrent">/profile/login</jsp:attribute>
-    <jsp:body><tags:profile-form formComponent="${sessionScope.loginForm}"/></jsp:body>
+    <jsp:body><tags:profile-form formComponent="${sessionScope.resetPasswordForm}"/></jsp:body>
 </tags:template>

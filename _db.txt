@@ -4,9 +4,9 @@ drop table "Permission"; drop table "Role"; drop table "RolePermission"; drop ta
 
 //create tables
 create table if not exists "Permission" (id identity primary key, uri varchar(255));
-create table if not exists "Role" (id identity primary key, name unique varchar(255));
+create table if not exists "Role" (id identity primary key, name varchar(255) unique);
 create table if not exists "RolePermission" (id identity primary key, role_id bigint references "Role" (id), permission_id bigint references "Permission" (id));
-create table if not exists "Login" (id identity primary key, email unique varchar(255), password varchar(255), attempt_left int, status int);
+create table if not exists "Login" (id identity primary key, email varchar(255) unique, password varchar(255), attempt_left int, status int);
 create table if not exists "User" (id identity primary key, first_name varchar(255), middle_name varchar(255), last_name varchar(255), login_id bigint references "Login" (id), role_id bigint references "Role" (id));
 
 
@@ -15,7 +15,10 @@ delete from "Permission";
 insert into "Permission" (uri) values ('/');
 insert into "Permission" (uri) values ('/home');
 insert into "Permission" (uri) values ('/profile/login');
+insert into "Permission" (uri) values ('/profile/register');
 insert into "Permission" (uri) values ('/profile/view');
+insert into "Permission" (uri) values ('/profile/reset-password');
+insert into "Permission" (uri) values ('/profile/edit');
 insert into "Permission" (uri) values ('/profile/logout');
 insert into "Permission" (uri) values ('/application/list');
 insert into "Permission" (uri) values ('/execution/list');
@@ -28,10 +31,13 @@ delete from "RolePermission";
 insert into "RolePermission" (role_id, permission_id) values (select id from "Role" where name is 'anonymous', select id from "Permission" where uri is '/');
 insert into "RolePermission" (role_id, permission_id) values (select id from "Role" where name is 'anonymous', select id from "Permission" where uri is '/home');
 insert into "RolePermission" (role_id, permission_id) values (select id from "Role" where name is 'anonymous', select id from "Permission" where uri is '/profile/login');
+insert into "RolePermission" (role_id, permission_id) values (select id from "Role" where name is 'anonymous', select id from "Permission" where uri is '/profile/register');
 insert into "RolePermission" (role_id, permission_id) values (select id from "Role" where name is 'admin', select id from "Permission" where uri is '/');
 insert into "RolePermission" (role_id, permission_id) values (select id from "Role" where name is 'admin', select id from "Permission" where uri is '/home');
 insert into "RolePermission" (role_id, permission_id) values (select id from "Role" where name is 'admin', select id from "Permission" where uri is '/profile/login');
 insert into "RolePermission" (role_id, permission_id) values (select id from "Role" where name is 'admin', select id from "Permission" where uri is '/profile/view');
+insert into "RolePermission" (role_id, permission_id) values (select id from "Role" where name is 'admin', select id from "Permission" where uri is '/profile/reset-password');
+insert into "RolePermission" (role_id, permission_id) values (select id from "Role" where name is 'admin', select id from "Permission" where uri is '/profile/edit');
 insert into "RolePermission" (role_id, permission_id) values (select id from "Role" where name is 'admin', select id from "Permission" where uri is '/profile/logout');
 insert into "RolePermission" (role_id, permission_id) values (select id from "Role" where name is 'admin', select id from "Permission" where uri is '/application/list');
 insert into "RolePermission" (role_id, permission_id) values (select id from "Role" where name is 'admin', select id from "Permission" where uri is '/execution/list');
@@ -45,7 +51,8 @@ insert into "User" (first_name, middle_name, last_name, login_id, role_id) value
 //select data
 select r.id, r.name, p.id, p.uri from "Role" as r join "Permission" as p, "RolePermission" as rp where r.id = rp.role_id and p.id = rp.permission_id;
 select u.id, u.first_name, u.middle_name, u.last_name, r.id, r.name, p.id, p.uri from "User" as u join "Role" as r, "Permission" as p, "RolePermission" as rp where r.id = u.role_id and r.id=rp.role_id and p.id = rp.permission_id;
-select u.id, u.first_name, u.middle_name, u.last_name, l.email, l.password from "User" as u join "Login" as l where u.login_id = l.id or u.login_id is null;
+select u.id, u.first_name, u.middle_name, u.last_name, l.email, l.password from "User" as u join "Login" as l where u.login_id = l.id;
+select u.id, u.first_name, u.middle_name, u.last_name, u.login_id from "User" as u where u.login_id is null;
 
 //scenario #1
 

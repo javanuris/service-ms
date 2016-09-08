@@ -6,23 +6,25 @@
     <c:forEach var="item" items="${formComponent.formItemArray}">
         <c:choose>
             <c:when test="${item.type.equals('submit') || item.type.equals('button')}">
-                <c:if test="${not empty item.validationMessageArray}">
-                    <c:forEach var="message" items="${item.validationMessageArray}">
-                        <div class="alert alert-danger"><fmt:message bundle="${ui}" key="${message}"/></div>
-                    </c:forEach>
-                </c:if>
-                <c:choose>
-                    <c:when test="${item.type.equals('submit')}">
-                        <button type="${item.type}" class="btn btn-default col-xs-12" id="${item.label}">
-                            <fmt:message bundle="${ui}" key="${item.label}"/>
-                        </button>
-                    </c:when>
-                    <c:when test="${item.type.equals('button')}">
-                        <a href="${item.value}" role="${item.type}" class="btn btn-default col-xs-12" id="${item.label}">
-                            <fmt:message bundle="${ui}" key="${item.label}"/>
-                        </a>
-                    </c:when>
-                </c:choose>
+                <div class="col-xs-12" style="padding: 5px 0;">
+                    <c:if test="${not empty item.validationMessageArray}">
+                        <c:forEach var="message" items="${item.validationMessageArray}">
+                            <div class="alert alert-danger"><fmt:message bundle="${ui}" key="${message}"/></div>
+                        </c:forEach>
+                    </c:if>
+                    <c:choose>
+                        <c:when test="${item.type.equals('submit')}">
+                            <button type="${item.type}" class="btn btn-default col-xs-12" id="${item.label}">
+                                <fmt:message bundle="${ui}" key="${item.label}"/>
+                            </button>
+                        </c:when>
+                        <c:when test="${item.type.equals('button')}">
+                            <a href="${item.placeholder}" role="${item.type}" class="btn btn-default col-xs-12" id="${item.label}">
+                                <fmt:message bundle="${ui}" key="${item.label}"/>
+                            </a>
+                        </c:when>
+                    </c:choose>
+                </div>
             </c:when>
             <c:when test="${item.type.equals('checkbox')}">
                 <div class="form-group">

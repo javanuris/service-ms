@@ -17,7 +17,14 @@ public class ActionFactory {
     private static final Lock actionMapLock = new ReentrantLock();
 
     public static Action getAction(String pathInfo) throws ActionException {
-        String actionPath = pathInfo.replace("/", ".").substring(1);
+        int i = pathInfo.indexOf("-");
+        while (i > 0 && i < pathInfo.length()) {
+            pathInfo = pathInfo.substring(0, i)
+                    .concat(pathInfo.substring(i + 1, i + 2).toUpperCase())
+                    .concat(pathInfo.substring(i + 2));
+            i = pathInfo.indexOf("-", i);
+        }
+        String actionPath = pathInfo.substring(1).replace("/", ".");
         int actionNamePoint = actionPath.lastIndexOf(".") + 1;
         String actionPathAndName = actionPath.substring(0, actionNamePoint)
                 .concat(actionPath.substring(actionNamePoint, actionNamePoint + 1).toUpperCase())

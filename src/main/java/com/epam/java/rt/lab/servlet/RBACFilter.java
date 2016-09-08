@@ -5,6 +5,7 @@ import com.epam.java.rt.lab.connection.ConnectionException;
 import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.entity.rbac.User;
 import com.epam.java.rt.lab.service.UserService;
+import com.epam.java.rt.lab.util.UrlParameter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,6 +43,7 @@ public class RBACFilter implements Filter {
                 if (userId != null) {
                     req.getSession().setAttribute("userId", userId);
                     User user = (new UserService()).getUser(userId);
+                    req.getSession().setAttribute("userName", user.getName());
                     req.getSession().setAttribute("navbarItemArray", NavbarComponent.getNavbarItemArray(user.getRole()));
                     logger.debug("USER FROM COOKIE ({})", user);
                 }
@@ -55,8 +57,9 @@ public class RBACFilter implements Filter {
                         logger.debug("REDIRECT (SHOULD BE NULL) {}", req.getSession().getAttribute("redirect"));
                     } else {
                         logger.debug("NEED TO REDIRECT");
-                        req.getSession().setAttribute("redirect", req.getContextPath().concat(req.getPathInfo()));
-                        req.getRequestDispatcher("/servlet/profile/login").forward(servletRequest, servletResponse);
+                        ((HttpServletResponse) servletResponse).sendRedirect("/profile/login".concat
+                                (UrlParameter.combineUrlParameter(new UrlParameter.UrlParameterBuilder
+                                        ("redirect", req.getContextPath().concat(req.getPathInfo())))));
                     }
                 } catch (ConnectionException | DaoException | SQLException e) {
                     throw new ServletException(e.getMessage());

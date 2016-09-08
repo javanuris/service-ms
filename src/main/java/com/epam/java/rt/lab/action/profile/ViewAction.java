@@ -41,7 +41,7 @@ public class ViewAction implements Action {
                     new ViewComponent.ViewItem
                             ("profile.view.login-email.label", "input", user.getLogin().getEmail()),
                     new ViewComponent.ViewItem
-                            ("profile.view.reset-login-password.label", "button", req.getContextPath().concat("/profile/password/reset")),
+                            ("profile.view.reset-login-password.label", "button", req.getContextPath().concat("/profile/reset-password")),
                     new ViewComponent.ViewItem
                             ("profile.view.edit-profile.label", "button", req.getContextPath().concat("/profile/edit"))));
             req.getRequestDispatcher("/WEB-INF/jsp/profile/view.jsp").forward(req, resp);

@@ -23,7 +23,8 @@ public class LogoutAction implements Action {
     public void execute(HttpServletRequest req, HttpServletResponse resp) throws ActionException {
         try {
             logger.debug("LOGOUT");
-            req.getSession().removeAttribute("user");
+            req.getSession().removeAttribute("userId");
+            req.getSession().removeAttribute("userName");
             req.getSession().removeAttribute("navbarItemArray");
             req.removeAttribute("navbarCurrent");
             ResponseCookie.setCookie(resp, UserService.getRememberCookieName(), null, 0, req.getContextPath().concat("/"));

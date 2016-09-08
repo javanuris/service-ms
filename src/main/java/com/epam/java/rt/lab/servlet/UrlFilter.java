@@ -1,5 +1,6 @@
 package com.epam.java.rt.lab.servlet;
 
+import com.epam.java.rt.lab.util.UrlParameter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,8 +25,9 @@ public class UrlFilter implements Filter {
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)
             throws IOException, ServletException {
         servletRequest.setAttribute("debugMode", true);
+        UrlParameter.setAttributeFromUrlParameter((HttpServletRequest) servletRequest);
         String requestURI = ((HttpServletRequest) servletRequest).getRequestURI()
-                .substring(((HttpServletRequest) servletRequest).getContextPath().length());
+                .substring(((HttpServletRequest) servletRequest).getContextPath().length()).toLowerCase();
         logger.debug(requestURI);
         if (requestURI.startsWith("/static/") || requestURI.startsWith("/webjars/") || requestURI.equals("/favicon.ico")) {
             filterChain.doFilter(servletRequest, servletResponse);
