@@ -4,7 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.sql.DataSource;
-import java.io.*;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -99,26 +100,14 @@ public class ConnectionPool implements DataSource {
                             (DriverManager.getConnection(databaseUrl, databaseUsername, databasePassword));
                 } else {
                     pooledConnection = availableConnectionsQueue.poll(100, TimeUnit.MILLISECONDS);
+                    pooledConnection.clearConnection();
                 }
-                return prepareConnection(pooledConnection);
+                return pooledConnection;
             }
         } catch (InterruptedException e) {
             throw new SQLException(e.getMessage());
         }
         return null;
-    }
-
-    private Connection prepareConnection(Connection connection) throws SQLException {
-        if (!connection.isValid(10)) {
-            throw new SQLException("Invalid connection error");
-        } else {
-            if (!connection.getAutoCommit()) {
-                connection.rollback();
-                connection.setAutoCommit(true);
-            }
-            if (connection.isReadOnly()) connection.setReadOnly(false);
-        }
-        return connection;
     }
 
     @Override

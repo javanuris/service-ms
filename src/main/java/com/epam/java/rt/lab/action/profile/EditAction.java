@@ -6,9 +6,7 @@ import com.epam.java.rt.lab.action.WebAction;
 import com.epam.java.rt.lab.component.FormComponent;
 import com.epam.java.rt.lab.connection.ConnectionException;
 import com.epam.java.rt.lab.dao.DaoException;
-import com.epam.java.rt.lab.entity.rbac.Login;
 import com.epam.java.rt.lab.entity.rbac.User;
-import com.epam.java.rt.lab.service.LoginService;
 import com.epam.java.rt.lab.service.UserService;
 import com.epam.java.rt.lab.util.FormValidator;
 import com.epam.java.rt.lab.util.UrlParameter;
@@ -69,6 +67,7 @@ public class EditAction implements Action {
                     user.setFirstName(formComponent.getFormItemArray()[0].getValue());
                     user.setMiddleName(formComponent.getFormItemArray()[1].getValue());
                     user.setLastName(formComponent.getFormItemArray()[2].getValue());
+                    logger.debug("user.getName() = {}", user.getName());
                     if (new UserService().updateName(user) != 1) {
                         logger.debug("UPDATE ERROR");
                         String[] validationMessageArray = {"profile.edit.submit.error-edit"};

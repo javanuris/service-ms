@@ -184,6 +184,7 @@ public abstract class H2JdbcDao implements Dao {
         int index = 1;
         Method method;
         for (Value value : sqlQuery.getValueList()) {
+            logger.debug("Trying to set value: ({}) {} / {}", index, value.get(), value.get().getClass());
             method = H2JdbcDao.getPreparedStatementMethod(value.get().getClass());
             if (method == null) throw new DaoException("Prepared statement method not found");
             method.invoke(preparedStatement, index, value.get());

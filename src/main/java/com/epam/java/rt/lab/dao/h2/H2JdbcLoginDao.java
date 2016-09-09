@@ -49,6 +49,6 @@ public class H2JdbcLoginDao extends H2JdbcDao implements Dao {
         } else if (columnName.equals("status")) {
             return (T) Integer.valueOf(login.getStatus());
         }
-        throw new DaoException("Field assigned to column");
+        throw new DaoException("Field not assigned to column");
     }
 }

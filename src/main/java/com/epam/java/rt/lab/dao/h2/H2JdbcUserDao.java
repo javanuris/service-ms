@@ -2,6 +2,7 @@ package com.epam.java.rt.lab.dao.h2;
 
 import com.epam.java.rt.lab.dao.Dao;
 import com.epam.java.rt.lab.dao.DaoException;
+import com.epam.java.rt.lab.entity.rbac.Login;
 import com.epam.java.rt.lab.entity.rbac.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +37,22 @@ public class H2JdbcUserDao extends H2JdbcDao implements Dao {
 
     @Override
     <T> T getValue(Object entity, String columnName) throws DaoException {
-        return null;
+        User user = (User) entity;
+        if (columnName.equals("id")) {
+            return (T) user.getId();
+        } else if (columnName.equals("first_name")) {
+            return (T) user.getFirstName();
+        } else if (columnName.equals("middle_name")) {
+            return (T) user.getMiddleName();
+        } else if (columnName.equals("last_name")) {
+            return (T) user.getLastName();
+        } else if (columnName.equals("login_id")) {
+            if (user.getLogin() == null) return null;
+            return (T) user.getLogin().getId();
+        } else if (columnName.equals("role_id")) {
+            if (user.getRole() == null) return null;
+            return (T) user.getRole().getId();
+        }
+        throw new DaoException("Field not assigned to column");
     }
 }

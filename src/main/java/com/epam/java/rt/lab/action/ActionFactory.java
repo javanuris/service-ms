@@ -42,7 +42,7 @@ public class ActionFactory {
                 Class<?> actionClass = Class.forName(ActionFactory.class.getPackage()
                         .getName().concat(".").concat(actionPathAndName));
                 if (actionClass.getAnnotation(WebAction.class) == null)
-                    throw new ActionException("Action '" + actionPathAndName + "' not found");;
+                    throw new ActionException("Action '" + actionPathAndName + "' not found");
                 Action actionObject = (Action) actionClass.newInstance();
                 ActionFactory.actionMap.put(actionPathAndName, actionObject);
                 return actionObject;

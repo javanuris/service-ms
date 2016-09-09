@@ -127,7 +127,19 @@ public class UserService extends BaseService {
         return rememberUserIdMap.get(UUID.fromString(rememberCookieValue));
     }
 
-    public int updateName(User user) {
-        return 0;
+    public int updateName(User user) throws DaoException, SQLException, ConnectionException {
+        logger.debug("updateName");
+        Connection connection = null;
+        Dao jdbcDao = null;
+        try {
+            connection = DaoFactory.getDaoFactory().getConnection();
+            jdbcDao = super.getJdbcDao(connection);
+            logger.debug("jdbcDao = {}", jdbcDao.getClass().getSimpleName());
+            return jdbcDao.update("first_name", "middle_name", "last_name").set(user).execute().getLastUpdateCount();
+        } finally {
+            if (jdbcDao != null) jdbcDao.close();
+            if (connection != null) DaoFactory.getDaoFactory().releaseConnection(connection);
+        }
     }
+
 }

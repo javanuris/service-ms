@@ -1,6 +1,5 @@
 package com.epam.java.rt.lab.action;
 
-import com.epam.java.rt.lab.component.NavbarComponent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

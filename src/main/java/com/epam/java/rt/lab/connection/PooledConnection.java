@@ -3,7 +3,6 @@ package com.epam.java.rt.lab.connection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.sql.*;
 import java.util.Map;
 import java.util.Properties;
@@ -18,12 +17,6 @@ public class PooledConnection implements Connection {
 
     PooledConnection(Connection connection) throws SQLException {
         this.connection = connection;
-//        this.connection = DriverManager
-//                .getConnection(properties.getProperty("db.URL"),
-//                        properties.getProperty("db.Username"),
-//                        properties.getProperty("db.Password"));
-//        this.shutdownProcess = false;
-//        logger.info("Pooled connection created");
     }
 
     void clearConnection() throws SQLException {

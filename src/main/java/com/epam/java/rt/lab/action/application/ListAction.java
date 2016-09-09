@@ -2,7 +2,6 @@ package com.epam.java.rt.lab.action.application;
 
 import com.epam.java.rt.lab.action.Action;
 import com.epam.java.rt.lab.action.ActionException;
-import com.epam.java.rt.lab.component.NavbarComponent;
 import com.epam.java.rt.lab.action.WebAction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
