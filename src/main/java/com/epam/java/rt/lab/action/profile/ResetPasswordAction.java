@@ -4,14 +4,12 @@ import com.epam.java.rt.lab.action.Action;
 import com.epam.java.rt.lab.action.ActionException;
 import com.epam.java.rt.lab.action.WebAction;
 import com.epam.java.rt.lab.component.FormComponent;
-import com.epam.java.rt.lab.component.NavbarComponent;
 import com.epam.java.rt.lab.connection.ConnectionException;
 import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.entity.rbac.Login;
 import com.epam.java.rt.lab.entity.rbac.User;
 import com.epam.java.rt.lab.service.LoginService;
 import com.epam.java.rt.lab.service.UserService;
-import com.epam.java.rt.lab.servlet.ResponseCookie;
 import com.epam.java.rt.lab.util.FormValidator;
 import com.epam.java.rt.lab.util.UrlParameter;
 import org.slf4j.Logger;
@@ -64,9 +62,7 @@ public class ResetPasswordAction implements Action {
                 req.getRequestDispatcher("/WEB-INF/jsp/profile/reset-password.jsp").forward(req, resp);
             } else if (req.getMethod().equals("POST")) {
                 logger.debug("POST");
-                for (FormComponent.FormItem formItem : formComponent.getFormItemArray())
-                    formItem.setValue(req.getParameter(formItem.getLabel()));
-                if (FormValidator.validate(formComponent.getFormItemArray())) {
+                if (FormValidator.setValueAndValidate(req, formComponent.getFormItemArray())) {
                     logger.debug("VALID");
                     if (!formComponent.getFormItemArray()[0].getValue().equals(formComponent.getFormItemArray()[1].getValue())) {
                         String[] validationMessageArray = {"profile.reset-password.confirm.error-not-equal"};
@@ -81,14 +77,21 @@ public class ResetPasswordAction implements Action {
                         formComponent.getFormItemArray()[3].setValidationMessageArray(validationMessageArray);
                     } else {
                         logger.debug("GRANTED");
-                        req.getSession().removeAttribute("resetPasswordForm");
                         login.setPassword(formComponent.getFormItemArray()[0].getValue());
-                        resp.sendRedirect(req.getContextPath().concat("/profile/view"));
-                        return;
+                        if (new LoginService().updatePassword(login) != 1) {
+                            logger.debug("UPDATE ERROR");
+                            String[] validationMessageArray = {"profile.reset-password.submit.error-reset-password"};
+                            formComponent.getFormItemArray()[3].setValidationMessageArray(validationMessageArray);
+                        } else {
+                            logger.debug("UPDATE SUCCESS");
+                            req.getSession().removeAttribute("resetPasswordForm");
+                            resp.sendRedirect(req.getContextPath().concat("/profile/view"));
+                            return;
+                        }
                     }
                 }
                 logger.debug("NOT VALID");
-                req.getRequestDispatcher("/WEB-INF/jsp/profile/login.jsp").forward(req, resp);
+                req.getRequestDispatcher("/WEB-INF/jsp/profile/reset-password.jsp").forward(req, resp);
             }
         } catch (ServletException | IOException | ConnectionException | DaoException | SQLException e) {
             throw new ActionException(e.getMessage());

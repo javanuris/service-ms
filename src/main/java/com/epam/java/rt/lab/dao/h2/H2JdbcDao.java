@@ -269,4 +269,12 @@ public abstract class H2JdbcDao implements Dao {
         return this;
     }
 
+    @Override
+    public int getLastUpdateCount() throws DaoException {
+        try {
+            return preparedStatement.getUpdateCount();
+        } catch (SQLException e) {
+            throw new DaoException(e.getMessage());
+        }
+    }
 }

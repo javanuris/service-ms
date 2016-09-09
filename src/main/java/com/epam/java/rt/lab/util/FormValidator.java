@@ -5,6 +5,7 @@ import com.epam.java.rt.lab.component.FormComponent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
@@ -20,14 +21,18 @@ public class FormValidator {
 
     }
 
-    public static boolean validate(FormComponent.FormItem[] formItemArray) {
+    public static boolean setValueAndValidate(HttpServletRequest req, FormComponent.FormItem[] formItemArray) {
+        logger.debug("VALIDATE >>");
         try {
             List<FormItemValidator> formItemValidatorList;
             for (FormComponent.FormItem formItem : formItemArray) {
+                formItem.setValue(req.getParameter(formItem.getLabel()));
+                logger.debug("{} = {}", formItem.getLabel(), formItem.getValue());
                 formItemValidatorList = FormValidator.formItemValidatorMap.get(formItem.getLabel());
-                if (formItemValidatorList == null) break;
-                for (FormItemValidator formItemValidator : formItemValidatorList) {
-                    if (!formItemValidator.validate(formItem.getValue())) return false;
+                if (formItemValidatorList != null) {
+                    for (FormItemValidator formItemValidator : formItemValidatorList) {
+                        if (!formItemValidator.validate(formItem.getValue())) return false;
+                    }
                 }
             }
             return true;
@@ -38,7 +43,7 @@ public class FormValidator {
 
     private static String validateString(FormComponent.FormItem formItem, String validRegex) {
         String value = String.valueOf(formItem.getValue());
-        // validate regex
+        // setValueAndValidate regex
         return value;
     }
 

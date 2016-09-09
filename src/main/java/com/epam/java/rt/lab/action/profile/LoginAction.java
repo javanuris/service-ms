@@ -71,9 +71,7 @@ public class LoginAction implements Action {
                 req.getRequestDispatcher("/WEB-INF/jsp/profile/login.jsp").forward(req, resp);
             } else if (req.getMethod().equals("POST")) {
                 logger.debug("POST");
-                for (FormComponent.FormItem formItem : formComponent.getFormItemArray())
-                    formItem.setValue(req.getParameter(formItem.getLabel()));
-                if (FormValidator.validate(formComponent.getFormItemArray())) {
+                if (FormValidator.setValueAndValidate(req, formComponent.getFormItemArray())) {
                     logger.debug("VALID");
                     LoginService loginService = new LoginService();
                     Login login = loginService.getLogin(

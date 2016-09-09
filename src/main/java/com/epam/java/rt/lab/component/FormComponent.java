@@ -59,6 +59,11 @@ public class FormComponent {
 
         public void setValue(String value) { this.value = value; }
 
+        public FormItem setValueAndReturn(String value) {
+            this.value = value;
+            return this;
+        }
+
         public String getValue() { return value; }
 
         public void setValidationMessageArray(String[] validationMessageArray) {

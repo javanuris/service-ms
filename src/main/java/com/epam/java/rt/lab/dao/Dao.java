@@ -37,4 +37,5 @@ public interface Dao {
 
     <T> Dao set(T entity) throws DaoException;
 
+    int getLastUpdateCount() throws DaoException;
 }

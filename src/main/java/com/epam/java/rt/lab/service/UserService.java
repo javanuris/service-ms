@@ -127,4 +127,7 @@ public class UserService extends BaseService {
         return rememberUserIdMap.get(UUID.fromString(rememberCookieValue));
     }
 
+    public int updateName(User user) {
+        return 0;
+    }
 }
