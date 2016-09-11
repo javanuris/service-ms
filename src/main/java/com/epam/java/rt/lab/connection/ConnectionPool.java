@@ -33,7 +33,7 @@ public class ConnectionPool implements DataSource {
     private ConnectionPool() {
     }
 
-    public static ConnectionPool getInstance() throws ConnectionException {
+    public static DataSource getInstance() throws ConnectionException {
         ConnectionPool instance = InstanceHolder.INSTANCE;
         if (databaseUrl == null || databaseUsername == null || databasePassword == null ||
                 databaseMaxConnections == 0)
@@ -45,11 +45,11 @@ public class ConnectionPool implements DataSource {
         try {
             Properties properties = new Properties();
             properties.load(ConnectionPool.class.getClassLoader().getResourceAsStream(fileName));
-            String databaseClass = properties.getProperty("database.management-system.class");
-            String databaseUrl = properties.getProperty("database.url");
-            String databaseUsername = properties.getProperty("database.username");
-            String databasePassword = properties.getProperty("database.password");
-            String databaseMaxConnections = properties.getProperty("database.max-connections");
+            String databaseClass = properties.getProperty("management-system.class");
+            String databaseUrl = properties.getProperty("url");
+            String databaseUsername = properties.getProperty("username");
+            String databasePassword = properties.getProperty("password");
+            String databaseMaxConnections = properties.getProperty("max-connections");
             if (databaseUrl == null || databaseUsername == null || databasePassword == null ||
                     databaseMaxConnections == null)
                 throw new ConnectionException("Database properties error");

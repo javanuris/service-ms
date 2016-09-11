@@ -3,7 +3,7 @@ package com.epam.java.rt.lab.service;
 import com.epam.java.rt.lab.connection.ConnectionException;
 import com.epam.java.rt.lab.dao.Dao;
 import com.epam.java.rt.lab.dao.DaoException;
-import com.epam.java.rt.lab.dao.factory.DaoFactory;
+import com.epam.java.rt.lab.dao.Dao_;
 import com.epam.java.rt.lab.entity.rbac.Login;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,62 +17,17 @@ import java.sql.SQLException;
 public class LoginService extends BaseService {
     private static final Logger logger = LoggerFactory.getLogger(LoginService.class);
 
-    public LoginService() throws DaoException {
-        super();
+    LoginService() throws ConnectionException, DaoException {
     }
 
-    Login getLogin(String email, String password, Connection connection)
-            throws DaoException, SQLException, ConnectionException {
-        logger.debug("getLogin");
-        Dao jdbcDao = null;
-        try {
-            jdbcDao = super.getJdbcDao(connection);
-            logger.debug("jdbcDao = {}", jdbcDao.getClass().getSimpleName());
-            Login login = jdbcDao.query("*").filter("email", email).first();
-            if (login == null || !login.getPassword().equals(password)) return null;
-            logger.debug("login.email = {}", login.getEmail());
-            return login;
-        } finally {
-            if (jdbcDao != null) jdbcDao.close();
-        }
-    }
-
-    public Login getLogin(String email, String password) throws DaoException, SQLException, ConnectionException {
-        logger.debug("getLogin");
-        Connection connection = null;
-        try {
-            connection = DaoFactory.getDaoFactory().getConnection();
-            return getLogin(email, password, connection);
-        } finally {
-            if (connection != null) DaoFactory.getDaoFactory().releaseConnection(connection);
-        }
-    }
-
-    Login getLogin(Long id, Connection connection)
-            throws DaoException, SQLException, ConnectionException {
-        logger.debug("getLogin");
-        Dao jdbcDao = null;
-        try {
-            jdbcDao = super.getJdbcDao(connection);
-            logger.debug("jdbcDao = {}", jdbcDao.getClass().getSimpleName());
-            Login login = jdbcDao.query("*").filter("id", id).first();
-            if (login == null) return null;
-            logger.debug("login.email = {}", login.getEmail());
-            return login;
-        } finally {
-            if (jdbcDao != null) jdbcDao.close();
-        }
-    }
-
-    public Login getLogin(Long id) throws DaoException, SQLException, ConnectionException {
-        logger.debug("getLogin");
-        Connection connection = null;
-        try {
-            connection = DaoFactory.getDaoFactory().getConnection();
-            return getLogin(id, connection);
-        } finally {
-            if (connection != null) DaoFactory.getDaoFactory().releaseConnection(connection);
-        }
+    Login getLogin(String email, String password) throws DaoException {
+        Login login = new Login();
+        login.setEmail(email);
+        login.setPassword(password);
+        Dao_ dao = super.daoFactory.createDao("Login");
+        login = dao.getFirst(login, "email, password");
+        daoFactory.close();
+        return login;
     }
 
     public int updatePassword(Login login)
@@ -80,15 +35,16 @@ public class LoginService extends BaseService {
         logger.debug("updateLogin");
         Connection connection = null;
         Dao jdbcDao = null;
-        try {
-            connection = DaoFactory.getDaoFactory().getConnection();
-            jdbcDao = super.getJdbcDao(connection);
-            logger.debug("jdbcDao = {}", jdbcDao.getClass().getSimpleName());
-            return jdbcDao.update("password").set(login).execute().getLastUpdateCount();
-        } finally {
-            if (jdbcDao != null) jdbcDao.close();
-            if (connection != null) DaoFactory.getDaoFactory().releaseConnection(connection);
-        }
+//        try {
+//            connection = AbstractDaoFactory.createDaoFactory().getConnection();
+//            jdbcDao = super.getJdbcDao(connection);
+//            logger.debug("jdbcDao = {}", jdbcDao.getClass().getSimpleName());
+//            return jdbcDao.update("password").set(login).execute().getLastUpdateCount();
+//        } finally {
+//            if (jdbcDao != null) jdbcDao.close();
+//            if (connection != null) AbstractDaoFactory.createDaoFactory().releaseConnection(connection);
+//        }
+        return 0;
     }
 
 }

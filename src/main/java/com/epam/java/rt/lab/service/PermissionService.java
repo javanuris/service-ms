@@ -3,9 +3,12 @@ package com.epam.java.rt.lab.service;
 import com.epam.java.rt.lab.connection.ConnectionException;
 import com.epam.java.rt.lab.dao.Dao;
 import com.epam.java.rt.lab.dao.DaoException;
-import com.epam.java.rt.lab.dao.factory.DaoFactory;
+import com.epam.java.rt.lab.dao.Dao_;
+import com.epam.java.rt.lab.dao.factory.AbstractDaoFactory;
+import com.epam.java.rt.lab.entity.rbac.Login;
 import com.epam.java.rt.lab.entity.rbac.Permission;
 import com.epam.java.rt.lab.entity.rbac.Role;
+import com.epam.java.rt.lab.entity.rbac.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,9 +23,22 @@ import java.util.List;
 public class PermissionService extends BaseService {
     private static final Logger logger = LoggerFactory.getLogger(PermissionService.class);
 
-    public PermissionService() throws DaoException {
-        super();
+    public PermissionService() throws ConnectionException, DaoException {
     }
+
+    List<Permission> getPermissionList(Role role) throws DaoException {
+        List<Permission> permissionList = new ArrayList<>();
+
+        permission
+
+        User user = new User();
+        user.setLogin(login);
+        Dao_ dao = super.daoFactory.createDao("User");
+        user = dao.getFirst(user, "login_id");
+        daoFactory.close();
+        return user;
+    }
+
 
     List<Permission> getPermissionList(Long roleId, Connection connection) throws DaoException, SQLException, ConnectionException {
         logger.debug("getPermissionList");
@@ -43,10 +59,10 @@ public class PermissionService extends BaseService {
         logger.debug("getPermissionList");
         Connection connection = null;
         try {
-            connection = DaoFactory.getDaoFactory().getConnection();
+            connection = AbstractDaoFactory.createDaoFactory().getConnection();
             return getPermissionList(roleId, connection);
         } finally {
-            if (connection != null) DaoFactory.getDaoFactory().releaseConnection(connection);
+            if (connection != null) AbstractDaoFactory.createDaoFactory().releaseConnection(connection);
         }
     }
 

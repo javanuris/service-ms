@@ -72,12 +72,16 @@ public class PooledConnection implements Connection {
         this.connection.rollback();
     }
 
+    void closePooled() throws SQLException {
+        this.connection.close();
+    }
+
     @Override // reason method for subclassing
     public void close() throws SQLException {
         boolean done = false;
         while (!done) {
             try {
-                ConnectionPool.getInstance().releaseConnection(this);
+                ((ConnectionPool) ConnectionPool.getInstance()).releaseConnection(this);
                 done = true;
                 logger.info("Pooled connection released");
             } catch (ConnectionException e) {

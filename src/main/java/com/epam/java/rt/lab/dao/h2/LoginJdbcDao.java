@@ -1,0 +1,70 @@
+package com.epam.java.rt.lab.dao.h2;
+
+import com.epam.java.rt.lab.dao.DaoException;
+import com.epam.java.rt.lab.dao.query.Column;
+import com.epam.java.rt.lab.entity.rbac.Login;
+
+import java.lang.reflect.Field;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+
+/**
+ * service-ms
+ */
+public class LoginJdbcDao extends JdbcDao {
+
+    public LoginJdbcDao(Connection connection) throws DaoException {
+        super(connection);
+    }
+
+    @Override
+    String preparedStatementMapKeyPrefix() {
+        return "Login";
+    }
+
+    @Override
+    <T> Column entityColumn(T entity, Field field) throws DaoException {
+        try {
+            switch (field.getName()) {
+                case "id":
+                    return new Column("id", fieldValue(field, entity));
+                case "email":
+                    return new Column("email", fieldValue(field, entity));
+                case "password":
+                    return new Column("password", fieldValue(field, entity));
+                default:
+                    throw new DaoException("exception.dao.jdbc.entity-column.field-name");
+            }
+        } catch (IllegalAccessException e) {
+            throw new DaoException("exception.dao.jdbc.query.add-column", e.getCause());
+        }
+    }
+
+    @Override
+    <T> T getEntityFromResultSet(T entity, ResultSet resultSet) throws DaoException {
+        try {
+            Login login = (Login) entity;
+            login.setId(resultSet.getLong("id"));
+            login.setEmail(resultSet.getString("email"));
+            login.setPassword(resultSet.getString("password"));
+            login.setAttemptLeft(resultSet.getInt("attempt_left"));
+            login.setStatus(resultSet.getInt("status"));
+            return (T) login;
+        } catch (SQLException e) {
+            throw new DaoException("exception.dao.jdbc.get-entity-from-result-set", e.getCause());
+        }
+    }
+
+    @Override
+    public <T> List<T> getAll(T entity, String fieldNames) throws DaoException {
+        throw new DaoException("exception.dao.jdbc.unsupported");
+    }
+
+    @Override
+    public <T> List<T> getAll(T entity, String fieldNames, String columnNames) throws DaoException {
+        throw new DaoException("exception.dao.jdbc.unsupported");
+    }
+
+}

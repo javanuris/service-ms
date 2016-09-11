@@ -53,6 +53,6 @@ public class H2JdbcUserDao extends H2JdbcDao implements Dao {
             if (user.getRole() == null) return null;
             return (T) user.getRole().getId();
         }
-        throw new DaoException("Field not assigned to column");
+        throw new DaoException("Field not assigned to Column");
     }
 }
