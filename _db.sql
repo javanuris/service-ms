@@ -3,7 +3,7 @@ drop table "Permission"; drop table "Role"; drop table "RolePermission"; drop ta
 
 
 //create tables
-create table if not exists "Permission" (id identity primary key, uri varchar(255));
+create table if not exists "Permission" (id identity primary key, uri varchar(255) unique);
 create table if not exists "Role" (id identity primary key, name varchar(255) unique);
 create table if not exists "RolePermission" (id identity primary key, role_id bigint references "Role" (id), permission_id bigint references "Permission" (id));
 create table if not exists "Login" (id identity primary key, email varchar(255) unique, password varchar(255), attempt_left int, status int);

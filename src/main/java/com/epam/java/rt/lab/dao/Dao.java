@@ -1,5 +1,7 @@
 package com.epam.java.rt.lab.dao;
 
+import com.epam.java.rt.lab.entity.rbac.User;
+
 import java.util.List;
 
 /**
@@ -15,6 +17,6 @@ public interface Dao {
 
     <T> List<T> getAll(T entity, String fieldNames, String columnNames) throws DaoException;
 
-
+    <T> int update(T entity, String fieldNames, String setNames) throws DaoException;
 
 }

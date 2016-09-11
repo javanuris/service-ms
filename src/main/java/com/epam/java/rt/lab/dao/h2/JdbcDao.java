@@ -1,9 +1,8 @@
 package com.epam.java.rt.lab.dao.h2;
 
-import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.dao.Dao;
-import com.epam.java.rt.lab.dao.query.Column;
-import com.epam.java.rt.lab.dao.query.Select;
+import com.epam.java.rt.lab.dao.DaoException;
+import com.epam.java.rt.lab.dao.query.*;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -21,7 +20,7 @@ import java.util.Map;
  */
 abstract class JdbcDao implements Dao {
     private static Map<Type, Method> preparedStatementMethodMap = new HashMap<>();
-    static Map<String, PreparedStatement> preparedStatementMap = new HashMap<>();
+    private static Map<String, PreparedStatement> preparedStatementMap = new HashMap<>();
     private Connection connection = null;
 
     private static void initPreparedStatementMethodMap() throws DaoException {
@@ -54,7 +53,7 @@ abstract class JdbcDao implements Dao {
         }
     }
 
-    public JdbcDao(Connection connection) throws DaoException {
+    JdbcDao(Connection connection) throws DaoException {
         this.connection = connection;
         if (preparedStatementMethodMap.size() == 0) initPreparedStatementMethodMap();
     }
@@ -80,17 +79,32 @@ abstract class JdbcDao implements Dao {
         }
     }
 
-    private void setPreparedStatementValues(PreparedStatement preparedStatement, List<Column> columnList) throws DaoException {
+    void setPreparedStatementValues(PreparedStatement preparedStatement,
+                                            List<Column> columnList) throws DaoException {
+        setPreparedStatementValues(preparedStatement, null, columnList);
+    }
+
+    void setPreparedStatementValues(PreparedStatement preparedStatement, List<Set> setList,
+                                            List<Column> columnList) throws DaoException {
         try {
-            int columnIndex = 1;
+            int valueIndex = 1;
             Method preparedStatementMethod;
+            if (setList != null) {
+                for (Set set : setList) {
+                    preparedStatementMethod = preparedStatementMethodMap.get(set.value.getClass());
+                    if (preparedStatementMethod == null)
+                        throw new DaoException("exception.dao.jdbc.set-prepared-statement-values.method");
+                    preparedStatementMethod.invoke(preparedStatement, valueIndex, set.value);
+                    valueIndex++;
+                }
+            }
             for (Column column : columnList) {
                 if (column.value != null && !column.isColumn) {
                     preparedStatementMethod = preparedStatementMethodMap.get(column.value.getClass());
                     if (preparedStatementMethod == null)
                         throw new DaoException("exception.dao.jdbc.set-prepared-statement-values.method");
-                    preparedStatementMethod.invoke(preparedStatement, columnIndex, column.value);
-                    columnIndex++;
+                    preparedStatementMethod.invoke(preparedStatement, valueIndex, column.value);
+                    valueIndex++;
                 }
             }
         } catch (IllegalAccessException | InvocationTargetException e) {
@@ -111,26 +125,40 @@ abstract class JdbcDao implements Dao {
         }
     }
 
-    <T> ResultSet query(T entity, String fieldNames, String columnNames) throws DaoException {
+    private <T> PreparedStatement query(SqlQuery sqlQuery, T entity, String fieldNames, String setNames) throws DaoException {
         try {
-            Select select = new Select(getEntityTableName(), columnNames);
-            if(fieldNames != null) {
+            if (setNames != null) {
+                setNames = setNames.replaceAll(" ", "");
+                for (String setName : setNames.split(",")) {
+                    Field field = getField(entity.getClass(), setName);
+                    sqlQuery.getSetList().add(getEntitySet(entity, field));
+                }
+            }
+            if (fieldNames != null) {
                 fieldNames = fieldNames.replaceAll(" ", "");
                 for (String fieldName : fieldNames.split(",")) {
                     Field field = getField(entity.getClass(), fieldName);
-                    select.columnList.add(getEntityColumn(entity, field));
+                    sqlQuery.getColumnList().add(getEntityColumn(entity, field));
                 }
             }
             PreparedStatement preparedStatement = getPreparedStatement
-                    (JdbcDao.preparedStatementMap, select.create());
-            setPreparedStatementValues(preparedStatement, select.columnList);
-            preparedStatement.execute();
-            return preparedStatement.getResultSet();
+                    (JdbcDao.preparedStatementMap, sqlQuery.create());
+            setPreparedStatementValues(preparedStatement, sqlQuery.getSetList(), sqlQuery.getColumnList());
+            return preparedStatement;
         } catch (NoSuchFieldException e) {
             e.printStackTrace();
             throw new DaoException("exception.dao.jdbc.query.get-declared-field", e.getCause());
+        }
+    }
+
+    private <T> ResultSet selectQuery(T entity, String fieldNames, String columnNames) throws DaoException {
+        try {
+            SqlQuery select = new Select(getEntityTableName(), columnNames);
+            PreparedStatement preparedStatement = query(select, entity, fieldNames, null);
+            preparedStatement.execute();
+            return preparedStatement.getResultSet();
         } catch (SQLException e) {
-            throw new DaoException("exception.dao.jdbc.query.get-result-set", e.getCause());
+            throw new DaoException("exception.dao.jdbc.selectQuery.get-result-set", e.getCause());
         }
     }
 
@@ -148,16 +176,11 @@ abstract class JdbcDao implements Dao {
         throw new NoSuchFieldException("exception.dao.jdbc.get-field");
     }
 
-    ResultSet rawQuery(String sqlQuery, List<Column> columnList) throws DaoException {
-        try {
-            PreparedStatement preparedStatement = getPreparedStatement
-                    (JdbcDao.preparedStatementMap, sqlQuery);
-            setPreparedStatementValues(preparedStatement, columnList);
-            preparedStatement.execute();
-            return preparedStatement.getResultSet();
-        } catch (SQLException e) {
-            throw new DaoException("exception.dao.jdbc.raw-query.get-result-set", e.getCause());
-        }
+    PreparedStatement rawQuery(String sqlQuery, List<Column> columnList) throws DaoException {
+        PreparedStatement preparedStatement = getPreparedStatement
+                (JdbcDao.preparedStatementMap, sqlQuery);
+        setPreparedStatementValues(preparedStatement, columnList);
+        return preparedStatement;
     }
 
     @Override
@@ -168,9 +191,9 @@ abstract class JdbcDao implements Dao {
     @Override
     public <T> T getFirst(T entity, String fieldNames, String columnNames) throws DaoException {
         try {
-            ResultSet resultSet = query(entity, fieldNames, columnNames);
+            ResultSet resultSet = selectQuery(entity, fieldNames, columnNames);
             if (resultSet == null || !resultSet.first()) return null;
-            return (T) getEntityFromResultSet(entity, resultSet);
+            return getEntityFromResultSet(entity, resultSet);
         } catch (SQLException e) {
             e.printStackTrace();
             throw new DaoException("exception.dao.jdbc.get-first.get-result-set", e.getCause());
@@ -185,7 +208,7 @@ abstract class JdbcDao implements Dao {
     @Override
     public <T> List<T> getAll(T entity, String fieldNames, String columnNames) throws DaoException {
         try {
-            ResultSet resultSet = query(entity, fieldNames, columnNames);
+            ResultSet resultSet = selectQuery(entity, fieldNames, columnNames);
             if (resultSet == null) return null;
             List<T> entityList = new ArrayList<>();
             while(resultSet.next()) entityList.add(getEntityFromResultSet(entity, resultSet));
@@ -200,5 +223,28 @@ abstract class JdbcDao implements Dao {
     abstract <T> Column getEntityColumn(T entity, Field field) throws DaoException;
 
     abstract <T> T getEntityFromResultSet(T entity, ResultSet resultSet) throws DaoException;
+
+    private <T> int updateQuery(T entity, String fieldNames, String setNames) throws DaoException {
+        try {
+            SqlQuery update = new Update(getEntityTableName());
+            PreparedStatement preparedStatement = query(update, entity, fieldNames, setNames);
+            System.out.println(preparedStatement);
+            return preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new DaoException("exception.dao.jdbc.updateQuery.get-result-set", e.getCause());
+        }
+    }
+
+    @Override
+    public <T> int update(T entity, String fieldNames, String setNames) throws DaoException {
+        return updateQuery(entity, fieldNames, setNames) + relUpdate(entity, setNames);
+    }
+
+    abstract <T> Set getEntitySet(T entity, Field field) throws DaoException;
+
+    <T> int relUpdate(T entity, String setNames) throws DaoException {
+        return 0;
+    }
 
 }

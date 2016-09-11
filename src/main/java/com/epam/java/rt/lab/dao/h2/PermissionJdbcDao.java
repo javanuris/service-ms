@@ -3,6 +3,7 @@ package com.epam.java.rt.lab.dao.h2;
 import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.dao.query.Column;
 import com.epam.java.rt.lab.dao.query.Select;
+import com.epam.java.rt.lab.dao.query.Set;
 import com.epam.java.rt.lab.entity.rbac.Permission;
 import com.epam.java.rt.lab.entity.rbac.Role;
 
@@ -39,10 +40,26 @@ public class PermissionJdbcDao extends JdbcDao {
                 case "uri":
                     return new Column("uri", fieldValue(field, entity));
                 default:
-                    throw new DaoException("exception.dao.jdbc.get-first.field-name");
+                    throw new DaoException("exception.dao.jdbc.get-entity-column.field-name");
             }
         } catch (IllegalAccessException e) {
-            throw new DaoException("exception.dao.jdbc.entity-column.add-column", e.getCause());
+            throw new DaoException("exception.dao.jdbc.get-entity-column.add-column", e.getCause());
+        }
+    }
+
+    @Override
+    <T> Set getEntitySet(T entity, Field field) throws DaoException {
+        try {
+            switch (field.getName()) {
+                case "id":
+                    return new Set("id", fieldValue(field, entity));
+                case "uri":
+                    return new Set("uri", fieldValue(field, entity));
+                default:
+                    throw new DaoException("exception.dao.jdbc.get-entity-set.field-name");
+            }
+        } catch (IllegalAccessException e) {
+            throw new DaoException("exception.dao.jdbc.get-entity-set.add-column", e.getCause());
         }
     }
 

@@ -2,6 +2,7 @@ package com.epam.java.rt.lab.dao.h2;
 
 import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.dao.query.Column;
+import com.epam.java.rt.lab.dao.query.Set;
 import com.epam.java.rt.lab.entity.rbac.Login;
 
 import java.lang.reflect.Field;
@@ -13,9 +14,9 @@ import java.util.List;
 /**
  * service-ms
  */
-public class LoginJdbcDao extends JdbcDao {
+class LoginJdbcDao extends JdbcDao {
 
-    public LoginJdbcDao(Connection connection) throws DaoException {
+    LoginJdbcDao(Connection connection) throws DaoException {
         super(connection);
     }
 
@@ -35,10 +36,32 @@ public class LoginJdbcDao extends JdbcDao {
                 case "password":
                     return new Column("password", fieldValue(field, entity));
                 default:
-                    throw new DaoException("exception.dao.jdbc.entity-column.field-name");
+                    throw new DaoException("exception.dao.jdbc.get-entity-column.field-name");
             }
         } catch (IllegalAccessException e) {
-            throw new DaoException("exception.dao.jdbc.query.add-column", e.getCause());
+            throw new DaoException("exception.dao.jdbc.get-entity-column.add-column", e.getCause());
+        }
+    }
+
+    @Override
+    <T> Set getEntitySet(T entity, Field field) throws DaoException {
+        try {
+            switch (field.getName()) {
+                case "id":
+                    return new Set("id", fieldValue(field, entity));
+                case "email":
+                    return new Set("email", fieldValue(field, entity));
+                case "password":
+                    return new Set("password", fieldValue(field, entity));
+                case "attemptLeft":
+                    return new Set("attempt_left", fieldValue(field, entity));
+                case "status":
+                    return new Set("status", fieldValue(field, entity));
+                default:
+                    throw new DaoException("exception.dao.jdbc.get-entity-column.field-name");
+            }
+        } catch (IllegalAccessException e) {
+            throw new DaoException("exception.dao.jdbc.get-entity-set.add-column", e.getCause());
         }
     }
 

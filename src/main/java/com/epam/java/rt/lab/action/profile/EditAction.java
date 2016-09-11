@@ -84,6 +84,7 @@ public class EditAction implements Action {
                 req.getRequestDispatcher("/WEB-INF/jsp/profile/edit.jsp").forward(req, resp);
             }
         } catch (ServletException | IOException | ConnectionException | DaoException e) {
+            e.printStackTrace();
             throw new ActionException("exception.action.edit", e.getCause());
         }
     }

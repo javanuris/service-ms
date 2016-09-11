@@ -52,7 +52,7 @@ public class UserService extends BaseService {
     public static String setRememberUserId(Long id) {
         if (rememberUserIdMap.containsValue(id)) {
             for (Map.Entry<UUID, Long> entry : rememberUserIdMap.entrySet()) {
-                if (entry.getValue() == id) {
+                if (entry.getValue().equals(id)) {
                     rememberUserIdMap.remove(entry.getKey());
                     break;
                 }
@@ -68,8 +68,11 @@ public class UserService extends BaseService {
         return rememberUserIdMap.get(UUID.fromString(rememberCookieValue));
     }
 
-    public int updateName(User user) {
-        return 0;
+    public int updateName(User user) throws DaoException {
+        Dao dao = super.daoFactory.createDao("User");
+        int updateCount = dao.update(user, "id", "firstName, middleName, lastName");
+        daoFactory.close();
+        return updateCount;
     }
 
 }
