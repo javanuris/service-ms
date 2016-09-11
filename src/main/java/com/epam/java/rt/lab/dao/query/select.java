@@ -10,7 +10,6 @@ public class Select {
     private String tableName;
     private String columnNames;
     public List<Column> columnList;
-    public List<Join> joinList;
 
     public Select(String tableName, String columnNames) {
         this.tableName = tableName;
@@ -25,7 +24,7 @@ public class Select {
     public String create() {
         StringBuilder result = new StringBuilder();
         result.append("SELECT ").append(this.columnNames).append(" FROM \"").append(this.tableName).append("\"");
-        result.append(" WHERE ").append(Column.columnArrayToString((Column[]) columnList.toArray()));
+        if (this.columnList.size() > 0) result.append(" WHERE ").append(Column.columnListToString(columnList));
         return result.toString();
     }
 

@@ -1,7 +1,6 @@
 package com.epam.java.rt.lab.dao.h2;
 
 import com.epam.java.rt.lab.dao.DaoException;
-import com.epam.java.rt.lab.dao.Dao_;
 import com.epam.java.rt.lab.dao.query.Column;
 import com.epam.java.rt.lab.entity.rbac.Login;
 import com.epam.java.rt.lab.entity.rbac.Role;
@@ -11,7 +10,6 @@ import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -35,7 +33,6 @@ public class UserJdbcDao extends JdbcDao {
                 case "id":
                     return new Column("id", fieldValue(field, entity));
                 case "login":
-                    System.out.println("!!! = " + ((Login) fieldValue(field, entity)).getId());
                     return new Column("login_id", ((Login) fieldValue(field, entity)).getId());
                 default:
                     throw new DaoException("exception.dao.jdbc.entity-column.field-name");

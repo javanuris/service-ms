@@ -44,15 +44,10 @@ public class RoleJdbcDao extends JdbcDao {
     @Override
     <T> T getEntityFromResultSet(T entity, ResultSet resultSet) throws DaoException {
         try {
-            System.out.println("!!! 0");
             Role role = (Role) entity;
             if (role == null) role = new Role();
-            System.out.println("!!! 1");
-            System.out.println("### " + resultSet.toString());
             role.setId(resultSet.getLong("id"));
-            System.out.println("!!! 2");
             role.setName(resultSet.getString("name"));
-            System.out.println("!!! 3");
             List<Column> columnList = new ArrayList<>();
             columnList.add(new Column("\"RolePermission\".permission_id", "\"Permission\".id", true));
             columnList.add(new Column("\"RolePermission\".role_id", role.getId()));
