@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.sql.DataSource;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -25,45 +24,31 @@ public class ConnectionPool implements DataSource {
     private static String databaseUrl;
     private static String databaseUsername;
     private static String databasePassword;
-    private static int databaseMaxConnections;
+    private static Integer databaseMaxConnections;
     private Semaphore connectionsSemaphore;
     private BlockingQueue<PooledConnection> availableConnectionsQueue;
     private AtomicInteger grantedConnections = new AtomicInteger();
 
     private ConnectionPool() {
+        connectionsSemaphore = new Semaphore(ConnectionPool.databaseMaxConnections);
+        availableConnectionsQueue = new ArrayBlockingQueue<PooledConnection>(ConnectionPool.databaseMaxConnections);
     }
 
     public static DataSource getInstance() throws ConnectionException {
-        ConnectionPool instance = InstanceHolder.INSTANCE;
-        if (databaseUrl == null || databaseUsername == null || databasePassword == null ||
-                databaseMaxConnections == 0)
-            instance.resetProperties("database.properties");
-        return instance;
+        return InstanceHolder.INSTANCE;
     }
 
-    public void resetProperties(String fileName) throws ConnectionException {
-        try {
-            Properties properties = new Properties();
-            properties.load(ConnectionPool.class.getClassLoader().getResourceAsStream(fileName));
-            String databaseClass = properties.getProperty("management-system.class");
-            String databaseUrl = properties.getProperty("url");
-            String databaseUsername = properties.getProperty("username");
-            String databasePassword = properties.getProperty("password");
-            String databaseMaxConnections = properties.getProperty("max-connections");
-            if (databaseUrl == null || databaseUsername == null || databasePassword == null ||
-                    databaseMaxConnections == null)
-                throw new ConnectionException("Database properties error");
-            while (!shutdown(10000)) ;
-            ConnectionPool.databaseUrl = databaseUrl;
-            ConnectionPool.databaseUsername = databaseUsername;
-            ConnectionPool.databasePassword = databasePassword;
-            ConnectionPool.databaseMaxConnections = Integer.valueOf(databaseMaxConnections);
-            Class.forName(databaseClass);
-            this.availableConnectionsQueue = new ArrayBlockingQueue<>(ConnectionPool.databaseMaxConnections);
-            this.connectionsSemaphore = new Semaphore(ConnectionPool.databaseMaxConnections);
-        } catch (IOException | ClassNotFoundException e) {
-            throw new ConnectionException(e.getMessage());
-        }
+    public static void initProperties(Properties properties) throws ConnectionException {
+        String databaseUrl = properties.getProperty("url");
+        String databaseUsername = properties.getProperty("username");
+        String databasePassword = properties.getProperty("password");
+        String databaseMaxConnections = properties.getProperty("max-connections");
+        if (databaseUrl == null || databaseUsername == null || databasePassword == null ||
+                databaseMaxConnections == null) throw new ConnectionException("exception.connection.init-properties");
+        ConnectionPool.databaseUrl = databaseUrl;
+        ConnectionPool.databaseUsername = databaseUsername;
+        ConnectionPool.databasePassword = databasePassword;
+        ConnectionPool.databaseMaxConnections = Integer.valueOf(databaseMaxConnections);
     }
 
     public boolean shutdown(long millis) throws ConnectionException {

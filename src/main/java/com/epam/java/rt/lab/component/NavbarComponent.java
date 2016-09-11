@@ -1,5 +1,7 @@
 package com.epam.java.rt.lab.component;
 
+import com.epam.java.rt.lab.connection.ConnectionException;
+import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.entity.rbac.Role;
 import com.epam.java.rt.lab.service.RoleService;
 import org.slf4j.Logger;
@@ -40,42 +42,41 @@ public class NavbarComponent {
         return navbarItemList;
     }
 
-    public static void updateRoleNavbarItemMap() {
+    public static void updateRoleNavbarItemMap()
+            throws InterruptedException, IOException, ConnectionException, DaoException {
         logger.debug("updateRoleNavbarItemMap");
         try {
             if (updateMapLock.tryLock(10, TimeUnit.MILLISECONDS)) {
-                try {
-                    List<NavbarItem> navbarItemList = getNavbarItemList("navbar.properties");
-                    List<NavbarItem> roleNavbarItemList;
-                    List<String> uriList;
-                    List<Role> roleList = RoleService.getRoleList();
-                    for (Role role : roleList) {
-                        logger.debug("role.name = {}", role.getName());
-                        uriList = role.getUriList();
-                        roleNavbarItemList = new ArrayList<>();
-                        for (NavbarItem navbarItem : navbarItemList) {
-                            if (uriList.contains(navbarItem.getLink()))
-                                roleNavbarItemList.add(navbarItem);
-                        }
-                        logger.debug("roleNavbarItemList.size() = {}", roleNavbarItemList.size());
-                        roleNavbarItemMap.put(role.getName(), roleNavbarItemList.toArray());
+                List<NavbarItem> navbarItemList = getNavbarItemList("navbar.properties");
+                List<NavbarItem> roleNavbarItemList;
+                List<String> uriList;
+                List<Role> roleList = (new RoleService()).getRoleList();
+                for (Role role : roleList) {
+                    logger.debug("role.name = {}", role.getName());
+                    uriList = role.getUriList();
+                    roleNavbarItemList = new ArrayList<>();
+                    for (NavbarItem navbarItem : navbarItemList) {
+                        if (uriList.contains(navbarItem.getLink()))
+                            roleNavbarItemList.add(navbarItem);
                     }
-                } catch (IOException e) {
-                    // TODO unhandled exception
-                    e.printStackTrace();
+                    logger.debug("roleNavbarItemList.size() = {}", roleNavbarItemList.size());
+                    roleNavbarItemMap.put(role.getName(), roleNavbarItemList.toArray());
                 }
             }
-        } catch (InterruptedException e) {
-            // TODO unhandled exception
-            e.printStackTrace();
         } finally {
             updateMapLock.unlock();
         }
     }
 
     public static Object[] getNavbarItemArray(Role role) {
-        if (roleNavbarItemMap.size() == 0) updateRoleNavbarItemMap();
-        return roleNavbarItemMap.get(role.getName());
+        try {
+            if (roleNavbarItemMap.size() == 0) updateRoleNavbarItemMap();
+            return roleNavbarItemMap.get(role.getName());
+        } catch (InterruptedException | ConnectionException | IOException | DaoException e) {
+            // TODO unhandled
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public static class NavbarItem {

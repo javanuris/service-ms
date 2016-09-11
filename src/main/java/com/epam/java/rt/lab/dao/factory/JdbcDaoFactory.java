@@ -15,18 +15,31 @@ import java.sql.Connection;
 public class JdbcDaoFactory extends AbstractDaoFactory {
     private static final Logger logger = LoggerFactory.getLogger(JdbcDaoFactory.class);
 
+    public JdbcDaoFactory(Connection connection) {
+        super(connection);
+    }
+
     @Override
     public Dao_ createDao(String daoShortName) throws DaoException {
         try {
-            Class daoClass = Class.forName(daoShortName.concat("JdbcDao"));
-            Constructor<Dao_> daoClassConstructor = daoClass.getConstructor(Connection.class);
-            return daoClassConstructor.newInstance(getConnection());
+            Class daoClass = Class.forName
+                    (JdbcDaoFactory.getDatabaseProperty("management-system.package")
+                            .concat(".").concat(daoShortName).concat("JdbcDao"));
+            logger.debug("daoClass: {}", daoClass.getName());
+            Constructor<?> daoClassConstructor = daoClass.getConstructor(Connection.class);
+            logger.debug("daoClassConstructor: {}", daoClassConstructor.getName());
+            Dao_ dao = (Dao_) daoClassConstructor.newInstance(getConnection());
+            logger.debug("dao: {}", dao.getClass().getName());
+            return (Dao_) daoClassConstructor.newInstance(getConnection());
         } catch (ClassNotFoundException e) {
             throw new DaoException("exception.dao.factory.jdbc.for-name", e.getCause());
         } catch (NoSuchMethodException e) {
             throw new DaoException("exception.dao.factory.jdbc.get-constructor", e.getCause());
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
             throw new DaoException("exception.dao.factory.jdbc.new-instance", e.getCause());
+        } catch (DaoException e) {
+            e.printStackTrace();
+            throw new DaoException();
         }
     }
 

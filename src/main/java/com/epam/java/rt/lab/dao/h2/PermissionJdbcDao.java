@@ -26,12 +26,12 @@ public class PermissionJdbcDao extends JdbcDao {
     }
 
     @Override
-    String preparedStatementMapKeyPrefix() {
+    String getEntityTableName() {
         return "Permission";
     }
 
     @Override
-    <T> Column entityColumn(T entity, Field field) throws DaoException {
+    <T> Column getEntityColumn(T entity, Field field) throws DaoException {
         try {
             switch (field.getName()) {
                 case "id":
@@ -50,6 +50,7 @@ public class PermissionJdbcDao extends JdbcDao {
     <T> T getEntityFromResultSet(T entity, ResultSet resultSet) throws DaoException {
         try {
             Permission permission = (Permission) entity;
+            if (permission == null) permission = new Permission();
             permission.setId(resultSet.getLong("id"));
             permission.setUri(resultSet.getString("uri"));
             return (T) permission;

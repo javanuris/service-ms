@@ -36,13 +36,14 @@ public class RBACFilter implements Filter {
         try {
             HttpServletRequest req = (HttpServletRequest) servletRequest;
             Long userId = (Long) req.getSession().getAttribute("userId");
+            UserService userService = new UserService();
             if (userId == null) {
                 logger.debug("TRYING TO GET USER FROM COOKIE");
                 Cookie rememberUserCookie = ResponseCookie.getCookie(req, UserService.getRememberCookieName());
                 if (rememberUserCookie != null) userId = UserService.getRememberUserId(rememberUserCookie.getValue());
                 if (userId != null) {
                     req.getSession().setAttribute("userId", userId);
-                    User user = (new UserService()).getUser(userId);
+                    User user = userService.getUser(userId);
                     req.getSession().setAttribute("userName", user.getName());
                     req.getSession().setAttribute("navbarItemArray", NavbarComponent.getNavbarItemArray(user.getRole()));
                     logger.debug("USER FROM COOKIE ({})", user);
@@ -50,8 +51,9 @@ public class RBACFilter implements Filter {
             }
             if (userId == null) {
                 try {
-                    logger.debug("ANONYMOUS URI = {}", UserService.getAnonymous().getRole().getUriList());
-                    if (UserService.getAnonymous().getRole().getUriList().contains(req.getPathInfo())) {
+                    logger.debug("getAnonymous = {}", userService.getAnonymous());
+                    logger.debug("ANONYMOUS URI = {}", userService.getAnonymous().getRole().getUriList());
+                    if (userService.getAnonymous().getRole().getUriList().contains(req.getPathInfo())) {
                         logger.debug("CONTAINS {}", req.getPathInfo());
                         filterChain.doFilter(servletRequest, servletResponse);
                         logger.debug("REDIRECT (SHOULD BE NULL) {}", req.getSession().getAttribute("redirect"));
@@ -61,11 +63,12 @@ public class RBACFilter implements Filter {
                                 (UrlParameter.combineUrlParameter(new UrlParameter.UrlParameterBuilder
                                         ("redirect", req.getContextPath().concat(req.getPathInfo())))));
                     }
-                } catch (ConnectionException | DaoException | SQLException e) {
-                    throw new ServletException(e.getMessage());
+                } catch (DaoException e) {
+                    e.printStackTrace();
+                    throw new ServletException("exception.servlet.rbac.get-anonymous", e.getCause());
                 }
             } else {
-                User user = (new UserService()).getUser(userId);
+                User user = userService.getUser(userId);
                 if (user.getRole().getUriList().contains(req.getPathInfo())) {
                     filterChain.doFilter(servletRequest, servletResponse);
                 } else {
@@ -76,8 +79,9 @@ public class RBACFilter implements Filter {
                     }
                 }
             }
-        } catch (DaoException | SQLException | ConnectionException e) {
-            throw new ServletException(e.getMessage());
+        } catch (DaoException| ConnectionException e) {
+            e.printStackTrace();
+            throw new ServletException("exception.servlet.rbac.get-user", e.getCause());
         }
     }
 

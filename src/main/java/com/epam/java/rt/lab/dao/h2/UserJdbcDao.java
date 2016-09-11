@@ -1,14 +1,17 @@
 package com.epam.java.rt.lab.dao.h2;
 
 import com.epam.java.rt.lab.dao.DaoException;
+import com.epam.java.rt.lab.dao.Dao_;
 import com.epam.java.rt.lab.dao.query.Column;
 import com.epam.java.rt.lab.entity.rbac.Login;
+import com.epam.java.rt.lab.entity.rbac.Role;
 import com.epam.java.rt.lab.entity.rbac.User;
 
 import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -21,17 +24,18 @@ public class UserJdbcDao extends JdbcDao {
     }
 
     @Override
-    String preparedStatementMapKeyPrefix() {
+    String getEntityTableName() {
         return "User";
     }
 
     @Override
-    <T> Column entityColumn(T entity, Field field) throws DaoException {
+    <T> Column getEntityColumn(T entity, Field field) throws DaoException {
         try {
             switch (field.getName()) {
                 case "id":
                     return new Column("id", fieldValue(field, entity));
                 case "login":
+                    System.out.println("!!! = " + ((Login) fieldValue(field, entity)).getId());
                     return new Column("login_id", ((Login) fieldValue(field, entity)).getId());
                 default:
                     throw new DaoException("exception.dao.jdbc.entity-column.field-name");
@@ -45,14 +49,20 @@ public class UserJdbcDao extends JdbcDao {
     <T> T getEntityFromResultSet(T entity, ResultSet resultSet) throws DaoException {
         try {
             User user = (User) entity;
+            if (user == null) user = new User();
             user.setId(resultSet.getLong("id"));
             user.setFirstName(resultSet.getString("first_name"));
             user.setMiddleName(resultSet.getString("middle_name"));
             user.setLastName(resultSet.getString("last_name"));
-            // role
-            // login
+            Role role = new Role();
+            role.setId(resultSet.getLong("role_id"));
+            user.setRole((new RoleJdbcDao(getConnection())).getFirst(role, "id"));
+            Login login = new Login();
+            login.setId(resultSet.getLong("login_id"));
+            user.setLogin((new LoginJdbcDao(getConnection())).getFirst(login, "id"));
             return (T) user;
         } catch (SQLException e) {
+            e.printStackTrace();
             throw new DaoException("exception.dao.jdbc.get-entity-from-result-set", e.getCause());
         }
     }

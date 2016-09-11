@@ -8,6 +8,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.sql.DataSource;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Properties;
@@ -21,22 +23,30 @@ public abstract class AbstractDaoFactory implements DaoFactory {
     private static DataSource connectionPool = null;
     private Connection connection = null;
 
-    public static AbstractDaoFactory createDaoFactory() throws DaoException, ConnectionException {
+    public static DaoFactory createDaoFactory() throws DaoException, ConnectionException {
+        logger.debug("createDaoFactory");
         try {
-            if (AbstractDaoFactory.connectionPool == null)
-                AbstractDaoFactory.connectionPool = ConnectionPool.getInstance();
             if (AbstractDaoFactory.databaseProperties == null) {
                 AbstractDaoFactory.databaseProperties = new Properties();
                 AbstractDaoFactory.databaseProperties.load
                         (AbstractDaoFactory.class.getClassLoader().getResourceAsStream("database.properties"));
             }
+            if (AbstractDaoFactory.connectionPool == null) {
+                ConnectionPool.initProperties(databaseProperties);
+                AbstractDaoFactory.connectionPool = ConnectionPool.getInstance();
+                Class.forName(databaseProperties.getProperty("management-system.class"));
+            }
             Class factoryClass = Class.forName(AbstractDaoFactory.databaseProperties.getProperty("management-system.factory"));
-            return (AbstractDaoFactory) factoryClass.newInstance();
+            Constructor<?> factoryClassConstructor = factoryClass.getConstructor(Connection.class);
+            return (DaoFactory) factoryClassConstructor.newInstance(AbstractDaoFactory.connectionPool.getConnection());
         } catch (IOException e) {
             throw new DaoException("exception.dao.properties.load", e.getCause());
         } catch (ClassNotFoundException e) {
             throw new DaoException("exception.dao.factory.for-name", e.getCause());
-        } catch (InstantiationException | IllegalAccessException e) {
+        } catch (NoSuchMethodException e) {
+            throw new DaoException("exception.dao.factory.get-constructor", e.getCause());
+        } catch (SQLException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
+            e.printStackTrace();
             throw new DaoException("exception.dao.factory.new-instance", e.getCause());
         }
     }
@@ -45,6 +55,10 @@ public abstract class AbstractDaoFactory implements DaoFactory {
         String databaseProperty = AbstractDaoFactory.databaseProperties.getProperty(key);
         if (databaseProperty == null) throw new DaoException("exception.dao.properties.key");
         return databaseProperty;
+    }
+
+    public AbstractDaoFactory(Connection connection) {
+        this.connection = connection;
     }
 
     @Override

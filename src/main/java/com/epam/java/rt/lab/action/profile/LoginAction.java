@@ -108,8 +108,9 @@ public class LoginAction implements Action {
                 logger.debug("NOT VALID");
                 req.getRequestDispatcher("/WEB-INF/jsp/profile/login.jsp").forward(req, resp);
             }
-        } catch (ServletException | IOException | ConnectionException | DaoException | SQLException e) {
-            throw new ActionException(e.getMessage());
+        } catch (ServletException | IOException | ConnectionException | DaoException e) {
+            e.printStackTrace();
+            throw new ActionException("exception.action.login", e.getCause());
         }
     }
 

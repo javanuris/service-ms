@@ -23,91 +23,27 @@ public class UserService extends BaseService {
     public UserService() throws ConnectionException, DaoException {
     }
 
-    User getUser(Login login) throws DaoException {
+    public User getUser(Login login) throws DaoException {
         User user = new User();
         user.setLogin(login);
         Dao_ dao = super.daoFactory.createDao("User");
-        user = dao.getFirst(user, "login_id");
+        user = dao.getFirst(user, "login");
         daoFactory.close();
         return user;
     }
 
-    User getAnonymous() throws DaoException {
-        return getUser(new Login());
+    public User getUser(Long id) throws DaoException {
+        User user = new User();
+        user.setId(id);
+        Dao_ dao = super.daoFactory.createDao("User");
+        user = dao.getFirst(user, "id");
+        daoFactory.close();
+        return user;
     }
 
-//
-//    User getUser(Login login, Connection connection) throws DaoException, SQLException, ConnectionException {
-//        logger.debug("getUser");
-//        Dao userDao = null;
-//        try {
-//            userDao = super.getJdbcDao(connection);
-//            logger.debug("userDao = {}", userDao.getClass().getSimpleName());
-//            User user = userDao.query("*").filter("login_id", loginId(login)).first();
-//            if (user == null) return null;
-//            user.setLogin(login);
-//            user.setRole((new RoleService())
-//                    .getRole(userDao.getResultSet().getLong("role_id"), connection));
-//            logger.debug("user.name = {}, login = {}, role = {}",
-//                    user.getName(), user.getLogin(), user.getRole().getName());
-//            return user;
-//        } finally {
-//            if (userDao != null) userDao.close();
-//        }
-//    }
-//
-//    public User getUser(Login login) throws DaoException, SQLException, ConnectionException {
-//        logger.debug("getUser");
-//        Connection connection = null;
-//        try {
-//            connection = AbstractDaoFactory.createDaoFactory().getConnection();
-//            return getUser(login, connection);
-//        } finally {
-//            if (connection != null) AbstractDaoFactory.createDaoFactory().releaseConnection(connection);
-//        }
-//    }
-//
-//    public static User getAnonymous() throws DaoException, SQLException, ConnectionException {
-//        logger.debug("getAnonymous");
-//        Connection connection = null;
-//        try {
-//            connection = AbstractDaoFactory.createDaoFactory().getConnection();
-//            return (new UserService()).getUser((Login) null, connection);
-//        } finally {
-//            if (connection != null) AbstractDaoFactory.createDaoFactory().releaseConnection(connection);
-//        }
-//    }
-//
-//    User getUser(Long id, Connection connection) throws DaoException, SQLException, ConnectionException {
-//        logger.debug("getUser");
-//        Dao userDao = null;
-//        try {
-//            userDao = super.getJdbcDao(connection);
-//            logger.debug("userDao = {}", userDao.getClass().getSimpleName());
-//            User user = userDao.query("*").filter("id", id).first();
-//            if (user == null) return null;
-//            user.setLogin((new LoginService()
-//                    .getLogin(userDao.getResultSet().getLong("login_id"), connection)));
-//            user.setRole((new RoleService())
-//                    .getRole(userDao.getResultSet().getLong("role_id"), connection));
-//            logger.debug("user.name = {}, login = {}, role = {}",
-//                    user.getName(), user.getLogin(), user.getRole().getName());
-//            return user;
-//        } finally {
-//            if (userDao != null) userDao.close();
-//        }
-//    }
-//
-//    public User getUser(Long id) throws DaoException, SQLException, ConnectionException {
-//        logger.debug("getUser");
-//        Connection connection = null;
-//        try {
-//            connection = AbstractDaoFactory.createDaoFactory().getConnection();
-//            return getUser(id, connection);
-//        } finally {
-//            if (connection != null) AbstractDaoFactory.createDaoFactory().releaseConnection(connection);
-//        }
-//    }
+    public User getAnonymous() throws DaoException {
+        return getUser(new Login());
+    }
 
     public static String getRememberCookieName() {
         return UserService.REMEMBER_COOKIE_NAME.toString();
@@ -132,19 +68,8 @@ public class UserService extends BaseService {
         return rememberUserIdMap.get(UUID.fromString(rememberCookieValue));
     }
 
-//    public int updateName(User user) throws DaoException, SQLException, ConnectionException {
-//        logger.debug("updateName");
-//        Connection connection = null;
-//        Dao jdbcDao = null;
-//        try {
-//            connection = AbstractDaoFactory.createDaoFactory().getConnection();
-//            jdbcDao = super.getJdbcDao(connection);
-//            logger.debug("jdbcDao = {}", jdbcDao.getClass().getSimpleName());
-//            return jdbcDao.update("first_name", "middle_name", "last_name").set(user).execute().getLastUpdateCount();
-//        } finally {
-//            if (jdbcDao != null) jdbcDao.close();
-//            if (connection != null) AbstractDaoFactory.createDaoFactory().releaseConnection(connection);
-//        }
-//    }
+    public int updateName(User user) {
+        return 0;
+    }
 
 }

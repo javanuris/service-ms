@@ -45,8 +45,8 @@ public class ViewAction implements Action {
                     new ViewComponent.ViewItem
                             ("profile.view.edit-profile.label", "button", req.getContextPath().concat("/profile/edit"))));
             req.getRequestDispatcher("/WEB-INF/jsp/profile/view.jsp").forward(req, resp);
-        } catch (ServletException | IOException | ConnectionException | DaoException | SQLException e) {
-            throw new ActionException(e.getMessage());
+        } catch (ServletException | IOException | ConnectionException | DaoException e) {
+            throw new ActionException("exception.action.view", e.getCause());
         }
     }
 

@@ -17,10 +17,10 @@ import java.sql.SQLException;
 public class LoginService extends BaseService {
     private static final Logger logger = LoggerFactory.getLogger(LoginService.class);
 
-    LoginService() throws ConnectionException, DaoException {
+    public LoginService() throws ConnectionException, DaoException {
     }
 
-    Login getLogin(String email, String password) throws DaoException {
+    public Login getLogin(String email, String password) throws DaoException {
         Login login = new Login();
         login.setEmail(email);
         login.setPassword(password);

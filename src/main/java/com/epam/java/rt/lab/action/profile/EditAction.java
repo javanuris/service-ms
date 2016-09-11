@@ -30,6 +30,7 @@ public class EditAction implements Action {
     public void execute(HttpServletRequest req, HttpServletResponse resp) throws ActionException {
         FormComponent formComponent = (FormComponent) req.getSession().getAttribute("editProfileForm");
         try {
+            UserService userService = new UserService();
             if (req.getMethod().equals("GET")) {
                 logger.debug("GET");
                 if (UrlParameter.getUrlParameter(req, "cancel", null) != null) {
@@ -41,7 +42,7 @@ public class EditAction implements Action {
                     for (FormComponent.FormItem formItem : formComponent.getFormItemArray())
                         formItem.setValidationMessageArray(null);
                 } else {
-                    User user = new UserService().getUser((Long) req.getSession().getAttribute("userId"));
+                    User user = userService.getUser((Long) req.getSession().getAttribute("userId"));
                     logger.debug("user = {}, {}, {}", user.getFirstName(), user.getMiddleName(), user.getLastName());
                     formComponent = new FormComponent("edit-profile", "/profile/edit",
                             new FormComponent.FormItem
@@ -63,12 +64,12 @@ public class EditAction implements Action {
                 logger.debug("POST");
                 if (FormValidator.setValueAndValidate(req, formComponent.getFormItemArray())) {
                     logger.debug("VALID");
-                    User user = new UserService().getUser((Long) req.getSession().getAttribute("userId"));
+                    User user = userService.getUser((Long) req.getSession().getAttribute("userId"));
                     user.setFirstName(formComponent.getFormItemArray()[0].getValue());
                     user.setMiddleName(formComponent.getFormItemArray()[1].getValue());
                     user.setLastName(formComponent.getFormItemArray()[2].getValue());
                     logger.debug("user.getName() = {}", user.getName());
-                    if (new UserService().updateName(user) != 1) {
+                    if (userService.updateName(user) != 1) {
                         logger.debug("UPDATE ERROR");
                         String[] validationMessageArray = {"profile.edit.submit.error-edit"};
                         formComponent.getFormItemArray()[3].setValidationMessageArray(validationMessageArray);
@@ -82,8 +83,8 @@ public class EditAction implements Action {
                 logger.debug("NOT VALID");
                 req.getRequestDispatcher("/WEB-INF/jsp/profile/edit.jsp").forward(req, resp);
             }
-        } catch (ServletException | IOException | ConnectionException | DaoException | SQLException e) {
-            throw new ActionException(e.getMessage());
+        } catch (ServletException | IOException | ConnectionException | DaoException e) {
+            throw new ActionException("exception.action.edit", e.getCause());
         }
     }
 }

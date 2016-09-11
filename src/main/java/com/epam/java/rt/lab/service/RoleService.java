@@ -34,47 +34,9 @@ public class RoleService extends BaseService {
         return role;
     }
 
-
-//    Role getRole(Long id, Connection connection) throws DaoException, SQLException, ConnectionException {
-//        logger.debug("getRole");
-//        Dao roleDao = null;
-//        try {
-//            roleDao = super.getJdbcDao(connection);
-//            logger.debug("roleDao = {}", roleDao.getClass().getSimpleName());
-//            Role role = roleDao.query("*").filter("id", id).first();
-//            if (role == null) return null;
-//            PermissionService permissionService = new PermissionService();
-//            role.setUriList(permissionService.getUriList(permissionService.getPermissionList(role.getId(), connection)));
-//            return role;
-//        } finally {
-//            if (roleDao != null) roleDao.close();
-//        }
-//    }
-//
-//    public Role getRole(Long id) throws DaoException, SQLException, ConnectionException {
-//        logger.debug("getRole({})", id);
-//        Connection connection = null;
-//        try {
-//            connection = AbstractDaoFactory.createDaoFactory().getConnection();
-//            return getRole(id, connection);
-//        } finally {
-//            if (connection != null) AbstractDaoFactory.createDaoFactory().releaseConnection(connection);
-//        }
-//    }
-
-    @Deprecated
-    public static Role getAnonymous() {
-        return new Role(2L, "anonymous", PermissionService.getAnonymous());
-    }
-
-    public static List<Role> getRoleList() {
-        List<Role> roleList = new ArrayList<>();
-        Role role = new Role();
-        role.setId(1L);
-        role.setName("admin");
-        role.setUriList(PermissionService.getPermissionUriList(role));
-        roleList.add(role);
-        return roleList;
+    public List<Role> getRoleList() throws DaoException {
+        Dao_ dao = super.daoFactory.createDao("Role");
+        return dao.getAll(null, null);
     }
 
 }

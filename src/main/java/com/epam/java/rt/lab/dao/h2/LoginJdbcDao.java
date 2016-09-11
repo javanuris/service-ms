@@ -20,12 +20,12 @@ public class LoginJdbcDao extends JdbcDao {
     }
 
     @Override
-    String preparedStatementMapKeyPrefix() {
+    String getEntityTableName() {
         return "Login";
     }
 
     @Override
-    <T> Column entityColumn(T entity, Field field) throws DaoException {
+    <T> Column getEntityColumn(T entity, Field field) throws DaoException {
         try {
             switch (field.getName()) {
                 case "id":
@@ -46,6 +46,7 @@ public class LoginJdbcDao extends JdbcDao {
     <T> T getEntityFromResultSet(T entity, ResultSet resultSet) throws DaoException {
         try {
             Login login = (Login) entity;
+            if (login == null) login = new Login();
             login.setId(resultSet.getLong("id"));
             login.setEmail(resultSet.getString("email"));
             login.setPassword(resultSet.getString("password"));
