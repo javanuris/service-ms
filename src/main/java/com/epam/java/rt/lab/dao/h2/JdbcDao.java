@@ -1,7 +1,7 @@
 package com.epam.java.rt.lab.dao.h2;
 
 import com.epam.java.rt.lab.dao.DaoException;
-import com.epam.java.rt.lab.dao.Dao_;
+import com.epam.java.rt.lab.dao.Dao;
 import com.epam.java.rt.lab.dao.query.Column;
 import com.epam.java.rt.lab.dao.query.Select;
 
@@ -19,7 +19,7 @@ import java.util.Map;
 /**
  * service-ms
  */
-abstract class JdbcDao implements Dao_ {
+abstract class JdbcDao implements Dao {
     private static Map<Type, Method> preparedStatementMethodMap = new HashMap<>();
     static Map<String, PreparedStatement> preparedStatementMap = new HashMap<>();
     private Connection connection = null;

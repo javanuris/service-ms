@@ -3,17 +3,10 @@ package com.epam.java.rt.lab.service;
 import com.epam.java.rt.lab.connection.ConnectionException;
 import com.epam.java.rt.lab.dao.Dao;
 import com.epam.java.rt.lab.dao.DaoException;
-import com.epam.java.rt.lab.dao.Dao_;
-import com.epam.java.rt.lab.dao.factory.AbstractDaoFactory;
-import com.epam.java.rt.lab.entity.rbac.Login;
 import com.epam.java.rt.lab.entity.rbac.Role;
-import com.epam.java.rt.lab.entity.rbac.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -28,14 +21,14 @@ public class RoleService extends BaseService {
     Role getRole(Long id) throws DaoException {
         Role role = new Role();
         role.setId(id);
-        Dao_ dao = super.daoFactory.createDao("Role");
+        Dao dao = super.daoFactory.createDao("Role");
         role = dao.getFirst(role, "id");
         daoFactory.close();
         return role;
     }
 
     public List<Role> getRoleList() throws DaoException {
-        Dao_ dao = super.daoFactory.createDao("Role");
+        Dao dao = super.daoFactory.createDao("Role");
         return dao.getAll(null, null);
     }
 

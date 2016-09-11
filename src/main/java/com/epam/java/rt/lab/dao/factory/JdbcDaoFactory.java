@@ -1,7 +1,7 @@
 package com.epam.java.rt.lab.dao.factory;
 
 import com.epam.java.rt.lab.dao.DaoException;
-import com.epam.java.rt.lab.dao.Dao_;
+import com.epam.java.rt.lab.dao.Dao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,7 +20,7 @@ public class JdbcDaoFactory extends AbstractDaoFactory {
     }
 
     @Override
-    public Dao_ createDao(String daoShortName) throws DaoException {
+    public Dao createDao(String daoShortName) throws DaoException {
         try {
             Class daoClass = Class.forName
                     (JdbcDaoFactory.getDatabaseProperty("management-system.package")
@@ -28,9 +28,9 @@ public class JdbcDaoFactory extends AbstractDaoFactory {
             logger.debug("daoClass: {}", daoClass.getName());
             Constructor<?> daoClassConstructor = daoClass.getConstructor(Connection.class);
             logger.debug("daoClassConstructor: {}", daoClassConstructor.getName());
-            Dao_ dao = (Dao_) daoClassConstructor.newInstance(getConnection());
+            Dao dao = (Dao) daoClassConstructor.newInstance(getConnection());
             logger.debug("dao: {}", dao.getClass().getName());
-            return (Dao_) daoClassConstructor.newInstance(getConnection());
+            return (Dao) daoClassConstructor.newInstance(getConnection());
         } catch (ClassNotFoundException e) {
             throw new DaoException("exception.dao.factory.jdbc.for-name", e.getCause());
         } catch (NoSuchMethodException e) {

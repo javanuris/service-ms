@@ -1,7 +1,7 @@
 package com.epam.java.rt.lab.dao.factory;
 
 import com.epam.java.rt.lab.dao.DaoException;
-import com.epam.java.rt.lab.dao.Dao_;
+import com.epam.java.rt.lab.dao.Dao;
 
 import java.sql.Connection;
 
@@ -18,7 +18,7 @@ public interface DaoFactory {
 
     void rollbackTransaction() throws DaoException;
 
-    Dao_ createDao(String daoShortName) throws DaoException;
+    Dao createDao(String daoShortName) throws DaoException;
 
     void close() throws DaoException;
 }

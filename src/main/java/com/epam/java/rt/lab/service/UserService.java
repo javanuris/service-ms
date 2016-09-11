@@ -2,7 +2,7 @@ package com.epam.java.rt.lab.service;
 
 import com.epam.java.rt.lab.connection.ConnectionException;
 import com.epam.java.rt.lab.dao.DaoException;
-import com.epam.java.rt.lab.dao.Dao_;
+import com.epam.java.rt.lab.dao.Dao;
 import com.epam.java.rt.lab.entity.rbac.Login;
 import com.epam.java.rt.lab.entity.rbac.User;
 import org.slf4j.Logger;
@@ -26,7 +26,7 @@ public class UserService extends BaseService {
     public User getUser(Login login) throws DaoException {
         User user = new User();
         user.setLogin(login);
-        Dao_ dao = super.daoFactory.createDao("User");
+        Dao dao = super.daoFactory.createDao("User");
         user = dao.getFirst(user, "login");
         daoFactory.close();
         return user;
@@ -35,7 +35,7 @@ public class UserService extends BaseService {
     public User getUser(Long id) throws DaoException {
         User user = new User();
         user.setId(id);
-        Dao_ dao = super.daoFactory.createDao("User");
+        Dao dao = super.daoFactory.createDao("User");
         user = dao.getFirst(user, "id");
         daoFactory.close();
         return user;

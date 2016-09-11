@@ -15,14 +15,12 @@ public class Column<T> {
     public Column(String name, T value) {
         this.name = convertName(name);
         this.value = value;
-        System.out.println(this.name + " = " + this.value);
     }
 
     public Column(String name, T value, boolean isColumn) {
         this.name = convertName(name);
         this.value = value;
         this.isColumn = isColumn;
-        System.out.println(this.name + " = " + this.value);
     }
 
     private String convertName(String name) {

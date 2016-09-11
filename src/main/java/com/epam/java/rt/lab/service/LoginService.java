@@ -3,7 +3,6 @@ package com.epam.java.rt.lab.service;
 import com.epam.java.rt.lab.connection.ConnectionException;
 import com.epam.java.rt.lab.dao.Dao;
 import com.epam.java.rt.lab.dao.DaoException;
-import com.epam.java.rt.lab.dao.Dao_;
 import com.epam.java.rt.lab.entity.rbac.Login;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +23,7 @@ public class LoginService extends BaseService {
         Login login = new Login();
         login.setEmail(email);
         login.setPassword(password);
-        Dao_ dao = super.daoFactory.createDao("Login");
+        Dao dao = super.daoFactory.createDao("Login");
         login = dao.getFirst(login, "email, password");
         daoFactory.close();
         return login;
