@@ -51,7 +51,6 @@ public class RBACFilter implements Filter {
             }
             if (userId == null) {
                 try {
-                    logger.debug("getAnonymous = {}", userService.getAnonymous());
                     logger.debug("ANONYMOUS URI = {}", userService.getAnonymous().getRole().getUriList());
                     if (userService.getAnonymous().getRole().getUriList().contains(req.getPathInfo())) {
                         logger.debug("CONTAINS {}", req.getPathInfo());

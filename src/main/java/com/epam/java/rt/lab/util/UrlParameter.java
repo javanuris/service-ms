@@ -19,7 +19,6 @@ public class UrlParameter {
                     parameterName = parameterNames.nextElement();
                     parameterValue = req.getParameter(parameterName);
                     req.setAttribute("url-".concat(parameterName), parameterValue);
-                    System.out.println(parameterName + " = " + parameterValue);
                 }
             }
         }
@@ -39,7 +38,6 @@ public class UrlParameter {
                 result.append(parameterName).append("=").append(parameterValue);
             }
         }
-        System.out.println(result);
         return result.toString();
     }
 
@@ -53,7 +51,6 @@ public class UrlParameter {
             }
             result.append(urlParameterBuilder.getName()).append("=").append(urlParameterBuilder.getValue());
         }
-        System.out.println(result);
         return result.toString();
     }
 
