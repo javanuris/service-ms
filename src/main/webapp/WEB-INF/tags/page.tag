@@ -8,27 +8,27 @@
         <div class="btn-group" role="group" aria-label="First" style="margin: 10px 0;">
             <c:choose>
                 <c:when test="${pageComponent.currentPage > 1}">
-                    <a href="${uriWithParameterPrefix.concat(1)}" type="button" class="btn btn-default">
-                        <span class="glyphicon glyphicon-step-backward" aria-hidden="true" style="margin: 3px -2px;"></span>
+                    <a href="${uriWithParameterPrefix.concat(1)}" type="button" class="btn btn-default btn-sm">
+                        <span class="glyphicon glyphicon-step-backward" aria-hidden="true" style="margin: 3px 0;"></span>
                     </a>
-                    <a href="${uriWithParameterPrefix.concat(pageComponent.currentPage - 1)}" type="button" class="btn btn-default">
-                        <span class="glyphicon glyphicon-triangle-left" aria-hidden="true" style="margin: 3px -2px;"></span>
+                    <a href="${uriWithParameterPrefix.concat(pageComponent.currentPage - 1)}" type="button" class="btn btn-default btn-sm">
+                        <span class="glyphicon glyphicon-triangle-left" aria-hidden="true" style="margin: 3px 0;"></span>
                     </a>
                 </c:when>
                 <c:otherwise>
-                    <a href="#" type="button" class="btn btn-default disabled">
-                        <span class="glyphicon glyphicon-step-backward" aria-hidden="true" style="margin: 3px -2px;"></span>
+                    <a href="#" type="button" class="btn btn-default disabled btn-sm">
+                        <span class="glyphicon glyphicon-step-backward" aria-hidden="true" style="margin: 3px 0;"></span>
                     </a>
-                    <a href="#" type="button" class="btn btn-default disabled">
-                        <span class="glyphicon glyphicon-triangle-left" aria-hidden="true" style="margin: 3px -2px;"></span>
+                    <a href="#" type="button" class="btn btn-default disabled btn-sm">
+                        <span class="glyphicon glyphicon-triangle-left" aria-hidden="true" style="margin: 3px 0;"></span>
                     </a>
                 </c:otherwise>
             </c:choose>
             <div class="btn-group dropup" role="group">
-                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="min-width: 50px;">
+                <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="min-width: 50px;">
                         ${pageComponent.currentPage}
                 </button>
-                <ul class="dropdown-menu" style="text-align: center; min-width: 50px;">
+                <ul class="dropdown-menu" style="text-align: center; min-width: 50px; overflow: auto; max-height: 250px;">
                     <c:forEach var="index" begin="1" end="${pageComponent.countPages}">
                         <li><a href="${uriWithParameterPrefix.concat(index)}">${index}</a></li>
                     </c:forEach>
@@ -36,19 +36,19 @@
             </div>
             <c:choose>
                 <c:when test="${pageComponent.currentPage < pageComponent.countPages}">
-                    <a href="${uriWithParameterPrefix.concat(pageComponent.currentPage + 1)}" type="button" class="btn btn-default">
-                        <span class="glyphicon glyphicon-triangle-right" aria-hidden="true" style="margin: 3px -2px;"></span>
+                    <a href="${uriWithParameterPrefix.concat(pageComponent.currentPage + 1)}" type="button" class="btn btn-default btn-sm">
+                        <span class="glyphicon glyphicon-triangle-right" aria-hidden="true" style="margin: 3px 0;"></span>
                     </a>
-                    <a href="${uriWithParameterPrefix.concat(pageComponent.countPages)}" type="button" class="btn btn-default">
-                        <span class="glyphicon glyphicon-step-forward" aria-hidden="true" style="margin: 3px -2px;"></span>
+                    <a href="${uriWithParameterPrefix.concat(pageComponent.countPages)}" type="button" class="btn btn-default btn-sm">
+                        <span class="glyphicon glyphicon-step-forward" aria-hidden="true" style="margin: 3px 0;"></span>
                     </a>
                 </c:when>
                 <c:otherwise>
-                    <a href="#" type="button" class="btn btn-default">
-                        <span class="glyphicon glyphicon-triangle-right disabled" aria-hidden="true" style="margin: 3px -2px;"></span>
+                    <a href="#" type="button" class="btn btn-default disabled btn-sm">
+                        <span class="glyphicon glyphicon-triangle-right" aria-hidden="true" style="margin: 3px 0;"></span>
                     </a>
-                    <a href="#" type="button" class="btn btn-default">
-                        <span class="glyphicon glyphicon-step-forward disabled" aria-hidden="true" style="margin: 3px -2px;"></span>
+                    <a href="#" type="button" class="btn btn-default disabled btn-sm">
+                        <span class="glyphicon glyphicon-step-forward" aria-hidden="true" style="margin: 3px 0;"></span>
                     </a>
                 </c:otherwise>
             </c:choose>

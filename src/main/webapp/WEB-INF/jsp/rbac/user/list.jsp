@@ -10,10 +10,6 @@
         ${requestScope.userList.addColumn(5, 'list.header.user-name.label', 'name')}
         ${requestScope.userList.addColumn(3, 'list.header.role-name.label', 'role')}
         ${requestScope.userList.addColumn(3, 'list.header.login-email.label', 'login')}
-        <tags:list>
-            <jsp:attribute name="listComponent">${requestScope.userList}</jsp:attribute>
-            <jsp:attribute name="pageComponent">"${requestScope.userListPage}</jsp:attribute>
-            <jsp:attribute name="uriWithParameterPrefix">${pageContext.request.contextPath}/rbac/user/list?page=</jsp:attribute>
-        </tags:list>
+        <tags:list listComponent="${requestScope.userList}" pageComponent="${requestScope.userListPage}" uriWithParameterPrefix="${pageContext.request.contextPath}/rbac/user/list?page="/>
     </jsp:body>
 </tags:template>
