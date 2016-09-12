@@ -16,9 +16,9 @@ import java.util.List;
 /**
  * service-ms
  */
-class RoleJdbcDao extends JdbcDao {
+public class RoleJdbcDao extends JdbcDao {
 
-    RoleJdbcDao(Connection connection) throws DaoException {
+    public RoleJdbcDao(Connection connection) throws DaoException {
         super(connection);
     }
 

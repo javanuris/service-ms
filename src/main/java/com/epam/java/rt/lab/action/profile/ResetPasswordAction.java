@@ -11,7 +11,7 @@ import com.epam.java.rt.lab.entity.rbac.User;
 import com.epam.java.rt.lab.service.LoginService;
 import com.epam.java.rt.lab.service.UserService;
 import com.epam.java.rt.lab.util.FormValidator;
-import com.epam.java.rt.lab.util.UrlParameter;
+import com.epam.java.rt.lab.util.UrlManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,16 +34,13 @@ public class ResetPasswordAction implements Action {
         try {
             if (req.getMethod().equals("GET")) {
                 logger.debug("GET");
-                if (UrlParameter.getUrlParameter(req, "cancel", null) != null) {
+                if (UrlManager.getUrlParameter(req, "cancel", null) != null) {
                     req.getSession().removeAttribute("resetPasswordForm");
-                    resp.sendRedirect("/profile/view");
+                    resp.sendRedirect(UrlManager.getContextUri(req, "/profile/view"));
                     return;
                 }
                 if (formComponent != null) {
-                    for (FormComponent.FormItem formItem : formComponent.getFormItemArray()) {
-                        formItem.setValue("");
-                        formItem.setValidationMessageArray(null);
-                    }
+                    formComponent.clear();
                 } else {
                     formComponent = new FormComponent("reset-password", "/profile/reset-password",
                             new FormComponent.FormItem
@@ -55,8 +52,8 @@ public class ResetPasswordAction implements Action {
                             new FormComponent.FormItem
                                     ("profile.reset-password.submit.label", "submit", "", ""),
                             new FormComponent.FormItem
-                                    ("profile.reset-password.cancel.label", "button", req.getContextPath().concat("/profile/reset-password")
-                                            .concat(UrlParameter.combineUrlParameter(new UrlParameter.UrlParameterBuilder("cancel", "true"))), ""));
+                                    ("profile.reset-password.cancel.label", "button",
+                                            UrlManager.getUriForButton(req, "/profile/reset-password", "cancel"), ""));
                     req.getSession().setAttribute("resetPasswordForm", formComponent);
                 }
                 req.getRequestDispatcher("/WEB-INF/jsp/profile/reset-password.jsp").forward(req, resp);
@@ -85,7 +82,7 @@ public class ResetPasswordAction implements Action {
                         } else {
                             logger.debug("UPDATE SUCCESS");
                             req.getSession().removeAttribute("resetPasswordForm");
-                            resp.sendRedirect(req.getContextPath().concat("/profile/view"));
+                            resp.sendRedirect(UrlManager.getContextUri(req, "/profile/view"));
                             return;
                         }
                     }

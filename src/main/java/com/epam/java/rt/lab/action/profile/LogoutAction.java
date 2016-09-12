@@ -5,6 +5,7 @@ import com.epam.java.rt.lab.action.ActionException;
 import com.epam.java.rt.lab.action.WebAction;
 import com.epam.java.rt.lab.service.UserService;
 import com.epam.java.rt.lab.servlet.ResponseCookie;
+import com.epam.java.rt.lab.util.UrlManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,7 +31,7 @@ public class LogoutAction implements Action {
             ResponseCookie.setCookie(resp, UserService.getRememberCookieName(), null, 0, req.getContextPath().concat("/"));
             resp.setHeader("Cache-Control", "no-cache");
             logger.debug("REDIRECTING ({})", req.getContextPath());
-            resp.sendRedirect(req.getContextPath().concat("/"));
+            resp.sendRedirect(UrlManager.getContextUri(req, "/"));
         } catch (IOException e) {
             throw new ActionException(e.getMessage());
         }

@@ -26,7 +26,7 @@ public class UserService extends BaseService {
     public User getUser(Login login) throws DaoException {
         User user = new User();
         user.setLogin(login);
-        Dao dao = super.daoFactory.createDao("User");
+        Dao dao = daoFactory.createDao("User");
         user = dao.getFirst(user, "login");
         daoFactory.close();
         return user;
@@ -35,7 +35,7 @@ public class UserService extends BaseService {
     public User getUser(Long id) throws DaoException {
         User user = new User();
         user.setId(id);
-        Dao dao = super.daoFactory.createDao("User");
+        Dao dao = daoFactory.createDao("User");
         user = dao.getFirst(user, "id");
         daoFactory.close();
         return user;
@@ -69,7 +69,7 @@ public class UserService extends BaseService {
     }
 
     public int updateName(User user) throws DaoException {
-        Dao dao = super.daoFactory.createDao("User");
+        Dao dao = daoFactory.createDao("User");
         int updateCount = dao.update(user, "id", "firstName, middleName, lastName");
         daoFactory.close();
         return updateCount;

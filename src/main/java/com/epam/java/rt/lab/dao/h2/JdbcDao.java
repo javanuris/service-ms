@@ -2,7 +2,10 @@ package com.epam.java.rt.lab.dao.h2;
 
 import com.epam.java.rt.lab.dao.Dao;
 import com.epam.java.rt.lab.dao.DaoException;
+import com.epam.java.rt.lab.dao.factory.JdbcDaoFactory;
 import com.epam.java.rt.lab.dao.query.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -18,7 +21,8 @@ import java.util.Map;
 /**
  * service-ms
  */
-abstract class JdbcDao implements Dao {
+public abstract class JdbcDao implements Dao {
+    private static final Logger logger = LoggerFactory.getLogger(JdbcDao.class);
     private static Map<Type, Method> preparedStatementMethodMap = new HashMap<>();
     private static Map<String, PreparedStatement> preparedStatementMap = new HashMap<>();
     private Connection connection = null;
@@ -53,7 +57,8 @@ abstract class JdbcDao implements Dao {
         }
     }
 
-    JdbcDao(Connection connection) throws DaoException {
+    public JdbcDao(Connection connection) throws DaoException {
+        logger.debug("JdbcDao: {}", connection);
         this.connection = connection;
         if (preparedStatementMethodMap.size() == 0) initPreparedStatementMethodMap();
     }

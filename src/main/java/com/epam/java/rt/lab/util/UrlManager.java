@@ -8,7 +8,16 @@ import java.util.List;
 /**
  * service-ms
  */
-public class UrlParameter {
+public class UrlManager {
+
+    public static String getUriForButton(HttpServletRequest req, String path, String parameterName) {
+        return UrlManager.getContextUri(req, path)
+                .concat(UrlManager.combineUrlParameter(new UrlManager.UrlParameterBuilder(parameterName, "true")));
+    }
+
+    public static String getContextUri(HttpServletRequest req, String path) {
+        return path == null ? null : req.getContextPath().concat(path);
+    }
 
     public static void setAttributeFromUrlParameter(HttpServletRequest req) {
         if (req.getMethod().equals("GET")) {
@@ -55,13 +64,13 @@ public class UrlParameter {
     }
 
     public static String getUrlParameter(HttpServletRequest req, String parameterName, String defaultValue) {
-        String parameterValue = (String) req.getParameter(parameterName);
-        return parameterValue == null ? defaultValue : parameterValue;
+        String parameterValue = req.getParameter(parameterName);
+        return parameterValue == null ? UrlManager.getContextUri(req, defaultValue) : parameterValue;
     }
 
     public static String getUrlParameterFromAttribute(HttpServletRequest req, String parameterName, String defaultValue) {
         String parameterValue = (String) req.getAttribute("url-".concat(parameterName));
-        return parameterValue == null ? defaultValue : parameterValue;
+        return parameterValue == null ? UrlManager.getContextUri(req, defaultValue) : parameterValue;
     }
 
     public static class UrlParameterBuilder {

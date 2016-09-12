@@ -1,9 +1,12 @@
 package com.epam.java.rt.lab.dao.h2;
 
+import com.epam.java.rt.lab.dao.Dao;
 import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.dao.query.Column;
 import com.epam.java.rt.lab.dao.query.Set;
 import com.epam.java.rt.lab.entity.rbac.Login;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
 import java.sql.Connection;
@@ -14,9 +17,10 @@ import java.util.List;
 /**
  * service-ms
  */
-class LoginJdbcDao extends JdbcDao {
+public class LoginJdbcDao extends JdbcDao {
+    private static final Logger logger = LoggerFactory.getLogger(LoginJdbcDao.class);
 
-    LoginJdbcDao(Connection connection) throws DaoException {
+    public LoginJdbcDao(Connection connection) throws DaoException {
         super(connection);
     }
 

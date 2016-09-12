@@ -23,7 +23,7 @@ public class LoginService extends BaseService {
         Login login = new Login();
         login.setEmail(email);
         login.setPassword(password);
-        Dao dao = super.daoFactory.createDao("Login");
+        Dao dao = daoFactory.createDao("Login");
         login = dao.getFirst(login, "email, password");
         daoFactory.close();
         return login;
@@ -32,7 +32,7 @@ public class LoginService extends BaseService {
     public int updatePassword(Login login)
             throws DaoException, SQLException, ConnectionException {
         logger.debug("updateLogin");
-        Dao dao = super.daoFactory.createDao("Login");
+        Dao dao = daoFactory.createDao("Login");
         int updateCount = dao.update(login, "id", "password");
         daoFactory.close();
         return updateCount;

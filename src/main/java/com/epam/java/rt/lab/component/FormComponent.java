@@ -26,6 +26,13 @@ public class FormComponent {
         return formItemArray;
     }
 
+    public void clear() {
+        for (FormItem formItem : this.formItemArray) {
+            formItem.setValue("");
+            formItem.setValidationMessageArray(null);
+        }
+    }
+
     public static class FormItem {
         private String label;
         private String type;

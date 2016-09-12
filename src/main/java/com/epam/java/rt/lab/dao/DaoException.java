@@ -7,6 +7,7 @@ import java.io.PrintWriter;
  * service-ms
  */
 public class DaoException extends Exception {
+
     public DaoException() {
         super();
     }
@@ -34,6 +35,7 @@ public class DaoException extends Exception {
 
     @Override
     public String getLocalizedMessage() {
+        //
         return super.getLocalizedMessage();
     }
 

@@ -5,7 +5,7 @@ import com.epam.java.rt.lab.connection.ConnectionException;
 import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.entity.rbac.User;
 import com.epam.java.rt.lab.service.UserService;
-import com.epam.java.rt.lab.util.UrlParameter;
+import com.epam.java.rt.lab.util.UrlManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,7 +15,6 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.sql.SQLException;
 
 /**
  * Service Management System
@@ -58,8 +57,8 @@ public class RBACFilter implements Filter {
                         logger.debug("REDIRECT (SHOULD BE NULL) {}", req.getSession().getAttribute("redirect"));
                     } else {
                         logger.debug("NEED TO REDIRECT");
-                        ((HttpServletResponse) servletResponse).sendRedirect("/profile/login".concat
-                                (UrlParameter.combineUrlParameter(new UrlParameter.UrlParameterBuilder
+                        ((HttpServletResponse) servletResponse).sendRedirect(UrlManager.getContextUri(req, "/profile/login")
+                                .concat(UrlManager.combineUrlParameter(new UrlManager.UrlParameterBuilder
                                         ("redirect", req.getContextPath().concat(req.getPathInfo())))));
                     }
                 } catch (DaoException e) {
@@ -72,7 +71,7 @@ public class RBACFilter implements Filter {
                     filterChain.doFilter(servletRequest, servletResponse);
                 } else {
                     if (req.getPathInfo().equals("/profile/login")) {
-                        ((HttpServletResponse) servletResponse).sendRedirect("/profile/view");
+                        ((HttpServletResponse) servletResponse).sendRedirect(UrlManager.getContextUri(req, "/profile/view"));
                     } else {
                         ((HttpServletResponse) servletResponse).sendError(403);
                     }

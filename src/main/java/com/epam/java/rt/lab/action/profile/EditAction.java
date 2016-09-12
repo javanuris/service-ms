@@ -9,7 +9,7 @@ import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.entity.rbac.User;
 import com.epam.java.rt.lab.service.UserService;
 import com.epam.java.rt.lab.util.FormValidator;
-import com.epam.java.rt.lab.util.UrlParameter;
+import com.epam.java.rt.lab.util.UrlManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,7 +17,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.sql.SQLException;
 
 /**
  * service-ms
@@ -33,14 +32,13 @@ public class EditAction implements Action {
             UserService userService = new UserService();
             if (req.getMethod().equals("GET")) {
                 logger.debug("GET");
-                if (UrlParameter.getUrlParameter(req, "cancel", null) != null) {
+                if (UrlManager.getUrlParameter(req, "cancel", null) != null) {
                     req.getSession().removeAttribute("editProfileForm");
-                    resp.sendRedirect("/profile/view");
+                    resp.sendRedirect(UrlManager.getContextUri(req, "/profile/view"));
                     return;
                 }
                 if (formComponent != null) {
-                    for (FormComponent.FormItem formItem : formComponent.getFormItemArray())
-                        formItem.setValidationMessageArray(null);
+                    formComponent.clear();
                 } else {
                     User user = userService.getUser((Long) req.getSession().getAttribute("userId"));
                     logger.debug("user = {}, {}, {}", user.getFirstName(), user.getMiddleName(), user.getLastName());
@@ -54,8 +52,8 @@ public class EditAction implements Action {
                             new FormComponent.FormItem
                                     ("profile.edit.submit.label", "submit", ""),
                             new FormComponent.FormItem
-                                    ("profile.edit.cancel.label", "button", req.getContextPath().concat("/profile/edit")
-                                            .concat(UrlParameter.combineUrlParameter(new UrlParameter.UrlParameterBuilder("cancel", "true")))));
+                                    ("profile.edit.cancel.label", "button",
+                                            UrlManager.getUriForButton(req, "/profile/edit", "cancel"), ""));
                     logger.debug("item.value = {}", formComponent.getFormItemArray()[0].getValue());
                     req.getSession().setAttribute("editProfileForm", formComponent);
                 }
@@ -76,7 +74,7 @@ public class EditAction implements Action {
                     } else {
                         logger.debug("UPDATE SUCCESS");
                         req.getSession().removeAttribute("editProfileForm");
-                        resp.sendRedirect(req.getContextPath().concat("/profile/view"));
+                        resp.sendRedirect(UrlManager.getContextUri(req, "/profile/view"));
                         return;
                     }
                 }

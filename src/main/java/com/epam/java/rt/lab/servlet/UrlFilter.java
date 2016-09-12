@@ -1,6 +1,6 @@
 package com.epam.java.rt.lab.servlet;
 
-import com.epam.java.rt.lab.util.UrlParameter;
+import com.epam.java.rt.lab.util.UrlManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,7 +25,7 @@ public class UrlFilter implements Filter {
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)
             throws IOException, ServletException {
         servletRequest.setAttribute("debugMode", true);
-        UrlParameter.setAttributeFromUrlParameter((HttpServletRequest) servletRequest);
+        UrlManager.setAttributeFromUrlParameter((HttpServletRequest) servletRequest);
         String requestURI = ((HttpServletRequest) servletRequest).getRequestURI()
                 .substring(((HttpServletRequest) servletRequest).getContextPath().length()).toLowerCase();
         logger.debug(requestURI);

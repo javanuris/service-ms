@@ -22,6 +22,7 @@ public class JdbcDaoFactory extends AbstractDaoFactory {
     @Override
     public Dao createDao(String daoShortName) throws DaoException {
         try {
+            logger.debug("createDao: {}", daoShortName);
             Class daoClass = Class.forName
                     (JdbcDaoFactory.getDatabaseProperty("management-system.package")
                             .concat(".").concat(daoShortName).concat("JdbcDao"));
@@ -30,7 +31,7 @@ public class JdbcDaoFactory extends AbstractDaoFactory {
             logger.debug("daoClassConstructor: {}", daoClassConstructor.getName());
             Dao dao = (Dao) daoClassConstructor.newInstance(getConnection());
             logger.debug("dao: {}", dao.getClass().getName());
-            return (Dao) daoClassConstructor.newInstance(getConnection());
+            return dao;
         } catch (ClassNotFoundException e) {
             throw new DaoException("exception.dao.factory.jdbc.for-name", e.getCause());
         } catch (NoSuchMethodException e) {

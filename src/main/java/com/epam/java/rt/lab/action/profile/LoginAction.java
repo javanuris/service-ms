@@ -13,7 +13,7 @@ import com.epam.java.rt.lab.service.LoginService;
 import com.epam.java.rt.lab.service.UserService;
 import com.epam.java.rt.lab.servlet.ResponseCookie;
 import com.epam.java.rt.lab.util.FormValidator;
-import com.epam.java.rt.lab.util.UrlParameter;
+import com.epam.java.rt.lab.util.UrlManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,7 +21,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.sql.SQLException;
 
 /**
  * Service Management System
@@ -33,28 +32,26 @@ public class LoginAction implements Action {
     @Override
     public void execute(HttpServletRequest req, HttpServletResponse resp) throws ActionException {
         try {
-            if (req.getSession().getAttribute("user") != null) {
-                logger.debug("REDIRECTING");
-                resp.sendRedirect("/profile/view");
-                logger.debug("REDIRECTED");
-                return;
-            }
+//            CHECKED IN RBAC FILTER
+//            if (req.getSession().getAttribute("user") != null) {
+//                logger.debug("REDIRECTING");
+//                resp.sendRedirect("/profile/view");
+//                logger.debug("REDIRECTED");
+//                return;
+//            }
             FormComponent formComponent = (FormComponent) req.getSession().getAttribute("loginForm");
             if (req.getMethod().equals("GET")) {
                 logger.debug("GET");
-                if (UrlParameter.getUrlParameter(req, "register", null) != null) {
+                if (UrlManager.getUrlParameter(req, "register", null) != null) {
                     req.getSession().removeAttribute("loginForm");
-                    resp.sendRedirect("/profile/register");
+                    resp.sendRedirect(UrlManager.getContextUri(req, "/profile/register"));
                     return;
                 }
                 if (formComponent != null) {
-                    for (FormComponent.FormItem formItem : formComponent.getFormItemArray()) {
-                        formItem.setValue("");
-                        formItem.setValidationMessageArray(null);
-                    }
+                    formComponent.clear();
                 } else {
                     formComponent = new FormComponent("login", "/profile/login".concat
-                            (UrlParameter.combineUrlParameterFromAttribute(req, "redirect")),
+                            (UrlManager.combineUrlParameterFromAttribute(req, "redirect")),
                             new FormComponent.FormItem
                                     ("profile.login.email.label", "input", "profile.login.email.label", ""),
                             new FormComponent.FormItem
@@ -64,8 +61,8 @@ public class LoginAction implements Action {
                             new FormComponent.FormItem
                                     ("profile.login.submit.label", "submit", "", ""),
                             new FormComponent.FormItem
-                                    ("profile.login.register.label", "button", req.getContextPath().concat("/profile/login")
-                                            .concat(UrlParameter.combineUrlParameter(new UrlParameter.UrlParameterBuilder("register", "true"))), ""));
+                                    ("profile.login.register.label", "button",
+                                            UrlManager.getUriForButton(req, "/profile/login", "register"), ""));
                     req.getSession().setAttribute("loginForm", formComponent);
                 }
                 req.getRequestDispatcher("/WEB-INF/jsp/profile/login.jsp").forward(req, resp);
@@ -98,7 +95,7 @@ public class LoginAction implements Action {
                                     UserService.setRememberUserId(user.getId()),
                                     2592000, req.getContextPath().concat("/"));
                         }
-                        String redirect = UrlParameter.getUrlParameter(req, "redirect", "/");
+                        String redirect = UrlManager.getUrlParameter(req, "redirect", "/");
                         logger.debug("REDIRECTING ({})", redirect);
                         resp.sendRedirect(redirect);
                         logger.debug("REDIRECTED");

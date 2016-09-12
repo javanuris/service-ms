@@ -8,9 +8,11 @@ import com.epam.java.rt.lab.connection.ConnectionException;
 import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.entity.rbac.User;
 import com.epam.java.rt.lab.service.UserService;
+import com.epam.java.rt.lab.util.UrlManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.print.DocFlavor;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -41,9 +43,9 @@ public class ViewAction implements Action {
                     new ViewComponent.ViewItem
                             ("profile.view.login-email.label", "input", user.getLogin().getEmail()),
                     new ViewComponent.ViewItem
-                            ("profile.view.reset-login-password.label", "button", req.getContextPath().concat("/profile/reset-password")),
+                            ("profile.view.reset-login-password.label", "button", UrlManager.getContextUri(req, "/profile/reset-password")),
                     new ViewComponent.ViewItem
-                            ("profile.view.edit-profile.label", "button", req.getContextPath().concat("/profile/edit"))));
+                            ("profile.view.edit-profile.label", "button", UrlManager.getContextUri(req, "/profile/edit"))));
             req.getRequestDispatcher("/WEB-INF/jsp/profile/view.jsp").forward(req, resp);
         } catch (ServletException | IOException | ConnectionException | DaoException e) {
             throw new ActionException("exception.action.view", e.getCause());

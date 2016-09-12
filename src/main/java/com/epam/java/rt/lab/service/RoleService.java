@@ -21,14 +21,14 @@ public class RoleService extends BaseService {
     Role getRole(Long id) throws DaoException {
         Role role = new Role();
         role.setId(id);
-        Dao dao = super.daoFactory.createDao("Role");
+        Dao dao = daoFactory.createDao("Role");
         role = dao.getFirst(role, "id");
         daoFactory.close();
         return role;
     }
 
     public List<Role> getRoleList() throws DaoException {
-        Dao dao = super.daoFactory.createDao("Role");
+        Dao dao = daoFactory.createDao("Role");
         return dao.getAll(null, null);
     }
 

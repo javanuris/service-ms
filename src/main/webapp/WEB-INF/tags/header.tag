@@ -8,7 +8,7 @@
             <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#app-navbar-collapse" aria-expanded="false">
                 <span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="/" style="padding: 10px;">
+            <a class="navbar-brand" href="<c:url value="/"/>" style="padding: 10px;">
                 <img alt="Brand" src="<c:url value="/static/brand.png"/>" style="width: 30px; height: 30px;">
             </a>
         </div>
@@ -21,7 +21,7 @@
                                 <li class="active"><a href="#"><fmt:message bundle="${ui}" key="${item.name}"/></a></li>
                             </c:when>
                             <c:otherwise>
-                                <li><a href="${item.link}"><fmt:message bundle="${ui}" key="${item.name}"/></a></li>
+                                <li><a href="<c:url value="${item.link}"/>"><fmt:message bundle="${ui}" key="${item.name}"/></a></li>
                             </c:otherwise>
                         </c:choose>
                     </c:forEach>
