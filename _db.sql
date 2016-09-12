@@ -52,6 +52,20 @@ insert into "RolePermission" (role_id, permission_id) values (select id from "Ro
 insert into "Login" (email, password, attempt_left, status) values ('test@test.com', 'test', 5, 0);
 insert into "User" (first_name, role_id) values ('anonymous', select id from "Role" where name is 'anonymous');
 insert into "User" (first_name, middle_name, last_name, login_id, role_id) values ('John', 'M.', 'Dow', select id from "Login" where email is 'test@test.com', select id from "Role" where name is 'admin');
+insert into "User" (first_name, middle_name, last_name, login_id, role_id) values ('Peter', 'A.', 'Hoff', select id from "Login" where email is 'test@test.com', select id from "Role" where name is 'admin');
+insert into "User" (first_name, middle_name, last_name, login_id, role_id) values ('Joseph', 'K.', 'Lemon', select id from "Login" where email is 'test@test.com', select id from "Role" where name is 'admin');
+insert into "User" (first_name, middle_name, last_name, login_id, role_id) values ('Jason', 'M.', 'Bourne', select id from "Login" where email is 'test@test.com', select id from "Role" where name is 'admin');
+insert into "User" (first_name, middle_name, last_name, login_id, role_id) values ('Michael', 'F.', 'Kane', select id from "Login" where email is 'test@test.com', select id from "Role" where name is 'admin');
+insert into "User" (first_name, middle_name, last_name, login_id, role_id) values ('Rebecca', 'W.', 'Douglas', select id from "Login" where email is 'test@test.com', select id from "Role" where name is 'admin');
+insert into "User" (first_name, middle_name, last_name, login_id, role_id) values ('Boris', 'M.', 'Staff', select id from "Login" where email is 'test@test.com', select id from "Role" where name is 'admin');
+insert into "User" (first_name, middle_name, last_name, login_id, role_id) values ('Dilan', 'R.', 'Peterson', select id from "Login" where email is 'test@test.com', select id from "Role" where name is 'admin');
+insert into "User" (first_name, middle_name, last_name, login_id, role_id) values ('Masha', 'O.', 'Brian', select id from "Login" where email is 'test@test.com', select id from "Role" where name is 'admin');
+insert into "User" (first_name, middle_name, last_name, login_id, role_id) values ('Marcello', 'P.', 'Begetti', select id from "Login" where email is 'test@test.com', select id from "Role" where name is 'admin');
+insert into "User" (first_name, middle_name, last_name, login_id, role_id) values ('Joshua', 'B.', 'Scava', select id from "Login" where email is 'test@test.com', select id from "Role" where name is 'admin');
+insert into "User" (first_name, middle_name, last_name, login_id, role_id) values ('Edie', 'N.', 'White', select id from "Login" where email is 'test@test.com', select id from "Role" where name is 'admin');
+insert into "User" (first_name, middle_name, last_name, login_id, role_id) values ('Gregory', 'Z.', 'Shvartz', select id from "Login" where email is 'test@test.com', select id from "Role" where name is 'admin');
+insert into "User" (first_name, middle_name, last_name, login_id, role_id) values ('Bill', 'L.', 'Black', select id from "Login" where email is 'test@test.com', select id from "Role" where name is 'admin');
+insert into "User" (first_name, middle_name, last_name, login_id, role_id) values ('Latisha', 'P.', 'Morrisson', select id from "Login" where email is 'test@test.com', select id from "Role" where name is 'admin');
 
 
 //select data

@@ -13,9 +13,15 @@ public interface Dao {
 
     <T> T getFirst(T entity, String fieldNames, String columnNames) throws DaoException;
 
+    <T> List<T> getAll() throws DaoException;
+
     <T> List<T> getAll(T entity, String fieldNames) throws DaoException;
 
     <T> List<T> getAll(T entity, String fieldNames, String columnNames) throws DaoException;
+
+    <T> List<T> getAll(T entity, String fieldNames, String columnNames, Long offset, Long count) throws DaoException;
+
+    Long getSelectCount();
 
     <T> int update(T entity, String fieldNames, String setNames) throws DaoException;
 

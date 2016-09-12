@@ -4,6 +4,7 @@ import com.epam.java.rt.lab.connection.ConnectionException;
 import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.entity.rbac.Role;
 import com.epam.java.rt.lab.service.RoleService;
+import com.epam.java.rt.lab.util.FormValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,7 +61,8 @@ public class NavigationComponent {
                         if (navItem.getName().startsWith(prefix))
                             navbarNavItemList.add(navItem);
                     }
-                    navItemMap.put(navbarItem.getLink(), navbarNavItemList.toArray());
+                    if (navbarNavItemList.size() > 0)
+                        navItemMap.put(prefix.substring(0, prefix.length() - 1), navbarNavItemList.toArray());
                 }
             }
         } finally {
@@ -79,10 +81,10 @@ public class NavigationComponent {
         return null;
     }
 
-    public static Object[] getNavItemArray(String navbarLink) {
+    public static Object[] getNavItemArray(String navPrefix) {
         try {
             if (navItemMap.size() == 0) updateNavigationItemMap();
-            return navItemMap.get(navbarLink);
+            return navItemMap.get(navPrefix);
         } catch (InterruptedException | ConnectionException | IOException | DaoException e) {
             // TODO unhandled
             e.printStackTrace();
@@ -97,8 +99,13 @@ public class NavigationComponent {
 
         public NavigationItem(String name, String link) {
             String index = name.substring(name.lastIndexOf(".") + 1);
-            this.index = Integer.valueOf(index);
-            this.name = name.substring(0, name.length() - index.length() - 1);
+            if (FormValidator.isOnlyDigits(index)) {
+                this.index = Integer.valueOf(index);
+                this.name = name.substring(0, name.length() - index.length() - 1);
+            } else {
+                this.index = 0;
+                this.name = name;
+            }
             this.link = link;
         }
 

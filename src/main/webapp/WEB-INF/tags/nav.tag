@@ -3,7 +3,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <c:if test="${requestScope.navItemArray != null}">
-    <ul class="nav nav-tabs">
+    <ul class="nav nav-tabs nav-justified">
         <c:forEach var="item" items="${requestScope.navItemArray}">
             <c:choose>
                 <c:when test="${navCurrent.equals(item.link)}">

@@ -13,4 +13,6 @@ public interface SqlQuery {
 
     String create();
 
+    String createCount();
+
 }

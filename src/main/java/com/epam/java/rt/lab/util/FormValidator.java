@@ -21,6 +21,10 @@ public class FormValidator {
 
     }
 
+    public static boolean isOnlyDigits(String value) {
+        return value.matches("^-?[0-9]+(\\.[0-9]+)?$");
+    }
+
     public static boolean setValueAndValidate(HttpServletRequest req, FormComponent.FormItem[] formItemArray) {
         logger.debug("VALIDATE >>");
         try {

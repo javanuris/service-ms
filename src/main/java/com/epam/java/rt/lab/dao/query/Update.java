@@ -37,4 +37,9 @@ public class Update implements SqlQuery {
         return result.toString();
     }
 
+    @Override
+    public String createCount() {
+        return null;
+    }
+
 }

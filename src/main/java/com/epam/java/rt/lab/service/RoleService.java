@@ -29,7 +29,9 @@ public class RoleService extends BaseService {
 
     public List<Role> getRoleList() throws DaoException {
         Dao dao = daoFactory.createDao("Role");
-        return dao.getAll(null, null);
+        List<Role> roleList = dao.getAll();
+        daoFactory.close();
+        return roleList;
     }
 
 }

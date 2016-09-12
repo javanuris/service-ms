@@ -1,5 +1,7 @@
 package com.epam.java.rt.lab.service;
 
+import com.epam.java.rt.lab.component.ListComponent;
+import com.epam.java.rt.lab.component.PageComponent;
 import com.epam.java.rt.lab.connection.ConnectionException;
 import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.dao.Dao;
@@ -9,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -73,6 +76,15 @@ public class UserService extends BaseService {
         int updateCount = dao.update(user, "id", "firstName, middleName, lastName");
         daoFactory.close();
         return updateCount;
+    }
+
+    public List<User> getUserList(PageComponent pageComponent) throws DaoException {
+        Dao dao = daoFactory.createDao("User");
+        List<User> userList = dao.getAll(null, null, null,
+                (pageComponent.getCurrentPage() - 1) * pageComponent.getItemsOnPage(), pageComponent.getItemsOnPage());
+        pageComponent.setCountPages((long) Math.ceil((dao.getSelectCount() * 1.0) / pageComponent.getItemsOnPage()));
+        daoFactory.close();
+        return userList;
     }
 
 }

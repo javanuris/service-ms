@@ -4,5 +4,10 @@
 <tags:template>
     <jsp:attribute name="title">title.home</jsp:attribute>
     <jsp:attribute name="navbarCurrent">/home</jsp:attribute>
-    <jsp:body>home</jsp:body>
+    <jsp:body>
+        <div class="jumbotron" style="text-align: center">
+            <h1>Service Management System</h1>
+            <h2>Java Lab #19 <small>Final Task - Web Application</small></h2>
+        </div>
+    </jsp:body>
 </tags:template>

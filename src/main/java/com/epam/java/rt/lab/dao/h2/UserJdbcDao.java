@@ -89,14 +89,4 @@ public class UserJdbcDao extends JdbcDao {
         }
     }
 
-    @Override
-    public <T> List<T> getAll(T entity, String fieldNames) throws DaoException {
-        throw new DaoException("exception.dao.jdbc.unsupported");
-    }
-
-    @Override
-    public <T> List<T> getAll(T entity, String fieldNames, String columnNames) throws DaoException {
-        throw new DaoException("exception.dao.jdbc.unsupported");
-    }
-
 }

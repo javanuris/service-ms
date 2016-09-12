@@ -26,6 +26,7 @@ public abstract class JdbcDao implements Dao {
     private static Map<Type, Method> preparedStatementMethodMap = new HashMap<>();
     private static Map<String, PreparedStatement> preparedStatementMap = new HashMap<>();
     private Connection connection = null;
+    private Long selectCount;
 
     private static void initPreparedStatementMethodMap() throws DaoException {
         try {
@@ -157,8 +158,20 @@ public abstract class JdbcDao implements Dao {
     }
 
     private <T> ResultSet selectQuery(T entity, String fieldNames, String columnNames) throws DaoException {
+        return selectQuery(entity, fieldNames, columnNames, null, null);
+    }
+
+    private <T> ResultSet selectQuery(T entity, String fieldNames, String columnNames, Long offset, Long count)
+            throws DaoException {
         try {
-            SqlQuery select = new Select(getEntityTableName(), columnNames);
+            SqlQuery select = new Select(getEntityTableName(), columnNames, offset, count);
+            if (offset != null && count != null) {
+                Statement statement = connection.createStatement();
+                statement.execute(select.createCount());
+                if (statement.getResultSet().next())
+                    this.selectCount = statement.getResultSet().getLong("count");
+                statement.close();
+            }
             PreparedStatement preparedStatement = query(select, entity, fieldNames, null);
             preparedStatement.execute();
             return preparedStatement.getResultSet();
@@ -206,14 +219,24 @@ public abstract class JdbcDao implements Dao {
     }
 
     @Override
+    public <T> List<T> getAll() throws DaoException {
+        return getAll(null, null, null);
+    }
+
+    @Override
     public <T> List<T> getAll(T entity, String fieldNames) throws DaoException {
-        return getAll(entity, fieldNames, null);
+        return getAll(entity, fieldNames, null, null, null);
     }
 
     @Override
     public <T> List<T> getAll(T entity, String fieldNames, String columnNames) throws DaoException {
+        return getAll(entity, fieldNames, columnNames, null, null);
+    }
+
+    @Override
+    public <T> List<T> getAll(T entity, String fieldNames, String columnNames, Long offset, Long count) throws DaoException {
         try {
-            ResultSet resultSet = selectQuery(entity, fieldNames, columnNames);
+            ResultSet resultSet = selectQuery(entity, fieldNames, columnNames, offset, count);
             if (resultSet == null) return null;
             List<T> entityList = new ArrayList<>();
             while(resultSet.next()) entityList.add(getEntityFromResultSet(entity, resultSet));
@@ -221,6 +244,11 @@ public abstract class JdbcDao implements Dao {
         } catch (SQLException e) {
             throw new DaoException("exception.dao.jdbc.get-all.get-result-set", e.getCause());
         }
+    }
+
+    @Override
+    public Long getSelectCount() {
+        return this.selectCount;
     }
 
     abstract String getEntityTableName();
