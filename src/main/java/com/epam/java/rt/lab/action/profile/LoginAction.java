@@ -4,7 +4,7 @@ import com.epam.java.rt.lab.action.Action;
 import com.epam.java.rt.lab.action.ActionException;
 import com.epam.java.rt.lab.action.WebAction;
 import com.epam.java.rt.lab.component.FormComponent;
-import com.epam.java.rt.lab.component.NavbarComponent;
+import com.epam.java.rt.lab.component.NavigationComponent;
 import com.epam.java.rt.lab.connection.ConnectionException;
 import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.entity.rbac.Login;
@@ -85,7 +85,7 @@ public class LoginAction implements Action {
                         if (user == null) throw new ActionException("profile.login.message.user-not-found");
                         req.getSession().setAttribute("userId", user.getId());
                         req.getSession().setAttribute("userName", user.getName());
-                        req.getSession().setAttribute("navbarItemArray", NavbarComponent.getNavbarItemArray(user.getRole()));
+                        req.getSession().setAttribute("navbarItemArray", NavigationComponent.getNavbarItemArray(user.getRole()));
                         logger.debug("REMEMBER = {}", formComponent.getFormItemArray()[2].getValue());
                         if (formComponent.getFormItemArray()[2].getValue() != null) {
                             logger.debug("REMEMBERING USER");

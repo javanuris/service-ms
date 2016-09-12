@@ -1,6 +1,6 @@
 package com.epam.java.rt.lab.servlet;
 
-import com.epam.java.rt.lab.component.NavbarComponent;
+import com.epam.java.rt.lab.component.NavigationComponent;
 import com.epam.java.rt.lab.connection.ConnectionException;
 import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.entity.rbac.User;
@@ -44,7 +44,7 @@ public class RBACFilter implements Filter {
                     req.getSession().setAttribute("userId", userId);
                     User user = userService.getUser(userId);
                     req.getSession().setAttribute("userName", user.getName());
-                    req.getSession().setAttribute("navbarItemArray", NavbarComponent.getNavbarItemArray(user.getRole()));
+                    req.getSession().setAttribute("navbarItemArray", NavigationComponent.getNavbarItemArray(user.getRole()));
                     logger.debug("USER FROM COOKIE ({})", user);
                 }
             }
