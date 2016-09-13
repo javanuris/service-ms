@@ -25,13 +25,13 @@ public class UploadServlet extends HttpServlet {
                 resp.getWriter().print("");
             } else {
                 logger.debug("UPLOAD FILE {}", uploadFileName);
-                String outputFileName = null;
+                File outputFile = null;
                 InputStream inputStream = req.getInputStream();
                 try {
                     if (inputStream != null) {
-                        outputFileName = File.createTempFile(uploadFileName.concat("_upload"), ".tmp").getAbsolutePath();
-                        logger.debug("OUTPUT FILE = {}", outputFileName);
-                        OutputStream outputStream = new FileOutputStream(outputFileName);
+                        outputFile = File.createTempFile(uploadFileName.concat("_upload"), ".tmp");
+                        logger.debug("OUTPUT FILE = {}", outputFile.getAbsolutePath());
+                        OutputStream outputStream = new FileOutputStream(outputFile);
                         try {
                             byte[] buffer = new byte[4096];
                             for (int n; (n = inputStream.read(buffer)) != -1; )
@@ -48,10 +48,10 @@ public class UploadServlet extends HttpServlet {
                     inputStream.close();
                 }
                 logger.debug("UPLOAD COMPLETE");
-                if (outputFileName == null) {
+                if (outputFile == null) {
                     resp.getWriter().print("");
                 } else {
-                    resp.getWriter().print(outputFileName);
+                    resp.getWriter().print(outputFile.getAbsolutePath());
                 }
             }
         }

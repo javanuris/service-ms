@@ -10,8 +10,10 @@
                     <fmt:message bundle="${ui}" key="${item.label}"/>
                 </a>
             </c:when>
-            <c:when test="${item.type.equals('checkbox')}">
-                <h4><small><fmt:message bundle="${ui}" key="${item.label}"/></small>${item.value}</h4>
+            <c:when test="${item.type.equals('image')}">
+                <div style="width: 100%; text-align: center;">
+                    <img src="${item.value}" alt="avatar" class="img-thumbnail" style="max-width: 50%; min-width: 50%; height: auto; align-content: center;">
+                </div>
             </c:when>
             <c:otherwise>
                 <div class="col-xs-4" style="color: darkgray; text-align: right;"><fmt:message bundle="${ui}" key="${item.label}"/>:</div>

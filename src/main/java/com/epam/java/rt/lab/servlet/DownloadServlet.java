@@ -27,10 +27,12 @@ public class DownloadServlet extends HttpServlet {
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         if (req.getMethod().equals("GET")) {
+            logger.debug("DOWNLOAD REQUESTED: {}", req.getPathInfo());
             InputStream inputStream = null;
             switch (req.getPathInfo()) {
-                case "avatar":
+                case "/avatar":
                     String avatarId = req.getParameter("id");
+                    logger.debug("AVATAR: {}", avatarId);
                     if (FormValidator.isOnlyDigits(avatarId))
                         try {
                             inputStream = (new UserService()).getAvatar(Long.valueOf(avatarId));
@@ -41,6 +43,8 @@ public class DownloadServlet extends HttpServlet {
                     break;
             }
             if (inputStream != null) {
+                logger.debug("READY TO DOWNLOAD");
+                resp.setContentType("image/jpeg");
                 BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream, 4096);
                 BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(resp.getOutputStream(), 4096);
                 byte[] buffer = new byte[4096];
@@ -48,6 +52,7 @@ public class DownloadServlet extends HttpServlet {
                 while ((length = bufferedInputStream.read(buffer)) > 0) {
                     bufferedOutputStream.write(buffer, 0, length);
                 }
+                logger.debug("DOWNLOAD COMPLETE");
             }
         }
     }

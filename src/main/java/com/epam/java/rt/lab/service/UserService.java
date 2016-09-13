@@ -114,4 +114,13 @@ public class UserService extends BaseService {
         return inputStream;
     }
 
+    public String getAvatarName(Long avatarId) throws DaoException {
+        Dao dao = daoFactory.createDao("User");
+        User user = new User();
+        user.setAvatarId(avatarId);
+        String avatarName = (String) dao.getRelEntity(user, "AvatarName");
+        daoFactory.close();
+        return avatarName;
+    }
+
 }

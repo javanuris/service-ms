@@ -82,6 +82,13 @@ public class RoleJdbcDao extends JdbcDao {
         } catch (SQLException e) {
             e.printStackTrace();
             throw new DaoException("exception.dao.jdbc.get-entity-from-result-set", e.getCause());
+        } finally {
+            try {
+                if (resultSet != null) resultSet.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+                throw new DaoException("exception.dao.get-entity-from-result-set.resultset-close", e.getCause());
+            }
         }
     }
 

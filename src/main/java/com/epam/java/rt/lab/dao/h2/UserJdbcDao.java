@@ -85,6 +85,7 @@ public class UserJdbcDao extends JdbcDao {
             user.setFirstName(resultSet.getString("first_name"));
             user.setMiddleName(resultSet.getString("middle_name"));
             user.setLastName(resultSet.getString("last_name"));
+            user.setAvatarId(resultSet.getLong("avatar_id"));
             Role role = new Role();
             role.setId(resultSet.getLong("role_id"));
             user.setRole((new RoleJdbcDao(getConnection())).getFirst(role, "id"));
@@ -100,7 +101,8 @@ public class UserJdbcDao extends JdbcDao {
 
     @Override
     public <T> Object getRelEntity(T entity, String relEntityName) throws DaoException {
-        if (relEntityName.equals("Avatar")) return getAvatar(entity);
+        if (relEntityName.equals("Avatar")) return getAvatar((User) entity);
+        if (relEntityName.equals("AvatarName")) return getAvatarName((User) entity);
         return null;
     }
 
@@ -109,10 +111,9 @@ public class UserJdbcDao extends JdbcDao {
         if (relEntityName.equals("Avatar")) putAvatar(entity, relEntity);
     }
 
-    private <T> Object getAvatar(T entity) throws DaoException {
+    private Object getAvatar(User user) throws DaoException {
         ResultSet relResultSet = null;
         try {
-            User user = (User) entity;
             List<Column> columnList = new ArrayList<>();
             columnList.add(new Column("\"Avatar\".id", user.getAvatarId()));
             PreparedStatement preparedStatement = rawQuery("SELECT file FROM \"Avatar\""
@@ -135,6 +136,31 @@ public class UserJdbcDao extends JdbcDao {
         }
     }
 
+    private String getAvatarName(User user) throws DaoException {
+        ResultSet relResultSet = null;
+        try {
+            List<Column> columnList = new ArrayList<>();
+            columnList.add(new Column("\"Avatar\".id", user.getAvatarId()));
+            PreparedStatement preparedStatement = rawQuery("SELECT name FROM \"Avatar\""
+                            .concat(" WHERE ").concat(Column.columnListToString(columnList, "AND", "=")),
+                            columnList);
+            preparedStatement.execute();
+            relResultSet = preparedStatement.getResultSet();
+            if (relResultSet.first()) return relResultSet.getString("name");
+            return null;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new DaoException("exception.dao.user.get-avatar-name", e.getCause());
+        } finally {
+            try {
+                if (relResultSet != null) relResultSet.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+                throw new DaoException("exception.dao.get-avatar-name.resultset-close", e.getCause());
+            }
+        }
+    }
+
     private <T> void putAvatar(T entity, Object relEntity) throws DaoException {
         ResultSet relResultSet = null;
         try {
@@ -153,9 +179,11 @@ public class UserJdbcDao extends JdbcDao {
                         columnList, PreparedStatement.RETURN_GENERATED_KEYS);
             } else {
                 columnList.add(new Column("\"Avatar\".id", user.getAvatarId()));
-                preparedStatement = rawQuery("INSERT INTO \"Avatar\" (name, file) VALUES (?, ?)"
-                        .concat(" WHERE ").concat(Column.columnListToString(columnList, "AND", "=")),
-                        columnList, PreparedStatement.RETURN_GENERATED_KEYS);
+                List<Column> whereList = new ArrayList<>();
+                whereList.add(new Column("\"Avatar\".id", user.getAvatarId()));
+                preparedStatement = rawQuery("UPDATE \"Avatar\" SET name = ?, file = ?"
+                        .concat(" WHERE ").concat(Column.columnListToString(whereList, "AND", "=")),
+                        columnList);
             }
             preparedStatement.executeUpdate();
             relResultSet = preparedStatement.getGeneratedKeys();

@@ -39,6 +39,8 @@ public class ViewAction implements Action {
                     new ViewComponent.ViewItem
                             ("profile.view.last-name.label", "input", user.getLastName()),
                     new ViewComponent.ViewItem
+                            ("profile.view.avatar.label", "image", UrlManager.getContextUri(req, "/file/download/avatar?id=" + user.getAvatarId())),
+                    new ViewComponent.ViewItem
                             ("profile.view.role-name.label", "input", user.getRole().getName()),
                     new ViewComponent.ViewItem
                             ("profile.view.login-email.label", "input", user.getLogin().getEmail()),

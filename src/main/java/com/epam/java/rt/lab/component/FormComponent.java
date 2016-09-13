@@ -72,7 +72,11 @@ public class FormComponent {
         public void setValue(String value) { this.value = value; }
 
         public <T> FormItem setValueAndReturn(T value) {
-            this.value = (String) value;
+            if (value == null) {
+                this.value = null;
+            } else {
+                this.value = String.valueOf(value);
+            }
             return this;
         }
 

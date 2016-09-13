@@ -54,7 +54,7 @@ public class EditAction implements Action {
                                     .setValueAndReturn(user.getLastName()),
                             new FormComponent.FormItem
                                     ("profile.edit.avatar.label", "file", "profile.edit.avatar.placeholder")
-                                    .setValueAndReturn(user.getAvatarId()),
+                                    .setValueAndReturn(userService.getAvatarName(user.getAvatarId())),
                             new FormComponent.FormItem
                                     ("profile.edit.submit.label", "submit", ""),
                             new FormComponent.FormItem
