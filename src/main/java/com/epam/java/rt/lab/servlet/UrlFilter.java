@@ -29,7 +29,8 @@ public class UrlFilter implements Filter {
         String requestURI = ((HttpServletRequest) servletRequest).getRequestURI()
                 .substring(((HttpServletRequest) servletRequest).getContextPath().length()).toLowerCase();
         logger.debug(requestURI);
-        if (requestURI.startsWith("/static/") || requestURI.startsWith("/webjars/") || requestURI.equals("/favicon.ico")) {
+        if (requestURI.startsWith("/static/") || requestURI.startsWith("/webjars/")
+                || requestURI.startsWith("/file/") || requestURI.equals("/favicon.ico")) {
             filterChain.doFilter(servletRequest, servletResponse);
         } else {
             servletRequest.getRequestDispatcher("/servlet".concat(requestURI))

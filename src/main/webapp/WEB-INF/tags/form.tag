@@ -36,6 +36,23 @@
                     </div>
                 </div>
             </c:when>
+            <c:when test="${item.type.equals('file')}">
+                <div class="form-group${not empty item.validationMessageArray ? ' has-error' : ''}">
+                    <label for="${item.label}"><fmt:message bundle="${ui}" key="${item.label}"/></label>
+                    <c:set var="browse"><fmt:message bundle="${ui}" key="message.browse-file"/></c:set>
+                    <c:set var="uploading"><fmt:message bundle="${ui}" key="message.uploading-file"/></c:set>
+                    <label class="btn btn-default btn-file">
+                        <input id="${item.label}" onchange="uploadToServer(this)" type="file" placeholder="${uploading}" name="/file/upload"/>
+                        <div id="${item.label}-label">
+                            <c:choose>
+                                <c:when test="${not empty item.value}">${item.value}</c:when>
+                                <c:otherwise>${browse}</c:otherwise>
+                            </c:choose>
+                        </div>
+                        <input id="${item.label}-hidden" name="${item.label}" placeholder="${browse}" hidden/>
+                    </label>
+                </div>
+            </c:when>
             <c:otherwise>
                 <div class="form-group${not empty item.validationMessageArray ? ' has-error' : ''}">
                     <label for="${item.label}"><fmt:message bundle="${ui}" key="${item.label}"/></label>

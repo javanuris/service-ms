@@ -17,6 +17,9 @@ public class FormValidator {
     private static final Logger logger = LoggerFactory.getLogger(FormValidator.class);
     private static final Map<String, List<FormItemValidator>> formItemValidatorMap = new HashMap<>();
 
+    private FormValidator() {
+    }
+
     public static void updateFormItemValidatorMap() {
 
     }

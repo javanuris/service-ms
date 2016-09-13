@@ -10,6 +10,9 @@ import java.util.List;
  */
 public class UrlManager {
 
+    private UrlManager() {
+    }
+
     public static String getUriForButton(HttpServletRequest req, String path, String parameterName) {
         return UrlManager.getContextUri(req, path)
                 .concat(UrlManager.combineUrlParameter(new UrlManager.UrlParameterBuilder(parameterName, "true")));

@@ -14,6 +14,7 @@ create table if not exists "User" (id identity primary key, first_name varchar(2
 delete from "Permission";
 insert into "Permission" (uri) values ('/');
 insert into "Permission" (uri) values ('/home');
+insert into "Permission" (uri) values ('/develop');
 insert into "Permission" (uri) values ('/profile/login');
 insert into "Permission" (uri) values ('/profile/register');
 insert into "Permission" (uri) values ('/profile/view');
@@ -37,6 +38,7 @@ insert into "RolePermission" (role_id, permission_id) values (select id from "Ro
 insert into "RolePermission" (role_id, permission_id) values (select id from "Role" where name is 'anonymous', select id from "Permission" where uri is '/profile/register');
 insert into "RolePermission" (role_id, permission_id) values (select id from "Role" where name is 'admin', select id from "Permission" where uri is '/');
 insert into "RolePermission" (role_id, permission_id) values (select id from "Role" where name is 'admin', select id from "Permission" where uri is '/home');
+insert into "RolePermission" (role_id, permission_id) values (select id from "Role" where name is 'admin', select id from "Permission" where uri is '/develop');
 insert into "RolePermission" (role_id, permission_id) values (select id from "Role" where name is 'admin', select id from "Permission" where uri is '/profile/login');
 insert into "RolePermission" (role_id, permission_id) values (select id from "Role" where name is 'admin', select id from "Permission" where uri is '/profile/view');
 insert into "RolePermission" (role_id, permission_id) values (select id from "Role" where name is 'admin', select id from "Permission" where uri is '/profile/reset-password');

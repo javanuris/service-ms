@@ -16,7 +16,7 @@
     <c:choose>
         <c:when test="${listComponent.valueMapList.size() > 0}">
             <c:forEach var="item" items="${listComponent.valueMapList}">
-                <a href="${item.get('href')}" class="list-group-item col-xs-12">
+                <a href="${item.get('href')}" class="list-group-item col-xs-12" style="border-left: hidden; border-right: hidden;">
                     <c:forEach var="listColumn" items="${listComponent.listColumnList}">
                         <div class="col-xs-${listColumn.width}">${item.get(listColumn.fieldName)}</div>
                     </c:forEach>

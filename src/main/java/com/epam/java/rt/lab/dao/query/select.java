@@ -52,7 +52,7 @@ public class Select implements SqlQuery {
         if (this.columnList.size() > 0)
             result.append(" WHERE ").append(Column.columnListToString(this.columnList, "AND", "="));
         if (offset != null && count != null) result.append(" LIMIT ").append(offset).append(", ").append(count);
-System.out.println(result);
+//System.out.println(result);
         return result.toString();
     }
 
@@ -62,7 +62,7 @@ System.out.println(result);
         result.append("SELECT COUNT(*) AS count ").append(" FROM \"").append(this.tableName).append("\"");
         if (this.columnList.size() > 0)
             result.append(" WHERE ").append(Column.columnListToString(this.columnList, "AND", "="));
-System.out.println(result);
+//System.out.println(result);
         return result.toString();
     }
 

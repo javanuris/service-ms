@@ -38,17 +38,23 @@ public class EditAction implements Action {
                     return;
                 }
                 if (formComponent != null) {
-                    formComponent.clear();
+                    formComponent.clearValidationMessageArray();
                 } else {
                     User user = userService.getUser((Long) req.getSession().getAttribute("userId"));
                     logger.debug("user = {}, {}, {}", user.getFirstName(), user.getMiddleName(), user.getLastName());
                     formComponent = new FormComponent("edit-profile", "/profile/edit",
                             new FormComponent.FormItem
-                                    ("profile.edit.first-name.label", "text", "profile.edit.first-name.label").setValueAndReturn(user.getFirstName()),
+                                    ("profile.edit.first-name.label", "text", "profile.edit.first-name.label")
+                                    .setValueAndReturn(user.getFirstName()),
                             new FormComponent.FormItem
-                                    ("profile.edit.middle-name.label", "text", "profile.edit.middle-name.label").setValueAndReturn(user.getMiddleName()),
+                                    ("profile.edit.middle-name.label", "text", "profile.edit.middle-name.label")
+                                    .setValueAndReturn(user.getMiddleName()),
                             new FormComponent.FormItem
-                                    ("profile.edit.last-name.label", "text", "profile.edit.last-name.label").setValueAndReturn(user.getLastName()),
+                                    ("profile.edit.last-name.label", "text", "profile.edit.last-name.label")
+                                    .setValueAndReturn(user.getLastName()),
+                            new FormComponent.FormItem
+                                    ("profile.edit.avatar.label", "file", "profile.edit.avatar.placeholder")
+                                    .setValueAndReturn(user.getAvatarId()),
                             new FormComponent.FormItem
                                     ("profile.edit.submit.label", "submit", ""),
                             new FormComponent.FormItem
@@ -74,6 +80,7 @@ public class EditAction implements Action {
                     } else {
                         logger.debug("UPDATE SUCCESS");
                         req.getSession().removeAttribute("editProfileForm");
+                        req.getSession().setAttribute("userName", user.getName());
                         resp.sendRedirect(UrlManager.getContextUri(req, "/profile/view"));
                         return;
                     }

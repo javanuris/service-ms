@@ -2,6 +2,8 @@ package com.epam.java.rt.lab.entity.rbac;
 
 import com.epam.java.rt.lab.entity.BaseEntity;
 
+import java.sql.Blob;
+
 /**
  * service-ms
  */
@@ -11,6 +13,7 @@ public class User extends BaseEntity {
     private String lastName;
     private Login login;
     private Role role;
+    private Long avatarId;
 
     public User() {
     }
@@ -70,6 +73,12 @@ public class User extends BaseEntity {
 
     public void setRole(Role role) {
         this.role = role;
+    }
+
+    public Long getAvatarId() { return avatarId; }
+
+    public void setAvatarId(Long avatarId) {
+        this.avatarId = avatarId;
     }
 
     public String getName() {

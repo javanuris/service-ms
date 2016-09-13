@@ -33,6 +33,11 @@ public class FormComponent {
         }
     }
 
+    public void clearValidationMessageArray() {
+        for (FormItem formItem : this.formItemArray)
+            formItem.setValidationMessageArray(null);
+    }
+
     public static class FormItem {
         private String label;
         private String type;
@@ -66,8 +71,8 @@ public class FormComponent {
 
         public void setValue(String value) { this.value = value; }
 
-        public FormItem setValueAndReturn(String value) {
-            this.value = value;
+        public <T> FormItem setValueAndReturn(T value) {
+            this.value = (String) value;
             return this;
         }
 
