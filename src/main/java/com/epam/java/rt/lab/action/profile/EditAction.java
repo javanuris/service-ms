@@ -72,8 +72,10 @@ public class EditAction implements Action {
                     user.setFirstName(formComponent.getFormItemArray()[0].getValue());
                     user.setMiddleName(formComponent.getFormItemArray()[1].getValue());
                     user.setLastName(formComponent.getFormItemArray()[2].getValue());
+                    if (formComponent.getFormItemArray()[3].getValue().length() > 0)
+                        userService.putAvatar(user, formComponent.getFormItemArray()[3].getValue());
                     logger.debug("user.getName() = {}", user.getName());
-                    if (userService.updateName(user) != 1) {
+                    if (userService.updateUser(user) != 1) {
                         logger.debug("UPDATE ERROR");
                         String[] validationMessageArray = {"profile.edit.submit.error-edit"};
                         formComponent.getFormItemArray()[3].setValidationMessageArray(validationMessageArray);

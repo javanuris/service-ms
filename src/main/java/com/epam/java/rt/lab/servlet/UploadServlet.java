@@ -51,8 +51,6 @@ public class UploadServlet extends HttpServlet {
                 if (outputFileName == null) {
                     resp.getWriter().print("");
                 } else {
-                    // undo delete file
-                    new File(outputFileName).delete();
                     resp.getWriter().print(outputFileName);
                 }
             }

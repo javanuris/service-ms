@@ -25,4 +25,7 @@ public interface Dao {
 
     <T> int update(T entity, String fieldNames, String setNames) throws DaoException;
 
+    <T> Object getRelEntity(T entity, String relEntityName) throws DaoException;
+
+    <T> void putRelEntity(T entity, String relEntityName, Object relEntity) throws DaoException;
 }

@@ -10,6 +10,8 @@ import com.epam.java.rt.lab.entity.rbac.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -71,9 +73,9 @@ public class UserService extends BaseService {
         return rememberUserIdMap.get(UUID.fromString(rememberCookieValue));
     }
 
-    public int updateName(User user) throws DaoException {
+    public int updateUser(User user) throws DaoException {
         Dao dao = daoFactory.createDao("User");
-        int updateCount = dao.update(user, "id", "firstName, middleName, lastName");
+        int updateCount = dao.update(user, "id", "firstName, middleName, lastName, avatarId");
         daoFactory.close();
         return updateCount;
     }
@@ -85,6 +87,31 @@ public class UserService extends BaseService {
         pageComponent.setCountPages((long) Math.ceil((dao.getSelectCount() * 1.0) / pageComponent.getItemsOnPage()));
         daoFactory.close();
         return userList;
+    }
+
+    public void putAvatar(User user, String fileName) throws DaoException {
+        if (fileName != null) {
+            Dao dao = daoFactory.createDao("User");
+            dao.putRelEntity(user, "Avatar", fileName);
+            new File(fileName).delete();
+            daoFactory.close();
+        }
+    }
+
+    public InputStream getAvatar(User user) throws DaoException {
+        Dao dao = daoFactory.createDao("User");
+        InputStream inputStream = (InputStream) dao.getRelEntity(user, "Avatar");
+        daoFactory.close();
+        return inputStream;
+    }
+
+    public InputStream getAvatar(Long avatarId) throws DaoException {
+        Dao dao = daoFactory.createDao("User");
+        User user = new User();
+        user.setAvatarId(avatarId);
+        InputStream inputStream = (InputStream) dao.getRelEntity(user, "Avatar");
+        daoFactory.close();
+        return inputStream;
     }
 
 }
