@@ -8,101 +8,47 @@
     <jsp:body>
         <tags:nav navCurrent="/develop"/>
         <form action="${pageContext.request.contextPath}/develop" method="POST">
-            <input type="text" class="form-control"/>
-            <label class="btn btn-default btn-file" style="position: relative; overflow: hidden; width: 100%; text-align: center;">
-                <input id="upload" onchange="uploadToServer(this)" type="file" class="form-control" placeholder="LOADING..."
-                       style="display: none; position: absolute; top: 0; right: 0; min-width: 100%; min-height: 100%;
-                                font-size: 100px; text-align: right; filter: alpha(opacity=0); opacity: 0;
-                                outline: none; background: white; cursor: inherit; display: block;"/>
-                <div id="upload-label">BROWSE FILE...</div>
-                <input id="upload-hidden" type="text" placeholder="BROWSE FILE..." hidden/>
-            </label>
+            <div class="form-control">
+                <input type="text" class="form-control"/>
+            </div>
+            <div class="form-control">
+                <div id="label-browse-file" hidden>BROWSE FILE...</div>
+                <div id="label-file-uploading" hidden>FILE UPLOADING...</div>
+                <div id="label-upload-error" hidden>FILE UPLOAD ERROR</div>
+                <label class="btn btn-default btn-file" style="position: relative; overflow: hidden; width: 100%; text-align: center;">
+                    <input id="upload-file" type="file" name="/file/upload"/>
+                    <span id="upload-label">NO FILE SELECTED</span>
+                    <input id="upload-hidden" type="text" hidden/>
+                </label>
+            </div>
             <button type="submit">SUBMIT</button>
         </form>
     </jsp:body>
 </tags:template>
 
 <script type="application/javascript">
-
-    function uploadToServer(upload) {
-        var label = document.getElementById(upload.id + '-label');
-        var text = document.getElementById(upload.id + '-hidden');
-        var file = upload.files[0];
-        label.innerHTML = upload.getAttribute("placeholder");
-        var formData = new FormData();
-        formData.append('upload', file, file.name);
-        var xhr = new XMLHttpRequest();
-        xhr.open('POST', '${pageContext.request.contextPath}/upload', true);
-        xhr.onload = function () {
-            if (xhr.status === 200) {
-                label.innerHTML = file.name;
-            } else {
-                label.innerHTML = text.getAttribute('placeholder');
-            }
-        };
-        xhr.send(formData);
-    };
-
-//    var form = document.getElementById('file-form');
-//    var upload = document.getElementById('upload');
-//    var uploadButton = document.getElementById('upload-button');
-//
-//    uploadToServer() {
-//
-//    };
-//
-//    upload.onclick = function () {
-//        this.value = null;
-//    }
-//
-//    upload.onchange = function(){
-//        upload.innerHTML = this.value;
-//    }
-
-//    form.onsubmit = function(event) {
-//        event.preventDefault();
-//
-//        // Update button text.
-//        uploadButton.innerHTML = 'Uploading...';
-//
-//        // Get the selected files from the input.
-//        var files = upload.files;
-//
-//        // Create a new FormData object.
-//        var formData = new FormData();
-//
-//        // Loop through each of the selected files.
-//        for (var i = 0; i < files.length; i++) {
-//            var file = files[i];
-//
-//            // Check the file type.
-//            if (!file.type.match('image.*')) {
-//                continue;
-//            }
-//
-//            // Add the file to the request.
-//            formData.append('photos[]', file, file.name);
-//        }
-//
-//        // Set up the request.
-//        var xhr = new XMLHttpRequest();
-//
-//        // Open the connection.
-//        xhr.open('POST', '/upload', true);
-//
-//        // Set up a handler for when the request finishes.
-//        xhr.onload = function () {
-//            if (xhr.status === 200) {
-//                // File(s) uploaded.
-//                uploadButton.innerHTML = 'Upload';
-//                alert(xhr.responseText);
-//            } else {
-//                alert('An error occurred!');
-//            }
-//        };
-//
-//        // Send the Data.
-//        xhr.send(formData);
-//    }
-
+    $(function() {
+        $('#upload-label').text($('#label-browse-file').text());
+        $('#upload-file').change(function() {
+            var $file = $(this)[0].files[0];
+            $('#upload-label').text($file.name + ' - ' + $('#label-file-uploading').text());
+            var formData = new FormData();
+            formData.append('file', $file);
+            var xhr = new XMLHttpRequest();
+            var async = true;
+            alert($(this).name);
+            xhr.open('POST', name, async);
+            xhr.send(formData);
+            xhr.onload = function () {
+                var pair = xhr.responseText.split('=');
+                if (pair[0] = 'filePath') {
+                    $('#upload-hidden').val(pair[1]);
+                    $('#upload-label').text(pair[1])
+                } else {
+                    $('#upload-hidden').val('');
+                    $('#upload-label').text($('#label-upload-error').text())
+                }
+            };
+        });
+    });
 </script>

@@ -22,7 +22,7 @@ import java.io.InputStream;
  */
 @WebServlet(urlPatterns = "/file/download/*")
 public class DownloadServlet extends HttpServlet {
-    private static final Logger logger = LoggerFactory.getLogger(FrontServlet.class);
+    private static final Logger logger = LoggerFactory.getLogger(DownloadServlet.class);
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

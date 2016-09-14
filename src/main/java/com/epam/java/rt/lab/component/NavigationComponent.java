@@ -71,6 +71,7 @@ public class NavigationComponent {
     }
 
     public static Object[] getNavbarItemArray(Role role) {
+        logger.debug("getNavbarItemArray({})", role.getName());
         try {
             if (roleNavbarItemMap.size() == 0) updateNavigationItemMap();
             return roleNavbarItemMap.get(role.getName());

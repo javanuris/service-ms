@@ -7,6 +7,8 @@ import com.epam.java.rt.lab.dao.query.Set;
 import com.epam.java.rt.lab.entity.rbac.Login;
 import com.epam.java.rt.lab.entity.rbac.Role;
 import com.epam.java.rt.lab.entity.rbac.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -24,6 +26,7 @@ import java.util.List;
  * service-ms
  */
 public class UserJdbcDao extends JdbcDao {
+    private static final Logger logger = LoggerFactory.getLogger(UserJdbcDao.class);
 
     public UserJdbcDao(Connection connection) throws DaoException {
         super(connection);
@@ -41,7 +44,7 @@ public class UserJdbcDao extends JdbcDao {
                 case "id":
                     return new Column("id", fieldValue(field, entity));
                 case "login":
-                    return new Column("login_id", ((Login) fieldValue(field, entity)).getId());
+                     return new Column("login_id", ((Login) fieldValue(field, entity)).getId());
                 default:
                     throw new DaoException("exception.dao.jdbc.get-entity-column.field-name");
             }
@@ -85,7 +88,8 @@ public class UserJdbcDao extends JdbcDao {
             user.setFirstName(resultSet.getString("first_name"));
             user.setMiddleName(resultSet.getString("middle_name"));
             user.setLastName(resultSet.getString("last_name"));
-            user.setAvatarId(resultSet.getLong("avatar_id"));
+            logger.debug("resultSet.getObject('avatar_id') = {}", (Long) resultSet.getObject("avatar_id"));
+            user.setAvatarId((Long) resultSet.getObject("avatar_id"));
             Role role = new Role();
             role.setId(resultSet.getLong("role_id"));
             user.setRole((new RoleJdbcDao(getConnection())).getFirst(role, "id"));
@@ -168,26 +172,30 @@ public class UserJdbcDao extends JdbcDao {
             String outputFileName = (String) relEntity;
             String fileName = outputFileName.substring(outputFileName.lastIndexOf("\\") + 1);
             fileName = fileName.substring(0, fileName.lastIndexOf("_upload"));
-            System.out.println(fileName + " >> " + outputFileName);
+            logger.debug("fileName = {}", outputFileName);
             InputStream inputStream = new FileInputStream(new File(outputFileName));
             PreparedStatement preparedStatement = null;
             List<Column> columnList = new ArrayList<>();
             columnList.add(new Column("\"Avatar\".name", fileName));
             columnList.add(new Column("\"Avatar\".file", inputStream));
+            logger.debug("user.getAvatarId() = {}", user.getAvatarId());
             if (user.getAvatarId() == null) {
+                logger.debug("INSERT AVATAR");
                 preparedStatement = rawQuery("INSERT INTO \"Avatar\" (name, file) VALUES (?, ?)",
                         columnList, PreparedStatement.RETURN_GENERATED_KEYS);
+                preparedStatement.executeUpdate();
+                relResultSet = preparedStatement.getGeneratedKeys();
+                if (relResultSet.first()) user.setAvatarId(relResultSet.getLong(1));
             } else {
+                logger.debug("UPDATE AVATAR");
                 columnList.add(new Column("\"Avatar\".id", user.getAvatarId()));
                 List<Column> whereList = new ArrayList<>();
                 whereList.add(new Column("\"Avatar\".id", user.getAvatarId()));
                 preparedStatement = rawQuery("UPDATE \"Avatar\" SET name = ?, file = ?"
                         .concat(" WHERE ").concat(Column.columnListToString(whereList, "AND", "=")),
                         columnList);
+                preparedStatement.executeUpdate();
             }
-            preparedStatement.executeUpdate();
-            relResultSet = preparedStatement.getGeneratedKeys();
-            if (relResultSet.first()) user.setAvatarId(relResultSet.getLong(1));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             throw new DaoException("exception.dao.user.put-avatar.file", e.getCause());

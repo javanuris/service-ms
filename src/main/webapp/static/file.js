@@ -1,20 +1,23 @@
 function uploadToServer(upload) {
-    var label = document.getElementById(upload.id + '-label');
-    var text = document.getElementById(upload.id + '-hidden');
-    var file = upload.files[0];
-    label.innerHTML = upload.getAttribute("placeholder");
-    var formData = new FormData();
-    formData.append('upload', file, file.name);
-    var xhr = new XMLHttpRequest();
-    xhr.open('POST', upload.name + '/' + file.name, true);
-    xhr.onload = function () {
-        if (xhr.status === 200) {
-            label.innerHTML = file.name;
-            text.value = xhr.responseText;
+    var $uploadId = upload.id.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    var $labelId = '#' + $uploadId + '-label';
+    var $hiddenId = '#' + $uploadId + '-hidden';
+    var $file = upload.files[0];
+    $($labelId).text($file.name + ' - ' + $('#ui-local-uploading-file').text());
+    var $formData = new FormData();
+    $formData.append('file', $file);
+    var $xhr = new XMLHttpRequest();
+    var async = true;
+    $xhr.open('POST', upload.name, async);
+    $xhr.onload = function() {
+        var pair = $xhr.responseText.split('=');
+        if (pair[0] == "filePath") {
+            $($hiddenId).val(pair[1]);
+            $($labelId).text($file.name);
         } else {
-            label.innerHTML = text.getAttribute('placeholder');
-            text.value = '';
+            $($hiddenId).val('');
+            $($labelId).text($('#ui-local-upload-error').text());
         }
     };
-    xhr.send(formData);
+    $xhr.send($formData);
 };
