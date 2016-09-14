@@ -20,7 +20,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * service-ms
@@ -105,9 +107,12 @@ public class UserJdbcDao extends JdbcDao {
 
     @Override
     public <T> Object getRelEntity(T entity, String relEntityName) throws DaoException {
-        if (relEntityName.equals("Avatar")) return getAvatar((User) entity);
-        if (relEntityName.equals("AvatarName")) return getAvatarName((User) entity);
-        return null;
+        switch(relEntityName) {
+            case "Avatar":
+                return getAvatar((User) entity);
+            default:
+                return null;
+        }
     }
 
     @Override
@@ -115,18 +120,22 @@ public class UserJdbcDao extends JdbcDao {
         if (relEntityName.equals("Avatar")) putAvatar(entity, relEntity);
     }
 
-    private Object getAvatar(User user) throws DaoException {
+    private Map<String, Object> getAvatar(User user) throws DaoException {
         ResultSet relResultSet = null;
         try {
             List<Column> columnList = new ArrayList<>();
             columnList.add(new Column("\"Avatar\".id", user.getAvatarId()));
-            PreparedStatement preparedStatement = rawQuery("SELECT file FROM \"Avatar\""
+            PreparedStatement preparedStatement = rawQuery("SELECT name, type, file FROM \"Avatar\""
                             .concat(" WHERE ").concat(Column.columnListToString(columnList, "AND", "=")),
                             columnList);
             preparedStatement.execute();
             relResultSet = preparedStatement.getResultSet();
-            if (relResultSet.first()) return relResultSet.getBinaryStream("file");
-            return null;
+            if (!relResultSet.first()) return null;
+            Map<String, Object> avatarMap = new HashMap<>();
+            avatarMap.put("name", relResultSet.getString("name"));
+            avatarMap.put("type", relResultSet.getString("type"));
+            avatarMap.put("file", relResultSet.getBinaryStream("file"));
+            return avatarMap;
         } catch (SQLException e) {
             e.printStackTrace();
             throw new DaoException("exception.dao.user.get-avatar", e.getCause());
@@ -140,48 +149,26 @@ public class UserJdbcDao extends JdbcDao {
         }
     }
 
-    private String getAvatarName(User user) throws DaoException {
-        ResultSet relResultSet = null;
-        try {
-            List<Column> columnList = new ArrayList<>();
-            columnList.add(new Column("\"Avatar\".id", user.getAvatarId()));
-            PreparedStatement preparedStatement = rawQuery("SELECT name FROM \"Avatar\""
-                            .concat(" WHERE ").concat(Column.columnListToString(columnList, "AND", "=")),
-                            columnList);
-            preparedStatement.execute();
-            relResultSet = preparedStatement.getResultSet();
-            if (relResultSet.first()) return relResultSet.getString("name");
-            return null;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw new DaoException("exception.dao.user.get-avatar-name", e.getCause());
-        } finally {
-            try {
-                if (relResultSet != null) relResultSet.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-                throw new DaoException("exception.dao.get-avatar-name.resultset-close", e.getCause());
-            }
-        }
-    }
-
     private <T> void putAvatar(T entity, Object relEntity) throws DaoException {
         ResultSet relResultSet = null;
         try {
             User user = (User) entity;
             String outputFileName = (String) relEntity;
             String fileName = outputFileName.substring(outputFileName.lastIndexOf("\\") + 1);
-            fileName = fileName.substring(0, fileName.lastIndexOf("_upload"));
-            logger.debug("fileName = {}", outputFileName);
+            fileName = fileName.substring(0, fileName.lastIndexOf(".avatar"));
+            logger.debug("fileName = {}", fileName);
+            String contentType = outputFileName.substring(outputFileName.lastIndexOf(".") + 1).replaceAll("_", "/");
+            logger.debug("contentType = {}", contentType);
             InputStream inputStream = new FileInputStream(new File(outputFileName));
             PreparedStatement preparedStatement = null;
             List<Column> columnList = new ArrayList<>();
             columnList.add(new Column("\"Avatar\".name", fileName));
+            columnList.add(new Column("\"Avatar\".type", contentType));
             columnList.add(new Column("\"Avatar\".file", inputStream));
             logger.debug("user.getAvatarId() = {}", user.getAvatarId());
             if (user.getAvatarId() == null) {
                 logger.debug("INSERT AVATAR");
-                preparedStatement = rawQuery("INSERT INTO \"Avatar\" (name, file) VALUES (?, ?)",
+                preparedStatement = rawQuery("INSERT INTO \"Avatar\" (name, type, file) VALUES (?, ?, ?)",
                         columnList, PreparedStatement.RETURN_GENERATED_KEYS);
                 preparedStatement.executeUpdate();
                 relResultSet = preparedStatement.getGeneratedKeys();
@@ -191,7 +178,7 @@ public class UserJdbcDao extends JdbcDao {
                 columnList.add(new Column("\"Avatar\".id", user.getAvatarId()));
                 List<Column> whereList = new ArrayList<>();
                 whereList.add(new Column("\"Avatar\".id", user.getAvatarId()));
-                preparedStatement = rawQuery("UPDATE \"Avatar\" SET name = ?, file = ?"
+                preparedStatement = rawQuery("UPDATE \"Avatar\" SET name = ?, type = ?, file = ?"
                         .concat(" WHERE ").concat(Column.columnListToString(whereList, "AND", "=")),
                         columnList);
                 preparedStatement.executeUpdate();

@@ -1,5 +1,6 @@
 function uploadToServer(upload) {
     var $uploadId = upload.id.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    var $imageId = '#' + $uploadId + '-image';
     var $labelId = '#' + $uploadId + '-label';
     var $hiddenId = '#' + $uploadId + '-hidden';
     var $file = upload.files[0];
@@ -14,6 +15,9 @@ function uploadToServer(upload) {
         if (pair[0] == "filePath") {
             $($hiddenId).val(pair[1]);
             $($labelId).text($file.name);
+            var src = $($imageId).attr("src");
+            var path = src.split("/download/");
+            $($imageId).attr("src", path[0] + "/download/pre-avatar?path=" + pair[1]);
         } else {
             $($hiddenId).val('');
             $($labelId).text($('#ui-local-upload-error').text());

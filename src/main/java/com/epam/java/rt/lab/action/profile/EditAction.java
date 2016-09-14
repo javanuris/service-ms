@@ -53,8 +53,9 @@ public class EditAction implements Action {
                                     ("profile.edit.last-name.label", "text", "profile.edit.last-name.label")
                                     .setValueAndReturn(user.getLastName()),
                             new FormComponent.FormItem
-                                    ("profile.edit.avatar.label", "file", "profile.edit.avatar.placeholder")
-                                    .setValueAndReturn(userService.getAvatarName(user.getAvatarId())),
+                                    ("profile.edit.avatar.label", "image", UrlManager.getContextUri(req, "/file/upload/avatar"))
+                                    .setValueAndReturn(UrlManager.getContextUri(req, "/file/download/avatar?id="
+                                            .concat(String.valueOf(user.getAvatarId())))),
                             new FormComponent.FormItem
                                     ("profile.edit.submit.label", "submit", ""),
                             new FormComponent.FormItem

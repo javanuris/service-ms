@@ -269,6 +269,7 @@ public abstract class JdbcDao implements Dao {
             while(resultSet.next()) entityList.add(getEntityFromResultSet(entity, resultSet));
             return entityList;
         } catch (SQLException e) {
+            e.printStackTrace();
             throw new DaoException("exception.dao.jdbc.get-all.get-result-set", e.getCause());
         }
     }

@@ -37,7 +37,23 @@
                 <div class="form-group${not empty item.validationMessageArray ? ' has-error' : ''}">
                     <label for="${item.label}"><fmt:message bundle="${ui}" key="${item.label}"/></label>
                     <label class="btn btn-default btn-file">
-                        <input id="${item.label}" onchange="uploadToServer(this)" type="file" name="/file/upload"/>
+                        <input id="${item.label}" onchange="uploadToServer(this)" type="file" name="${item.placeholder}"/>
+                        <div id="${item.label}-label"><fmt:message bundle="${ui}" key="message.browse-file"/></div>
+                        <input id="${item.label}-hidden" name="${item.label}" hidden/>
+                        <tags:validation validationMessageArray="${item.validationMessageArray}"/>
+                    </label>
+                </div>
+            </c:when>
+            <c:when test="${item.type.equals('image')}">
+                <div class="form-group${not empty item.validationMessageArray ? ' has-error' : ''}">
+                    <label for="${item.label}"><fmt:message bundle="${ui}" key="${item.label}"/></label>
+                    <label class="btn btn-default btn-file">
+                        <input id="${item.label}" onchange="uploadToServer(this)" type="file" name="${item.placeholder}"/>
+                        <c:if test="${not empty item.value}">
+                            <div style="width: 100%; text-align: center;">
+                                <img id="${item.label}-image" src="${item.value}" alt="avatar" class="img-thumbnail" style="max-width: 100%; min-width: 100%; height: auto; align-content: center;">
+                            </div>
+                        </c:if>
                         <div id="${item.label}-label"><fmt:message bundle="${ui}" key="message.browse-file"/></div>
                         <input id="${item.label}-hidden" name="${item.label}" hidden/>
                         <tags:validation validationMessageArray="${item.validationMessageArray}"/>

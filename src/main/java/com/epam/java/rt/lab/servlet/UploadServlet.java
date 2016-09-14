@@ -19,7 +19,7 @@ import java.nio.file.StandardCopyOption;
  * service-ms
  */
 @MultipartConfig
-@WebServlet(urlPatterns = "/file/upload")
+@WebServlet(urlPatterns = "/file/upload/*")
 public class UploadServlet extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(UploadServlet.class);
 
@@ -28,12 +28,25 @@ public class UploadServlet extends HttpServlet {
         if (req.getMethod().equals("POST")) {
             logger.debug("UPLOAD FILE");
             Part filePart = req.getPart("file");
-            InputStream inputStream = filePart.getInputStream();
-            String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
-            File outputFile = File.createTempFile(fileName.concat("_upload"), ".tmp");
-            Files.copy(inputStream, outputFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-            logger.debug("UPLOAD COMPLETE");
-            resp.getWriter().print("filePath=".concat(outputFile.getAbsolutePath()));
+            String prefix = null;
+            String postfix = null;
+            switch (req.getPathInfo()) {
+                case "/avatar":
+                    prefix = ".avatar";
+                    postfix = ".".concat(filePart.getContentType().replaceAll("/", "_"));
+                    break;
+            }
+            if (prefix != null) {
+                InputStream inputStream = filePart.getInputStream();
+                String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
+                File outputFile = File.createTempFile(fileName.concat(prefix), postfix);
+                Files.copy(inputStream, outputFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                logger.debug("UPLOAD COMPLETE");
+                resp.getWriter().print("filePath=".concat(outputFile.getAbsolutePath()));
+            } else {
+                logger.debug("UPLOAD ERROR");
+                resp.getWriter().print("");
+            }
         }
     }
 

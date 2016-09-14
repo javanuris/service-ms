@@ -12,10 +12,8 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.util.Map;
 
 /**
  * service-ms
@@ -33,18 +31,26 @@ public class DownloadServlet extends HttpServlet {
                 case "/avatar":
                     String avatarId = req.getParameter("id");
                     logger.debug("AVATAR: {}", avatarId);
-                    if (FormValidator.isOnlyDigits(avatarId))
+                    if (FormValidator.isOnlyDigits(avatarId)) {
                         try {
-                            inputStream = (new UserService()).getAvatar(Long.valueOf(avatarId));
+                            Map<String, Object> avatarMap = (new UserService()).getAvatar(Long.valueOf(avatarId));
+                            resp.setContentType((String) avatarMap.get("type"));
+                            inputStream = (InputStream) avatarMap.get("file");
                         } catch (DaoException | ConnectionException e) {
                             e.printStackTrace();
                             throw new ServletException(e.getMessage(), e.getCause());
                         }
+                    }
+                    break;
+                case "/pre-avatar":
+                    String avatarPath = req.getParameter("path");
+                    logger.debug("AVATAR: {}", avatarPath);
+                    resp.setContentType(avatarPath.substring(avatarPath.lastIndexOf(".") + 1).replaceAll("_", "/"));
+                    inputStream = new FileInputStream(new File(avatarPath));
                     break;
             }
             if (inputStream != null) {
                 logger.debug("READY TO DOWNLOAD");
-                resp.setContentType("image/jpeg");
                 BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream, 4096);
                 BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(resp.getOutputStream(), 4096);
                 byte[] buffer = new byte[4096];

@@ -98,29 +98,17 @@ public class UserService extends BaseService {
         }
     }
 
-    public InputStream getAvatar(User user) throws DaoException {
+    public Map<String, Object> getAvatar(User user) throws DaoException {
         Dao dao = daoFactory.createDao("User");
-        InputStream inputStream = (InputStream) dao.getRelEntity(user, "Avatar");
+        Map<String, Object>  avatarMap = (Map<String, Object>) dao.getRelEntity(user, "Avatar");
         daoFactory.close();
-        return inputStream;
+        return avatarMap;
     }
 
-    public InputStream getAvatar(Long avatarId) throws DaoException {
-        Dao dao = daoFactory.createDao("User");
+    public Map<String, Object> getAvatar(Long avatarId) throws DaoException {
         User user = new User();
         user.setAvatarId(avatarId);
-        InputStream inputStream = (InputStream) dao.getRelEntity(user, "Avatar");
-        daoFactory.close();
-        return inputStream;
-    }
-
-    public String getAvatarName(Long avatarId) throws DaoException {
-        Dao dao = daoFactory.createDao("User");
-        User user = new User();
-        user.setAvatarId(avatarId);
-        String avatarName = (String) dao.getRelEntity(user, "AvatarName");
-        daoFactory.close();
-        return avatarName;
+        return getAvatar(user);
     }
 
 }
