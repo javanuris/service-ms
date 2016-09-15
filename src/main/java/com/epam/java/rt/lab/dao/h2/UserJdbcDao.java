@@ -10,15 +10,9 @@ import com.epam.java.rt.lab.entity.rbac.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
+import java.io.*;
 import java.lang.reflect.Field;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -94,10 +88,10 @@ public class UserJdbcDao extends JdbcDao {
             user.setAvatarId((Long) resultSet.getObject("avatar_id"));
             Role role = new Role();
             role.setId(resultSet.getLong("role_id"));
-            user.setRole((new RoleJdbcDao(getConnection())).getFirst(role, "id"));
+            user.setRole((new RoleJdbcDao(getConnection())).getFirst(role, "id", ""));
             Login login = new Login();
             login.setId(resultSet.getLong("login_id"));
-            user.setLogin((new LoginJdbcDao(getConnection())).getFirst(login, "id"));
+            user.setLogin((new LoginJdbcDao(getConnection())).getFirst(login, "id", ""));
             return (T) user;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -121,46 +115,36 @@ public class UserJdbcDao extends JdbcDao {
     }
 
     private Map<String, Object> getAvatar(User user) throws DaoException {
-        ResultSet relResultSet = null;
-        try {
-            List<Column> columnList = new ArrayList<>();
-            columnList.add(new Column("\"Avatar\".id", user.getAvatarId()));
-            PreparedStatement preparedStatement = rawQuery("SELECT name, type, file FROM \"Avatar\""
-                            .concat(" WHERE ").concat(Column.columnListToString(columnList, "AND", "=")),
-                            columnList);
-            preparedStatement.execute();
-            relResultSet = preparedStatement.getResultSet();
-            if (!relResultSet.first()) return null;
+        List<Column> columnList = new ArrayList<>();
+        columnList.add(new Column("\"Avatar\".id", user.getAvatarId()));
+        String sqlString = "SELECT name, type, file FROM \"Avatar\""
+                .concat(" WHERE ").concat(Column.columnListToString(columnList, "AND", "="));
+        try (PreparedStatement preparedStatement = getConnection().prepareStatement(sqlString);
+             ResultSet resultSet = setPreparedStatementValues(preparedStatement, columnList).executeQuery();) {
+            if (resultSet == null || !resultSet.first()) return null;
             Map<String, Object> avatarMap = new HashMap<>();
-            avatarMap.put("name", relResultSet.getString("name"));
-            avatarMap.put("type", relResultSet.getString("type"));
-            avatarMap.put("file", relResultSet.getBinaryStream("file"));
+            avatarMap.put("name", resultSet.getString("name"));
+            avatarMap.put("type", resultSet.getString("type"));
+            avatarMap.put("file", resultSet.getBinaryStream("file"));
             return avatarMap;
         } catch (SQLException e) {
             e.printStackTrace();
-            throw new DaoException("exception.dao.user.get-avatar", e.getCause());
-        } finally {
-            try {
-                if (relResultSet != null) relResultSet.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-                throw new DaoException("exception.dao.get-avatar.resultset-close", e.getCause());
-            }
+            throw new DaoException("exception.dao.get-avatar", e.getCause());
         }
     }
 
     private <T> void putAvatar(T entity, Object relEntity) throws DaoException {
-        ResultSet relResultSet = null;
-        try {
+        String outputFilePath = (String) relEntity;
+        String outputFileName = outputFilePath.substring(outputFilePath.lastIndexOf("\\") + 1);
+        int avatarInfoIndex = outputFileName.lastIndexOf(".avatar.");
+        String fileName = outputFileName.substring(0, avatarInfoIndex);
+        logger.debug("fileName = {}", fileName);
+        avatarInfoIndex = avatarInfoIndex + 8;
+        String contentType = outputFileName.substring(avatarInfoIndex,
+                outputFileName.indexOf(".", avatarInfoIndex)).replaceAll("_", "/");
+        logger.debug("contentType = {}", contentType);
+        try (InputStream inputStream = new FileInputStream(new File(outputFilePath));) {
             User user = (User) entity;
-            String outputFileName = (String) relEntity;
-            String fileName = outputFileName.substring(outputFileName.lastIndexOf("\\") + 1);
-            fileName = fileName.substring(0, fileName.lastIndexOf(".avatar"));
-            logger.debug("fileName = {}", fileName);
-            String contentType = outputFileName.substring(outputFileName.lastIndexOf(".") + 1).replaceAll("_", "/");
-            logger.debug("contentType = {}", contentType);
-            InputStream inputStream = new FileInputStream(new File(outputFileName));
-            PreparedStatement preparedStatement = null;
             List<Column> columnList = new ArrayList<>();
             columnList.add(new Column("\"Avatar\".name", fileName));
             columnList.add(new Column("\"Avatar\".type", contentType));
@@ -168,35 +152,33 @@ public class UserJdbcDao extends JdbcDao {
             logger.debug("user.getAvatarId() = {}", user.getAvatarId());
             if (user.getAvatarId() == null) {
                 logger.debug("INSERT AVATAR");
-                preparedStatement = rawQuery("INSERT INTO \"Avatar\" (name, type, file) VALUES (?, ?, ?)",
-                        columnList, PreparedStatement.RETURN_GENERATED_KEYS);
-                preparedStatement.executeUpdate();
-                relResultSet = preparedStatement.getGeneratedKeys();
-                if (relResultSet.first()) user.setAvatarId(relResultSet.getLong(1));
+                String sqlString = "INSERT INTO \"Avatar\" (name, type, file) VALUES (?, ?, ?)";
+                try (PreparedStatement preparedStatement =
+                             getConnection().prepareStatement(sqlString, Statement.RETURN_GENERATED_KEYS);
+                     ResultSet resultSet =
+                             getGeneratedKeysAfterUpdate(setPreparedStatementValues(preparedStatement, columnList));) {
+                    if (resultSet.first()) user.setAvatarId(resultSet.getLong(1));
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    throw new DaoException("exception.dao.put-avatar.sql-insert", e.getCause());
+                }
             } else {
                 logger.debug("UPDATE AVATAR");
                 columnList.add(new Column("\"Avatar\".id", user.getAvatarId()));
                 List<Column> whereList = new ArrayList<>();
                 whereList.add(new Column("\"Avatar\".id", user.getAvatarId()));
-                preparedStatement = rawQuery("UPDATE \"Avatar\" SET name = ?, type = ?, file = ?"
-                        .concat(" WHERE ").concat(Column.columnListToString(whereList, "AND", "=")),
-                        columnList);
-                preparedStatement.executeUpdate();
+                String sqlString = "UPDATE \"Avatar\" SET name = ?, type = ?, file = ?"
+                        .concat(" WHERE ").concat(Column.columnListToString(whereList, "AND", "="));
+                try (PreparedStatement preparedStatement = getConnection().prepareStatement(sqlString);) {
+                    setPreparedStatementValues(preparedStatement, columnList).executeUpdate();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    throw new DaoException("exception.dao.put-avatar.sql-update", e.getCause());
+                }
             }
-        } catch (FileNotFoundException e) {
+        } catch (IOException e) {
             e.printStackTrace();
-            throw new DaoException("exception.dao.user.put-avatar.file", e.getCause());
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw new DaoException("exception.dao.user.put-avatar.update", e.getCause());
-        } finally {
-            try {
-                if (relResultSet != null) relResultSet.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-                throw new DaoException("exception.dao.put-avatar.resultset-close", e.getCause());
-            }
+            throw new DaoException("exception.dao.put-avatar.output-file-name", e.getCause());
         }
-
     }
 }

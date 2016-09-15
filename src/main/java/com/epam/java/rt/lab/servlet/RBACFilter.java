@@ -5,6 +5,7 @@ import com.epam.java.rt.lab.connection.ConnectionException;
 import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.entity.rbac.User;
 import com.epam.java.rt.lab.service.UserService;
+import com.epam.java.rt.lab.util.CookieManager;
 import com.epam.java.rt.lab.util.UrlManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,13 +33,14 @@ public class RBACFilter implements Filter {
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)
             throws IOException, ServletException {
         logger.debug("RBAC");
+        UserService userService = null;
         try {
             HttpServletRequest req = (HttpServletRequest) servletRequest;
             Long userId = (Long) req.getSession().getAttribute("userId");
-            UserService userService = new UserService();
+            userService = new UserService();
             if (userId == null) {
                 logger.debug("TRYING TO GET USER FROM COOKIE");
-                Cookie rememberUserCookie = ResponseCookie.getCookie(req, UserService.getRememberCookieName());
+                Cookie rememberUserCookie = CookieManager.getCookie(req, UserService.getRememberCookieName());
                 if (rememberUserCookie != null) userId = UserService.getRememberUserId(rememberUserCookie.getValue());
                 if (userId != null) {
                     req.getSession().setAttribute("userId", userId);
@@ -57,9 +59,10 @@ public class RBACFilter implements Filter {
                         logger.debug("REDIRECT (SHOULD BE NULL) {}", req.getSession().getAttribute("redirect"));
                     } else {
                         logger.debug("NEED TO REDIRECT");
+                        UrlManager.putParametersToCookie(req, (HttpServletResponse) servletResponse);
                         ((HttpServletResponse) servletResponse).sendRedirect(UrlManager.getContextUri(req, "/profile/login")
-                                .concat(UrlManager.combineUrlParameter(new UrlManager.UrlParameterBuilder
-                                        ("redirect", req.getContextPath().concat(req.getPathInfo())))));
+                                .concat(UrlManager.combineUrlParameter(new UrlManager.UrlParameterBuilder("redirect",
+                                        UrlManager.getContextUri(req, req.getPathInfo())))));
                     }
                 } catch (DaoException e) {
                     e.printStackTrace();
@@ -80,6 +83,12 @@ public class RBACFilter implements Filter {
         } catch (DaoException| ConnectionException e) {
             e.printStackTrace();
             throw new ServletException("exception.servlet.rbac.get-user", e.getCause());
+        } finally {
+            try {
+                if (userService != null) userService.close();
+            } catch (DaoException e) {
+                e.printStackTrace();
+            }
         }
     }
 

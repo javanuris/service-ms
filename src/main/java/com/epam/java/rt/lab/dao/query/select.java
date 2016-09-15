@@ -6,12 +6,13 @@ import java.util.List;
 /**
  * service-ms
  */
-public class Select implements SqlQuery {
+public class Select implements Query {
     private String tableName;
     private String columnNames;
     private Long offset;
     private Long count;
     private List<Column> columnList;
+    private String sql;
 
     public Select(String tableName, String columnNames) {
         this.tableName = tableName;
@@ -41,8 +42,18 @@ public class Select implements SqlQuery {
     }
 
     @Override
+    public void setSetList(List<Set> setList) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public List<Column> getColumnList() {
         return this.columnList;
+    }
+
+    @Override
+    public void setColumnList(List<Column> columnList) {
+        this.columnList = columnList;
     }
 
     @Override
@@ -66,4 +77,13 @@ public class Select implements SqlQuery {
         return result.toString();
     }
 
+    @Override
+    public String getSql() {
+        return this.sql;
+    }
+
+    @Override
+    public void setSql(String sql) {
+        this.sql = sql;
+    }
 }

@@ -28,8 +28,9 @@ public class EditAction implements Action {
     @Override
     public void execute(HttpServletRequest req, HttpServletResponse resp) throws ActionException {
         FormComponent formComponent = (FormComponent) req.getSession().getAttribute("editProfileForm");
+        UserService userService = null;
         try {
-            UserService userService = new UserService();
+            userService = new UserService();
             if (req.getMethod().equals("GET")) {
                 logger.debug("GET");
                 if (UrlManager.getUrlParameter(req, "cancel", null) != null) {
@@ -60,7 +61,7 @@ public class EditAction implements Action {
                                     ("profile.edit.submit.label", "submit", ""),
                             new FormComponent.FormItem
                                     ("profile.edit.cancel.label", "button",
-                                            UrlManager.getUriForButton(req, "/profile/edit", "cancel"), ""));
+                                            UrlManager.getUriForButton(req, "/profile/edit", "cancel")));
                     logger.debug("item.value = {}", formComponent.getFormItemArray()[0].getValue());
                     req.getSession().setAttribute("editProfileForm", formComponent);
                 }
@@ -94,6 +95,12 @@ public class EditAction implements Action {
         } catch (ServletException | IOException | ConnectionException | DaoException e) {
             e.printStackTrace();
             throw new ActionException("exception.action.edit", e.getCause());
+        } finally {
+            try {
+                if (userService != null) userService.close();
+            } catch (DaoException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

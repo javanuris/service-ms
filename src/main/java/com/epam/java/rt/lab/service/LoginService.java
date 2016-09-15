@@ -24,8 +24,7 @@ public class LoginService extends BaseService {
         login.setEmail(email);
         login.setPassword(password);
         Dao dao = daoFactory.createDao("Login");
-        login = dao.getFirst(login, "email, password");
-        daoFactory.close();
+        login = dao.getFirst(login, "email, password", null);
         return login;
     }
 
@@ -34,7 +33,6 @@ public class LoginService extends BaseService {
         logger.debug("updateLogin");
         Dao dao = daoFactory.createDao("Login");
         int updateCount = dao.update(login, "id", "password");
-        daoFactory.close();
         return updateCount;
     }
 

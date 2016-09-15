@@ -1,5 +1,9 @@
 package com.epam.java.rt.lab.dao.query;
 
+import com.epam.java.rt.lab.dao.Dao;
+
+import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.List;
 
 /**

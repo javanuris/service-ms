@@ -24,41 +24,43 @@ public class DownloadServlet extends HttpServlet {
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        if (req.getMethod().equals("GET")) {
-            logger.debug("DOWNLOAD REQUESTED: {}", req.getPathInfo());
-            InputStream inputStream = null;
-            switch (req.getPathInfo()) {
-                case "/avatar":
-                    String avatarId = req.getParameter("id");
-                    logger.debug("AVATAR: {}", avatarId);
-                    if (FormValidator.isOnlyDigits(avatarId)) {
-                        try {
-                            Map<String, Object> avatarMap = (new UserService()).getAvatar(Long.valueOf(avatarId));
-                            resp.setContentType((String) avatarMap.get("type"));
-                            inputStream = (InputStream) avatarMap.get("file");
-                        } catch (DaoException | ConnectionException e) {
-                            e.printStackTrace();
-                            throw new ServletException(e.getMessage(), e.getCause());
+        if (req.getSession().getAttribute("userId") != null) {
+            if (req.getMethod().equals("GET")) {
+                logger.debug("DOWNLOAD REQUESTED: {}", req.getPathInfo());
+                InputStream inputStream = null;
+                switch (req.getPathInfo()) {
+                    case "/avatar":
+                        String avatarId = req.getParameter("id");
+                        logger.debug("AVATAR: {}", avatarId);
+                        if (FormValidator.isOnlyDigits(avatarId)) {
+                            try {
+                                Map<String, Object> avatarMap = (new UserService()).getAvatar(Long.valueOf(avatarId));
+                                resp.setContentType((String) avatarMap.get("type"));
+                                inputStream = (InputStream) avatarMap.get("file");
+                            } catch (DaoException | ConnectionException e) {
+                                e.printStackTrace();
+                                throw new ServletException(e.getMessage(), e.getCause());
+                            }
                         }
-                    }
-                    break;
-                case "/pre-avatar":
-                    String avatarPath = req.getParameter("path");
-                    logger.debug("AVATAR: {}", avatarPath);
-                    resp.setContentType(avatarPath.substring(avatarPath.lastIndexOf(".") + 1).replaceAll("_", "/"));
-                    inputStream = new FileInputStream(new File(avatarPath));
-                    break;
-            }
-            if (inputStream != null) {
-                logger.debug("READY TO DOWNLOAD");
-                BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream, 4096);
-                BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(resp.getOutputStream(), 4096);
-                byte[] buffer = new byte[4096];
-                int length;
-                while ((length = bufferedInputStream.read(buffer)) > 0) {
-                    bufferedOutputStream.write(buffer, 0, length);
+                        break;
+                    case "/pre-avatar":
+                        String avatarPath = req.getParameter("path");
+                        logger.debug("AVATAR: {}", avatarPath);
+                        resp.setContentType(avatarPath.substring(avatarPath.lastIndexOf(".") + 1).replaceAll("_", "/"));
+                        inputStream = new FileInputStream(new File(avatarPath));
+                        break;
                 }
-                logger.debug("DOWNLOAD COMPLETE");
+                if (inputStream != null) {
+                    logger.debug("READY TO DOWNLOAD");
+                    BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream, 4096);
+                    BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(resp.getOutputStream(), 4096);
+                    byte[] buffer = new byte[4096];
+                    int length;
+                    while ((length = bufferedInputStream.read(buffer)) > 0) {
+                        bufferedOutputStream.write(buffer, 0, length);
+                    }
+                    logger.debug("DOWNLOAD COMPLETE");
+                }
             }
         }
     }

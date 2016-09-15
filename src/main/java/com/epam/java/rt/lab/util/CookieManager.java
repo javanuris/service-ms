@@ -1,4 +1,4 @@
-package com.epam.java.rt.lab.servlet;
+package com.epam.java.rt.lab.util;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -7,7 +7,7 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * service-ms
  */
-public class ResponseCookie {
+public class CookieManager {
 
     public static Cookie getCookie(HttpServletRequest req, String name) {
         for (Cookie cookie : req.getCookies())

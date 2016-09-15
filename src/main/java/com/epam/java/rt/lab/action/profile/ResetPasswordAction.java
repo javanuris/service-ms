@@ -31,6 +31,7 @@ public class ResetPasswordAction implements Action {
     @Override
     public void execute(HttpServletRequest req, HttpServletResponse resp) throws ActionException {
         FormComponent formComponent = (FormComponent) req.getSession().getAttribute("resetPasswordForm");
+        LoginService loginService = null;
         try {
             if (req.getMethod().equals("GET")) {
                 logger.debug("GET");
@@ -66,8 +67,10 @@ public class ResetPasswordAction implements Action {
                         formComponent.getFormItemArray()[1].setValidationMessageArray(validationMessageArray);
                         return;
                     }
-                    User user = new UserService().getUser((Long) req.getSession().getAttribute("userId"));
-                    Login  login = new LoginService().getLogin(user.getLogin().getEmail(), formComponent.getFormItemArray()[2].getValue());
+                    loginService = new LoginService();
+                    UserService userService = new UserService();
+                    User user = userService.getUser((Long) req.getSession().getAttribute("userId"));
+                    Login login = loginService.getLogin(user.getLogin().getEmail(), formComponent.getFormItemArray()[2].getValue());
                     if (login == null) {
                         logger.debug("DENIED");
                         String[] validationMessageArray = {"profile.reset-password.submit.error-reset-password"};
@@ -75,7 +78,7 @@ public class ResetPasswordAction implements Action {
                     } else {
                         logger.debug("GRANTED");
                         login.setPassword(formComponent.getFormItemArray()[0].getValue());
-                        if (new LoginService().updatePassword(login) != 1) {
+                        if (loginService.updatePassword(login) != 1) {
                             logger.debug("UPDATE ERROR");
                             String[] validationMessageArray = {"profile.reset-password.submit.error-reset-password"};
                             formComponent.getFormItemArray()[3].setValidationMessageArray(validationMessageArray);
@@ -92,6 +95,12 @@ public class ResetPasswordAction implements Action {
             }
         } catch (ServletException | IOException | ConnectionException | DaoException | SQLException e) {
             throw new ActionException(e.getMessage());
+        } finally {
+            try {
+                if (loginService != null) loginService.close();
+            } catch (DaoException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

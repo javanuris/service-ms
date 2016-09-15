@@ -15,4 +15,8 @@ abstract class BaseService {
         daoFactory = AbstractDaoFactory.createDaoFactory();
     }
 
+    public void close() throws DaoException {
+        daoFactory.close();
+    }
+
 }

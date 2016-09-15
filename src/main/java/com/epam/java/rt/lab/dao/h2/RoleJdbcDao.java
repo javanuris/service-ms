@@ -69,46 +69,40 @@ public class RoleJdbcDao extends JdbcDao {
             List<Column> columnList = new ArrayList<>();
             columnList.add(new Column("\"RolePermission\".permission_id", "\"Permission\".id", true));
             columnList.add(new Column("\"RolePermission\".role_id", role.getId()));
-            PreparedStatement preparedStatement = rawQuery("SELECT \"Permission\".uri FROM \"Permission\""
+            String sqlString = "SELECT \"Permission\".uri FROM \"Permission\""
                     .concat(" JOIN \"RolePermission\"")
-                            .concat(" WHERE ").concat(Column.columnListToString(columnList, "AND", "=")),
-                    columnList);
-            preparedStatement.execute();
-            ResultSet relResultSet = preparedStatement.getResultSet();
-            List<String> uriList = new ArrayList<>();
-            while (relResultSet.next()) uriList.add(relResultSet.getString("uri"));
-            role.setUriList(uriList);
-            return (T) role;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw new DaoException("exception.dao.jdbc.get-entity-from-result-set", e.getCause());
-        } finally {
-            try {
-                if (resultSet != null) resultSet.close();
+                    .concat(" WHERE ").concat(Column.columnListToString(columnList, "AND", "="));
+            try (PreparedStatement preparedStatement = getConnection().prepareStatement(sqlString);
+                 ResultSet relResultSet = setPreparedStatementValues(preparedStatement, columnList).executeQuery();) {
+                List<String> uriList = new ArrayList<>();
+                while (relResultSet.next()) uriList.add(relResultSet.getString("uri"));
+                role.setUriList(uriList);
+                return (T) role;
             } catch (SQLException e) {
                 e.printStackTrace();
-                throw new DaoException("exception.dao.get-entity-from-result-set.resultset-close", e.getCause());
+                throw new DaoException("exception.dao.get-entity-from-result-set.uri-list", e.getCause());
             }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new DaoException("exception.dao.jdbc.get-entity-from-result-set.role", e.getCause());
         }
     }
 
     @Override
     <T> int relUpdate(T entity, String setNames) throws DaoException {
-        try {
-            int updateCount = 0;
-            Role role = (Role) entity;
-            List<Column> columnList = new ArrayList<>();
-            columnList.add(new Column("\"RolePermission\".permission_id", "\"Permission\".id", true));
-            columnList.add(new Column("\"RolePermission\".role_id", role.getId()));
-            PreparedStatement preparedStatement =
-                    rawQuery("SELECT \"RolePermission\".id \"Permission\".uri FROM \"Permission\""
-                                    .concat(" JOIN \"RolePermission\"")
-                                    .concat(" WHERE ").concat(Column.columnListToString(columnList, "AND", "=")),
-                            columnList);
-            preparedStatement.execute();
-            ResultSet relResultSet = preparedStatement.getResultSet();
+        int updateCount = 0;
+        Role role = (Role) entity;
+        List<Column> columnList = new ArrayList<>();
+        columnList.add(new Column("\"RolePermission\".permission_id", "\"Permission\".id", true));
+        columnList.add(new Column("\"RolePermission\".role_id", role.getId()));
+        String sqlString = "SELECT \"RolePermission\".id \"Permission\".uri FROM \"Permission\""
+                .concat(" JOIN \"RolePermission\"")
+                .concat(" WHERE ").concat(Column.columnListToString(columnList, "AND", "="));
+        try (PreparedStatement preparedStatement = getConnection().prepareStatement(sqlString);
+             ResultSet relResultSet = preparedStatement.executeQuery();) {
             List<String> uriList = role.getUriList();
             List<String> resUriList = new ArrayList<>();
+            // delete references
             columnList.clear();
             while (relResultSet.next()) {
                 if (!uriList.contains(relResultSet.getString("uri"))) {
@@ -117,36 +111,47 @@ public class RoleJdbcDao extends JdbcDao {
                     resUriList.add(relResultSet.getString("uri"));
                 }
             }
-            preparedStatement = getConnection().prepareStatement("DELETE FROM \"RolePermission\""
-                            .concat(" WHERE ").concat(Column.columnListToString(columnList, "OR", "=")));
-            setPreparedStatementValues(preparedStatement, columnList);
-            updateCount = updateCount + preparedStatement.executeUpdate();
+            sqlString = "DELETE FROM \"RolePermission\""
+                    .concat(" WHERE ").concat(Column.columnListToString(columnList, "OR", "="));
+            try (PreparedStatement deleteStatement = getConnection().prepareStatement(sqlString);) {
+                setPreparedStatementValues(deleteStatement, columnList);
+                updateCount += deleteStatement.executeUpdate();
+            } catch (SQLException e) {
+                e.printStackTrace();
+                throw new DaoException("exception.dao.rel-update.delete", e.getCause());
+            }
+            // define unreferenced
             columnList.clear();
             for (String uri : uriList) if (!resUriList.contains(uri)) columnList.add(new Column("uri", uri));
-            preparedStatement.close();
-            preparedStatement = getConnection().prepareStatement("SELECT * FROM \"Permission\""
-                    .concat(" WHERE ").concat(Column.columnListToString(columnList, "OR", "=")));
-            setPreparedStatementValues(preparedStatement, columnList);
-            preparedStatement.execute();
-            relResultSet = preparedStatement.getResultSet();
-            columnList.clear();
-            while (relResultSet.next()) columnList.add(new Column("permission_id", relResultSet.getLong("id")));
-            preparedStatement.close();
-            preparedStatement = getConnection().prepareStatement
-                    ("INSERT INTO \"RolePermission\" (role_id, permission_id) VALUES (?, ?)");
-            List<Column> insertList = new ArrayList<>();
-            for (Column column : columnList) {
-                preparedStatement.clearParameters();
-                insertList.clear();
-                insertList.add(new Column("", role.getId()));
-                insertList.add(new Column("", column.value));
-                setPreparedStatementValues(preparedStatement, insertList);
-                updateCount = updateCount + preparedStatement.executeUpdate();
+            sqlString = "SELECT * FROM \"Permission\""
+                    .concat(" WHERE ").concat(Column.columnListToString(columnList, "OR", "="));
+            try (PreparedStatement selectStatement = getConnection().prepareStatement(sqlString);
+                 ResultSet resultSet = setPreparedStatementValues(selectStatement, columnList).executeQuery();) {
+                // add references
+                columnList.clear();
+                while (resultSet.next()) columnList.add(new Column("permission_id", resultSet.getLong("id")));
+                sqlString = "INSERT INTO \"RolePermission\" (role_id, permission_id) VALUES (?, ?)";
+                try (PreparedStatement addStatement = getConnection().prepareStatement(sqlString);) {
+                    List<Column> insertList = new ArrayList<>();
+                    for (Column column : columnList) {
+                        addStatement.clearParameters();
+                        insertList.clear();
+                        insertList.add(new Column("", role.getId()));
+                        insertList.add(new Column("", column.value));
+                        updateCount += setPreparedStatementValues(preparedStatement, insertList).executeUpdate();
+                    }
+                    return updateCount;
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    throw new DaoException("exception.dao.rel-update.result-set", e.getCause());
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+                throw new DaoException("exception.dao.rel-update.result-set", e.getCause());
             }
-            return updateCount;
         } catch (SQLException e) {
             e.printStackTrace();
-            throw new DaoException("exception.dao.jdbc.rel-update", e.getCause());
+            throw new DaoException("exception.dao.rel-update.result-set", e.getCause());
         }
     }
 }

@@ -1,4 +1,4 @@
-package com.epam.java.rt.lab.action.profile;
+package com.epam.java.rt.lab.action.rbac.user;
 
 import com.epam.java.rt.lab.action.Action;
 import com.epam.java.rt.lab.action.ActionException;
@@ -8,16 +8,15 @@ import com.epam.java.rt.lab.connection.ConnectionException;
 import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.entity.rbac.User;
 import com.epam.java.rt.lab.service.UserService;
+import com.epam.java.rt.lab.util.FormValidator;
 import com.epam.java.rt.lab.util.UrlManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.print.DocFlavor;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.sql.SQLException;
 
 /**
  * Service Management System
@@ -30,9 +29,23 @@ public class ViewAction implements Action {
     public void execute(HttpServletRequest req, HttpServletResponse resp) throws ActionException {
         UserService userService = null;
         try {
-            logger.debug("/WEB-INF/jsp/profile/view.jsp");
+            logger.debug("/WEB-INF/jsp/rbac/user/view.jsp");
+            if (UrlManager.getUrlParameter(req, "cancel", null) != null) {
+                req.getSession().removeAttribute("editProfileForm");
+                resp.sendRedirect(UrlManager.getContextUri(req, "/profile/view"));
+                return;
+            }
+            String id = UrlManager.getUrlParameterFromAttribute(req, "id", null);
+            if (id == null && !FormValidator.isOnlyDigits(id)) {
+                resp.sendRedirect(UrlManager.getContextUri(req, "/rbac/user/list"));
+                return;
+            }
             userService = new UserService();
-            User user = userService.getUser((Long) req.getSession().getAttribute("userId"));
+            User user = userService.getUser((Long) req.getSession().getAttribute(id));
+            if (user == null) {
+                resp.sendRedirect(UrlManager.getContextUri(req, "/rbac/user/list"));
+                return;
+            }
             req.getSession().setAttribute("profileView", new ViewComponent(
                     new ViewComponent.ViewItem
                             ("profile.view.first-name.label", "input", user.getFirstName()),
@@ -46,13 +59,17 @@ public class ViewAction implements Action {
                             ("profile.view.role-name.label", "input", user.getRole().getName()),
                     new ViewComponent.ViewItem
                             ("profile.view.login-email.label", "input", user.getLogin().getEmail()),
+//                    new ViewComponent.ViewItem
+//                            ("profile.view.reset-login-password.label", "button", UrlManager.getContextUri(req, "/profile/reset-password")),
                     new ViewComponent.ViewItem
-                            ("profile.view.reset-login-password.label", "button", UrlManager.getContextUri(req, "/profile/reset-password")),
+                            ("profile.view.edit-profile.label", "button", UrlManager.getContextUri(req, "/rbac/user/edit"
+                                    .concat(UrlManager.combineUrlParameter(new UrlManager.UrlParameterBuilder("id", id))))),
                     new ViewComponent.ViewItem
-                            ("profile.view.edit-profile.label", "button", UrlManager.getContextUri(req, "/profile/edit"))));
-            req.getRequestDispatcher("/WEB-INF/jsp/profile/view.jsp").forward(req, resp);
+                            ("profile.view.cancel.label", "button", UrlManager.getUriForButton(req, "/rbac/user/list", "cancel"))));
+            req.getRequestDispatcher("/WEB-INF/jsp/rbac/user/view.jsp").forward(req, resp);
         } catch (ServletException | IOException | ConnectionException | DaoException e) {
-            throw new ActionException("exception.action.view", e.getCause());
+            e.printStackTrace();
+            throw new ActionException("exception.action.rbac.user.view", e.getCause());
         } finally {
             try {
                 if (userService != null) userService.close();

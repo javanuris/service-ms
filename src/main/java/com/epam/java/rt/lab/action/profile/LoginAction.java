@@ -11,7 +11,7 @@ import com.epam.java.rt.lab.entity.rbac.Login;
 import com.epam.java.rt.lab.entity.rbac.User;
 import com.epam.java.rt.lab.service.LoginService;
 import com.epam.java.rt.lab.service.UserService;
-import com.epam.java.rt.lab.servlet.ResponseCookie;
+import com.epam.java.rt.lab.util.CookieManager;
 import com.epam.java.rt.lab.util.FormValidator;
 import com.epam.java.rt.lab.util.UrlManager;
 import org.slf4j.Logger;
@@ -31,14 +31,8 @@ public class LoginAction implements Action {
 
     @Override
     public void execute(HttpServletRequest req, HttpServletResponse resp) throws ActionException {
+        LoginService loginService = null;
         try {
-//            CHECKED IN RBAC FILTER
-//            if (req.getSession().getAttribute("user") != null) {
-//                logger.debug("REDIRECTING");
-//                resp.sendRedirect("/profile/view");
-//                logger.debug("REDIRECTED");
-//                return;
-//            }
             FormComponent formComponent = (FormComponent) req.getSession().getAttribute("loginForm");
             if (req.getMethod().equals("GET")) {
                 logger.debug("GET");
@@ -70,7 +64,7 @@ public class LoginAction implements Action {
                 logger.debug("POST");
                 if (FormValidator.setValueAndValidate(req, formComponent.getFormItemArray())) {
                     logger.debug("VALID");
-                    LoginService loginService = new LoginService();
+                    loginService = new LoginService();
                     Login login = loginService.getLogin(
                             formComponent.getFormItemArray()[0].getValue(),
                             formComponent.getFormItemArray()[1].getValue());
@@ -89,13 +83,14 @@ public class LoginAction implements Action {
                         logger.debug("REMEMBER = {}", formComponent.getFormItemArray()[2].getValue());
                         if (formComponent.getFormItemArray()[2].getValue() != null) {
                             logger.debug("REMEMBERING USER");
-                            ResponseCookie.setCookie(
+                            CookieManager.setCookie(
                                     resp,
                                     UserService.getRememberCookieName(),
                                     UserService.setRememberUserId(user.getId()),
                                     2592000, req.getContextPath().concat("/"));
                         }
                         String redirect = UrlManager.getUrlParameter(req, "redirect", "/");
+                        redirect = redirect.concat(UrlManager.getParametersFromCookie(req));
                         logger.debug("REDIRECTING ({})", redirect);
                         resp.sendRedirect(redirect);
                         logger.debug("REDIRECTED");
@@ -108,6 +103,12 @@ public class LoginAction implements Action {
         } catch (ServletException | IOException | ConnectionException | DaoException e) {
             e.printStackTrace();
             throw new ActionException("exception.action.login", e.getCause());
+        } finally {
+            try {
+                if (loginService != null) loginService.close();
+            } catch (DaoException e) {
+                e.printStackTrace();
+            }
         }
     }
 

@@ -1,9 +1,12 @@
 package com.epam.java.rt.lab.util;
 
 import javax.servlet.ServletRequest;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Map;
 
 /**
  * service-ms
@@ -64,6 +67,31 @@ public class UrlManager {
             result.append(urlParameterBuilder.getName()).append("=").append(urlParameterBuilder.getValue());
         }
         return result.toString();
+    }
+
+    public static void putParametersToCookie(HttpServletRequest req, HttpServletResponse resp) {
+        boolean first = true;
+        StringBuilder parameters = new StringBuilder();
+        Enumeration<String> names = req.getParameterNames();
+        while (names.hasMoreElements()) {
+            String name = names.nextElement();
+            if (first) {
+                first = false;
+                parameters.append("?");
+            } else {
+                parameters.append("&");
+            }
+            parameters.append(name).append("=").append(req.getParameter(name));
+        }
+        CookieManager.setCookie(resp, "url-parameters", parameters.toString(), 90000, getContextUri(req, "/"));
+    }
+
+    public static String getParametersFromCookie(HttpServletRequest req) {
+        Cookie cookie = CookieManager.getCookie(req, "url-parameters");
+        if (cookie == null) return "";
+        cookie.setValue(null);
+        cookie.setMaxAge(0);
+        return cookie.getValue();
     }
 
     public static String getUrlParameter(HttpServletRequest req, String parameterName, String defaultValue) {

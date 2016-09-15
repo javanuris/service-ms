@@ -6,10 +6,11 @@ import java.util.List;
 /**
  * service-ms
  */
-public class Update implements SqlQuery {
+public class Update implements Query {
     private String tableName;
     private List<Set> setList;
     private List<Column> columnList;
+    private String sql;
 
     public Update(String tableName) {
         this.tableName = tableName;
@@ -23,8 +24,18 @@ public class Update implements SqlQuery {
     }
 
     @Override
+    public void setSetList(List<Set> setList) {
+        this.setList = setList;
+    }
+
+    @Override
     public List<Column> getColumnList() {
         return this.columnList;
+    }
+
+    @Override
+    public void setColumnList(List<Column> columnList) {
+        this.columnList = columnList;
     }
 
     @Override
@@ -40,6 +51,16 @@ public class Update implements SqlQuery {
     @Override
     public String createCount() {
         return null;
+    }
+
+    @Override
+    public String getSql() {
+        return this.sql;
+    }
+
+    @Override
+    public void setSql(String sql) {
+        this.sql = sql;
     }
 
 }

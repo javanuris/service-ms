@@ -32,8 +32,7 @@ public class UserService extends BaseService {
         User user = new User();
         user.setLogin(login);
         Dao dao = daoFactory.createDao("User");
-        user = dao.getFirst(user, "login");
-        daoFactory.close();
+        user = dao.getFirst(user, "login", "");
         return user;
     }
 
@@ -41,8 +40,7 @@ public class UserService extends BaseService {
         User user = new User();
         user.setId(id);
         Dao dao = daoFactory.createDao("User");
-        user = dao.getFirst(user, "id");
-        daoFactory.close();
+        user = dao.getFirst(user, "id", "");
         return user;
     }
 
@@ -76,16 +74,14 @@ public class UserService extends BaseService {
     public int updateUser(User user) throws DaoException {
         Dao dao = daoFactory.createDao("User");
         int updateCount = dao.update(user, "id", "firstName, middleName, lastName, avatarId");
-        daoFactory.close();
         return updateCount;
     }
 
     public List<User> getUserList(PageComponent pageComponent) throws DaoException {
         Dao dao = daoFactory.createDao("User");
-        List<User> userList = dao.getAll(null, null, null,
+        List<User> userList = dao.getAll(null, null, null, "",
                 (pageComponent.getCurrentPage() - 1) * pageComponent.getItemsOnPage(), pageComponent.getItemsOnPage());
         pageComponent.setCountPages((long) Math.ceil((dao.getSelectCount() * 1.0) / pageComponent.getItemsOnPage()));
-        daoFactory.close();
         return userList;
     }
 
@@ -94,14 +90,13 @@ public class UserService extends BaseService {
             Dao dao = daoFactory.createDao("User");
             dao.putRelEntity(user, "Avatar", fileName);
             new File(fileName).delete();
-            daoFactory.close();
         }
     }
 
     public Map<String, Object> getAvatar(User user) throws DaoException {
         Dao dao = daoFactory.createDao("User");
         Map<String, Object>  avatarMap = (Map<String, Object>) dao.getRelEntity(user, "Avatar");
-        daoFactory.close();
+
         return avatarMap;
     }
 

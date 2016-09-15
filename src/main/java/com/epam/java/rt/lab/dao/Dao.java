@@ -1,5 +1,6 @@
 package com.epam.java.rt.lab.dao;
 
+import com.epam.java.rt.lab.dao.h2.JdbcDao;
 import com.epam.java.rt.lab.entity.rbac.User;
 
 import java.util.List;
@@ -9,17 +10,17 @@ import java.util.List;
  */
 public interface Dao {
 
-    <T> T getFirst(T entity, String fieldNames) throws DaoException;
+    <T> T getFirst(T entity, String fieldNames, String order) throws DaoException;
 
-    <T> T getFirst(T entity, String fieldNames, String columnNames) throws DaoException;
+    <T> T getFirst(T entity, String fieldNames, String columnNames, String order) throws DaoException;
 
-    <T> List<T> getAll() throws DaoException;
+    <T> List<T> getAll(String order) throws DaoException;
 
-    <T> List<T> getAll(T entity, String fieldNames) throws DaoException;
+    <T> List<T> getAll(T entity, String fieldNames, String order) throws DaoException;
 
-    <T> List<T> getAll(T entity, String fieldNames, String columnNames) throws DaoException;
+    <T> List<T> getAll(T entity, String fieldNames, String columnNames, String order) throws DaoException;
 
-    <T> List<T> getAll(T entity, String fieldNames, String columnNames, Long offset, Long count) throws DaoException;
+    <T> List<T> getAll(T entity, String fieldNames, String columnNames, String order, Long offset, Long count) throws DaoException;
 
     Long getSelectCount();
 
