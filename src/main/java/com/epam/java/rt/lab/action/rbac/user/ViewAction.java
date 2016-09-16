@@ -8,8 +8,7 @@ import com.epam.java.rt.lab.connection.ConnectionException;
 import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.entity.rbac.User;
 import com.epam.java.rt.lab.service.UserService;
-import com.epam.java.rt.lab.util.CookieManager;
-import com.epam.java.rt.lab.util.FormValidator;
+import com.epam.java.rt.lab.util.FormManager;
 import com.epam.java.rt.lab.util.UrlManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +17,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Map;
 
 /**
  * Service Management System
@@ -33,7 +31,7 @@ public class ViewAction implements Action {
         try {
             logger.debug("/WEB-INF/jsp/rbac/user/view.jsp");
             String id = req.getParameter("id");
-            if (id == null || !FormValidator.isOnlyDigits(id) || req.getParameter("cancel") != null) {
+            if (id == null || !FormManager.isOnlyDigits(id) || req.getParameter("cancel") != null) {
                 req.getSession().removeAttribute("profileView");
                 resp.sendRedirect(UrlManager.getContextUri(req, "/rbac/user/list"));
                 return;

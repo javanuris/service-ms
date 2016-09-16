@@ -16,13 +16,14 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * Service Management System
  */
 @WebFilter(urlPatterns = "/servlet/*", dispatcherTypes = DispatcherType.FORWARD)
-public class RBACFilter implements Filter {
-    private static final Logger logger = LoggerFactory.getLogger(RBACFilter.class);
+public class RbacFilter implements Filter {
+    private static final Logger logger = LoggerFactory.getLogger(RbacFilter.class);
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
@@ -32,7 +33,7 @@ public class RBACFilter implements Filter {
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)
             throws IOException, ServletException {
-        logger.debug("RBAC");
+        logger.debug("RbacFilter");
         UserService userService = null;
         try {
             HttpServletRequest req = (HttpServletRequest) servletRequest;
@@ -59,10 +60,10 @@ public class RBACFilter implements Filter {
                         logger.debug("REDIRECT (SHOULD BE NULL) {}", req.getSession().getAttribute("redirect"));
                     } else {
                         logger.debug("NEED TO REDIRECT");
-                        UrlManager.putParametersToCookie(req, (HttpServletResponse) servletResponse);
-                        ((HttpServletResponse) servletResponse).sendRedirect(UrlManager.getContextUri(req, "/profile/login")
-                                .concat(UrlManager.combineUrlParameter(new UrlManager.UrlParameterBuilder("redirect",
-                                        UrlManager.getContextUri(req, req.getPathInfo())))));
+                        HttpServletResponse resp = (HttpServletResponse) servletResponse;
+                        Map<String, String> parameterMap = UrlManager.getRequestParameterMap(req.getQueryString());
+                        parameterMap.put("redirect", req.getPathInfo());
+                        resp.sendRedirect(UrlManager.getContextUri(req, "/profile/login", parameterMap));
                     }
                 } catch (DaoException e) {
                     e.printStackTrace();

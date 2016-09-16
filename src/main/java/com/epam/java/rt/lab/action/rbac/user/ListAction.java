@@ -10,7 +10,7 @@ import com.epam.java.rt.lab.connection.ConnectionException;
 import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.entity.rbac.User;
 import com.epam.java.rt.lab.service.UserService;
-import com.epam.java.rt.lab.util.FormValidator;
+import com.epam.java.rt.lab.util.FormManager;
 import com.epam.java.rt.lab.util.UrlManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +35,7 @@ public class ListAction implements Action {
         try {
             logger.debug("/WEB-INF/jsp/rbac/user/list.jsp");
 //            String id = UrlManager.getUrlParameter(req, "id", null);
-//            if (id != null && FormValidator.isOnlyDigits(id)) {
+//            if (id != null && FormManager.isOnlyDigits(id)) {
 //                req.getSession().removeAttribute("userList");
 //                resp.sendRedirect(UrlManager.getContextUri(req, "/rbac/user/view"));
 //                return;
@@ -45,7 +45,7 @@ public class ListAction implements Action {
             userService = new UserService();
             String page = UrlManager.getUrlParameterFromAttribute(req, "page", "1");
             Long pageIndex = 1L;
-            if (FormValidator.isOnlyDigits(page)) pageIndex = Long.valueOf(page);
+            if (FormManager.isOnlyDigits(page)) pageIndex = Long.valueOf(page);
             PageComponent pageComponent = new PageComponent(pageIndex, ListComponent.MAX_LIST_ITEM_ON_PAGE);
             for (User user : userService.getUserList(pageComponent)) {
                 Map<String, String> valueMap = new HashMap<>();

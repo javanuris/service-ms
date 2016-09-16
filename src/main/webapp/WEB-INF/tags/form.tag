@@ -4,7 +4,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <form name="${formComponent.name}" action="<c:url value="${formComponent.action}"/>" method="POST">
-    <c:forEach var="item" items="${formComponent.formItemArray}">
+    <c:forEach var="item" items="${formComponent.iterator()}">
         <c:choose>
             <c:when test="${item.type.equals('submit') || item.type.equals('button')}">
                 <div class="col-xs-12" style="padding: 5px 0;">

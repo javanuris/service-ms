@@ -101,9 +101,12 @@ public abstract class AbstractDaoFactory implements DaoFactory {
     @Override
     public void close() throws DaoException {
         try {
-            connection.close();
+            if (connection != null) {
+                connection.close();
+                connection = null;
+            }
         } catch (SQLException e) {
-            throw new DaoException("exception.dao.factory.close",e.getCause());
+            throw new DaoException("exception.dao.factory.close", e.getCause());
         }
     }
 

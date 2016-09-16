@@ -24,7 +24,6 @@ public abstract class JdbcDao implements Dao {
     private static final Logger logger = LoggerFactory.getLogger(JdbcDao.class);
     public enum CRUD {CREATE, READ, UPDATE, DELETE, COUNT};
     private static Map<String, String> cachedQueryMap = new HashMap<>();
-    private static Map<String, PreparedStatement> preparedStatementMap = new HashMap<>();
     private static Map<Type, Method> preparedStatementMethodMap = new HashMap<>();
     private Connection connection = null;
     private Long selectCount;

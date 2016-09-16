@@ -12,7 +12,7 @@ import com.epam.java.rt.lab.entity.rbac.User;
 import com.epam.java.rt.lab.service.LoginService;
 import com.epam.java.rt.lab.service.UserService;
 import com.epam.java.rt.lab.util.CookieManager;
-import com.epam.java.rt.lab.util.FormValidator;
+import com.epam.java.rt.lab.util.FormManager;
 import com.epam.java.rt.lab.util.UrlManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,86 +32,75 @@ public class LoginAction implements Action {
 
     @Override
     public void execute(HttpServletRequest req, HttpServletResponse resp) throws ActionException {
-        logger.debug("LoginAction: {}", CookieManager.getCookie(req, "REQUEST_PARAMETER_REDIRECT") != null ?
-                CookieManager.getCookie(req, "REQUEST_PARAMETER_REDIRECT").getValue() : "REDIRECT_COOKIE_EMPTY");
-        LoginService loginService = null;
-        try {
-            FormComponent formComponent = (FormComponent) req.getSession().getAttribute("loginForm");
-            if (req.getMethod().equals("GET")) {
+        try (LoginService loginService = new LoginService()) {
+            FormComponent formComponent = null;
+            switch (FormComponent.getStatus("profile.login", UrlManager.getContextPathInfo(req), 100)) {
+                case 1:
+                    formComponent = FormComponent.get("profile.login");
+                    break;
+                case 0:
+                    formComponent = FormComponent.set("profile.login",
+                            new FormComponent.Item("profile.login.email.label", "input", "profile.login.email.label"),
+                            new FormComponent.Item("profile.login.password.label", "password", "profile.login.password.label"),
+                            new FormComponent.Item("profile.login.remember.label", "checkbox", "profile.login.remember.label"),
+                            new FormComponent.Item("profile.login.submit.label", "submit", ""),
+                            new FormComponent.Item("profile.login.register.label", "button",
+                                    UrlManager.getContextUri(req, "/profile/register"))
+                    );
+                    break;
+                case -1:
+                    throw new ActionException("exception.action.login.form-status");
+            }
+            req.setAttribute("loginForm", formComponent);
+            if ("GET".equals(req.getMethod())) {
                 logger.debug("GET");
-                if (req.getParameter("register") != null) {
-                    req.getSession().removeAttribute("loginForm");
-                    resp.sendRedirect(UrlManager.getContextUri(req, "/profile/register"));
-                    return;
-                }
-                if (formComponent != null) {
-                    formComponent.clear();
-                } else {
-                    formComponent = new FormComponent("login",
-                            UrlManager.getContextUri(req, "/profile/login", UrlManager.getRequestParameterString(req)),
-                            new FormComponent.FormItem
-                                    ("profile.login.email.label", "input", "profile.login.email.label", ""),
-                            new FormComponent.FormItem
-                                    ("profile.login.password.label", "password", "profile.login.password.label", ""),
-                            new FormComponent.FormItem
-                                    ("profile.login.remember.label", "checkbox", "profile.login.remember.label", ""),
-                            new FormComponent.FormItem
-                                    ("profile.login.submit.label", "submit", "", ""),
-                            new FormComponent.FormItem
-                                    ("profile.login.register.label", "button",
-                                            UrlManager.getUriForButton(req, "/profile/login", "register"), ""));
-                    req.getSession().setAttribute("loginForm", formComponent);
-                }
+                System.out.println("name: " + formComponent.getName() + ", action: " + formComponent.getAction());
+                formComponent.setActionParameterString(UrlManager.getRequestParameterString(req));
                 req.getRequestDispatcher("/WEB-INF/jsp/profile/login.jsp").forward(req, resp);
-            } else if (req.getMethod().equals("POST")) {
+                return;
+            } else if ("POST".equals(req.getMethod())) {
                 logger.debug("POST");
-                if (FormValidator.setValueAndValidate(req, formComponent.getFormItemArray())) {
-                    logger.debug("VALID");
-                    loginService = new LoginService();
+                if (FormManager.setValueAndValidate(req, formComponent)) {
+                    logger.debug("FORM VALID");
                     Login login = loginService.getLogin(
-                            formComponent.getFormItemArray()[0].getValue(),
-                            formComponent.getFormItemArray()[1].getValue());
+                            formComponent.getItem(0).getValue(),
+                            formComponent.getItem(1).getValue()
+                    );
                     if (login == null) {
                         logger.debug("DENIED");
-                        String[] validationMessageArray = {"profile.login.submit.error-auth"};
-                        formComponent.getFormItemArray()[3].setValidationMessageArray(validationMessageArray);
+                        String[] validationMessageArray = {"profile.login.error.denied"};
+                        formComponent.getItem(3).setValidationMessageArray(validationMessageArray);
                     } else {
                         logger.debug("GRANTED");
-                        req.getSession().removeAttribute("loginForm");
-                        User user = (new UserService()).getUser(login);
-                        if (user == null) throw new ActionException("profile.login.message.user-not-found");
+                        UserService userService = new UserService();
+                        User user = userService.getUser(login);
+                        if (user == null)
+                            throw new ActionException("exception.action.login.user-login");
                         req.getSession().setAttribute("userId", user.getId());
                         req.getSession().setAttribute("userName", user.getName());
                         req.getSession().setAttribute("navbarItemArray", NavigationComponent.getNavbarItemArray(user.getRole()));
-                        logger.debug("REMEMBER = {}", formComponent.getFormItemArray()[2].getValue());
-                        if (formComponent.getFormItemArray()[2].getValue() != null) {
-                            logger.debug("REMEMBERING USER");
-                            CookieManager.setCookie(
-                                    resp,
-                                    UserService.getRememberCookieName(),
-                                    UserService.setRememberUserId(user.getId()),
-                                    2592000, req.getContextPath().concat("/"));
+                        if (formComponent.getItem(2).getValue() != null) {
+                            logger.debug("REMEMBER ME");
+                            CookieManager.setCookie(resp,
+                                    UserService.getRememberCookieName(), UserService.setRememberUserId(user.getId()),
+                                    2592000, UrlManager.getContextUri(req, "/")
+                            );
                         }
                         Map<String, String> parameterMap = UrlManager.getRequestParameterMap(req.getQueryString());
-                        String redirect = parameterMap.get("redirect");
-                        parameterMap.remove("redirect");
-                        logger.debug("REDIRECTING ({}, {})", redirect, UrlManager.getRequestParameterString(parameterMap));
+                        String redirect = parameterMap.remove("redirect");
+                        logger.debug("REDIRECT TO {}", redirect);
                         resp.sendRedirect(UrlManager.getContextUri(req, redirect, parameterMap));
                         return;
                     }
                 }
-                logger.debug("NOT VALID");
                 req.getRequestDispatcher("/WEB-INF/jsp/profile/login.jsp").forward(req, resp);
             }
-        } catch (ServletException | IOException | ConnectionException | DaoException e) {
+        } catch (ConnectionException | DaoException e) {
             e.printStackTrace();
-            throw new ActionException("exception.action.login", e.getCause());
-        } finally {
-            try {
-                if (loginService != null) loginService.close();
-            } catch (DaoException e) {
-                e.printStackTrace();
-            }
+            throw new ActionException("exception.action.login.login-service", e.getCause());
+        } catch (ServletException | IOException e) {
+            e.printStackTrace();
+            throw new ActionException("exception.action.login.forward", e.getCause());
         }
     }
 

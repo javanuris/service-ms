@@ -4,5 +4,5 @@
 <tags:template>
     <jsp:attribute name="title">title.profile.login</jsp:attribute>
     <jsp:attribute name="navbarCurrent">/profile/login</jsp:attribute>
-    <jsp:body><tags:profile-form formComponent="${sessionScope.loginForm}"/></jsp:body>
+    <jsp:body><tags:profile-form formComponent="${requestScope.loginForm}"/></jsp:body>
 </tags:template>

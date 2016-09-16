@@ -8,7 +8,7 @@ import com.epam.java.rt.lab.dao.factory.DaoFactory;
 /**
  * service-ms
  */
-abstract class BaseService {
+abstract class BaseService implements AutoCloseable{
     DaoFactory daoFactory;
 
     BaseService() throws ConnectionException, DaoException {

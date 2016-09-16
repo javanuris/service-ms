@@ -4,14 +4,11 @@ import com.epam.java.rt.lab.connection.ConnectionException;
 import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.entity.rbac.Role;
 import com.epam.java.rt.lab.service.RoleService;
-import com.epam.java.rt.lab.util.FormValidator;
+import com.epam.java.rt.lab.util.FormManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
@@ -100,7 +97,7 @@ public class NavigationComponent {
 
         public NavigationItem(String name, String link) {
             String index = name.substring(name.lastIndexOf(".") + 1);
-            if (FormValidator.isOnlyDigits(index)) {
+            if (FormManager.isOnlyDigits(index)) {
                 this.index = Integer.valueOf(index);
                 this.name = name.substring(0, name.length() - index.length() - 1);
             } else {
