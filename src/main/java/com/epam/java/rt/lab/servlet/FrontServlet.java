@@ -3,6 +3,8 @@ package com.epam.java.rt.lab.servlet;
 import com.epam.java.rt.lab.action.Action;
 import com.epam.java.rt.lab.action.ActionException;
 import com.epam.java.rt.lab.action.ActionFactory;
+import com.epam.java.rt.lab.util.CookieManager;
+import com.epam.java.rt.lab.util.UrlManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,6 +24,9 @@ public class FrontServlet extends HttpServlet {
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        logger.debug("FrontServlet: {}", CookieManager.getCookie(req, "REQUEST_PARAMETER_REDIRECT") != null ?
+                CookieManager.getCookie(req, "REQUEST_PARAMETER_REDIRECT").getValue() : "REDIRECT_COOKIE_EMPTY");
+        logger.debug("PARAMETERS: {}", UrlManager.getRequestParameterString(req));
         try {
             if (req.getPathInfo().equals("/")) {
                 ActionFactory.getAction("/home").execute(req, resp);

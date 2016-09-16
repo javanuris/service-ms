@@ -56,8 +56,7 @@ public class ListAction implements Action {
                 valueMap.put("name", user.getName());
                 valueMap.put("role", user.getRole().getName());
                 valueMap.put("href", UrlManager.getContextUri(req,
-                        "/rbac/user/view".concat(UrlManager.combineUrlParameter
-                                (new UrlManager.UrlParameterBuilder("id", String.valueOf(user.getId()))))));
+                        "/rbac/user/view?id=".concat(String.valueOf(user.getId()))));
                 if (user.getLogin() != null) valueMap.put("login", user.getLogin().getEmail());
                 listComponent.addValueMap(valueMap);
             }

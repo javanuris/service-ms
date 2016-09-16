@@ -8,6 +8,7 @@ import com.epam.java.rt.lab.connection.ConnectionException;
 import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.entity.rbac.User;
 import com.epam.java.rt.lab.service.UserService;
+import com.epam.java.rt.lab.util.CookieManager;
 import com.epam.java.rt.lab.util.FormValidator;
 import com.epam.java.rt.lab.util.UrlManager;
 import org.slf4j.Logger;
@@ -17,6 +18,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * Service Management System
@@ -30,18 +32,14 @@ public class ViewAction implements Action {
         UserService userService = null;
         try {
             logger.debug("/WEB-INF/jsp/rbac/user/view.jsp");
-            if (UrlManager.getUrlParameter(req, "cancel", null) != null) {
-                req.getSession().removeAttribute("editProfileForm");
-                resp.sendRedirect(UrlManager.getContextUri(req, "/profile/view"));
-                return;
-            }
-            String id = UrlManager.getUrlParameterFromAttribute(req, "id", null);
-            if (id == null && !FormValidator.isOnlyDigits(id)) {
+            String id = req.getParameter("id");
+            if (id == null || !FormValidator.isOnlyDigits(id) || req.getParameter("cancel") != null) {
+                req.getSession().removeAttribute("profileView");
                 resp.sendRedirect(UrlManager.getContextUri(req, "/rbac/user/list"));
                 return;
             }
             userService = new UserService();
-            User user = userService.getUser((Long) req.getSession().getAttribute(id));
+            User user = userService.getUser(Long.valueOf(id));
             if (user == null) {
                 resp.sendRedirect(UrlManager.getContextUri(req, "/rbac/user/list"));
                 return;

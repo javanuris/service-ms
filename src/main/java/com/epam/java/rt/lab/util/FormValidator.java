@@ -25,6 +25,7 @@ public class FormValidator {
     }
 
     public static boolean isOnlyDigits(String value) {
+        if (value == null) return false;
         return value.matches("^-?[0-9]+(\\.[0-9]+)?$");
     }
 

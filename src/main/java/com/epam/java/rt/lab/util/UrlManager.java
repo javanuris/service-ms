@@ -1,11 +1,8 @@
 package com.epam.java.rt.lab.util;
 
-import javax.servlet.ServletRequest;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.Enumeration;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -21,40 +18,71 @@ public class UrlManager {
                 .concat(UrlManager.combineUrlParameter(new UrlManager.UrlParameterBuilder(parameterName, "true")));
     }
 
-    public static String getContextUri(HttpServletRequest req, String path) {
-        return path == null ? null : req.getContextPath().concat(path);
-    }
-
-    public static void setAttributeFromUrlParameter(HttpServletRequest req) {
-        if (req.getMethod().equals("GET")) {
-            Enumeration<String> parameterNames = req.getParameterNames();
-            String parameterName, parameterValue;
-            if (parameterNames != null) {
-                while (parameterNames.hasMoreElements()) {
-                    parameterName = parameterNames.nextElement();
-                    parameterValue = req.getParameter(parameterName);
-                    req.setAttribute("url-".concat(parameterName), parameterValue);
-                }
-            }
-        }
-    }
-
-    public static String combineUrlParameterFromAttribute(HttpServletRequest req, String... parameterNameArray) {
-        StringBuilder result = new StringBuilder();
-        String parameterValue;
-        for (String parameterName : parameterNameArray) {
-            parameterValue = (String) req.getAttribute("url-".concat(parameterName));
-            if (parameterValue != null) {
-                if (result.length() == 0) {
-                    result.append("?");
+    public static String getContextUri(HttpServletRequest req, String path, String... parameterArray) {
+        boolean first = true;
+        StringBuilder parameterString = new StringBuilder();
+        for (String parameter : parameterArray) {
+            if (parameter != null && parameter.length() > 0) {
+                if (first) {
+                    first = false;
+                    parameterString.append("?");
                 } else {
-                    result.append("&");
+                    parameterString.append("&");
                 }
-                result.append(parameterName).append("=").append(parameterValue);
+                parameterString.append(parameter);
             }
         }
-        return result.toString();
+        return path == null ? req.getContextPath().concat("/").concat(parameterString.toString())
+                : req.getContextPath().concat(path).concat(parameterString.toString());
     }
+
+    public static String getContextUri(HttpServletRequest req, String path, Map<String, String> parameterMap) {
+        return getContextUri(req, path, getRequestParameterString(parameterMap));
+    }
+
+    public static String getRequestParameterString(Map<String, String> parameterMap) {
+        boolean first = true;
+        StringBuilder parameters = new StringBuilder();
+        for (Map.Entry<String, String> parameter : parameterMap.entrySet()) {
+            if (first) {
+                first = false;
+            } else {
+                parameters.append("&");
+            }
+            parameters.append(parameter.getKey()).append("=").append(parameter.getValue());
+        }
+        return parameters.toString();
+    }
+
+    public static Map<String, String> getRequestParameterMap(String parameterString) {
+        Map<String, String> parameterMap = new HashMap<>();
+        String[] parameterArray = parameterString.split("&");
+        for (String parameter : parameterArray) {
+            String[] parameterNameValue = parameter.split("=");
+            if (parameterNameValue.length == 2
+                    && parameterNameValue[0].length() > 0 && parameterNameValue[1].length() > 0)
+                parameterMap.put(parameterNameValue[0], parameterNameValue[1]);
+
+        }
+        return parameterMap;
+    }
+
+    public static String getRequestParameterString(HttpServletRequest req) {
+        boolean first = true;
+        StringBuilder parameters = new StringBuilder();
+        Enumeration names = req.getParameterNames();
+        while (names.hasMoreElements()) {
+            String name = (String) names.nextElement();
+            if (first) {
+                first = false;
+            } else {
+                parameters.append("&");
+            }
+            parameters.append(name).append("=").append(req.getParameter(name));
+        }
+        return parameters.toString();
+    }
+
 
     public static String combineUrlParameter(UrlParameterBuilder... urlParameterBuilderArray) {
         StringBuilder result = new StringBuilder();
@@ -67,31 +95,6 @@ public class UrlManager {
             result.append(urlParameterBuilder.getName()).append("=").append(urlParameterBuilder.getValue());
         }
         return result.toString();
-    }
-
-    public static void putParametersToCookie(HttpServletRequest req, HttpServletResponse resp) {
-        boolean first = true;
-        StringBuilder parameters = new StringBuilder();
-        Enumeration<String> names = req.getParameterNames();
-        while (names.hasMoreElements()) {
-            String name = names.nextElement();
-            if (first) {
-                first = false;
-                parameters.append("?");
-            } else {
-                parameters.append("&");
-            }
-            parameters.append(name).append("=").append(req.getParameter(name));
-        }
-        CookieManager.setCookie(resp, "url-parameters", parameters.toString(), 90000, getContextUri(req, "/"));
-    }
-
-    public static String getParametersFromCookie(HttpServletRequest req) {
-        Cookie cookie = CookieManager.getCookie(req, "url-parameters");
-        if (cookie == null) return "";
-        cookie.setValue(null);
-        cookie.setMaxAge(0);
-        return cookie.getValue();
     }
 
     public static String getUrlParameter(HttpServletRequest req, String parameterName, String defaultValue) {

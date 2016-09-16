@@ -21,6 +21,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * Service Management System
@@ -31,12 +32,14 @@ public class LoginAction implements Action {
 
     @Override
     public void execute(HttpServletRequest req, HttpServletResponse resp) throws ActionException {
+        logger.debug("LoginAction: {}", CookieManager.getCookie(req, "REQUEST_PARAMETER_REDIRECT") != null ?
+                CookieManager.getCookie(req, "REQUEST_PARAMETER_REDIRECT").getValue() : "REDIRECT_COOKIE_EMPTY");
         LoginService loginService = null;
         try {
             FormComponent formComponent = (FormComponent) req.getSession().getAttribute("loginForm");
             if (req.getMethod().equals("GET")) {
                 logger.debug("GET");
-                if (UrlManager.getUrlParameter(req, "register", null) != null) {
+                if (req.getParameter("register") != null) {
                     req.getSession().removeAttribute("loginForm");
                     resp.sendRedirect(UrlManager.getContextUri(req, "/profile/register"));
                     return;
@@ -44,8 +47,8 @@ public class LoginAction implements Action {
                 if (formComponent != null) {
                     formComponent.clear();
                 } else {
-                    formComponent = new FormComponent("login", "/profile/login".concat
-                            (UrlManager.combineUrlParameterFromAttribute(req, "redirect")),
+                    formComponent = new FormComponent("login",
+                            UrlManager.getContextUri(req, "/profile/login", UrlManager.getRequestParameterString(req)),
                             new FormComponent.FormItem
                                     ("profile.login.email.label", "input", "profile.login.email.label", ""),
                             new FormComponent.FormItem
@@ -89,11 +92,11 @@ public class LoginAction implements Action {
                                     UserService.setRememberUserId(user.getId()),
                                     2592000, req.getContextPath().concat("/"));
                         }
-                        String redirect = UrlManager.getUrlParameter(req, "redirect", "/");
-                        redirect = redirect.concat(UrlManager.getParametersFromCookie(req));
-                        logger.debug("REDIRECTING ({})", redirect);
-                        resp.sendRedirect(redirect);
-                        logger.debug("REDIRECTED");
+                        Map<String, String> parameterMap = UrlManager.getRequestParameterMap(req.getQueryString());
+                        String redirect = parameterMap.get("redirect");
+                        parameterMap.remove("redirect");
+                        logger.debug("REDIRECTING ({}, {})", redirect, UrlManager.getRequestParameterString(parameterMap));
+                        resp.sendRedirect(UrlManager.getContextUri(req, redirect, parameterMap));
                         return;
                     }
                 }
