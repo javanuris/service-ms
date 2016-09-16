@@ -39,6 +39,7 @@ public class UrlManager {
 
     public static Map<String, String> getRequestParameterMap(String parameterString) {
         Map<String, String> parameterMap = new HashMap<>();
+        if (parameterString == null) return parameterMap;
         String[] parameterArray = parameterString.split("&");
         for (String parameter : parameterArray) {
             String[] parameterNameValue = parameter.split("=");

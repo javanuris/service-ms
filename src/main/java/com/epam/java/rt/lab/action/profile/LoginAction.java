@@ -56,8 +56,6 @@ public class LoginAction implements Action {
                 logger.debug("GET");
                 System.out.println("name: " + formComponent.getName() + ", action: " + formComponent.getAction());
                 formComponent.setActionParameterString(UrlManager.getRequestParameterString(req));
-                req.getRequestDispatcher("/WEB-INF/jsp/profile/login.jsp").forward(req, resp);
-                return;
             } else if ("POST".equals(req.getMethod())) {
                 logger.debug("POST");
                 if (FormManager.setValueAndValidate(req, formComponent)) {
@@ -93,8 +91,8 @@ public class LoginAction implements Action {
                         return;
                     }
                 }
-                req.getRequestDispatcher("/WEB-INF/jsp/profile/login.jsp").forward(req, resp);
             }
+            req.getRequestDispatcher("/WEB-INF/jsp/profile/login.jsp").forward(req, resp);
         } catch (ConnectionException | DaoException e) {
             e.printStackTrace();
             throw new ActionException("exception.action.login.login-service", e.getCause());

@@ -27,80 +27,65 @@ public class EditAction implements Action {
 
     @Override
     public void execute(HttpServletRequest req, HttpServletResponse resp) throws ActionException {
-//        FormComponent formComponent = (FormComponent) req.getSession().getAttribute("editProfileForm");
-//        UserService userService = null;
-//        try {
-//            userService = new UserService();
-//            if (req.getMethod().equals("GET")) {
-//                logger.debug("GET");
-//                if (UrlManager.getUrlParameter(req, "cancel", null) != null) {
-//                    req.getSession().removeAttribute("editProfileForm");
-//                    resp.sendRedirect(UrlManager.getContextUri(req, "/profile/view"));
-//                    return;
-//                }
-//                if (formComponent != null) {
-//                    formComponent.clearValidationMessageArray();
-//                } else {
-//                    User user = userService.getUser((Long) req.getSession().getAttribute("userId"));
-//                    logger.debug("user = {}, {}, {}", user.getFirstName(), user.getMiddleName(), user.getLastName());
-//                    formComponent = new FormComponent("edit-profile", "/profile/edit",
-//                            new FormComponent.FormItem
-//                                    ("profile.edit.first-name.label", "text", "profile.edit.first-name.label")
-//                                    .setValueAndReturn(user.getFirstName()),
-//                            new FormComponent.FormItem
-//                                    ("profile.edit.middle-name.label", "text", "profile.edit.middle-name.label")
-//                                    .setValueAndReturn(user.getMiddleName()),
-//                            new FormComponent.FormItem
-//                                    ("profile.edit.last-name.label", "text", "profile.edit.last-name.label")
-//                                    .setValueAndReturn(user.getLastName()),
-//                            new FormComponent.FormItem
-//                                    ("profile.edit.avatar.label", "image", UrlManager.getContextUri(req, "/file/upload/avatar"))
-//                                    .setValueAndReturn(UrlManager.getContextUri(req, "/file/download/avatar?id="
-//                                            .concat(String.valueOf(user.getAvatarId())))),
-//                            new FormComponent.FormItem
-//                                    ("profile.edit.submit.label", "submit", ""),
-//                            new FormComponent.FormItem
-//                                    ("profile.edit.cancel.label", "button",
-//                                            UrlManager.getUriForButton(req, "/profile/edit", "cancel")));
-//                    logger.debug("item.value = {}", formComponent.getFormItemArray()[0].getValue());
-//                    req.getSession().setAttribute("editProfileForm", formComponent);
-//                }
-//                req.getRequestDispatcher("/WEB-INF/jsp/profile/edit.jsp").forward(req, resp);
-//            } else if (req.getMethod().equals("POST")) {
-//                logger.debug("POST");
-//                if (FormManager.setValueAndValidate(req, formComponent.getFormItemArray())) {
-//                    logger.debug("VALID");
-//                    User user = userService.getUser((Long) req.getSession().getAttribute("userId"));
-//                    user.setFirstName(formComponent.getFormItemArray()[0].getValue());
-//                    user.setMiddleName(formComponent.getFormItemArray()[1].getValue());
-//                    user.setLastName(formComponent.getFormItemArray()[2].getValue());
-//                    if (formComponent.getFormItemArray()[3].getValue().length() > 0)
-//                        userService.putAvatar(user, formComponent.getFormItemArray()[3].getValue());
-//                    logger.debug("user.getName() = {}", user.getName());
-//                    if (userService.updateUser(user) != 1) {
-//                        logger.debug("UPDATE ERROR");
-//                        String[] validationMessageArray = {"profile.edit.submit.error-edit"};
-//                        formComponent.getFormItemArray()[3].setValidationMessageArray(validationMessageArray);
-//                    } else {
-//                        logger.debug("UPDATE SUCCESS");
-//                        req.getSession().removeAttribute("editProfileForm");
-//                        req.getSession().setAttribute("userName", user.getName());
-//                        resp.sendRedirect(UrlManager.getContextUri(req, "/profile/view"));
-//                        return;
-//                    }
-//                }
-//                logger.debug("NOT VALID");
-//                req.getRequestDispatcher("/WEB-INF/jsp/profile/edit.jsp").forward(req, resp);
-//            }
-//        } catch (ServletException | IOException | ConnectionException | DaoException e) {
-//            e.printStackTrace();
-//            throw new ActionException("exception.action.edit", e.getCause());
-//        } finally {
-//            try {
-//                if (userService != null) userService.close();
-//            } catch (DaoException e) {
-//                e.printStackTrace();
-//            }
-//        }
+        try (UserService userService = new UserService()) {
+            User user = userService.getUser((Long) req.getSession().getAttribute("userId"));
+            FormComponent formComponent = null;
+            switch (FormComponent.getStatus("profile.edit", UrlManager.getContextPathInfo(req), 100)) {
+                case 1:
+                    formComponent = FormComponent.get("profile.edit");
+                    break;
+                case 0:
+                    formComponent = FormComponent.set("profile.edit",
+                            new FormComponent.Item("profile.edit.first-name.label", "input", "profile.edit.first-name.label")
+                                    .setValueAndReturnItem(user.getFirstName()),
+                            new FormComponent.Item("profile.edit.middle-name.label", "input", "profile.edit.middle-name.label")
+                                    .setValueAndReturnItem(user.getMiddleName()),
+                            new FormComponent.Item("profile.edit.last-name.label", "input", "profile.edit.last-name.label")
+                                    .setValueAndReturnItem(user.getLastName()),
+                            new FormComponent.Item("profile.edit.avatar.label", "image",
+                                    UrlManager.getContextUri(req, "/file/upload/avatar"))
+                                    .setValueAndReturnItem(UrlManager.getContextUri(req,
+                                            "/file/download/avatar", "id=".concat(String.valueOf(user.getAvatarId())))),
+                            new FormComponent.Item("profile.edit.submit.label", "submit", ""),
+                            new FormComponent.Item("profile.edit.cancel.label", "button",
+                                    UrlManager.getContextUri(req, "/profile/view"))
+                    );
+                    break;
+                case -1:
+                    throw new ActionException("exception.action.login.form-status");
+            }
+            req.setAttribute("editForm", formComponent);
+            if ("GET".equals(req.getMethod())) {
+                logger.debug("GET");
+                //
+            } else if ("POST".equals(req.getMethod())) {
+                logger.debug("POST");
+                if (FormManager.setValueAndValidate(req, formComponent)) {
+                    logger.debug("FORM VALID");
+                    user.setFirstName(formComponent.getItem(0).getValue());
+                    user.setMiddleName(formComponent.getItem(1).getValue());
+                    user.setLastName(formComponent.getItem(2).getValue());
+                    if (formComponent.getItem(3).getValue().length() > 0)
+                        userService.putAvatar(user, formComponent.getItem(3).getValue());
+                    if (userService.updateUser(user) != 1) {
+                        logger.debug("UPDATE ERROR");
+                        String[] validationMessageArray = {"profile.edit.submit.error-edit"};
+                        formComponent.getItem(3).setValidationMessageArray(validationMessageArray);
+                    } else {
+                        logger.debug("UPDATE SUCCESS");
+                        req.getSession().setAttribute("userName", user.getName());
+                        resp.sendRedirect(UrlManager.getContextUri(req, "/profile/view"));
+                        return;
+                    }
+                }
+            }
+            req.getRequestDispatcher("/WEB-INF/jsp/profile/edit.jsp").forward(req, resp);
+        } catch (ConnectionException | DaoException e) {
+            e.printStackTrace();
+            throw new ActionException("exception.action.edit.user-service", e.getCause());
+        } catch (ServletException | IOException e) {
+            e.printStackTrace();
+            throw new ActionException("exception.action.edit.forward", e.getCause());
+        }
     }
 }

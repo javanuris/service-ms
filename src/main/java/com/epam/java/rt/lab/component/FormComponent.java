@@ -161,6 +161,11 @@ public class FormComponent implements Iterable<FormComponent.Item> {
             val().value = value;
         }
 
+        public Item setValueAndReturnItem(String value) {
+            val().value = value;
+            return this;
+        }
+
         public String[] getValidationMessageArray() {
             return val().validationMessageArray;
         }
