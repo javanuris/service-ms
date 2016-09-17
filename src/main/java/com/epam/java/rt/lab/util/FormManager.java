@@ -28,8 +28,16 @@ public class FormManager {
         return value.matches("^-?[0-9]+(\\.[0-9]+)?$");
     }
 
-    public static boolean setValueAndValidate(HttpServletRequest req, FormComponent formComponent) {
-        logger.debug("VALIDATE >>");
+    public static void setValues(HttpServletRequest req, FormComponent formComponent) {
+        logger.debug("SET-VALUES");
+        for (int i = 0; i < formComponent.getItemArrayLength(); i++) {
+            FormComponent.Item formItem = formComponent.getItem(i);
+            formItem.setValue(req.getParameter(formItem.getLabel()));
+        }
+    }
+
+    public static boolean setValuesAndValidate(HttpServletRequest req, FormComponent formComponent) {
+        logger.debug("SET-VALUES-AND-VALIDATE");
 //        try {
 //            List<FormItemValidator> formItemValidatorList;
             for (int i = 0; i < formComponent.getItemArrayLength(); i++) {
@@ -51,7 +59,7 @@ public class FormManager {
 //
 //    private static String validateString(FormComponent.FormItem formItem, String validRegex) {
 //        String value = String.valueOf(formItem.getValue());
-//        // setValueAndValidate regex
+//        // setValuesAndValidate regex
 //        return value;
 //    }
 //

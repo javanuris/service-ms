@@ -110,8 +110,15 @@ public class UserJdbcDao extends JdbcDao {
     }
 
     @Override
-    public <T> void putRelEntity(T entity, String relEntityName, Object relEntity) throws DaoException {
-        if (relEntityName.equals("Avatar")) putAvatar(entity, relEntity);
+    public <T> int putRelEntity(T entity, String relEntityName, Object relEntity) throws DaoException {
+        if (relEntityName.equals("Avatar")) return putAvatar(entity, relEntity);
+        return 0;
+    }
+
+    @Override
+    public <T> int removeRelEntity(T entity, String relEntityName) throws DaoException {
+        if (relEntityName.equals("Avatar")) return removeAvatar(entity);
+        return 0;
     }
 
     private Map<String, Object> getAvatar(User user) throws DaoException {
@@ -133,7 +140,7 @@ public class UserJdbcDao extends JdbcDao {
         }
     }
 
-    private <T> void putAvatar(T entity, Object relEntity) throws DaoException {
+    private <T> int putAvatar(T entity, Object relEntity) throws DaoException {
         String outputFilePath = (String) relEntity;
         String outputFileName = outputFilePath.substring(outputFilePath.lastIndexOf("\\") + 1);
         int avatarInfoIndex = outputFileName.lastIndexOf(".avatar.");
@@ -145,10 +152,10 @@ public class UserJdbcDao extends JdbcDao {
         logger.debug("contentType = {}", contentType);
         try (InputStream inputStream = new FileInputStream(new File(outputFilePath));) {
             User user = (User) entity;
-            List<Column> columnList = new ArrayList<>();
-            columnList.add(new Column("\"Avatar\".name", fileName));
-            columnList.add(new Column("\"Avatar\".type", contentType));
-            columnList.add(new Column("\"Avatar\".file", inputStream));
+            List<Set> setList = new ArrayList<>();
+            setList.add(new Set("\"Avatar\".name", fileName));
+            setList.add(new Set("\"Avatar\".type", contentType));
+            setList.add(new Set("\"Avatar\".file", inputStream));
             logger.debug("user.getAvatarId() = {}", user.getAvatarId());
             if (user.getAvatarId() == null) {
                 logger.debug("INSERT AVATAR");
@@ -156,21 +163,22 @@ public class UserJdbcDao extends JdbcDao {
                 try (PreparedStatement preparedStatement =
                              getConnection().prepareStatement(sqlString, Statement.RETURN_GENERATED_KEYS);
                      ResultSet resultSet =
-                             getGeneratedKeysAfterUpdate(setPreparedStatementValues(preparedStatement, columnList));) {
+                             getGeneratedKeysAfterUpdate(setPreparedStatementValues(preparedStatement, setList));) {
                     if (resultSet.first()) user.setAvatarId(resultSet.getLong(1));
+                    return 1;
                 } catch (SQLException e) {
                     e.printStackTrace();
                     throw new DaoException("exception.dao.put-avatar.sql-insert", e.getCause());
                 }
             } else {
                 logger.debug("UPDATE AVATAR");
+                List<Column> columnList = new ArrayList<>();
                 columnList.add(new Column("\"Avatar\".id", user.getAvatarId()));
-                List<Column> whereList = new ArrayList<>();
-                whereList.add(new Column("\"Avatar\".id", user.getAvatarId()));
                 String sqlString = "UPDATE \"Avatar\" SET name = ?, type = ?, file = ?"
-                        .concat(" WHERE ").concat(Column.columnListToString(whereList, "AND", "="));
+                        .concat(" WHERE ").concat(Column.columnListToString(columnList, "AND", "="));
                 try (PreparedStatement preparedStatement = getConnection().prepareStatement(sqlString);) {
-                    setPreparedStatementValues(preparedStatement, columnList).executeUpdate();
+                    setPreparedStatementValues(preparedStatement, setList, columnList).executeUpdate();
+                    return 1;
                 } catch (SQLException e) {
                     e.printStackTrace();
                     throw new DaoException("exception.dao.put-avatar.sql-update", e.getCause());
@@ -179,6 +187,34 @@ public class UserJdbcDao extends JdbcDao {
         } catch (IOException e) {
             e.printStackTrace();
             throw new DaoException("exception.dao.put-avatar.output-file-name", e.getCause());
+        }
+    }
+
+    private <T> int removeAvatar(T entity) throws DaoException {
+        User user = (User) entity;
+        List<Set> setList = new ArrayList<>();
+        setList.add(new Set("avatar_id", null));
+        List<Column> columnList = new ArrayList<>();
+        columnList.add(new Column("id", user.getId()));
+        String sqlString = "UPDATE \"User\" SET avatar_id = ?"
+                .concat(" WHERE ").concat(Column.columnListToString(columnList, "AND", "="));
+        try (PreparedStatement preparedStatement = getConnection().prepareStatement(sqlString);) {
+            setPreparedStatementValues(preparedStatement, setList, columnList).executeUpdate();
+            columnList.clear();
+            columnList.add(new Column("\"Avatar\".id", user.getAvatarId()));
+            sqlString = "DELETE FROM \"Avatar\""
+                    .concat(" WHERE ").concat(Column.columnListToString(columnList, "AND", "="));
+            try (PreparedStatement deleteStatement = getConnection().prepareStatement(sqlString);) {
+                setPreparedStatementValues(deleteStatement, columnList).executeUpdate();
+                user.setAvatarId(null);
+                return 1;
+            } catch (SQLException e) {
+                e.printStackTrace();
+                throw new DaoException("exception.dao.remove-avatar.sql-delete", e.getCause());
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new DaoException("exception.dao.remove-avatar.sql-update", e.getCause());
         }
     }
 }

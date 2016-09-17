@@ -208,8 +208,17 @@ public abstract class JdbcDao implements Dao {
     }
 
     PreparedStatement setPreparedStatementValues(PreparedStatement preparedStatement,
-                                                 List<Column> columnList) throws DaoException {
-        return setPreparedStatementValues(preparedStatement, null, columnList);
+                                                 List<?> setOrColumnList) throws DaoException {
+        // it could be List<T> instead List<?>, and then it should be <T extend someParentClass>, but in this case
+        // it is too expensive to create extra number of classes which do almost similar job
+        if (setOrColumnList == null) return setPreparedStatementValues(preparedStatement, null, null);
+        switch (setOrColumnList.get(0).getClass().getSimpleName()) {
+            case "Set":
+                return setPreparedStatementValues(preparedStatement, (List<Set>) setOrColumnList, null);
+            case "Column":
+                return setPreparedStatementValues(preparedStatement, null, (List<Column>) setOrColumnList);
+        }
+        throw new DaoException("exception.dao.jdbc.set-prepared-statement-values.type-error");
     }
 
     ResultSet getGeneratedKeysAfterUpdate(PreparedStatement preparedStatement) throws SQLException {
@@ -484,7 +493,13 @@ public abstract class JdbcDao implements Dao {
     }
 
     @Override
-    public <T> void putRelEntity(T entity, String relEntityName, Object relEntity) throws DaoException {
+    public <T> int putRelEntity(T entity, String relEntityName, Object relEntity) throws DaoException {
+        return 0;
+    }
+
+    @Override
+    public <T> int removeRelEntity(T entity, String relEntityName) throws DaoException {
+        return 0;
     }
 
 }

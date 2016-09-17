@@ -55,8 +55,6 @@ public class ViewAction implements Action {
                             ("profile.view.role-name.label", "input", user.getRole().getName()),
                     new ViewComponent.ViewItem
                             ("profile.view.login-email.label", "input", user.getLogin().getEmail()),
-//                    new ViewComponent.ViewItem
-//                            ("profile.view.reset-login-password.label", "button", UrlManager.getContextUri(req, "/profile/reset-password")),
                     new ViewComponent.ViewItem
                             ("profile.view.edit-profile.label", "button", UrlManager.getContextUri(req, "/rbac/user/edit"
                                     .concat(UrlManager.combineUrlParameter(new UrlManager.UrlParameterBuilder("id", id))))),

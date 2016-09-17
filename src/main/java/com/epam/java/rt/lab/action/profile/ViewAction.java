@@ -12,12 +12,10 @@ import com.epam.java.rt.lab.util.UrlManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.print.DocFlavor;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.sql.SQLException;
 
 /**
  * Service Management System
@@ -41,13 +39,14 @@ public class ViewAction implements Action {
                     new ViewComponent.ViewItem
                             ("profile.view.last-name.label", "input", user.getLastName()),
                     new ViewComponent.ViewItem
-                            ("profile.view.avatar.label", "image", UrlManager.getContextUri(req, "/file/download/avatar?id=" + user.getAvatarId())),
+                            ("profile.view.avatar.label", "image",
+                                    UrlManager.getContextRef(req, "/file/download/avatar", "id", user.getAvatarId())),
                     new ViewComponent.ViewItem
                             ("profile.view.role-name.label", "input", user.getRole().getName()),
                     new ViewComponent.ViewItem
                             ("profile.view.login-email.label", "input", user.getLogin().getEmail()),
                     new ViewComponent.ViewItem
-                            ("profile.view.reset-login-password.label", "button", UrlManager.getContextUri(req, "/profile/reset-password")),
+                            ("profile.view.reset-password.label", "button", UrlManager.getContextUri(req, "/profile/reset-password")),
                     new ViewComponent.ViewItem
                             ("profile.view.edit-profile.label", "button", UrlManager.getContextUri(req, "/profile/edit"))));
             req.getRequestDispatcher("/WEB-INF/jsp/profile/view.jsp").forward(req, resp);

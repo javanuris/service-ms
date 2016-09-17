@@ -16,8 +16,8 @@ function uploadToServer(upload) {
             $($hiddenId).val(pair[1]);
             $($labelId).text($file.name);
             var src = $($imageId).attr("src");
-            var path = src.split("/download/");
-            $($imageId).attr("src", path[0] + "/download/pre-avatar?path=" + pair[1]);
+            var path = src.split("file/download/");
+            $($imageId).attr("src", path[0] + "file/download/pre-avatar?path=" + pair[1]);
         } else {
             $($hiddenId).val('');
             $($labelId).text($('#ui-local-upload-error').text());

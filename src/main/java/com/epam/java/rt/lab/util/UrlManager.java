@@ -18,6 +18,19 @@ public class UrlManager {
                 .concat(UrlManager.combineUrlParameter(new UrlManager.UrlParameterBuilder(parameterName, "true")));
     }
 
+    public static String getContextRef(HttpServletRequest req, String path,
+                                       String parameterNames, Object... parameterValueArray) {
+        Map<String, String> parameterMap = new HashMap<>();
+        String[] parameterNameArray = parameterNames.replaceAll(" ", "").split(",");
+        for (int i = 0; i < parameterValueArray.length; i++)
+            if (parameterValueArray[i] != null)
+                parameterMap.put(parameterNameArray[i], String.valueOf(parameterValueArray[i]));
+        String parameterString = getRequestParameterString(parameterMap);
+        System.out.println(parameterString);
+        if (parameterString.length() == 0) return null;
+        return getContextUri(req, path, parameterString);
+    }
+
     public static String getContextUri(HttpServletRequest req, String path, String... parameterArray) {
         String parameterString = getRequestParameterString(parameterArray);
         if (parameterString.length() > 0) parameterString = "?".concat(parameterString);

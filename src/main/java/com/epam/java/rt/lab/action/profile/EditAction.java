@@ -36,18 +36,15 @@ public class EditAction implements Action {
                     break;
                 case 0:
                     formComponent = FormComponent.set("profile.edit",
-                            new FormComponent.Item("profile.edit.first-name.label", "input", "profile.edit.first-name.label")
-                                    .setValueAndReturnItem(user.getFirstName()),
-                            new FormComponent.Item("profile.edit.middle-name.label", "input", "profile.edit.middle-name.label")
-                                    .setValueAndReturnItem(user.getMiddleName()),
-                            new FormComponent.Item("profile.edit.last-name.label", "input", "profile.edit.last-name.label")
-                                    .setValueAndReturnItem(user.getLastName()),
-                            new FormComponent.Item("profile.edit.avatar.label", "image",
-                                    UrlManager.getContextUri(req, "/file/upload/avatar"))
-                                    .setValueAndReturnItem(UrlManager.getContextUri(req,
-                                            "/file/download/avatar", "id=".concat(String.valueOf(user.getAvatarId())))),
-                            new FormComponent.Item("profile.edit.submit.label", "submit", ""),
-                            new FormComponent.Item("profile.edit.cancel.label", "button",
+                            new FormComponent.Item("profile.edit.first-name.label", "input", "profile.edit.first-name.label"),
+                            new FormComponent.Item("profile.edit.middle-name.label", "input", "profile.edit.middle-name.label"),
+                            new FormComponent.Item("profile.edit.last-name.label", "input", "profile.edit.last-name.label"),
+                            new FormComponent.Item("profile.edit.avatar.label", "image", UrlManager.getContextUri(req, "/file/upload/avatar")),
+                            new FormComponent.Item("profile.edit.remove-avatar.label", "button",
+                                    UrlManager.getContextUri(req, "/profile/edit", "sub-action=remove-avatar")),
+                            new FormComponent.Item("profile.edit.submit.label", "submit",
+                                    ""),
+                            new FormComponent.Item("profile.edit.view-profile.label", "button",
                                     UrlManager.getContextUri(req, "/profile/view"))
                     );
                     break;
@@ -57,10 +54,30 @@ public class EditAction implements Action {
             req.setAttribute("editForm", formComponent);
             if ("GET".equals(req.getMethod())) {
                 logger.debug("GET");
-                //
+                formComponent.getItem(0).setValue(user.getFirstName());
+                formComponent.getItem(1).setValue(user.getMiddleName());
+                formComponent.getItem(2).setValue(user.getLastName());
+                formComponent.getItem(3).setValue(UrlManager.getContextRef(req, "/file/download/avatar", "id", user.getAvatarId()));
+                String subAction = req.getParameter("sub-action");
+                if (subAction != null) {
+                    switch (subAction) {
+                        case "remove-avatar":
+                            logger.debug("REMOVE-AVATAR");
+                            userService.removeAvatar(user);
+                            if (userService.updateUser(user) != 1) {
+                                logger.debug("REMOVE ERROR");
+                                String[] validationMessageArray = {"profile.edit.avatar.error-remove"};
+                                formComponent.getItem(3).setValidationMessageArray(validationMessageArray);
+                            } else {
+                                logger.debug("REMOVE SUCCESS");
+                                resp.sendRedirect(UrlManager.getContextUri(req, "/profile/edit"));
+                                return;
+                            }
+                    }
+                }
             } else if ("POST".equals(req.getMethod())) {
                 logger.debug("POST");
-                if (FormManager.setValueAndValidate(req, formComponent)) {
+                if (FormManager.setValuesAndValidate(req, formComponent)) {
                     logger.debug("FORM VALID");
                     user.setFirstName(formComponent.getItem(0).getValue());
                     user.setMiddleName(formComponent.getItem(1).getValue());
@@ -70,7 +87,7 @@ public class EditAction implements Action {
                     if (userService.updateUser(user) != 1) {
                         logger.debug("UPDATE ERROR");
                         String[] validationMessageArray = {"profile.edit.submit.error-edit"};
-                        formComponent.getItem(3).setValidationMessageArray(validationMessageArray);
+                        formComponent.getItem(4).setValidationMessageArray(validationMessageArray);
                     } else {
                         logger.debug("UPDATE SUCCESS");
                         req.getSession().setAttribute("userName", user.getName());

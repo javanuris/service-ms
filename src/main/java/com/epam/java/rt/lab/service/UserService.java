@@ -93,10 +93,16 @@ public class UserService extends BaseService {
         }
     }
 
+    public void removeAvatar(User user) throws DaoException {
+        if (user.getAvatarId() != null) {
+            Dao dao = daoFactory.createDao("User");
+            dao.removeRelEntity(user, "Avatar");
+        }
+    }
+
     public Map<String, Object> getAvatar(User user) throws DaoException {
         Dao dao = daoFactory.createDao("User");
         Map<String, Object>  avatarMap = (Map<String, Object>) dao.getRelEntity(user, "Avatar");
-
         return avatarMap;
     }
 

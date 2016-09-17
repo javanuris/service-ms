@@ -60,7 +60,7 @@ public class ResetPasswordAction implements Action {
 //                req.getRequestDispatcher("/WEB-INF/jsp/profile/reset-password.jsp").forward(req, resp);
 //            } else if (req.getMethod().equals("POST")) {
 //                logger.debug("POST");
-//                if (FormManager.setValueAndValidate(req, formComponent.getFormItemArray())) {
+//                if (FormManager.setValuesAndValidate(req, formComponent.getFormItemArray())) {
 //                    logger.debug("VALID");
 //                    if (!formComponent.getFormItemArray()[0].getValue().equals(formComponent.getFormItemArray()[1].getValue())) {
 //                        String[] validationMessageArray = {"profile.reset-password.confirm.error-not-equal"};

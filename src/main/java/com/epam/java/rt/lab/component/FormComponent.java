@@ -1,6 +1,8 @@
 package com.epam.java.rt.lab.component;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -40,19 +42,25 @@ public class FormComponent implements Iterable<FormComponent.Item> {
     }
 
     public static FormComponent get(String name) {
-        return FormComponent.formComponentMap.get(name);
+        return FormComponent.formComponentMap.get(name).copyDef();
     }
 
     public static FormComponent set(String name, Item... itemArray) {
-        System.out.println("1");
         FormComponent formComponent = FormComponent.formComponentMap.get(name);
-        System.out.println("2");
         if (formComponent.status.get() != -1) return null;
-        System.out.println("3");
         formComponent.itemArray = itemArray;
-        System.out.println("4");
         formComponent.status.set(1);
-        System.out.println("5");
+        return formComponent.copyDef();
+    }
+
+    private FormComponent copyDef() {
+        // this method makes possible to use FormComponent in multithreading, because client receives copy
+        // with definitions and newly created fields or objects for mutable values
+        FormComponent formComponent = new FormComponent(this.fieldDef.name, this.fieldDef.actionUri);
+        List<Item> itemList = new ArrayList<>();
+        for (Item item : this.itemArray) itemList.add(new Item(item.getItemDef()));
+        Item[] itemArray = new Item[itemList.size()];
+        formComponent.setItemArray(itemList.toArray(itemArray));
         return formComponent;
     }
 
@@ -80,6 +88,10 @@ public class FormComponent implements Iterable<FormComponent.Item> {
 
     public Item getItem(int index) {
         return this.itemArray != null && 0 <= index && index < this.itemArray.length ? this.itemArray[index] : null;
+    }
+
+    private void setItemArray(Item[] itemArray) {
+        this.itemArray = itemArray;
     }
 
     @Override
@@ -128,6 +140,14 @@ public class FormComponent implements Iterable<FormComponent.Item> {
             this.itemDef = new ItemDef(label, type, placeholder);
         }
 
+        Item(ItemDef itemDef) {
+            this.itemDef = itemDef;
+        }
+
+        ItemDef getItemDef() {
+            return this.itemDef;
+        }
+
         public String getLabel() {
             return itemDef.label;
         }
@@ -159,11 +179,6 @@ public class FormComponent implements Iterable<FormComponent.Item> {
 
         public void setValue(String value) {
             val().value = value;
-        }
-
-        public Item setValueAndReturnItem(String value) {
-            val().value = value;
-            return this;
         }
 
         public String[] getValidationMessageArray() {

@@ -58,7 +58,7 @@ public class LoginAction implements Action {
                 formComponent.setActionParameterString(UrlManager.getRequestParameterString(req));
             } else if ("POST".equals(req.getMethod())) {
                 logger.debug("POST");
-                if (FormManager.setValueAndValidate(req, formComponent)) {
+                if (FormManager.setValuesAndValidate(req, formComponent)) {
                     logger.debug("FORM VALID");
                     Login login = loginService.getLogin(
                             formComponent.getItem(0).getValue(),
