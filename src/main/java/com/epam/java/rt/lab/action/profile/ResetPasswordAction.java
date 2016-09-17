@@ -6,7 +6,6 @@ import com.epam.java.rt.lab.action.WebAction;
 import com.epam.java.rt.lab.component.FormComponent;
 import com.epam.java.rt.lab.connection.ConnectionException;
 import com.epam.java.rt.lab.dao.DaoException;
-import com.epam.java.rt.lab.entity.rbac.Login;
 import com.epam.java.rt.lab.entity.rbac.User;
 import com.epam.java.rt.lab.service.LoginService;
 import com.epam.java.rt.lab.service.UserService;
@@ -30,77 +29,71 @@ public class ResetPasswordAction implements Action {
 
     @Override
     public void execute(HttpServletRequest req, HttpServletResponse resp) throws ActionException {
-//        FormComponent formComponent = (FormComponent) req.getSession().getAttribute("resetPasswordForm");
-//        LoginService loginService = null;
-//        try {
-//            if (req.getMethod().equals("GET")) {
-//                logger.debug("GET");
-//                if (UrlManager.getUrlParameter(req, "cancel", null) != null) {
-//                    req.getSession().removeAttribute("resetPasswordForm");
-//                    resp.sendRedirect(UrlManager.getContextUri(req, "/profile/view"));
-//                    return;
-//                }
-//                if (formComponent != null) {
-////                    formComponent.clear();
-//                } else {
-//                    formComponent = new FormComponent("reset-password", "/profile/reset-password",
-//                            new FormComponent.FormItem
-//                                    ("profile.reset-password.password.label", "password", "profile.reset-password.password.label", ""),
-//                            new FormComponent.FormItem
-//                                    ("profile.reset-password.confirm.label", "password", "profile.reset-password.confirm.label", ""),
-//                            new FormComponent.FormItem
-//                                    ("profile.reset-password.old.label", "password", "profile.reset-password.old.label", ""),
-//                            new FormComponent.FormItem
-//                                    ("profile.reset-password.submit.label", "submit", "", ""),
-//                            new FormComponent.FormItem
-//                                    ("profile.reset-password.cancel.label", "button",
-//                                            UrlManager.getUriForButton(req, "/profile/reset-password", "cancel"), ""));
-//                    req.getSession().setAttribute("resetPasswordForm", formComponent);
-//                }
-//                req.getRequestDispatcher("/WEB-INF/jsp/profile/reset-password.jsp").forward(req, resp);
-//            } else if (req.getMethod().equals("POST")) {
-//                logger.debug("POST");
-//                if (FormManager.setValuesAndValidate(req, formComponent.getFormItemArray())) {
-//                    logger.debug("VALID");
-//                    if (!formComponent.getFormItemArray()[0].getValue().equals(formComponent.getFormItemArray()[1].getValue())) {
-//                        String[] validationMessageArray = {"profile.reset-password.confirm.error-not-equal"};
-//                        formComponent.getFormItemArray()[1].setValidationMessageArray(validationMessageArray);
-//                        return;
-//                    }
-//                    loginService = new LoginService();
-//                    UserService userService = new UserService();
-//                    User user = userService.getUser((Long) req.getSession().getAttribute("userId"));
-//                    Login login = loginService.getLogin(user.getLogin().getEmail(), formComponent.getFormItemArray()[2].getValue());
-//                    if (login == null) {
-//                        logger.debug("DENIED");
-//                        String[] validationMessageArray = {"profile.reset-password.submit.error-reset-password"};
-//                        formComponent.getFormItemArray()[3].setValidationMessageArray(validationMessageArray);
-//                    } else {
-//                        logger.debug("GRANTED");
-//                        login.setPassword(formComponent.getFormItemArray()[0].getValue());
-//                        if (loginService.updatePassword(login) != 1) {
-//                            logger.debug("UPDATE ERROR");
-//                            String[] validationMessageArray = {"profile.reset-password.submit.error-reset-password"};
-//                            formComponent.getFormItemArray()[3].setValidationMessageArray(validationMessageArray);
-//                        } else {
-//                            logger.debug("UPDATE SUCCESS");
-//                            req.getSession().removeAttribute("resetPasswordForm");
-//                            resp.sendRedirect(UrlManager.getContextUri(req, "/profile/view"));
-//                            return;
-//                        }
-//                    }
-//                }
-//                logger.debug("NOT VALID");
-//                req.getRequestDispatcher("/WEB-INF/jsp/profile/reset-password.jsp").forward(req, resp);
-//            }
-//        } catch (ServletException | IOException | ConnectionException | DaoException | SQLException e) {
-//            throw new ActionException(e.getMessage());
-//        } finally {
-//            try {
-//                if (loginService != null) loginService.close();
-//            } catch (DaoException e) {
-//                e.printStackTrace();
-//            }
-//        }
+        try (LoginService loginService = new LoginService()) {
+            FormComponent formComponent = null;
+            switch (FormComponent.getStatus("profile.reset-password", UrlManager.getContextPathInfo(req), 100)) {
+                case 1:
+                    formComponent = FormComponent.get("profile.reset-password");
+                    break;
+                case 0:
+                    formComponent = FormComponent.set("profile.reset-password",
+                            new FormComponent.Item("profile.reset-password.password.label", "password", "profile.reset-password.password.label"),
+                            new FormComponent.Item("profile.reset-password.confirm.label", "password", "profile.reset-password.confirm.label"),
+                            new FormComponent.Item("profile.reset-password.current.label", "password", "profile.reset-password.current.label"),
+                            new FormComponent.Item("profile.reset-password.submit.label", "submit", ""),
+                            new FormComponent.Item("profile.reset-password.view-profile.label", "button",
+                                    UrlManager.getContextUri(req, "/profile/view"))
+                    );
+                    break;
+                case -1:
+                    throw new ActionException("exception.action.reset-password.form-status");
+            }
+            req.setAttribute("resetPasswordForm", formComponent);
+            if ("GET".equals(req.getMethod())) {
+                logger.debug("GET");
+                //
+            } else if ("POST".equals(req.getMethod())) {
+                logger.debug("POST");
+                if (FormManager.setValuesAndValidate(req, formComponent)) {
+                    logger.debug("FORM VALID");
+                    if (formComponent.getItem(0).getValue().equals(formComponent.getItem(1).getValue())) {
+                        logger.debug("PASSWORD AND CONFIRM EQUAL");
+                        UserService userService = new UserService();
+                        User user = userService.getUser((Long) req.getSession().getAttribute("userId"));
+                        if (user.getLogin().getPassword().equals(formComponent.getItem(2).getValue())) {
+                            logger.debug("GRANTED");
+                            user.getLogin().setPassword(formComponent.getItem(0).getValue());
+                            if (loginService.updatePassword(user.getLogin()) != 1) {
+                                logger.debug("UPDATE ERROR");
+                                String[] validationMessageArray = {"profile.reset-password.submit.error-reset-password"};
+                                formComponent.getItem(3).setValidationMessageArray(validationMessageArray);
+                            } else {
+                                logger.debug("UPDATE SUCCESS");
+                                resp.sendRedirect(UrlManager.getContextUri(req, "/profile/view"));
+                                return;
+                            }
+                        } else {
+                            logger.debug("DENIED");
+                            String[] validationMessageArray = {"profile.reset-password.current.error-incorrect"};
+                            formComponent.getItem(2).setValidationMessageArray(validationMessageArray);
+                        }
+                    } else {
+                        logger.debug("PASSWORD AND CONFIRM NOT EQUAL");
+                        String[] validationMessageArray = {"profile.reset-password.confirm.error-not-equal"};
+                        formComponent.getItem(1).setValidationMessageArray(validationMessageArray);
+                    }
+                }
+            }
+            req.getRequestDispatcher("/WEB-INF/jsp/profile/reset-password.jsp").forward(req, resp);
+        } catch (ConnectionException | DaoException e) {
+            e.printStackTrace();
+            throw new ActionException("exception.action.reset-password.login-service", e.getCause());
+        } catch (ServletException | IOException e) {
+            e.printStackTrace();
+            throw new ActionException("exception.action.reset-password.forward", e.getCause());
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new ActionException("exception.action.reset-password.update-login", e.getCause());
+        }
     }
 }

@@ -36,4 +36,12 @@ public class LoginService extends BaseService {
         return updateCount;
     }
 
+    public boolean isLoginExists(String email) throws DaoException {
+        Login login = new Login();
+        login.setEmail(email);
+        Dao dao = daoFactory.createDao("Login");
+        login = dao.getFirst(login, "email", null);
+        return login != null;
+    }
+
 }

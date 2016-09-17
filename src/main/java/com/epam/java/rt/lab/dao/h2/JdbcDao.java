@@ -4,6 +4,8 @@ import com.epam.java.rt.lab.dao.Dao;
 import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.dao.query.*;
 import com.epam.java.rt.lab.dao.query.Set;
+import org.joda.time.DateTime;
+import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,6 +18,7 @@ import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.sql.*;
 import java.util.*;
+import java.util.Date;
 
 /**
  * service-ms
@@ -48,13 +51,14 @@ public abstract class JdbcDao implements Dao {
                 preparedStatementMethodMap.put(Float.class, PreparedStatement.class.getMethod("setFloat", int.class, float.class));
 //            preparedStatementMethodMap.put(Time.class, PreparedStatement.class.getMethod("setTime", int.class, Time.class));
 //            preparedStatementMethodMap.put(Date.class, PreparedStatement.class.getMethod("setDate", int.class, Date.class));
-//            preparedStatementMethodMap.put(Timestamp.class, PreparedStatement.class.getMethod("setTimestamp", int.class, Timestamp.class));
+                preparedStatementMethodMap.put(Timestamp.class, PreparedStatement.class.getMethod("setTimestamp", int.class, Timestamp.class));
                 preparedStatementMethodMap.put(String.class, PreparedStatement.class.getMethod("setString", int.class, String.class));
                 preparedStatementMethodMap.put(Blob.class, PreparedStatement.class.getMethod("setBlob", int.class, Blob.class));
                 preparedStatementMethodMap.put(Clob.class, PreparedStatement.class.getMethod("setClob", int.class, Clob.class));
                 preparedStatementMethodMap.put(FileInputStream.class, PreparedStatement.class.getMethod("setBinaryStream", int.class, InputStream.class));
             }
         } catch (NoSuchMethodException e) {
+            e.printStackTrace();
             throw new DaoException("exception.dao.jdbc.init-prepared-statement-method-map", e.getCause());
         }
     }
@@ -493,7 +497,7 @@ public abstract class JdbcDao implements Dao {
     }
 
     @Override
-    public <T> int putRelEntity(T entity, String relEntityName, Object relEntity) throws DaoException {
+    public <T> int setRelEntity(T entity, String relEntityName, Object relEntity) throws DaoException {
         return 0;
     }
 

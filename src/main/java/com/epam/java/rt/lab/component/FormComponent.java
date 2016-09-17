@@ -27,7 +27,6 @@ public class FormComponent implements Iterable<FormComponent.Item> {
         FormComponent newForm = new FormComponent(name, actionUri);
         FormComponent mapForm = FormComponent.formComponentMap.putIfAbsent(name, newForm);
         if (mapForm == null) mapForm = newForm;
-        System.out.println("mapForm = " + mapForm);
         return mapForm.status.get() == 0 ? mapForm.status.getAndSet(-1) : waitStatus(mapForm, millis);
     }
 
@@ -100,11 +99,9 @@ public class FormComponent implements Iterable<FormComponent.Item> {
             private int index = 0;
 
             public boolean hasNext(){
-                System.out.println(index);
                 return index < itemArray.length;
             }
             public Item next(){
-                System.out.println(itemArray[index].getType());
                 return itemArray[index++];
             }
 

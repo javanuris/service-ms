@@ -1,6 +1,5 @@
 package com.epam.java.rt.lab.dao.h2;
 
-import com.epam.java.rt.lab.dao.Dao;
 import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.dao.query.Column;
 import com.epam.java.rt.lab.dao.query.Set;
@@ -10,7 +9,10 @@ import com.epam.java.rt.lab.entity.rbac.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.sql.*;
 import java.util.ArrayList;
@@ -102,6 +104,8 @@ public class UserJdbcDao extends JdbcDao {
     @Override
     public <T> Object getRelEntity(T entity, String relEntityName) throws DaoException {
         switch(relEntityName) {
+            case "Remember":
+                return getRemember((String) entity);
             case "Avatar":
                 return getAvatar((User) entity);
             default:
@@ -110,15 +114,103 @@ public class UserJdbcDao extends JdbcDao {
     }
 
     @Override
-    public <T> int putRelEntity(T entity, String relEntityName, Object relEntity) throws DaoException {
-        if (relEntityName.equals("Avatar")) return putAvatar(entity, relEntity);
-        return 0;
+    public <T> int setRelEntity(T entity, String relEntityName, Object relEntity) throws DaoException {
+        switch (relEntityName) {
+            case "Remember":
+                return setRemember(relEntity);
+            case "Avatar":
+                return setAvatar(entity, relEntity);
+            default:
+                return 0;
+        }
     }
 
     @Override
     public <T> int removeRelEntity(T entity, String relEntityName) throws DaoException {
-        if (relEntityName.equals("Avatar")) return removeAvatar(entity);
+        switch (relEntityName) {
+            case "Remember":
+                return removeRemember(entity);
+            case "Avatar":
+                return removeAvatar(entity);
+        }
         return 0;
+    }
+
+    private Map<String, Object> getRemember(String rememberName) throws DaoException {
+        List<Column> columnList = new ArrayList<>();
+        columnList.add(new Column("name", rememberName));
+        String sqlString = "SELECT * FROM \"Remember\""
+                .concat(" WHERE ").concat(Column.columnListToString(columnList, "AND", "="));
+        try (PreparedStatement preparedStatement = getConnection().prepareStatement(sqlString);
+             ResultSet resultSet = setPreparedStatementValues(preparedStatement, columnList).executeQuery();) {
+            if (resultSet == null || !resultSet.first()) return null;
+            Map<String, Object> rememberMap = new HashMap<>();
+            rememberMap.put("id", resultSet.getLong("id"));
+            rememberMap.put("userId", resultSet.getLong("user_id"));
+            rememberMap.put("name", resultSet.getString("name"));
+            rememberMap.put("value", resultSet.getString("value"));
+            rememberMap.put("valid", resultSet.getTimestamp("valid"));
+            return rememberMap;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new DaoException("exception.dao.get-remember", e.getCause());
+        }
+    }
+
+    private <T> int setRemember(Object relEntity) throws DaoException {
+        Map<String, Object> rememberValueMap = (Map<String, Object>) relEntity;
+        List<Column> columnList = new ArrayList<>();
+        columnList.add(new Column("user_id", rememberValueMap.get("userId")));
+        String sqlString = "SELECT id FROM \"Remember\""
+                .concat(" WHERE ").concat(Column.columnListToString(columnList, "AND", "="));
+        try (PreparedStatement preparedStatement = getConnection().prepareStatement(sqlString);
+             ResultSet resultSet = setPreparedStatementValues(preparedStatement, columnList).executeQuery();) {
+            if (resultSet != null && resultSet.first())
+                rememberValueMap.put("id", resultSet.getString("id"));
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new DaoException("exception.dao.set-remember.sql-select", e.getCause());
+        }
+        List<Set> setList = new ArrayList<>();
+        setList.add(new Set("user_id", rememberValueMap.get("userId")));
+        setList.add(new Set("name", rememberValueMap.get("name")));
+        setList.add(new Set("value", rememberValueMap.get("value")));
+        setList.add(new Set("valid", rememberValueMap.get("valid")));
+        if (rememberValueMap.get("id") == null) {
+            logger.debug("INSERT REMEMBER");
+            sqlString = "INSERT INTO \"Remember\" (user_id, name, value, valid) VALUES (?, ?, ?, ?)";
+            try (PreparedStatement preparedStatement =
+                         getConnection().prepareStatement(sqlString, Statement.RETURN_GENERATED_KEYS);) {
+                return setPreparedStatementValues(preparedStatement, setList).executeUpdate();
+            } catch (SQLException e) {
+                e.printStackTrace();
+                throw new DaoException("exception.dao.set-remember.sql-insert", e.getCause());
+            }
+        } else {
+            logger.debug("UPDATE REMEMBER");
+            sqlString = "UPDATE \"Remember\" SET user_id = ?, name = ?, value = ?, valid = ?"
+                    .concat(" WHERE ").concat(Column.columnListToString(columnList, "AND", "="));
+            try (PreparedStatement preparedStatement = getConnection().prepareStatement(sqlString);) {
+                return setPreparedStatementValues(preparedStatement, setList, columnList).executeUpdate();
+            } catch (SQLException e) {
+                e.printStackTrace();
+                throw new DaoException("exception.dao.set-remember.sql-update", e.getCause());
+            }
+        }
+    }
+
+    private <T> int removeRemember(T entity) throws DaoException {
+        Long userId = (Long) entity;
+        List<Column> columnList = new ArrayList<>();
+        columnList.add(new Column("user_id", userId));
+        String sqlString = "DELETE FROM \"Remember\""
+                .concat(" WHERE ").concat(Column.columnListToString(columnList, "AND", "="));
+        try (PreparedStatement deleteStatement = getConnection().prepareStatement(sqlString);) {
+            return setPreparedStatementValues(deleteStatement, columnList).executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new DaoException("exception.dao.remove-remember.sql-delete", e.getCause());
+        }
     }
 
     private Map<String, Object> getAvatar(User user) throws DaoException {
@@ -140,7 +232,7 @@ public class UserJdbcDao extends JdbcDao {
         }
     }
 
-    private <T> int putAvatar(T entity, Object relEntity) throws DaoException {
+    private <T> int setAvatar(T entity, Object relEntity) throws DaoException {
         String outputFilePath = (String) relEntity;
         String outputFileName = outputFilePath.substring(outputFilePath.lastIndexOf("\\") + 1);
         int avatarInfoIndex = outputFileName.lastIndexOf(".avatar.");

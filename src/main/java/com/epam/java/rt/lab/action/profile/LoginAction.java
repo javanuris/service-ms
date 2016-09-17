@@ -11,9 +11,8 @@ import com.epam.java.rt.lab.entity.rbac.Login;
 import com.epam.java.rt.lab.entity.rbac.User;
 import com.epam.java.rt.lab.service.LoginService;
 import com.epam.java.rt.lab.service.UserService;
-import com.epam.java.rt.lab.util.CookieManager;
-import com.epam.java.rt.lab.util.FormManager;
-import com.epam.java.rt.lab.util.UrlManager;
+import com.epam.java.rt.lab.util.*;
+import org.h2.util.DateTimeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,7 +20,9 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Service Management System
@@ -54,7 +55,6 @@ public class LoginAction implements Action {
             req.setAttribute("loginForm", formComponent);
             if ("GET".equals(req.getMethod())) {
                 logger.debug("GET");
-                System.out.println("name: " + formComponent.getName() + ", action: " + formComponent.getAction());
                 formComponent.setActionParameterString(UrlManager.getRequestParameterString(req));
             } else if ("POST".equals(req.getMethod())) {
                 logger.debug("POST");
@@ -66,7 +66,7 @@ public class LoginAction implements Action {
                     );
                     if (login == null) {
                         logger.debug("DENIED");
-                        String[] validationMessageArray = {"profile.login.error.denied"};
+                        String[] validationMessageArray = {"profile.login.submit.error-denied"};
                         formComponent.getItem(3).setValidationMessageArray(validationMessageArray);
                     } else {
                         logger.debug("GRANTED");
@@ -79,10 +79,22 @@ public class LoginAction implements Action {
                         req.getSession().setAttribute("navbarItemArray", NavigationComponent.getNavbarItemArray(user.getRole()));
                         if (formComponent.getItem(2).getValue() != null) {
                             logger.debug("REMEMBER ME");
-                            CookieManager.setCookie(resp,
-                                    UserService.getRememberCookieName(), UserService.setRememberUserId(user.getId()),
-                                    2592000, UrlManager.getContextUri(req, "/")
-                            );
+                            try {
+                                String rememberCookieName = CookieManager.getRememberCookieName(req);
+                                String rememberCookieValue = HashManager.hashString(UUID.randomUUID().toString());
+                                CookieManager.setRememberCookieValue(req, resp, rememberCookieName, rememberCookieValue);
+                                Map<String, Object> rememberValueMap = new HashMap<>();
+                                rememberValueMap.put("userId", user.getId());
+                                rememberValueMap.put("name", rememberCookieName);
+                                rememberValueMap.put("value", rememberCookieValue);
+                                rememberValueMap.put("valid",
+                                        TimestampManager.daysToTimestamp(TimestampManager.getCurrentTimestamp(), 30));
+                                userService.setRemember(rememberValueMap);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+
+
                         }
                         Map<String, String> parameterMap = UrlManager.getRequestParameterMap(req.getQueryString());
                         String redirect = parameterMap.remove("redirect");

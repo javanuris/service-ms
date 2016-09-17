@@ -3,6 +3,8 @@ package com.epam.java.rt.lab.action.profile;
 import com.epam.java.rt.lab.action.Action;
 import com.epam.java.rt.lab.action.ActionException;
 import com.epam.java.rt.lab.action.WebAction;
+import com.epam.java.rt.lab.connection.ConnectionException;
+import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.service.UserService;
 import com.epam.java.rt.lab.util.CookieManager;
 import com.epam.java.rt.lab.util.UrlManager;
@@ -24,12 +26,19 @@ public class LogoutAction implements Action {
     public void execute(HttpServletRequest req, HttpServletResponse resp) throws ActionException {
         try {
             logger.debug("LOGOUT");
+            try (UserService userService = new UserService();) {
+                Long userId = (Long) req.getSession().getAttribute("userId");
+                userService.removeRemember(userId);
+            } catch (ConnectionException | DaoException e) {
+                e.printStackTrace();
+                throw new ActionException("exception.action.logout.user-service", e.getCause());
+            }
             req.getSession().removeAttribute("userId");
             req.getSession().removeAttribute("userName");
             req.getSession().removeAttribute("navbarItemArray");
             req.getSession().invalidate();
             req.removeAttribute("navbarCurrent");
-            CookieManager.setCookie(resp, UserService.getRememberCookieName(), null, 0, req.getContextPath().concat("/"));
+            CookieManager.removeRememberCookieValue(req, resp, CookieManager.getRememberCookieName(req));
             resp.setHeader("Cache-Control", "no-cache");
             logger.debug("REDIRECTING ({})", req.getContextPath());
             resp.sendRedirect(UrlManager.getContextUri(req, "/"));

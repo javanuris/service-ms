@@ -1,6 +1,5 @@
 package com.epam.java.rt.lab.service;
 
-import com.epam.java.rt.lab.component.ListComponent;
 import com.epam.java.rt.lab.component.PageComponent;
 import com.epam.java.rt.lab.connection.ConnectionException;
 import com.epam.java.rt.lab.dao.DaoException;
@@ -11,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,27 +46,34 @@ public class UserService extends BaseService {
         return getUser(new Login());
     }
 
-    public static String getRememberCookieName() {
-        return UserService.REMEMBER_COOKIE_NAME.toString();
+    private <T> Map<String, Object> getRelEntity(T entity, String relEntityName) throws DaoException {
+        Dao dao = daoFactory.createDao("User");
+        Map<String, Object> relEntityMap = (Map<String, Object>) dao.getRelEntity(entity, relEntityName);
+        return relEntityMap;
     }
 
-    public static String setRememberUserId(Long id) {
-        if (rememberUserIdMap.containsValue(id)) {
-            for (Map.Entry<UUID, Long> entry : rememberUserIdMap.entrySet()) {
-                if (entry.getValue().equals(id)) {
-                    rememberUserIdMap.remove(entry.getKey());
-                    break;
-                }
-            }
+    private <T> void setRelEntity(T entity, String relEntityName, Object relEntity) throws DaoException {
+        if (relEntity != null) {
+            Dao dao = daoFactory.createDao("User");
+            dao.setRelEntity(entity, relEntityName, relEntity);
         }
-        UUID uuid = UUID.randomUUID();
-        while (rememberUserIdMap.containsKey(uuid)) uuid = UUID.randomUUID();
-        rememberUserIdMap.put(uuid, id);
-        return uuid.toString();
     }
 
-    public static Long getRememberUserId(String rememberCookieValue) {
-        return rememberUserIdMap.get(UUID.fromString(rememberCookieValue));
+    private <T> void removeRelEntity(T entity, String relEntityName) throws DaoException {
+        Dao dao = daoFactory.createDao("User");
+        dao.removeRelEntity(entity, relEntityName);
+    }
+
+    public Map<String, Object> getRemember(String rememberName) throws DaoException {
+        return getRelEntity(rememberName, "Remember");
+    }
+
+    public void setRemember(Map<String, Object> rememberValueMap) throws DaoException {
+        setRelEntity(null, "Remember", rememberValueMap);
+    }
+
+    public void removeRemember(Long userId) throws DaoException {
+        removeRelEntity(userId, "Remember");
     }
 
     public int updateUser(User user) throws DaoException {
@@ -85,31 +90,22 @@ public class UserService extends BaseService {
         return userList;
     }
 
-    public void putAvatar(User user, String fileName) throws DaoException {
-        if (fileName != null) {
-            Dao dao = daoFactory.createDao("User");
-            dao.putRelEntity(user, "Avatar", fileName);
-            new File(fileName).delete();
-        }
-    }
-
-    public void removeAvatar(User user) throws DaoException {
-        if (user.getAvatarId() != null) {
-            Dao dao = daoFactory.createDao("User");
-            dao.removeRelEntity(user, "Avatar");
-        }
-    }
-
     public Map<String, Object> getAvatar(User user) throws DaoException {
-        Dao dao = daoFactory.createDao("User");
-        Map<String, Object>  avatarMap = (Map<String, Object>) dao.getRelEntity(user, "Avatar");
-        return avatarMap;
+        return getRelEntity(user, "Avatar");
     }
 
     public Map<String, Object> getAvatar(Long avatarId) throws DaoException {
         User user = new User();
         user.setAvatarId(avatarId);
         return getAvatar(user);
+    }
+
+    public void setAvatar(User user, String fileName) throws DaoException {
+        setRelEntity(user, "Avatar", fileName);
+    }
+
+    public void removeAvatar(User user) throws DaoException {
+        removeRelEntity(user, "Avatar");
     }
 
 }
