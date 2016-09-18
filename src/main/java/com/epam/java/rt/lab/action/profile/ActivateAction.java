@@ -34,8 +34,8 @@ public class ActivateAction implements Action {
              UserService userService = new UserService();) {
             if ("GET".equals(req.getMethod())) {
                 logger.debug("GET");
-                String activationEmail = (String) req.getSession().getAttribute("activationEmail");
-                String activationCode = (String) req.getSession().getAttribute("activationCode");
+                String activationEmail = req.getParameter("email");
+                String activationCode = req.getParameter("code");
                 logger.debug("email: {}, code: {}", activationEmail, activationCode);
                 req.getSession().removeAttribute("activationEmail");
                 req.getSession().removeAttribute("activationCode");
@@ -47,7 +47,7 @@ public class ActivateAction implements Action {
                         User user = new User();
                         Role role = roleService.getRoleAuthorized();
                         user.setRole(role);
-                        login = loginService.getLogin(login.getEmail(), login.getPassword());
+                        login = loginService.getLogin(login.getEmail());
                         user.setLogin(login);
                         userService.addUser(user);
                         resp.sendRedirect(UrlManager.getContextUri(req, "/profile/login"));

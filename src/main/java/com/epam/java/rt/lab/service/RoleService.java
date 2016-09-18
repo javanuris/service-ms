@@ -4,6 +4,7 @@ import com.epam.java.rt.lab.connection.ConnectionException;
 import com.epam.java.rt.lab.dao.Dao;
 import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.entity.rbac.Role;
+import com.epam.java.rt.lab.util.GlobalManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,7 +29,7 @@ public class RoleService extends BaseService {
 
     public Role getRoleAuthorized() throws DaoException {
         Role role = new Role();
-        role.setName("authorized");
+        role.setName(GlobalManager.getProperty("role.authorized"));
         Dao dao = daoFactory.createDao("Role");
         role = dao.getFirst(role, "name", "name ASC");
         return role;

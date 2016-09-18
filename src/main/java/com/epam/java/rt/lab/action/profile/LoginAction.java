@@ -19,6 +19,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -44,8 +45,7 @@ public class LoginAction implements Action {
                             new FormComponent.Item("profile.login.password.label", "password", "profile.login.password.label"),
                             new FormComponent.Item("profile.login.remember.label", "checkbox", "profile.login.remember.label"),
                             new FormComponent.Item("profile.login.submit-login.label", "submit", "submit-login"),
-                            new FormComponent.Item("profile.login.reset-password.label", "button",
-                                    UrlManager.getContextUri(req, "/profile/reset-password")),
+                            new FormComponent.Item("profile.login.submit-forgot.label", "submit", "submit-forgot"),
                             new FormComponent.Item("profile.login.submit-register.label", "submit", "submit-register")
                     );
                     break;
@@ -62,16 +62,25 @@ public class LoginAction implements Action {
                     logger.debug("FORM VALID");
                     if (req.getParameter(formComponent.getItem(3).getPlaceholder()) != null) {
                         logger.debug("SUBMIT-LOGIN");
-                        Login login = loginService.getLogin(
-                                formComponent.getItem(0).getValue(),
-                                formComponent.getItem(1).getValue()
-                        );
-                        if (login == null) {
+                        Login login = loginService.getLogin(formComponent.getItem(0).getValue());
+                        if (login == null || !login.getPassword().equals(formComponent.getItem(1).getValue()) ||
+                                login.getAttemptLeft() == 0 || login.getStatus() < 0) {
                             logger.debug("DENIED");
-                            String[] validationMessageArray = {"profile.login.submit-login.error-denied"};
-                            formComponent.getItem(3).setValidationMessageArray(validationMessageArray);
+                            if (login != null && (login.getAttemptLeft() <= 0 || login.getStatus() < 0)) {
+                                String[] validationMessageArray = {"profile.login.submit-login.error-blocked"};
+                                formComponent.getItem(3).setValidationMessageArray(validationMessageArray);
+                            } else {
+                                if (login != null && login.getAttemptLeft() > 0) {
+                                    login.setAttemptLeft(login.getAttemptLeft() - 1);
+                                    loginService.updateAttemptLeft(login);
+                                }
+                                String[] validationMessageArray = {"profile.login.submit-login.error-denied"};
+                                formComponent.getItem(3).setValidationMessageArray(validationMessageArray);
+                            }
                         } else {
                             logger.debug("GRANTED");
+                            login.setAttemptLeft(Integer.valueOf(GlobalManager.getProperty("login.attempt.max")));
+                            loginService.updateAttemptLeft(login);
                             UserService userService = new UserService();
                             User user = userService.getUser(login);
                             if (user == null)
@@ -82,15 +91,17 @@ public class LoginAction implements Action {
                             if (formComponent.getItem(2).getValue() != null) {
                                 logger.debug("REMEMBER ME");
                                 try {
-                                    String rememberCookieName = CookieManager.getRememberCookieName(req);
+                                    String rememberCookieName = CookieManager.getDependantCookieName(req);
                                     String rememberCookieValue = HashManager.hashString(UUID.randomUUID().toString());
-                                    CookieManager.setRememberCookieValue(req, resp, rememberCookieName, rememberCookieValue);
+                                    CookieManager.setDependantCookieValue(req, resp, rememberCookieName, rememberCookieValue,
+                                            Integer.valueOf(GlobalManager.getProperty("remember.days.valid")) * 86400);
                                     Map<String, Object> rememberValueMap = new HashMap<>();
                                     rememberValueMap.put("userId", user.getId());
                                     rememberValueMap.put("name", rememberCookieName);
                                     rememberValueMap.put("value", rememberCookieValue);
                                     rememberValueMap.put("valid",
-                                            TimestampManager.daysToTimestamp(TimestampManager.getCurrentTimestamp(), 30));
+                                            TimestampManager.daysToTimestamp(TimestampManager.getCurrentTimestamp(),
+                                                    Integer.valueOf(GlobalManager.getProperty("remember.days.valid"))));
                                     userService.setRemember(rememberValueMap);
                                 } catch (Exception e) {
                                     e.printStackTrace();
@@ -102,6 +113,36 @@ public class LoginAction implements Action {
                             resp.sendRedirect(UrlManager.getContextUri(req, redirect, parameterMap));
                             return;
                         }
+                    } else if (req.getParameter(formComponent.getItem(4).getPlaceholder()) != null) {
+                        logger.debug("SUBMIT-FORGOT");
+                        Login login = loginService.getLogin(formComponent.getItem(0).getValue());
+                        if (login == null) {
+                            logger.debug("EMAIL NOT EXISTS");
+                            String[] validationMessageArray = {"profile.login.email.error-exists-forgot"};
+                            formComponent.getItem(0).setValidationMessageArray(validationMessageArray);
+                        } else {
+                            if (login.getAttemptLeft() > 0 && login.getStatus() >= 0) {
+                                try {
+                                    String forgotCookieName = "_".concat(CookieManager.getDependantCookieName(req));
+                                    String forgotCookieValue = HashManager.hashString(UUID.randomUUID().toString());
+                                    CookieManager.setDependantCookieValue(req, resp, forgotCookieName, forgotCookieValue,
+                                            Integer.valueOf(GlobalManager.getProperty("forgot.seconds.valid")));
+                                    loginService.setForgotCode(formComponent.getItem(0).getValue(), forgotCookieValue);
+                                    req.getSession().setAttribute("forgotEmail", formComponent.getItem(0).getValue());
+                                    req.getSession().setAttribute("forgotCode", forgotCookieValue);
+                                    req.getSession().setAttribute("forgotRef",
+                                            UrlManager.getContextRef(req, "/profile/forgot-password", "email, code",
+                                                    formComponent.getItem(0).getValue(), forgotCookieValue));
+                                    resp.sendRedirect(UrlManager.getContextUri(req, "/home"));
+                                    return;
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            } else {
+                                String[] validationMessageArray = {"profile.login.email.error-block-forgot"};
+                                formComponent.getItem(0).setValidationMessageArray(validationMessageArray);
+                            }
+                        }
                     } else if (req.getParameter(formComponent.getItem(5).getPlaceholder()) != null) {
                         logger.debug("SUBMIT-REGISTER");
                         if (loginService.isLoginExists(formComponent.getItem(0).getValue())) {
@@ -109,10 +150,13 @@ public class LoginAction implements Action {
                             String[] validationMessageArray = {"profile.login.email.error-exists-register"};
                             formComponent.getItem(0).setValidationMessageArray(validationMessageArray);
                         } else {
+                            String activationCode = loginService.createActivationCode
+                                    (formComponent.getItem(0).getValue(), formComponent.getItem(1).getValue());
                             req.getSession().setAttribute("activationEmail", formComponent.getItem(0).getValue());
-                            req.getSession().setAttribute("activationCode", loginService.createActivationCode
-                                    (formComponent.getItem(0).getValue(), formComponent.getItem(1).getValue()));
-                            req.getSession().setAttribute("activationRef", UrlManager.getContextUri(req, "/profile/activate"));
+                            req.getSession().setAttribute("activationCode", activationCode);
+                            req.getSession().setAttribute("activationRef",
+                                    UrlManager.getContextRef(req, "/profile/activate", "email, code",
+                                            formComponent.getItem(0).getValue(), activationCode));
                             resp.sendRedirect(UrlManager.getContextUri(req, "/home"));
                             return;
                         }
@@ -126,6 +170,9 @@ public class LoginAction implements Action {
         } catch (ServletException | IOException e) {
             e.printStackTrace();
             throw new ActionException("exception.action.login.forward", e.getCause());
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new ActionException("exception.action.login.update", e.getCause());
         }
     }
 

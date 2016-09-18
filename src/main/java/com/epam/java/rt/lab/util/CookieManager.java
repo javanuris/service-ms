@@ -26,7 +26,7 @@ public class CookieManager {
         }
     }
 
-    public static String getRememberCookieName(HttpServletRequest req) {
+    public static String getDependantCookieName(HttpServletRequest req) {
         if (req.getCookies() == null) return null;
         String ip = req.getHeader("X-FORWARDED-FOR");
         if (ip == null) ip = req.getRemoteAddr();
@@ -38,18 +38,18 @@ public class CookieManager {
         return null;
     }
 
-    public static String getRememberCookieValue(HttpServletRequest req, String rememberCookieName) {
-        Cookie rememberCookie = getCookie(req, rememberCookieName);
+    public static String getDependantCookieValue(HttpServletRequest req, String dependantCookieName) {
+        Cookie rememberCookie = getCookie(req, dependantCookieName);
         return rememberCookie == null ? null : rememberCookie.getValue();
     }
 
-    public static void removeRememberCookieValue(HttpServletRequest req, HttpServletResponse resp, String rememberCookieName) {
-        setCookie(resp, rememberCookieName, null, 0, UrlManager.getContextUri(req, "/"));
+    public static void removeDependantCookieValue(HttpServletRequest req, HttpServletResponse resp, String dependantCookieName) {
+        setCookie(resp, dependantCookieName, null, 0, UrlManager.getContextUri(req, "/"));
     }
 
-    public static void setRememberCookieValue(HttpServletRequest req, HttpServletResponse resp,
-                                              String rememberCookieName, String rememberCookieValue) {
-        setCookie(resp, rememberCookieName, rememberCookieValue, 2592000, UrlManager.getContextUri(req, "/"));
+    public static void setDependantCookieValue(HttpServletRequest req, HttpServletResponse resp,
+                                               String dependantCookieName, String dependantCookieValue, int maxAge) {
+        setCookie(resp, dependantCookieName, dependantCookieValue, maxAge, UrlManager.getContextUri(req, "/"));
     }
 
 }

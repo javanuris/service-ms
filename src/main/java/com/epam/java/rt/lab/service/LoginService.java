@@ -4,12 +4,15 @@ import com.epam.java.rt.lab.connection.ConnectionException;
 import com.epam.java.rt.lab.dao.Dao;
 import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.entity.rbac.Login;
+import com.epam.java.rt.lab.util.GlobalManager;
 import com.epam.java.rt.lab.util.HashManager;
+import com.epam.java.rt.lab.util.TimestampManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.Map;
 
 /**
@@ -21,12 +24,11 @@ public class LoginService extends BaseService {
     public LoginService() throws ConnectionException, DaoException {
     }
 
-    public Login getLogin(String email, String password) throws DaoException {
+    public Login getLogin(String email) throws DaoException {
         Login login = new Login();
         login.setEmail(email);
-        login.setPassword(password);
         Dao dao = daoFactory.createDao("Login");
-        login = dao.getFirst(login, "email, password", "email ASC");
+        login = dao.getFirst(login, "email", "email ASC");
         return login;
     }
 
@@ -39,8 +41,14 @@ public class LoginService extends BaseService {
             throws DaoException, SQLException, ConnectionException {
         logger.debug("updateLogin");
         Dao dao = daoFactory.createDao("Login");
-        int updateCount = dao.update(login, "id", "password");
-        return updateCount;
+        return dao.update(login, "id", "password");
+    }
+
+    public int updateAttemptLeft(Login login)
+            throws DaoException, SQLException, ConnectionException {
+        logger.debug("updateLogin");
+        Dao dao = daoFactory.createDao("Login");
+        return dao.update(login, "id", "attemptLeft");
     }
 
     public boolean isLoginExists(String email) throws DaoException {
@@ -93,11 +101,44 @@ public class LoginService extends BaseService {
         login.setEmail(activationEmail);
         Map<String, Object> activationMap = getRelEntity(login, "Activation");
         removeRelEntity(login, "Activation");
-        if (activationMap == null && activationCode.equals(activationMap.get("code"))) return null;
+        if (activationMap == null || !activationCode.equals(activationMap.get("code")) ||
+                TimestampManager.secondsBetweenTimestamps(TimestampManager.getCurrentTimestamp(),
+                (Timestamp) activationMap.get("valid")) <= 0) return null;
         login.setPassword((String) activationMap.get("password"));
-        login.setAttemptLeft(5);
+        login.setAttemptLeft(Integer.valueOf(GlobalManager.getProperty("login.attempt.max")));
         login.setStatus(0);
         return login;
     }
 
+    public void setForgotCode(String email, String code) throws DaoException {
+        try {
+            Login login = new Login();
+            login.setEmail(email);
+            setRelEntity(login, "Forgot", code);
+        } catch (DaoException e) {
+            e.printStackTrace();
+            throw e;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public Login confirmForgotCode(String forgotEmail, String forgotCode) throws DaoException {
+        if (forgotEmail == null || forgotCode == null) return null;
+        Login login = new Login();
+        login.setEmail(forgotEmail);
+        Map<String, Object> forgotMap = getRelEntity(login, "Forgot");
+        if (forgotMap == null || !forgotCode.equals(forgotMap.get("code")) ||
+                TimestampManager.secondsBetweenTimestamps(TimestampManager.getCurrentTimestamp(),
+                        (Timestamp) forgotMap.get("valid")) <= 0) return null;
+        return getLogin(forgotEmail);
+    }
+
+    public void removeForgotCode(String forgotEmail) throws DaoException {
+        if (forgotEmail != null) {
+            Login login = new Login();
+            login.setEmail(forgotEmail);
+            removeRelEntity(login, "Forgot");
+        }
+    }
 }

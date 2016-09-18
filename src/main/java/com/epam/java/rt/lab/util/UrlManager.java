@@ -13,11 +13,6 @@ public class UrlManager {
     private UrlManager() {
     }
 
-    public static String getUriForButton(HttpServletRequest req, String path, String parameterName) {
-        return UrlManager.getContextUri(req, path)
-                .concat(UrlManager.combineUrlParameter(new UrlManager.UrlParameterBuilder(parameterName, "true")));
-    }
-
     public static String getContextRef(HttpServletRequest req, String path,
                                        String parameterNames, Object... parameterValueArray) {
         Map<String, String> parameterMap = new HashMap<>();
@@ -110,57 +105,4 @@ public class UrlManager {
         return parameterString.toString();
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-    public static String combineUrlParameter(UrlParameterBuilder... urlParameterBuilderArray) {
-        StringBuilder result = new StringBuilder();
-        for (UrlParameterBuilder urlParameterBuilder : urlParameterBuilderArray) {
-            if (result.length() == 0) {
-                result.append("?");
-            } else {
-                result.append("&");
-            }
-            result.append(urlParameterBuilder.getName()).append("=").append(urlParameterBuilder.getValue());
-        }
-        return result.toString();
-    }
-
-    public static String getUrlParameter(HttpServletRequest req, String parameterName, String defaultValue) {
-        String parameterValue = req.getParameter(parameterName);
-        return parameterValue == null ? UrlManager.getContextUri(req, defaultValue) : parameterValue;
-    }
-
-    public static String getUrlParameterFromAttribute(HttpServletRequest req, String parameterName, String defaultValue) {
-        String parameterValue = (String) req.getAttribute("url-".concat(parameterName));
-        return parameterValue == null ? UrlManager.getContextUri(req, defaultValue) : parameterValue;
-    }
-
-    public static class UrlParameterBuilder {
-        private String name;
-        private String value;
-
-        public UrlParameterBuilder(String name, String value) {
-            this.name = name;
-            this.value = value;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public String getValue() {
-            return value;
-        }
-    }
 }

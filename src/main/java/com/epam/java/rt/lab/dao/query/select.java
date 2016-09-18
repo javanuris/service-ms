@@ -12,6 +12,7 @@ public class Select implements Query {
     private Long offset;
     private Long count;
     private List<Column> columnList;
+    private String order;
     private String sql;
 
     public Select(String tableName, String columnNames) {
@@ -22,9 +23,10 @@ public class Select implements Query {
             this.columnNames = columnNames;
         }
         this.columnList = new ArrayList<>();
+        this.order = null;
     }
 
-    public Select(String tableName, String columnNames, Long offset, Long count) {
+    public Select(String tableName, String columnNames, Long offset, Long count, String order) {
         this.tableName = tableName;
         if (columnNames == null) {
             this.columnNames = "*";
@@ -34,6 +36,7 @@ public class Select implements Query {
         this.offset = offset;
         this.count = count;
         this.columnList = new ArrayList<>();
+        this.order = order;
     }
 
     @Override
@@ -62,8 +65,8 @@ public class Select implements Query {
         result.append("SELECT ").append(this.columnNames).append(" FROM \"").append(this.tableName).append("\"");
         if (this.columnList.size() > 0)
             result.append(" WHERE ").append(Column.columnListToString(this.columnList, "AND", "="));
+        if (order != null && order.length() > 0) result.append(" ORDER BY ").append(order);
         if (offset != null && count != null) result.append(" LIMIT ").append(offset).append(", ").append(count);
-//System.out.println(result);
         return result.toString();
     }
 
@@ -73,7 +76,6 @@ public class Select implements Query {
         result.append("SELECT COUNT(*) AS count ").append(" FROM \"").append(this.tableName).append("\"");
         if (this.columnList.size() > 0)
             result.append(" WHERE ").append(Column.columnListToString(this.columnList, "AND", "="));
-//System.out.println(result);
         return result.toString();
     }
 

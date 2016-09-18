@@ -56,10 +56,7 @@ public class ViewAction implements Action {
                     new ViewComponent.ViewItem
                             ("profile.view.login-email.label", "input", user.getLogin().getEmail()),
                     new ViewComponent.ViewItem
-                            ("profile.view.edit-profile.label", "button", UrlManager.getContextUri(req, "/rbac/user/edit"
-                                    .concat(UrlManager.combineUrlParameter(new UrlManager.UrlParameterBuilder("id", id))))),
-                    new ViewComponent.ViewItem
-                            ("profile.view.cancel.label", "button", UrlManager.getUriForButton(req, "/rbac/user/list", "cancel"))));
+                            ("profile.view.cancel.label", "button", "")));
             req.getRequestDispatcher("/WEB-INF/jsp/rbac/user/view.jsp").forward(req, resp);
         } catch (ServletException | IOException | ConnectionException | DaoException e) {
             e.printStackTrace();

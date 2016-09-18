@@ -9,11 +9,21 @@
         <div class="jumbotron" style="text-align: center">
             <c:choose>
                 <c:when test="${not empty sessionScope.activationRef}">
-                    <h2><fmt:message bundle="${ui}" key="message.activation.congratulation"/></h2>
-                    <h4><fmt:message bundle="${ui}" key="message.activation.info"/></h4>
+                    <h2><fmt:message bundle="${ui}" key="message.register.header"/></h2>
+                    <h4><fmt:message bundle="${ui}" key="message.register.info"/></h4>
                     <a href="${sessionScope.activationRef}">
-                        <fmt:message bundle="${ui}" key="message.activation.link"/>${sessionScope.activationEmail}
+                        <fmt:message bundle="${ui}" key="message.register.link"/>${sessionScope.activationEmail}
                     </a>
+                </c:when>
+                <c:when test="${not empty sessionScope.forgotRef}">
+                    <h2><fmt:message bundle="${ui}" key="message.forgot.header"/></h2>
+                    <h4><fmt:message bundle="${ui}" key="message.forgot.info"/></h4>
+                    <a href="${sessionScope.forgotRef}">
+                        <fmt:message bundle="${ui}" key="message.forgot.link"/>${sessionScope.forgotEmail}
+                    </a>
+                </c:when>
+                <c:when test="${not empty sessionScope.message}">
+                    <h4><fmt:message bundle="${ui}" key="${sessionScope.message}"/></h4>
                 </c:when>
                 <c:otherwise>
                     <h1><fmt:message bundle="${ui}" key="title.home"/></h1>

@@ -6,6 +6,7 @@ import com.epam.java.rt.lab.dao.query.Column;
 import com.epam.java.rt.lab.dao.query.Set;
 import com.epam.java.rt.lab.entity.rbac.Login;
 import com.epam.java.rt.lab.entity.rbac.User;
+import com.epam.java.rt.lab.util.GlobalManager;
 import com.epam.java.rt.lab.util.TimestampManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -93,6 +94,8 @@ public class LoginJdbcDao extends JdbcDao {
         switch(relEntityName) {
             case "Activation":
                 return getActivation(entity);
+            case "Forgot":
+                return getForgot(entity);
             default:
                 return null;
         }
@@ -103,6 +106,8 @@ public class LoginJdbcDao extends JdbcDao {
         switch (relEntityName) {
             case "Activation":
                 return setActivation(entity, relEntity);
+            case "Forgot":
+                return setForgot(entity, relEntity);
             default:
                 return 0;
         }
@@ -113,6 +118,8 @@ public class LoginJdbcDao extends JdbcDao {
         switch (relEntityName) {
             case "Activation":
                 return removeActivation(entity);
+            case "Forgot":
+                return removeForgot(entity);
             default:
                 return 0;
         }
@@ -154,13 +161,14 @@ public class LoginJdbcDao extends JdbcDao {
                 id = resultSet.getLong("id");
         } catch (SQLException e) {
             e.printStackTrace();
-            throw new DaoException("exception.dao.set-remember.sql-select", e.getCause());
+            throw new DaoException("exception.dao.set-activation.sql-select", e.getCause());
         }
         List<Set> setList = new ArrayList<>();
         setList.add(new Set("email", login.getEmail()));
         setList.add(new Set("password", login.getPassword()));
         setList.add(new Set("code", activationCode));
-        setList.add(new Set("valid", TimestampManager.daysToTimestamp(TimestampManager.getCurrentTimestamp(), 1)));
+        setList.add(new Set("valid", TimestampManager.daysToTimestamp(TimestampManager.getCurrentTimestamp(),
+                Integer.valueOf(GlobalManager.getProperty("activation.days.valid")))));
         if (id == null) {
             logger.debug("INSERT ACTIVATION");
             sqlString = "INSERT INTO \"Activation\" (email, password, code, valid) VALUES (?, ?, ?, ?)";
@@ -195,6 +203,85 @@ public class LoginJdbcDao extends JdbcDao {
         } catch (SQLException e) {
             e.printStackTrace();
             throw new DaoException("exception.dao.remove-activation.sql-delete", e.getCause());
+        }
+    }
+
+    private <T> Map<String, Object> getForgot(T entity) throws DaoException {
+        Login login = (Login) entity;
+        List<Column> columnList = new ArrayList<>();
+        columnList.add(new Column("email", login.getEmail()));
+        String sqlString = "SELECT * FROM \"Forgot\""
+                .concat(" WHERE ").concat(Column.columnListToString(columnList, "AND", "="));
+        try (PreparedStatement preparedStatement = getConnection().prepareStatement(sqlString);
+             ResultSet resultSet = setPreparedStatementValues(preparedStatement, columnList).executeQuery();) {
+            if (resultSet == null || !resultSet.first()) return null;
+            Map<String, Object> forgotMap = new HashMap<>();
+            forgotMap.put("id", resultSet.getLong("id"));
+            forgotMap.put("email", resultSet.getString("email"));
+            forgotMap.put("code", resultSet.getString("code"));
+            forgotMap.put("valid", resultSet.getTimestamp("valid"));
+            return forgotMap;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new DaoException("exception.dao.get-activation", e.getCause());
+        }
+    }
+
+    private <T> int setForgot(T entity, Object relEntity) throws DaoException {
+        Login login = (Login) entity;
+        String forgotCode = (String) relEntity;
+        Long id = null;
+        List<Column> columnList = new ArrayList<>();
+        columnList.add(new Column("email", login.getEmail()));
+        String sqlString = "SELECT id FROM \"Forgot\""
+                .concat(" WHERE ").concat(Column.columnListToString(columnList, "AND", "="));
+        try (PreparedStatement preparedStatement = getConnection().prepareStatement(sqlString);
+             ResultSet resultSet = setPreparedStatementValues(preparedStatement, columnList).executeQuery();) {
+            if (resultSet != null && resultSet.first())
+                id = resultSet.getLong("id");
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new DaoException("exception.dao.set-forgot.sql-select", e.getCause());
+        }
+        List<Set> setList = new ArrayList<>();
+        setList.add(new Set("email", login.getEmail()));
+        setList.add(new Set("code", forgotCode));
+        setList.add(new Set("valid", TimestampManager.daysToTimestamp(TimestampManager.getCurrentTimestamp(),
+                Integer.valueOf(GlobalManager.getProperty("forgot.seconds.valid")))));
+        if (id == null) {
+            logger.debug("INSERT FORGOT");
+            sqlString = "INSERT INTO \"Forgot\" (email, code, valid) VALUES (?, ?, ?)";
+            try (PreparedStatement preparedStatement =
+                         getConnection().prepareStatement(sqlString, Statement.RETURN_GENERATED_KEYS);) {
+                return setPreparedStatementValues(preparedStatement, setList).executeUpdate();
+            } catch (SQLException e) {
+                e.printStackTrace();
+                throw new DaoException("exception.dao.set-forgot.sql-insert", e.getCause());
+            }
+        } else {
+            logger.debug("UPDATE FORGOT");
+            sqlString = "UPDATE \"Forgot\" SET email = ?, code = ?, valid = ?"
+                    .concat(" WHERE ").concat(Column.columnListToString(columnList, "AND", "="));
+            try (PreparedStatement preparedStatement = getConnection().prepareStatement(sqlString);) {
+                return setPreparedStatementValues(preparedStatement, setList, columnList).executeUpdate();
+            } catch (SQLException e) {
+                e.printStackTrace();
+                throw new DaoException("exception.dao.set-forgot.sql-update", e.getCause());
+            }
+        }
+    }
+
+    private <T> int removeForgot(T entity) throws DaoException {
+        Login login = (Login) entity;
+        List<Column> columnList = new ArrayList<>();
+        columnList.add(new Column("email", login.getEmail()));
+        String sqlString = "DELETE FROM \"Forgot\""
+                .concat(" WHERE ").concat(Column.columnListToString(columnList, "AND", "="));
+        try (PreparedStatement deleteStatement = getConnection().prepareStatement(sqlString);) {
+            return setPreparedStatementValues(deleteStatement, columnList).executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new DaoException("exception.dao.remove-forgot.sql-delete", e.getCause());
         }
     }
 
