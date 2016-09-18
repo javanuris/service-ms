@@ -12,7 +12,6 @@ import com.epam.java.rt.lab.entity.rbac.User;
 import com.epam.java.rt.lab.service.LoginService;
 import com.epam.java.rt.lab.service.UserService;
 import com.epam.java.rt.lab.util.*;
-import org.h2.util.DateTimeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,9 +43,10 @@ public class LoginAction implements Action {
                             new FormComponent.Item("profile.login.email.label", "input", "profile.login.email.label"),
                             new FormComponent.Item("profile.login.password.label", "password", "profile.login.password.label"),
                             new FormComponent.Item("profile.login.remember.label", "checkbox", "profile.login.remember.label"),
-                            new FormComponent.Item("profile.login.submit.label", "submit", ""),
-                            new FormComponent.Item("profile.login.register.label", "button",
-                                    UrlManager.getContextUri(req, "/profile/register"))
+                            new FormComponent.Item("profile.login.submit-login.label", "submit", "submit-login"),
+                            new FormComponent.Item("profile.login.reset-password.label", "button",
+                                    UrlManager.getContextUri(req, "/profile/forget-password")),
+                            new FormComponent.Item("profile.login.submit-register.label", "submit", "submit-register")
                     );
                     break;
                 case -1:
@@ -60,47 +60,62 @@ public class LoginAction implements Action {
                 logger.debug("POST");
                 if (FormManager.setValuesAndValidate(req, formComponent)) {
                     logger.debug("FORM VALID");
-                    Login login = loginService.getLogin(
-                            formComponent.getItem(0).getValue(),
-                            formComponent.getItem(1).getValue()
-                    );
-                    if (login == null) {
-                        logger.debug("DENIED");
-                        String[] validationMessageArray = {"profile.login.submit.error-denied"};
-                        formComponent.getItem(3).setValidationMessageArray(validationMessageArray);
-                    } else {
-                        logger.debug("GRANTED");
-                        UserService userService = new UserService();
-                        User user = userService.getUser(login);
-                        if (user == null)
-                            throw new ActionException("exception.action.login.user-login");
-                        req.getSession().setAttribute("userId", user.getId());
-                        req.getSession().setAttribute("userName", user.getName());
-                        req.getSession().setAttribute("navbarItemArray", NavigationComponent.getNavbarItemArray(user.getRole()));
-                        if (formComponent.getItem(2).getValue() != null) {
-                            logger.debug("REMEMBER ME");
-                            try {
-                                String rememberCookieName = CookieManager.getRememberCookieName(req);
-                                String rememberCookieValue = HashManager.hashString(UUID.randomUUID().toString());
-                                CookieManager.setRememberCookieValue(req, resp, rememberCookieName, rememberCookieValue);
-                                Map<String, Object> rememberValueMap = new HashMap<>();
-                                rememberValueMap.put("userId", user.getId());
-                                rememberValueMap.put("name", rememberCookieName);
-                                rememberValueMap.put("value", rememberCookieValue);
-                                rememberValueMap.put("valid",
-                                        TimestampManager.daysToTimestamp(TimestampManager.getCurrentTimestamp(), 30));
-                                userService.setRemember(rememberValueMap);
-                            } catch (Exception e) {
-                                e.printStackTrace();
+                    if (req.getParameter(formComponent.getItem(3).getPlaceholder()) != null) {
+                        logger.debug("SUBMIT-LOGIN");
+                        Login login = loginService.getLogin(
+                                formComponent.getItem(0).getValue(),
+                                formComponent.getItem(1).getValue()
+                        );
+                        if (login == null) {
+                            logger.debug("DENIED");
+                            String[] validationMessageArray = {"profile.login.submit-login.error-denied"};
+                            formComponent.getItem(3).setValidationMessageArray(validationMessageArray);
+                        } else {
+                            logger.debug("GRANTED");
+                            UserService userService = new UserService();
+                            User user = userService.getUser(login);
+                            if (user == null)
+                                throw new ActionException("exception.action.login.user-login");
+                            req.getSession().setAttribute("userId", user.getId());
+                            req.getSession().setAttribute("userName", user.getName());
+                            req.getSession().setAttribute("navbarItemArray", NavigationComponent.getNavbarItemArray(user.getRole()));
+                            if (formComponent.getItem(2).getValue() != null) {
+                                logger.debug("REMEMBER ME");
+                                try {
+                                    String rememberCookieName = CookieManager.getRememberCookieName(req);
+                                    String rememberCookieValue = HashManager.hashString(UUID.randomUUID().toString());
+                                    CookieManager.setRememberCookieValue(req, resp, rememberCookieName, rememberCookieValue);
+                                    Map<String, Object> rememberValueMap = new HashMap<>();
+                                    rememberValueMap.put("userId", user.getId());
+                                    rememberValueMap.put("name", rememberCookieName);
+                                    rememberValueMap.put("value", rememberCookieValue);
+                                    rememberValueMap.put("valid",
+                                            TimestampManager.daysToTimestamp(TimestampManager.getCurrentTimestamp(), 30));
+                                    userService.setRemember(rememberValueMap);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
                             }
-
-
+                            Map<String, String> parameterMap = UrlManager.getRequestParameterMap(req.getQueryString());
+                            String redirect = parameterMap.remove("redirect");
+                            logger.debug("REDIRECT TO {}", redirect);
+                            resp.sendRedirect(UrlManager.getContextUri(req, redirect, parameterMap));
+                            return;
                         }
-                        Map<String, String> parameterMap = UrlManager.getRequestParameterMap(req.getQueryString());
-                        String redirect = parameterMap.remove("redirect");
-                        logger.debug("REDIRECT TO {}", redirect);
-                        resp.sendRedirect(UrlManager.getContextUri(req, redirect, parameterMap));
-                        return;
+                    } else if (req.getParameter(formComponent.getItem(5).getPlaceholder()) != null) {
+                        logger.debug("SUBMIT-REGISTER");
+                        if (loginService.isLoginExists(formComponent.getItem(0).getValue())) {
+                            logger.debug("EMAIL EXISTS ERROR");
+                            String[] validationMessageArray = {"profile.login.email.error-exists-register"};
+                            formComponent.getItem(0).setValidationMessageArray(validationMessageArray);
+                        } else {
+                            req.getSession().setAttribute("activationEmail", formComponent.getItem(0).getValue());
+                            req.getSession().setAttribute("activationCode", loginService.createActivationCode
+                                    (formComponent.getItem(0).getValue(), formComponent.getItem(1).getValue()));
+                            req.getSession().setAttribute("activationRef", UrlManager.getContextUri(req, "/profile/activate"));
+                            resp.sendRedirect(UrlManager.getContextUri(req, "/home"));
+                            return;
+                        }
                     }
                 }
             }

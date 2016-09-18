@@ -11,12 +11,12 @@
                     <tags:validation validationMessageArray="${item.validationMessageArray}"/>
                     <c:choose>
                         <c:when test="${item.type.equals('submit')}">
-                            <button type="${item.type}" class="btn btn-default col-xs-12" id="${item.label}">
+                            <button type="${item.type}" class="btn btn-default col-xs-12" name="${item.placeholder}">
                                 <fmt:message bundle="${ui}" key="${item.label}"/>
                             </button>
                         </c:when>
                         <c:when test="${item.type.equals('button')}">
-                            <a href="${item.placeholder}" role="${item.type}" class="btn btn-default col-xs-12" id="${item.label}">
+                            <a href="${item.placeholder}" role="${item.type}" class="btn btn-default col-xs-12" name="${item.placeholder}">
                                 <fmt:message bundle="${ui}" key="${item.label}"/>
                             </a>
                         </c:when>
@@ -40,8 +40,8 @@
                         <input id="${item.label}" onchange="uploadToServer(this)" type="file" name="${item.placeholder}"/>
                         <div id="${item.label}-label"><fmt:message bundle="${ui}" key="message.browse-file"/></div>
                         <input id="${item.label}-hidden" name="${item.label}" hidden/>
-                        <tags:validation validationMessageArray="${item.validationMessageArray}"/>
                     </label>
+                    <tags:validation validationMessageArray="${item.validationMessageArray}"/>
                 </div>
             </c:when>
             <c:when test="${item.type.equals('image')}">
@@ -55,8 +55,8 @@
                         </div>
                         <div id="${item.label}-label"><fmt:message bundle="${ui}" key="message.browse-file"/></div>
                         <input id="${item.label}-hidden" name="${item.label}" hidden/>
-                        <tags:validation validationMessageArray="${item.validationMessageArray}"/>
                     </label>
+                    <tags:validation validationMessageArray="${item.validationMessageArray}"/>
                 </div>
             </c:when>
             <c:otherwise>

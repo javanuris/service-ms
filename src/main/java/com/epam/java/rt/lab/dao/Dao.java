@@ -31,4 +31,6 @@ public interface Dao {
     <T> int setRelEntity(T entity, String relEntityName, Object relEntity) throws DaoException;
 
     <T> int removeRelEntity(T entity, String relEntityName) throws DaoException;
+
+    <T> int create(T entity) throws DaoException;
 }

@@ -6,17 +6,23 @@ import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.entity.rbac.User;
 import com.epam.java.rt.lab.service.UserService;
 import com.epam.java.rt.lab.util.CookieManager;
+import com.epam.java.rt.lab.util.HashManager;
+import com.epam.java.rt.lab.util.TimestampManager;
 import com.epam.java.rt.lab.util.UrlManager;
+import org.joda.time.DateTime;
+import org.joda.time.ReadableInstant;
+import org.joda.time.Seconds;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Service Management System
@@ -34,21 +40,39 @@ public class RbacFilter implements Filter {
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)
             throws IOException, ServletException {
         logger.debug("RbacFilter");
-        UserService userService = null;
-        try {
+        try (UserService userService = new UserService();) {
             HttpServletRequest req = (HttpServletRequest) servletRequest;
             Long userId = (Long) req.getSession().getAttribute("userId");
-            userService = new UserService();
+            User user = null;
             if (userId == null) {
                 logger.debug("TRYING TO GET USER FROM COOKIE");
-                Cookie rememberUserCookie = CookieManager.getCookie(req, UserService.getRememberCookieName());
-                if (rememberUserCookie != null) userId = UserService.getRememberUserId(rememberUserCookie.getValue());
-                if (userId != null) {
-                    req.getSession().setAttribute("userId", userId);
-                    User user = userService.getUser(userId);
-                    req.getSession().setAttribute("userName", user.getName());
-                    req.getSession().setAttribute("navbarItemArray", NavigationComponent.getNavbarItemArray(user.getRole()));
-                    logger.debug("USER FROM COOKIE ({})", user);
+                String rememberCookieName = CookieManager.getRememberCookieName(req);
+                String rememberCookieValue = CookieManager.getRememberCookieValue(req, rememberCookieName);
+                if (rememberCookieValue != null) {
+                    Map<String, Object> rememberValueMap = userService.getRemember(rememberCookieName);
+                    if (rememberValueMap != null && rememberCookieValue.equals(rememberValueMap.get("value")) &&
+                            TimestampManager.secondsBetweenTimestamps(TimestampManager.getCurrentTimestamp(),
+                                    (Timestamp) rememberValueMap.get("valid")) > 0) {
+                        userService.setRemember(rememberValueMap);
+                        userId = (Long) rememberValueMap.get("userId");
+                        user = userService.getUser(userId);
+                        req.getSession().setAttribute("userId", userId);
+                        req.getSession().setAttribute("userName", user.getName());
+                        req.getSession().setAttribute("navbarItemArray", NavigationComponent.getNavbarItemArray(user.getRole()));
+                        try {
+                            rememberCookieValue = HashManager.hashString(UUID.randomUUID().toString());
+                            rememberValueMap.put("value", rememberCookieValue);
+                            userService.setRemember(rememberValueMap);
+                            CookieManager.setRememberCookieValue(req, (HttpServletResponse) servletResponse,
+                                    rememberCookieName, rememberCookieValue);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        CookieManager.removeRememberCookieValue
+                                (req, (HttpServletResponse) servletResponse, rememberCookieName);
+                        if (rememberValueMap != null) userService.removeRemember((Long) rememberValueMap.get("userId"));
+                    }
                 }
             }
             if (userId == null) {
@@ -70,7 +94,7 @@ public class RbacFilter implements Filter {
                     throw new ServletException("exception.servlet.rbac.get-anonymous", e.getCause());
                 }
             } else {
-                User user = userService.getUser(userId);
+                if (user == null) user = userService.getUser(userId);
                 if (user.getRole().getUriList().contains(req.getPathInfo())) {
                     filterChain.doFilter(servletRequest, servletResponse);
                 } else {
@@ -81,15 +105,9 @@ public class RbacFilter implements Filter {
                     }
                 }
             }
-        } catch (DaoException| ConnectionException e) {
+        } catch (ConnectionException | DaoException e) {
             e.printStackTrace();
-            throw new ServletException("exception.servlet.rbac.get-user", e.getCause());
-        } finally {
-            try {
-                if (userService != null) userService.close();
-            } catch (DaoException e) {
-                e.printStackTrace();
-            }
+            throw new ServletException("exception.filter.rbac.user-service", e.getCause());
         }
     }
 

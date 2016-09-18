@@ -76,4 +76,8 @@ public class PermissionJdbcDao extends JdbcDao {
         }
     }
 
+    @Override
+    <T> String getEntitySetNames(T entity) {
+        return null;
+    }
 }

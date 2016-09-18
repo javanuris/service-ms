@@ -24,7 +24,7 @@ import java.sql.SQLException;
  * service-ms
  */
 @WebAction
-public class ResetPasswordAction implements Action {
+public class SetPasswordAction implements Action {
     private static final Logger logger = LoggerFactory.getLogger(LoginAction.class);
 
     @Override
@@ -37,11 +37,11 @@ public class ResetPasswordAction implements Action {
                     break;
                 case 0:
                     formComponent = FormComponent.set("profile.reset-password",
-                            new FormComponent.Item("profile.reset-password.password.label", "password", "profile.reset-password.password.label"),
-                            new FormComponent.Item("profile.reset-password.confirm.label", "password", "profile.reset-password.confirm.label"),
-                            new FormComponent.Item("profile.reset-password.current.label", "password", "profile.reset-password.current.label"),
-                            new FormComponent.Item("profile.reset-password.submit.label", "submit", ""),
-                            new FormComponent.Item("profile.reset-password.view-profile.label", "button",
+                            new FormComponent.Item("profile.set-password.password.label", "password", "profile.set-password.password.label"),
+                            new FormComponent.Item("profile.set-password.confirm.label", "password", "profile.set-password.confirm.label"),
+                            new FormComponent.Item("profile.set-password.current.label", "password", "profile.set-password.current.label"),
+                            new FormComponent.Item("profile.set-password.submit.label", "submit", ""),
+                            new FormComponent.Item("profile.set-password.view-profile.label", "button",
                                     UrlManager.getContextUri(req, "/profile/view"))
                     );
                     break;
@@ -74,17 +74,17 @@ public class ResetPasswordAction implements Action {
                             }
                         } else {
                             logger.debug("DENIED");
-                            String[] validationMessageArray = {"profile.reset-password.current.error-incorrect"};
+                            String[] validationMessageArray = {"profile.set-password.current.error-incorrect"};
                             formComponent.getItem(2).setValidationMessageArray(validationMessageArray);
                         }
                     } else {
                         logger.debug("PASSWORD AND CONFIRM NOT EQUAL");
-                        String[] validationMessageArray = {"profile.reset-password.confirm.error-not-equal"};
+                        String[] validationMessageArray = {"profile.set-password.confirm.error-not-equal"};
                         formComponent.getItem(1).setValidationMessageArray(validationMessageArray);
                     }
                 }
             }
-            req.getRequestDispatcher("/WEB-INF/jsp/profile/reset-password.jsp").forward(req, resp);
+            req.getRequestDispatcher("/WEB-INF/jsp/profile/set-password.jsp").forward(req, resp);
         } catch (ConnectionException | DaoException e) {
             e.printStackTrace();
             throw new ActionException("exception.action.reset-password.login-service", e.getCause());

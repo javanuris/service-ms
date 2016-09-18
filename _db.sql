@@ -10,7 +10,7 @@ create table if not exists "Login" (id identity primary key, email varchar(255) 
 create table if not exists "Avatar" (id identity primary key, name varchar(255), type varchar(255), file blob);
 create table if not exists "User" (id identity primary key, first_name varchar(255), middle_name varchar(255), last_name varchar(255), login_id bigint references "Login" (id), role_id bigint references "Role" (id), avatar_id bigint references "Avatar" (id));
 create table if not exists "Remember" (id identity primary key, user_id bigint unique, name varchar(255), value varchar(255), valid datetime);
-create table if not exists "Activation" (id identity primary key, email varchar(255) unique, code varchar(255), create datetime);
+create table if not exists "Activation" (id identity primary key, email varchar(255) unique, password varchar(255), code varchar(255), valid datetime);
 
 
 //init data
@@ -19,9 +19,9 @@ insert into "Permission" (uri) values ('/');
 insert into "Permission" (uri) values ('/home');
 insert into "Permission" (uri) values ('/develop');
 insert into "Permission" (uri) values ('/profile/login');
-insert into "Permission" (uri) values ('/profile/register');
+insert into "Permission" (uri) values ('/profile/activate');
 insert into "Permission" (uri) values ('/profile/view');
-insert into "Permission" (uri) values ('/profile/reset-password');
+insert into "Permission" (uri) values ('/profile/set-password');
 insert into "Permission" (uri) values ('/profile/edit');
 insert into "Permission" (uri) values ('/profile/logout');
 insert into "Permission" (uri) values ('/rbac/user/list');
@@ -39,12 +39,12 @@ delete from "RolePermission";
 insert into "RolePermission" (role_id, permission_id) values (select id from "Role" where name is 'anonymous', select id from "Permission" where uri is '/');
 insert into "RolePermission" (role_id, permission_id) values (select id from "Role" where name is 'anonymous', select id from "Permission" where uri is '/home');
 insert into "RolePermission" (role_id, permission_id) values (select id from "Role" where name is 'anonymous', select id from "Permission" where uri is '/profile/login');
-insert into "RolePermission" (role_id, permission_id) values (select id from "Role" where name is 'anonymous', select id from "Permission" where uri is '/profile/register');
+insert into "RolePermission" (role_id, permission_id) values (select id from "Role" where name is 'anonymous', select id from "Permission" where uri is '/profile/activate');
 insert into "RolePermission" (role_id, permission_id) values (select id from "Role" where name is 'admin', select id from "Permission" where uri is '/');
 insert into "RolePermission" (role_id, permission_id) values (select id from "Role" where name is 'admin', select id from "Permission" where uri is '/home');
 insert into "RolePermission" (role_id, permission_id) values (select id from "Role" where name is 'admin', select id from "Permission" where uri is '/develop');
 insert into "RolePermission" (role_id, permission_id) values (select id from "Role" where name is 'admin', select id from "Permission" where uri is '/profile/view');
-insert into "RolePermission" (role_id, permission_id) values (select id from "Role" where name is 'admin', select id from "Permission" where uri is '/profile/reset-password');
+insert into "RolePermission" (role_id, permission_id) values (select id from "Role" where name is 'admin', select id from "Permission" where uri is '/profile/set-password');
 insert into "RolePermission" (role_id, permission_id) values (select id from "Role" where name is 'admin', select id from "Permission" where uri is '/profile/edit');
 insert into "RolePermission" (role_id, permission_id) values (select id from "Role" where name is 'admin', select id from "Permission" where uri is '/profile/logout');
 insert into "RolePermission" (role_id, permission_id) values (select id from "Role" where name is 'admin', select id from "Permission" where uri is '/rbac/user/list');

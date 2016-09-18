@@ -154,4 +154,9 @@ public class RoleJdbcDao extends JdbcDao {
             throw new DaoException("exception.dao.rel-update.result-set", e.getCause());
         }
     }
+
+    @Override
+    <T> String getEntitySetNames(T entity) {
+        return null;
+    }
 }

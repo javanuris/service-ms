@@ -132,8 +132,9 @@ public class UserJdbcDao extends JdbcDao {
                 return removeRemember(entity);
             case "Avatar":
                 return removeAvatar(entity);
+            default:
+                return 0;
         }
-        return 0;
     }
 
     private Map<String, Object> getRemember(String rememberName) throws DaoException {
@@ -157,7 +158,7 @@ public class UserJdbcDao extends JdbcDao {
         }
     }
 
-    private <T> int setRemember(Object relEntity) throws DaoException {
+    private int setRemember(Object relEntity) throws DaoException {
         Map<String, Object> rememberValueMap = (Map<String, Object>) relEntity;
         List<Column> columnList = new ArrayList<>();
         columnList.add(new Column("user_id", rememberValueMap.get("userId")));
@@ -166,7 +167,7 @@ public class UserJdbcDao extends JdbcDao {
         try (PreparedStatement preparedStatement = getConnection().prepareStatement(sqlString);
              ResultSet resultSet = setPreparedStatementValues(preparedStatement, columnList).executeQuery();) {
             if (resultSet != null && resultSet.first())
-                rememberValueMap.put("id", resultSet.getString("id"));
+                rememberValueMap.put("id", resultSet.getLong("id"));
         } catch (SQLException e) {
             e.printStackTrace();
             throw new DaoException("exception.dao.set-remember.sql-select", e.getCause());
@@ -308,5 +309,10 @@ public class UserJdbcDao extends JdbcDao {
             e.printStackTrace();
             throw new DaoException("exception.dao.remove-avatar.sql-update", e.getCause());
         }
+    }
+
+    @Override
+    <T> String getEntitySetNames(T entity) {
+        return null;
     }
 }
