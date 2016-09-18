@@ -90,7 +90,7 @@ public abstract class JdbcDao implements Dao {
                 query.setSql(queryString == null ? query.create() : queryString);
                 break;
             case READ:
-                query = new Select(getEntityTableName(), columnNames, null, null);
+                query = new Select(getEntityTableName(), columnNames, offset, count, order);
                 fitQueryToEntity(query, entity, setNames, fieldNames);
                 query.setSql(queryString == null ? query.create() : queryString);
                 break;
@@ -102,7 +102,7 @@ public abstract class JdbcDao implements Dao {
             case DELETE:
                 break;
             case COUNT:
-                query = new Select(getEntityTableName(), columnNames, offset, count);
+                query = new Select(getEntityTableName(), columnNames, null, null, null);
                 query.setSql(queryString == null ? query.createCount() : queryString);
                 break;
         }
@@ -154,7 +154,7 @@ public abstract class JdbcDao implements Dao {
                 entityClass = entityClass.getSuperclass();
             }
         }
-        throw new NoSuchFieldException("exception.dao.query.reflect.get-field");
+        throw new NoSuchFieldException("exception.dao.query.reflect.get-field: " + fieldName);
     }
 
     <T> T fieldValue(Field field, Object entity) throws IllegalAccessException {
@@ -240,7 +240,7 @@ public abstract class JdbcDao implements Dao {
 
     @Override
     public <T> T getFirst(T entity, String fieldNames, String columnNames, String order) throws DaoException {
-        Query query = getCachedQuery(CRUD.READ, entity, fieldNames, columnNames, null, order, 0L, 1L);
+        Query query = getCachedQuery(CRUD.READ, entity, fieldNames, columnNames, null, order, null, null);
         try (PreparedStatement preparedStatement = getConnection().prepareStatement(query.getSql());
              ResultSet resultSet = setPreparedStatementValues(preparedStatement, query).executeQuery();) {
             if (resultSet == null || !resultSet.first()) return null;
@@ -268,7 +268,7 @@ public abstract class JdbcDao implements Dao {
 
     @Override
     public <T> List<T> getAll(T entity, String fieldNames, String columnNames, String order, Long offset, Long count) throws DaoException {
-        Query query = getCachedQuery(CRUD.READ, entity, fieldNames, columnNames, null, order, 0L, 1L);
+        Query query = getCachedQuery(CRUD.READ, entity, fieldNames, columnNames, null, order, offset, count);
         if (offset != null && count != null) {
             try (PreparedStatement countStatement = getConnection().prepareStatement(query.createCount());
                  ResultSet resultSet = countStatement.executeQuery();) {

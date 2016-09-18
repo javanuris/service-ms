@@ -45,7 +45,7 @@ public class LoginAction implements Action {
                             new FormComponent.Item("profile.login.remember.label", "checkbox", "profile.login.remember.label"),
                             new FormComponent.Item("profile.login.submit-login.label", "submit", "submit-login"),
                             new FormComponent.Item("profile.login.reset-password.label", "button",
-                                    UrlManager.getContextUri(req, "/profile/forget-password")),
+                                    UrlManager.getContextUri(req, "/profile/reset-password")),
                             new FormComponent.Item("profile.login.submit-register.label", "submit", "submit-register")
                     );
                     break;

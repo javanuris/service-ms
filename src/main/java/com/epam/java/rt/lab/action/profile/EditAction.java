@@ -57,7 +57,11 @@ public class EditAction implements Action {
                 formComponent.getItem(0).setValue(user.getFirstName());
                 formComponent.getItem(1).setValue(user.getMiddleName());
                 formComponent.getItem(2).setValue(user.getLastName());
-                formComponent.getItem(3).setValue(UrlManager.getContextRef(req, "/file/download/avatar", "id", user.getAvatarId()));
+                if (user.getAvatarId() == null) {
+                    formComponent.getItem(3).setValue(UrlManager.getContextUri(req, "/file/download/avatar"));
+                } else {
+                    formComponent.getItem(3).setValue(UrlManager.getContextRef(req, "/file/download/avatar", "id", user.getAvatarId()));
+                }
                 String subAction = req.getParameter("sub-action");
                 if (subAction != null) {
                     switch (subAction) {

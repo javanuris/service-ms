@@ -34,16 +34,10 @@ public class ListAction implements Action {
         UserService userService = null;
         try {
             logger.debug("/WEB-INF/jsp/rbac/user/list.jsp");
-//            String id = UrlManager.getUrlParameter(req, "id", null);
-//            if (id != null && FormManager.isOnlyDigits(id)) {
-//                req.getSession().removeAttribute("userList");
-//                resp.sendRedirect(UrlManager.getContextUri(req, "/rbac/user/view"));
-//                return;
-//            }
             req.setAttribute("navItemArray", NavigationComponent.getNavItemArray("nav.rbac"));
             ListComponent listComponent = new ListComponent();
             userService = new UserService();
-            String page = UrlManager.getUrlParameterFromAttribute(req, "page", "1");
+            String page = req.getParameter("page");
             Long pageIndex = 1L;
             if (FormManager.isOnlyDigits(page)) pageIndex = Long.valueOf(page);
             PageComponent pageComponent = new PageComponent(pageIndex, ListComponent.MAX_LIST_ITEM_ON_PAGE);

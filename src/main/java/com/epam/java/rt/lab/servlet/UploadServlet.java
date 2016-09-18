@@ -32,7 +32,7 @@ public class UploadServlet extends HttpServlet {
         while (names.hasMoreElements()) {
             String key = (String) names.nextElement();
             List<String> types = new ArrayList<>();
-            for (String type : properties.getProperty(key).split(",")) types.add(type);
+            for (String type : properties.getProperty(key).replaceAll(" ", "").split(",")) types.add(type);
             contentTypeListMap.put(key, types);
         }
     }

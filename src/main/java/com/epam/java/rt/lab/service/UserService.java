@@ -30,7 +30,7 @@ public class UserService extends BaseService {
         User user = new User();
         user.setLogin(login);
         Dao dao = daoFactory.createDao("User");
-        user = dao.getFirst(user, "login", "");
+        user = dao.getFirst(user, "login", "first_name ASC");
         return user;
     }
 
@@ -38,12 +38,17 @@ public class UserService extends BaseService {
         User user = new User();
         user.setId(id);
         Dao dao = daoFactory.createDao("User");
-        user = dao.getFirst(user, "id", "");
+        user = dao.getFirst(user, "id", "first_name ASC");
         return user;
     }
 
     public User getAnonymous() throws DaoException {
         return getUser(new Login());
+    }
+
+    public int addUser(User user) throws DaoException {
+        Dao dao = daoFactory.createDao("User");
+        return dao.create(user);
     }
 
     private <T> Map<String, Object> getRelEntity(T entity, String relEntityName) throws DaoException {
@@ -84,7 +89,7 @@ public class UserService extends BaseService {
 
     public List<User> getUserList(PageComponent pageComponent) throws DaoException {
         Dao dao = daoFactory.createDao("User");
-        List<User> userList = dao.getAll(null, null, null, "",
+        List<User> userList = dao.getAll(null, null, null, "first_name ASC",
                 (pageComponent.getCurrentPage() - 1) * pageComponent.getItemsOnPage(), pageComponent.getItemsOnPage());
         pageComponent.setCountPages((long) Math.ceil((dao.getSelectCount() * 1.0) / pageComponent.getItemsOnPage()));
         return userList;

@@ -18,17 +18,25 @@ public class RoleService extends BaseService {
     public RoleService() throws ConnectionException, DaoException {
     }
 
-    Role getRole(Long id) throws DaoException {
+    public Role getRole(Long id) throws DaoException {
         Role role = new Role();
         role.setId(id);
         Dao dao = daoFactory.createDao("Role");
-        role = dao.getFirst(role, "id", "");
+        role = dao.getFirst(role, "id", "name ASC");
+        return role;
+    }
+
+    public Role getRoleAuthorized() throws DaoException {
+        Role role = new Role();
+        role.setName("authorized");
+        Dao dao = daoFactory.createDao("Role");
+        role = dao.getFirst(role, "name", "name ASC");
         return role;
     }
 
     public List<Role> getRoleList() throws DaoException {
         Dao dao = daoFactory.createDao("Role");
-        List<Role> roleList = dao.getAll("");
+        List<Role> roleList = dao.getAll("name ASC");
         return roleList;
     }
 

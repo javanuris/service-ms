@@ -64,9 +64,11 @@ public class UserJdbcDao extends JdbcDao {
                 case "lastName":
                     return new Set("last_name", fieldValue(field, entity));
                 case "role":
-                    return new Set("role_id", ((Role) fieldValue(field, entity)).getId());
+                    Role role = (Role) fieldValue(field, entity);
+                    return role == null ? new Set("role_id", null) : new Set("role_id", role.getId());
                 case "login":
-                    return new Set("login_id", ((Login) fieldValue(field, entity)).getId());
+                    Login login = (Login) fieldValue(field, entity);
+                    return login == null ? new Set("login_id", null) : new Set("login_id", login.getId());
                 case "avatarId":
                     return new Set("avatar_id", fieldValue(field, entity));
                 default:
@@ -313,6 +315,7 @@ public class UserJdbcDao extends JdbcDao {
 
     @Override
     <T> String getEntitySetNames(T entity) {
-        return null;
+        return "firstName, middleName, lastName, role, login, avatarId";
     }
+
 }

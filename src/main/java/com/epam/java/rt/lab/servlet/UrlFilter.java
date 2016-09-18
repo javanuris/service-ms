@@ -27,6 +27,7 @@ public class UrlFilter implements Filter {
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)
             throws IOException, ServletException {
         servletRequest.setAttribute("debugMode", true);
+        servletRequest.setCharacterEncoding("UTF-8");
         logger.debug("UriFilter:");
         HttpServletRequest req = (HttpServletRequest) servletRequest;
         String requestURI = req.getRequestURI().substring((req).getContextPath().length()).toLowerCase();

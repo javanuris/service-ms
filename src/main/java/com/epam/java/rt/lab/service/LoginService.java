@@ -26,7 +26,7 @@ public class LoginService extends BaseService {
         login.setEmail(email);
         login.setPassword(password);
         Dao dao = daoFactory.createDao("Login");
-        login = dao.getFirst(login, "email, password", null);
+        login = dao.getFirst(login, "email, password", "email ASC");
         return login;
     }
 
@@ -70,18 +70,6 @@ public class LoginService extends BaseService {
         dao.removeRelEntity(entity, relEntityName);
     }
 
-//    public Map<String, Object> getRemember(String rememberName) throws DaoException {
-//        return getRelEntity(rememberName, "Remember");
-//    }
-//
-//    public void setRemember(Map<String, Object> rememberValueMap) throws DaoException {
-//        setRelEntity(null, "Remember", rememberValueMap);
-//    }
-//
-//    public void removeRemember(Long userId) throws DaoException {
-//        removeRelEntity(userId, "Remember");
-//    }
-//
     public String createActivationCode(String email, String password) throws DaoException {
         try {
             String activationCode = HashManager.hashString(email.concat(password));

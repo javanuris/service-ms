@@ -1,7 +1,8 @@
+<%@tag pageEncoding="UTF-8" %>
+<%@attribute name="navbarCurrent" type="java.lang.String" %>
+<%@ taglib prefix="tags" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<%@attribute name="navbarCurrent" type="java.lang.String" %>
-<%@tag pageEncoding="UTF-8" %>
 <nav class="navbar navbar-default navbar-fixed-top navbar-inverse" style="background-color: RGBA(75, 75, 75, 25);">
     <div class="container-fluid">
         <div class="navbar-header">
@@ -28,33 +29,29 @@
                 </ul>
             </c:if>
             <ul class="nav navbar-nav navbar-right">
-                <c:if test="${sessionScope.userId != null}">
-                    <c:choose>
-                        <c:when test="${navbarCurrent.equals('/profile/view')}">
-                            <li class="active"><a href="#">${sessionScope.userName}</a></li>
-                        </c:when>
-                        <c:otherwise>
-                            <li><a href="${pageContext.request.contextPath}/profile/view">${sessionScope.userName}</a></li>
-                        </c:otherwise>
-                    </c:choose>
-                    <li><a href="${pageContext.request.contextPath}/profile/logout">
-                        <span class="glyphicon glyphicon-log-out" aria-hidden="true"></span>
-                    </a></li>
-                </c:if>
-                <c:if test="${sessionScope.userId == null}">
-                    <c:choose>
-                        <c:when test="${navbarCurrent.equals('/profile/login')}">
-                            <li><a href="#">
-                                <span class="glyphicon glyphicon-log-in" aria-hidden="true"></span>
-                            </a></li>
-                        </c:when>
-                        <c:otherwise>
-                            <li><a href="${pageContext.request.contextPath}/profile/login">
-                                <span class="glyphicon glyphicon-log-in" aria-hidden="true"></span>
-                            </a></li>
-                        </c:otherwise>
-                    </c:choose>
-                </c:if>
+                <c:choose>
+                    <c:when test="${not empty sessionScope.userId}">
+                        <c:choose>
+                            <c:when test="${navbarCurrent.equals('/profile/view')}">
+                                <c:set var="usernameActive" value="active"/>
+                                <c:set var="usernameHref" value="#"/>
+                            </c:when>
+                            <c:otherwise>
+                                <c:set var="usernameActive" value=""/>
+                                <c:set var="usernameHref" value="${pageContext.request.contextPath}/profile/view"/>
+                            </c:otherwise>
+                        </c:choose>
+                        <tags:username active="${usernameActive}" href="${usernameHref}"/>
+                        <li><a href="${pageContext.request.contextPath}/profile/logout">
+                            <span class="glyphicon glyphicon-log-out" aria-hidden="true"></span>
+                        </a></li>
+                    </c:when>
+                    <c:otherwise>
+                        <li><a href="${pageContext.request.contextPath}/profile/login">
+                            <span class="glyphicon glyphicon-log-in" aria-hidden="true"></span>
+                        </a></li>
+                    </c:otherwise>
+                </c:choose>
             </ul>
         </div>
     </div>

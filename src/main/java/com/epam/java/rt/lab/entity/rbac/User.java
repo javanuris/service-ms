@@ -86,7 +86,7 @@ public class User extends BaseEntity {
         if (firstName != null) name = name.concat(" ").concat(firstName);
         if (middleName != null) name = name.concat(" ").concat(middleName);
         if (lastName != null) name = name.concat(" ").concat(lastName);
-        return name.substring(1);
+        return name.trim();
     }
 
 }
