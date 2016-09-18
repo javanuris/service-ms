@@ -26,8 +26,8 @@
                     <h4><fmt:message bundle="${ui}" key="${sessionScope.message}"/></h4>
                 </c:when>
                 <c:otherwise>
-                    <h1><fmt:message bundle="${ui}" key="title.home"/></h1>
-                    <h2><fmt:message bundle="${ui}" key="message.footer"/></h2>
+                    <h2><fmt:message bundle="${ui}" key="title.home"/></h2>
+                    <h3><fmt:message bundle="${ui}" key="message.footer"/></h3>
                 </c:otherwise>
             </c:choose>
         </div>

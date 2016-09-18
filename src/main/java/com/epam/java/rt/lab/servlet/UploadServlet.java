@@ -60,6 +60,7 @@ public class UploadServlet extends HttpServlet {
                     String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
                     File outputFile = File.createTempFile(fileName.concat(prefix), postfix);
                     Files.copy(inputStream, outputFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                    inputStream.close();
                     logger.debug("UPLOAD COMPLETE");
                     resp.getWriter().print("filePath=".concat(outputFile.getAbsolutePath()));
                     return;

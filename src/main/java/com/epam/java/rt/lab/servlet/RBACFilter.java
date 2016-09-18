@@ -5,13 +5,7 @@ import com.epam.java.rt.lab.connection.ConnectionException;
 import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.entity.rbac.User;
 import com.epam.java.rt.lab.service.UserService;
-import com.epam.java.rt.lab.util.CookieManager;
-import com.epam.java.rt.lab.util.HashManager;
-import com.epam.java.rt.lab.util.TimestampManager;
-import com.epam.java.rt.lab.util.UrlManager;
-import org.joda.time.DateTime;
-import org.joda.time.ReadableInstant;
-import org.joda.time.Seconds;
+import com.epam.java.rt.lab.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,8 +40,8 @@ public class RbacFilter implements Filter {
             User user = null;
             if (userId == null) {
                 logger.debug("TRYING TO GET USER FROM COOKIE");
-                String rememberCookieName = CookieManager.getRememberCookieName(req);
-                String rememberCookieValue = CookieManager.getRememberCookieValue(req, rememberCookieName);
+                String rememberCookieName = CookieManager.getDependantCookieName(req);
+                String rememberCookieValue = CookieManager.getDependantCookieValue(req, rememberCookieName);
                 if (rememberCookieValue != null) {
                     Map<String, Object> rememberValueMap = userService.getRemember(rememberCookieName);
                     if (rememberValueMap != null && rememberCookieValue.equals(rememberValueMap.get("value")) &&
@@ -63,13 +57,14 @@ public class RbacFilter implements Filter {
                             rememberCookieValue = HashManager.hashString(UUID.randomUUID().toString());
                             rememberValueMap.put("value", rememberCookieValue);
                             userService.setRemember(rememberValueMap);
-                            CookieManager.setRememberCookieValue(req, (HttpServletResponse) servletResponse,
-                                    rememberCookieName, rememberCookieValue);
+                            CookieManager.setDependantCookieValue(req, (HttpServletResponse) servletResponse,
+                                    rememberCookieName, rememberCookieValue,
+                                    Integer.valueOf(GlobalManager.getProperty("remember.days.valid")) * 86400);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
                     } else {
-                        CookieManager.removeRememberCookieValue
+                        CookieManager.removeDependantCookieValue
                                 (req, (HttpServletResponse) servletResponse, rememberCookieName);
                         if (rememberValueMap != null) userService.removeRemember((Long) rememberValueMap.get("userId"));
                     }

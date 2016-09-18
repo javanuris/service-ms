@@ -4,6 +4,7 @@ import com.epam.java.rt.lab.connection.ConnectionException;
 import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.service.UserService;
 import com.epam.java.rt.lab.util.FormManager;
+import org.h2.util.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,13 +53,9 @@ public class DownloadServlet extends HttpServlet {
                 }
                 if (inputStream != null) {
                     logger.debug("READY TO DOWNLOAD");
-                    BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream, 4096);
-                    BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(resp.getOutputStream(), 4096);
-                    byte[] buffer = new byte[4096];
-                    int length;
-                    while ((length = bufferedInputStream.read(buffer)) > 0) {
-                        bufferedOutputStream.write(buffer, 0, length);
-                    }
+                    IOUtils.copy(inputStream, resp.getOutputStream());
+                    inputStream.close();
+                    resp.getOutputStream().close();
                     logger.debug("DOWNLOAD COMPLETE");
                 }
             }
