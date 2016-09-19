@@ -31,7 +31,7 @@ public class CookieManager {
         String ip = req.getHeader("X-FORWARDED-FOR");
         if (ip == null) ip = req.getRemoteAddr();
         try {
-            return HashManager.hashString(ip.concat(req.getHeader("User-Agent")).concat(ip));
+            return HashGenerator.hashString(ip.concat(req.getHeader("User-Agent")).concat(ip));
         } catch (Exception e) {
             e.printStackTrace();
         }

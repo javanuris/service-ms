@@ -81,7 +81,7 @@ public class EditAction implements Action {
                 }
             } else if ("POST".equals(req.getMethod())) {
                 logger.debug("POST");
-                if (FormManager.setValuesAndValidate(req, formComponent)) {
+                if (FormManager.validate(req, formComponent)) {
                     logger.debug("FORM VALID");
                     user.setFirstName(formComponent.getItem(0).getValue());
                     user.setMiddleName(formComponent.getItem(1).getValue());

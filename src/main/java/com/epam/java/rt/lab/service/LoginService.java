@@ -4,13 +4,12 @@ import com.epam.java.rt.lab.connection.ConnectionException;
 import com.epam.java.rt.lab.dao.Dao;
 import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.entity.rbac.Login;
-import com.epam.java.rt.lab.util.GlobalManager;
-import com.epam.java.rt.lab.util.HashManager;
-import com.epam.java.rt.lab.util.TimestampManager;
+import com.epam.java.rt.lab.util.GlobalProperties;
+import com.epam.java.rt.lab.util.HashGenerator;
+import com.epam.java.rt.lab.util.TimestampCompare;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Map;
@@ -80,7 +79,7 @@ public class LoginService extends BaseService {
 
     public String createActivationCode(String email, String password) throws DaoException {
         try {
-            String activationCode = HashManager.hashString(email.concat(password));
+            String activationCode = HashGenerator.hashString(email.concat(password));
             Login login = new Login();
             login.setEmail(email);
             login.setPassword(password);
@@ -102,10 +101,10 @@ public class LoginService extends BaseService {
         Map<String, Object> activationMap = getRelEntity(login, "Activation");
         removeRelEntity(login, "Activation");
         if (activationMap == null || !activationCode.equals(activationMap.get("code")) ||
-                TimestampManager.secondsBetweenTimestamps(TimestampManager.getCurrentTimestamp(),
+                TimestampCompare.secondsBetweenTimestamps(TimestampCompare.getCurrentTimestamp(),
                 (Timestamp) activationMap.get("valid")) <= 0) return null;
         login.setPassword((String) activationMap.get("password"));
-        login.setAttemptLeft(Integer.valueOf(GlobalManager.getProperty("login.attempt.max")));
+        login.setAttemptLeft(Integer.valueOf(GlobalProperties.getProperty("login.attempt.max")));
         login.setStatus(0);
         return login;
     }
@@ -129,7 +128,7 @@ public class LoginService extends BaseService {
         login.setEmail(forgotEmail);
         Map<String, Object> forgotMap = getRelEntity(login, "Forgot");
         if (forgotMap == null || !forgotCode.equals(forgotMap.get("code")) ||
-                TimestampManager.secondsBetweenTimestamps(TimestampManager.getCurrentTimestamp(),
+                TimestampCompare.secondsBetweenTimestamps(TimestampCompare.getCurrentTimestamp(),
                         (Timestamp) forgotMap.get("valid")) <= 0) return null;
         return getLogin(forgotEmail);
     }

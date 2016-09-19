@@ -1,13 +1,11 @@
 package com.epam.java.rt.lab.dao.h2;
 
-import com.epam.java.rt.lab.dao.Dao;
 import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.dao.query.Column;
 import com.epam.java.rt.lab.dao.query.Set;
 import com.epam.java.rt.lab.entity.rbac.Login;
-import com.epam.java.rt.lab.entity.rbac.User;
-import com.epam.java.rt.lab.util.GlobalManager;
-import com.epam.java.rt.lab.util.TimestampManager;
+import com.epam.java.rt.lab.util.GlobalProperties;
+import com.epam.java.rt.lab.util.TimestampCompare;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -167,8 +165,8 @@ public class LoginJdbcDao extends JdbcDao {
         setList.add(new Set("email", login.getEmail()));
         setList.add(new Set("password", login.getPassword()));
         setList.add(new Set("code", activationCode));
-        setList.add(new Set("valid", TimestampManager.daysToTimestamp(TimestampManager.getCurrentTimestamp(),
-                Integer.valueOf(GlobalManager.getProperty("activation.days.valid")))));
+        setList.add(new Set("valid", TimestampCompare.daysToTimestamp(TimestampCompare.getCurrentTimestamp(),
+                Integer.valueOf(GlobalProperties.getProperty("activation.days.valid")))));
         if (id == null) {
             logger.debug("INSERT ACTIVATION");
             sqlString = "INSERT INTO \"Activation\" (email, password, code, valid) VALUES (?, ?, ?, ?)";
@@ -246,8 +244,8 @@ public class LoginJdbcDao extends JdbcDao {
         List<Set> setList = new ArrayList<>();
         setList.add(new Set("email", login.getEmail()));
         setList.add(new Set("code", forgotCode));
-        setList.add(new Set("valid", TimestampManager.daysToTimestamp(TimestampManager.getCurrentTimestamp(),
-                Integer.valueOf(GlobalManager.getProperty("forgot.seconds.valid")))));
+        setList.add(new Set("valid", TimestampCompare.daysToTimestamp(TimestampCompare.getCurrentTimestamp(),
+                Integer.valueOf(GlobalProperties.getProperty("forgot.seconds.valid")))));
         if (id == null) {
             logger.debug("INSERT FORGOT");
             sqlString = "INSERT INTO \"Forgot\" (email, code, valid) VALUES (?, ?, ?)";

@@ -5,7 +5,7 @@ import java.security.MessageDigest;
 /**
  * service-ms
  */
-public class HashManager {
+public class HashGenerator {
 
     public static String hashString(String sourceString) throws Exception {
         MessageDigest md = MessageDigest.getInstance("SHA-256");
@@ -21,7 +21,7 @@ public class HashManager {
     }
 
     public static boolean compareHashToSource(String hashString, String sourceString) throws Exception {
-        String hashSourceString = HashManager.hashString(sourceString);
+        String hashSourceString = HashGenerator.hashString(sourceString);
         return hashString.equals(hashSourceString);
     }
 

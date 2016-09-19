@@ -8,17 +8,17 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * service-ms
  */
-public class GlobalManager {
+public class GlobalProperties {
     private static Properties globalProperties = new Properties();
     private static Lock propertiesLock = new ReentrantLock();
 
-    private GlobalManager() {
+    private GlobalProperties() {
     }
 
     public static void init() {
         if (propertiesLock.tryLock()) {
             try {
-                globalProperties.load(GlobalManager.class.getClassLoader().getResourceAsStream("global.properties"));
+                globalProperties.load(GlobalProperties.class.getClassLoader().getResourceAsStream("global.properties"));
             } catch (IOException e) {
                 e.printStackTrace();
             }

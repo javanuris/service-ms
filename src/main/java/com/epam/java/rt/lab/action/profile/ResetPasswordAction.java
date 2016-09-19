@@ -54,7 +54,7 @@ public class ResetPasswordAction implements Action {
                 //
             } else if ("POST".equals(req.getMethod())) {
                 logger.debug("POST");
-                if (FormManager.setValuesAndValidate(req, formComponent)) {
+                if (FormManager.validate(req, formComponent)) {
                     logger.debug("FORM VALID");
                     if (formComponent.getItem(0).getValue().equals(formComponent.getItem(1).getValue())) {
                         logger.debug("PASSWORD AND CONFIRM EQUAL");

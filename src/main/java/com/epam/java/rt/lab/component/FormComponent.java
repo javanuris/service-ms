@@ -1,6 +1,9 @@
 package com.epam.java.rt.lab.component;
 
+import com.epam.java.rt.lab.util.FormManager;
+
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -113,25 +116,25 @@ public class FormComponent implements Iterable<FormComponent.Item> {
 
     // immutable definition
     private static class Def {
-        String name;
-        String actionUri;
+        private String name;
+        private String actionUri;
 
-        public Def() {
+        private Def() {
         }
     }
 
     // mutable values
     private static class Val {
-        String actionParameterString = "";
+        private String actionParameterString = "";
 
-        public Val() {
+        private Val() {
         }
     }
 
     // form item
     public static class Item {
-        ItemDef itemDef;
-        ItemVal itemVal;
+        private ItemDef itemDef;
+        private ItemVal itemVal;
 
         public Item(String label, String type, String placeholder) {
             this.itemDef = new ItemDef(label, type, placeholder);
@@ -157,6 +160,10 @@ public class FormComponent implements Iterable<FormComponent.Item> {
             return itemDef.placeholder;
         }
 
+        public ItemDef getValidatorList() {
+            return this.itemDef;
+        }
+
         private ItemVal val() {
             if (this.itemVal == null) this.itemVal = new ItemVal();
             return this.itemVal;
@@ -178,6 +185,14 @@ public class FormComponent implements Iterable<FormComponent.Item> {
             val().value = value;
         }
 
+        public String getGenericValue() {
+            return (String) val().genericValue;
+        }
+
+        public <T> void setGenericValue(T genericValue) {
+            val().genericValue = genericValue;
+        }
+
         public String[] getValidationMessageArray() {
             return val().validationMessageArray;
         }
@@ -188,25 +203,51 @@ public class FormComponent implements Iterable<FormComponent.Item> {
     }
 
     // immutable item definition
-    private static class ItemDef {
-        String label = "";
-        String type = "";
-        String placeholder = "";
+    private static class ItemDef implements Iterable<FormManager.Validator> {
+        private String label = null;
+        private String type = null;
+        private String placeholder = null;
+        private List<FormManager.Validator> validatorList;
 
-        public ItemDef(String label, String type, String placeholder) {
+        private ItemDef(String label, String type, String placeholder, FormManager.Validator... validatorArray) {
             this.label = label;
             this.type = type;
             this.placeholder = placeholder;
+            if (validatorArray.length > 0) {
+                this.validatorList = new ArrayList<>();
+                Collections.addAll(this.validatorList, validatorArray);
+            }
         }
+
+        @Override
+        public Iterator<FormManager.Validator> iterator() {
+            return new Iterator<FormManager.Validator>() {
+                private int index = 0;
+
+                public boolean hasNext() {
+                    return index < validatorList.size();
+                }
+
+                public FormManager.Validator next() {
+                    return validatorList.get(index++);
+                }
+
+                public void remove() {
+                    throw new UnsupportedOperationException();
+                }
+            };
+        }
+
     }
 
     // mutable item values
-    private static class ItemVal {
-        String[] availableValueArray = null;
-        String value = "";
-        String[] validationMessageArray = null;
+    private static class ItemVal<T> {
+        private String[] availableValueArray = null;
+        private String value = null;
+        private T genericValue = null;
+        private String[] validationMessageArray = null;
 
-        public ItemVal() {
+        private ItemVal() {
         }
     }
 }

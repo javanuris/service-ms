@@ -3,9 +3,6 @@ package com.epam.java.rt.lab.dao.h2;
 import com.epam.java.rt.lab.dao.Dao;
 import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.dao.query.*;
-import com.epam.java.rt.lab.dao.query.Set;
-import org.joda.time.DateTime;
-import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,19 +14,24 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.sql.*;
-import java.util.*;
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * service-ms
  */
 public abstract class JdbcDao implements Dao {
     private static final Logger logger = LoggerFactory.getLogger(JdbcDao.class);
-    public enum CRUD {CREATE, READ, UPDATE, DELETE, COUNT};
     private static Map<String, String> cachedQueryMap = new HashMap<>();
     private static Map<Type, Method> preparedStatementMethodMap = new HashMap<>();
     private Connection connection = null;
     private Long selectCount;
+
+    private enum CRUD {
+        CREATE, READ, UPDATE, DELETE, COUNT
+    }
 
     private static void initPreparedStatementMethodMap() throws DaoException {
         try {

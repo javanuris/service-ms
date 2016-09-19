@@ -7,13 +7,9 @@ import com.epam.java.rt.lab.component.FormComponent;
 import com.epam.java.rt.lab.connection.ConnectionException;
 import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.entity.rbac.Login;
-import com.epam.java.rt.lab.entity.rbac.Role;
-import com.epam.java.rt.lab.entity.rbac.User;
 import com.epam.java.rt.lab.service.LoginService;
-import com.epam.java.rt.lab.service.UserService;
 import com.epam.java.rt.lab.util.CookieManager;
 import com.epam.java.rt.lab.util.FormManager;
-import com.epam.java.rt.lab.util.TimestampManager;
 import com.epam.java.rt.lab.util.UrlManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +19,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 
 /**
  * service-ms
@@ -86,7 +81,7 @@ public class ForgotPasswordAction implements Action {
                         "code=".concat(req.getParameter("code"))
                 };
                 formComponent.setActionParameterString(UrlManager.getRequestParameterString(parameterArray));
-                if (FormManager.setValuesAndValidate(req, formComponent)) {
+                if (FormManager.validate(req, formComponent)) {
                     logger.debug("FORM VALID");
                     if (formComponent.getItem(0).getValue().equals(formComponent.getItem(1).getValue())) {
                         logger.debug("PASSWORD AND CONFIRM EQUAL");

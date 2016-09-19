@@ -58,7 +58,7 @@ public class LoginAction implements Action {
                 formComponent.setActionParameterString(UrlManager.getRequestParameterString(req));
             } else if ("POST".equals(req.getMethod())) {
                 logger.debug("POST");
-                if (FormManager.setValuesAndValidate(req, formComponent)) {
+                if (FormManager.validate(req, formComponent)) {
                     logger.debug("FORM VALID");
                     if (req.getParameter(formComponent.getItem(3).getPlaceholder()) != null) {
                         logger.debug("SUBMIT-LOGIN");
@@ -79,7 +79,7 @@ public class LoginAction implements Action {
                             }
                         } else {
                             logger.debug("GRANTED");
-                            login.setAttemptLeft(Integer.valueOf(GlobalManager.getProperty("login.attempt.max")));
+                            login.setAttemptLeft(Integer.valueOf(GlobalProperties.getProperty("login.attempt.max")));
                             loginService.updateAttemptLeft(login);
                             UserService userService = new UserService();
                             User user = userService.getUser(login);
@@ -92,16 +92,16 @@ public class LoginAction implements Action {
                                 logger.debug("REMEMBER ME");
                                 try {
                                     String rememberCookieName = CookieManager.getDependantCookieName(req);
-                                    String rememberCookieValue = HashManager.hashString(UUID.randomUUID().toString());
+                                    String rememberCookieValue = HashGenerator.hashString(UUID.randomUUID().toString());
                                     CookieManager.setDependantCookieValue(req, resp, rememberCookieName, rememberCookieValue,
-                                            Integer.valueOf(GlobalManager.getProperty("remember.days.valid")) * 86400);
+                                            Integer.valueOf(GlobalProperties.getProperty("remember.days.valid")) * 86400);
                                     Map<String, Object> rememberValueMap = new HashMap<>();
                                     rememberValueMap.put("userId", user.getId());
                                     rememberValueMap.put("name", rememberCookieName);
                                     rememberValueMap.put("value", rememberCookieValue);
                                     rememberValueMap.put("valid",
-                                            TimestampManager.daysToTimestamp(TimestampManager.getCurrentTimestamp(),
-                                                    Integer.valueOf(GlobalManager.getProperty("remember.days.valid"))));
+                                            TimestampCompare.daysToTimestamp(TimestampCompare.getCurrentTimestamp(),
+                                                    Integer.valueOf(GlobalProperties.getProperty("remember.days.valid"))));
                                     userService.setRemember(rememberValueMap);
                                 } catch (Exception e) {
                                     e.printStackTrace();
@@ -124,9 +124,9 @@ public class LoginAction implements Action {
                             if (login.getAttemptLeft() > 0 && login.getStatus() >= 0) {
                                 try {
                                     String forgotCookieName = "_".concat(CookieManager.getDependantCookieName(req));
-                                    String forgotCookieValue = HashManager.hashString(UUID.randomUUID().toString());
+                                    String forgotCookieValue = HashGenerator.hashString(UUID.randomUUID().toString());
                                     CookieManager.setDependantCookieValue(req, resp, forgotCookieName, forgotCookieValue,
-                                            Integer.valueOf(GlobalManager.getProperty("forgot.seconds.valid")));
+                                            Integer.valueOf(GlobalProperties.getProperty("forgot.seconds.valid")));
                                     loginService.setForgotCode(formComponent.getItem(0).getValue(), forgotCookieValue);
                                     req.getSession().setAttribute("forgotEmail", formComponent.getItem(0).getValue());
                                     req.getSession().setAttribute("forgotCode", forgotCookieValue);

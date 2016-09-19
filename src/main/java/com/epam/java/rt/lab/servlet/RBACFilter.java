@@ -45,7 +45,7 @@ public class RbacFilter implements Filter {
                 if (rememberCookieValue != null) {
                     Map<String, Object> rememberValueMap = userService.getRemember(rememberCookieName);
                     if (rememberValueMap != null && rememberCookieValue.equals(rememberValueMap.get("value")) &&
-                            TimestampManager.secondsBetweenTimestamps(TimestampManager.getCurrentTimestamp(),
+                            TimestampCompare.secondsBetweenTimestamps(TimestampCompare.getCurrentTimestamp(),
                                     (Timestamp) rememberValueMap.get("valid")) > 0) {
                         userService.setRemember(rememberValueMap);
                         userId = (Long) rememberValueMap.get("userId");
@@ -54,12 +54,12 @@ public class RbacFilter implements Filter {
                         req.getSession().setAttribute("userName", user.getName());
                         req.getSession().setAttribute("navbarItemArray", NavigationComponent.getNavbarItemArray(user.getRole()));
                         try {
-                            rememberCookieValue = HashManager.hashString(UUID.randomUUID().toString());
+                            rememberCookieValue = HashGenerator.hashString(UUID.randomUUID().toString());
                             rememberValueMap.put("value", rememberCookieValue);
                             userService.setRemember(rememberValueMap);
                             CookieManager.setDependantCookieValue(req, (HttpServletResponse) servletResponse,
                                     rememberCookieName, rememberCookieValue,
-                                    Integer.valueOf(GlobalManager.getProperty("remember.days.valid")) * 86400);
+                                    Integer.valueOf(GlobalProperties.getProperty("remember.days.valid")) * 86400);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }

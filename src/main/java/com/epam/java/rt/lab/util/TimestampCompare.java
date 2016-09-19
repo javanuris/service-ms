@@ -11,7 +11,7 @@ import java.util.Date;
 /**
  * service-ms
  */
-public class TimestampManager {
+public class TimestampCompare {
 
     public static Timestamp getCurrentTimestamp() {
         Date now = new Date();
