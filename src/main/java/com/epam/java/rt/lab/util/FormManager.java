@@ -39,53 +39,47 @@ public class FormManager {
     }
 
     public static boolean isOnlyDigits(String value) {
-        return value != null && value.matches(getProperty("digits"));
+        return value != null && value.matches(getProperty("digits.regex"));
     }
 
     public static boolean validate(HttpServletRequest req, FormComponent formComponent) {
         logger.debug("VALIDATE");
+        Validator validator;
         boolean result = true;
         for (int i = 0; i < formComponent.getItemArrayLength(); i++) {
             FormComponent.Item formItem = formComponent.getItem(i);
             formItem.setValue(req.getParameter(formItem.getLabel()));
             logger.debug("{} = {}", formItem.getLabel(), formItem.getValue());
-            for (Validator validator : formItem.getValidatorList()) {
+            if (!formItem.getIgnoreValidate()) {
                 String[] validationMessageArray = {};
-                switch (validator.getType()) {
-                    case BOOLEAN:
+                validator = formItem.getValidator();
+                if (validator != null) {
+                    logger.debug("validator = {}", validator.getType());
+                    if (validator.getType().equals(Validator.ValidatorType.BOOLEAN)) {
                         if (!isParsable(formItem.getValue()) ||
                                 (!Boolean.TRUE.toString().equals(formItem.getValue()) &&
                                         !Boolean.FALSE.toString().equals(formItem.getValue()))) {
                             result = false;
-                            validationMessageArray = new String[]{"validation.boolean"};
+                            validationMessageArray = new String[]{validator.validationMessage};
                         }
-                        break;
-                    case BOOLEAN_OR_NULL:
+                    } else if (validator.getType().equals(Validator.ValidatorType.BOOLEAN_OR_NULL)) {
                         if (isParsable(formItem.getValue()) &&
                                 !Boolean.TRUE.toString().equals(formItem.getValue()) &&
                                 !Boolean.FALSE.toString().equals(formItem.getValue())) {
                             result = false;
-                            validationMessageArray = new String[]{"validation.boolean-or-null"};
-
+                            validationMessageArray = new String[]{validator.validationMessage};
                         }
-                        break;
-                    case NUMBER:
-                    case NUMBER_OR_NULL:
+                    } else if (validator.getType().equals(Validator.ValidatorType.NUMBER) ||
+                            validator.getType().equals(Validator.ValidatorType.NUMBER_OR_NULL)) {
                         if (isParsable(formItem.getValue()) || validator.getType().equals(Validator.ValidatorType.NUMBER)) {
                             if (!isParsable(formItem.getValue())) {
-                                validationMessageArray = new String[]{"validation.number"};
+                                validationMessageArray = new String[]{validator.validationMessage};
                             } else {
                                 Number number = NumberCompare.getNumber(formItem.getValue(), validator.numberMin);
                                 NumberCompare numberCompare = new NumberCompare();
                                 if ((validator.numberMin != null && (numberCompare.compare(validator.numberMin, number) > 0)) ||
                                         (validator.numberMax != null && (numberCompare.compare(number, validator.numberMax) > 0))) {
                                     result = false;
-                                    String message;
-                                    if (validator.getType().equals(Validator.ValidatorType.NUMBER)) {
-                                        message = "validation.number";
-                                    } else {
-                                        message = "validation.number-or-null";
-                                    }
                                     if (validator.numberMin != null || validator.numberMax != null) {
                                         String range;
                                         if (validator.numberMin != null && validator.numberMax != null) {
@@ -96,22 +90,26 @@ public class FormManager {
                                         } else {
                                             range = "<= ".concat(validator.numberMax.toString());
                                         }
-                                        validationMessageArray = new String[]{message, range};
+                                        validationMessageArray = new String[]{validator.validationMessage, range};
                                     } else {
-                                        validationMessageArray = new String[]{message};
+                                        validationMessageArray = new String[]{validator.validationMessage};
                                     }
                                 }
                             }
                         }
-                        break;
-                    case PATTERN:
-                        if (formItem.getValue() == null || formItem.getValue().matches())
-                        if (isParsable(formItem.getValue())) {
-
+                    } else if (validator.getType().equals(Validator.ValidatorType.PATTERN)) {
+                        if (formItem.getValue() == null || !formItem.getValue().matches(validator.getRegex())) {
+                            result = false;
+                            validationMessageArray = new String[]{validator.validationMessage};
                         }
-
+                    } else if (validator.getType().equals(Validator.ValidatorType.PATTERN_OR_NULL)) {
+                        if (formItem.getValue() != null && !formItem.getValue().matches(validator.getRegex())) {
+                            result = false;
+                            validationMessageArray = new String[]{validator.validationMessage};
+                        }
+                    }
+                    if (validationMessageArray.length > 0) formItem.setValidationMessageArray(validationMessageArray);
                 }
-                if (validationMessageArray.length > 0) formItem.setValidationMessageArray(validationMessageArray);
             }
         }
         return result;
@@ -127,68 +125,70 @@ public class FormManager {
         private T numberMax;
         private Timestamp compareTimestamp;
         private String regex;
+        private String validationMessage;
 
         public enum ValidatorType {
             BOOLEAN, NUMBER, FUTURE, PAST, PATTERN,
             BOOLEAN_OR_NULL, NUMBER_OR_NULL, FUTURE_OR_NULL, PAST_OR_NULL, PATTERN_OR_NULL
         }
 
-        private Validator(ValidatorType type) {
+        private Validator(ValidatorType type, String validationMessage) {
             this.type = type;
+            this.validationMessage = validationMessage;
         }
 
-        public static Validator getBoolean() {
-            return new Validator(ValidatorType.BOOLEAN);
+        public static Validator getBoolean(String validationMessage) {
+            return new Validator(ValidatorType.BOOLEAN, validationMessage);
         }
 
-        public static <T extends Number> Validator getNumber(T numberMin, T numberMax) {
-            Validator validator = new Validator<T>(ValidatorType.NUMBER);
+        public static <T extends Number> Validator getNumber(T numberMin, T numberMax, String validationMessage) {
+            Validator validator = new Validator<T>(ValidatorType.NUMBER, validationMessage);
             validator.numberMin = numberMin;
             validator.numberMax = numberMax;
             return validator;
         }
 
-        private static Validator getTimestamp(ValidatorType validatorType, Timestamp timestamp) {
-            Validator validator = new Validator(validatorType);
+        private static Validator getTimestamp(ValidatorType validatorType, Timestamp timestamp, String validationMessage) {
+            Validator validator = new Validator(validatorType, validationMessage);
             validator.compareTimestamp = timestamp;
             return validator;
         }
 
-        public static Validator getFuture(Timestamp timestamp) {
-            return getTimestamp(ValidatorType.FUTURE, timestamp);
+        public static Validator getFuture(Timestamp timestamp, String validationMessage) {
+            return getTimestamp(ValidatorType.FUTURE, timestamp, validationMessage);
         }
 
-        public static Validator getPast(Timestamp timestamp) {
-            return getTimestamp(ValidatorType.PAST, timestamp);
+        public static Validator getPast(Timestamp timestamp, String validationMessage) {
+            return getTimestamp(ValidatorType.PAST, timestamp, validationMessage);
         }
 
-        public static Validator getPattern(String regex) {
-            Validator validator = new Validator(ValidatorType.PATTERN);
+        public static Validator getPattern(String regex, String validationMessage) {
+            Validator validator = new Validator(ValidatorType.PATTERN, validationMessage);
             validator.regex = regex;
             return validator;
         }
 
-        public static Validator getBooleanOrNull() {
-            return new Validator(ValidatorType.BOOLEAN_OR_NULL);
+        public static Validator getBooleanOrNull(String validationMessage) {
+            return new Validator(ValidatorType.BOOLEAN_OR_NULL, validationMessage);
         }
 
-        public static <T extends Number> Validator getNumberOrNull(T numberMin, T numberMax) {
-            Validator validator = new Validator<T>(ValidatorType.NUMBER_OR_NULL);
+        public static <T extends Number> Validator getNumberOrNull(T numberMin, T numberMax, String validationMessage) {
+            Validator validator = new Validator<T>(ValidatorType.NUMBER_OR_NULL, validationMessage);
             validator.numberMin = numberMin;
             validator.numberMax = numberMax;
             return validator;
         }
 
-        public static Validator getFutureOrNull(Timestamp timestamp) {
-            return getTimestamp(ValidatorType.FUTURE_OR_NULL, timestamp);
+        public static Validator getFutureOrNull(Timestamp timestamp, String validationMessage) {
+            return getTimestamp(ValidatorType.FUTURE_OR_NULL, timestamp, validationMessage);
         }
 
-        public static Validator getPastOrNull(Timestamp timestamp) {
-            return getTimestamp(ValidatorType.PAST_OR_NULL, timestamp);
+        public static Validator getPastOrNull(Timestamp timestamp, String validationMessage) {
+            return getTimestamp(ValidatorType.PAST_OR_NULL, timestamp, validationMessage);
         }
 
-        public static Validator getPatternOrNull(String regex) {
-            Validator validator = new Validator(ValidatorType.PATTERN_OR_NULL);
+        public static Validator getPatternOrNull(String regex, String validationMessage) {
+            Validator validator = new Validator(ValidatorType.PATTERN_OR_NULL, validationMessage);
             validator.regex = regex;
             return validator;
         }
@@ -211,6 +211,10 @@ public class FormManager {
 
         public String getRegex() {
             return regex;
+        }
+
+        public String getValidationMessage() {
+            return validationMessage;
         }
     }
 

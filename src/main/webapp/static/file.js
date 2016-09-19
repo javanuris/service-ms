@@ -13,14 +13,15 @@ function uploadToServer(upload) {
     $xhr.onload = function() {
         var pair = $xhr.responseText.split('=');
         if (pair[0] == "filePath") {
-            $($hiddenId).val(pair[1]);
             $($labelId).text($file.name);
             var src = $($imageId).attr("src");
-            var path = src.split("/file/download/");
-            $($imageId).attr("src", path[0] + "/file/download/pre-avatar?path=" + pair[1]);
+            var path = src.split("?");
+            src = path[0] + "?path=" + pair[1];
+            $($hiddenId).val(src);
+            $($imageId).attr("src", src);
         } else {
-            $($hiddenId).val('');
             $($labelId).text($('#ui-local-upload-error').text());
+            $($hiddenId).val('');
         }
     };
     $xhr.send($formData);

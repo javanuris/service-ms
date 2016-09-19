@@ -32,24 +32,24 @@ public class DownloadServlet extends HttpServlet {
                 switch (req.getPathInfo()) {
                     case "/avatar":
                         String avatarId = req.getParameter("id");
-                        logger.debug("AVATAR: {}", avatarId);
-                        if (FormManager.isOnlyDigits(avatarId)) {
-                            try {
-                                Map<String, Object> avatarMap = (new UserService()).getAvatar(Long.valueOf(avatarId));
-                                resp.setContentType((String) avatarMap.get("type"));
-                                inputStream = (InputStream) avatarMap.get("file");
-                            } catch (DaoException | ConnectionException e) {
-                                e.printStackTrace();
-                                throw new ServletException(e.getMessage(), e.getCause());
-                            }
-                        }
-                        break;
-                    case "/pre-avatar":
                         String avatarPath = req.getParameter("path");
-                        logger.debug("AVATAR: {}", avatarPath);
-                        resp.setContentType(avatarPath.substring(avatarPath.lastIndexOf(".") + 1).replaceAll("_", "/"));
-                        inputStream = new FileInputStream(new File(avatarPath));
-                        break;
+                        if (avatarId != null) {
+                            logger.debug("AVATAR BY ID: {}", avatarId);
+                            if (FormManager.isOnlyDigits(avatarId)) {
+                                try {
+                                    Map<String, Object> avatarMap = (new UserService()).getAvatar(Long.valueOf(avatarId));
+                                    resp.setContentType((String) avatarMap.get("type"));
+                                    inputStream = (InputStream) avatarMap.get("file");
+                                } catch (DaoException | ConnectionException e) {
+                                    e.printStackTrace();
+                                    throw new ServletException(e.getMessage(), e.getCause());
+                                }
+                            }
+                        } else if (avatarPath != null) {
+                            logger.debug("AVATAR BY PATH: {}", avatarPath);
+                            resp.setContentType(avatarPath.substring(avatarPath.lastIndexOf(".") + 1).replaceAll("_", "/"));
+                            inputStream = new FileInputStream(new File(avatarPath));
+                        }
                 }
                 if (inputStream != null) {
                     logger.debug("READY TO DOWNLOAD");

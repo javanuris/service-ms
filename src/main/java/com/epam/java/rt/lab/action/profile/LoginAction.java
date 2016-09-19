@@ -41,12 +41,14 @@ public class LoginAction implements Action {
                     break;
                 case 0:
                     formComponent = FormComponent.set("profile.login",
-                            new FormComponent.Item("profile.login.email.label", "input", "profile.login.email.label"),
-                            new FormComponent.Item("profile.login.password.label", "password", "profile.login.password.label"),
-                            new FormComponent.Item("profile.login.remember.label", "checkbox", "profile.login.remember.label"),
-                            new FormComponent.Item("profile.login.submit-login.label", "submit", "submit-login"),
-                            new FormComponent.Item("profile.login.submit-forgot.label", "submit", "submit-forgot"),
-                            new FormComponent.Item("profile.login.submit-register.label", "submit", "submit-register")
+                            new FormComponent.Item("profile.login.email.label", "input", "profile.login.email.label",
+                                    FormManager.Validator.getPattern(FormManager.getProperty("email.regex"), "validation.email")),
+                            new FormComponent.Item("profile.login.password.label", "password", "profile.login.password.label",
+                                    FormManager.Validator.getPattern(FormManager.getProperty("password.regex"), "validation.password")),
+                            new FormComponent.Item("profile.login.remember.label", "checkbox", "profile.login.remember.label", null),
+                            new FormComponent.Item("profile.login.submit-login.label", "submit", "submit-login", null),
+                            new FormComponent.Item("profile.login.submit-forgot.label", "submit", "submit-forgot", null),
+                            new FormComponent.Item("profile.login.submit-register.label", "submit", "submit-register", null)
                     );
                     break;
                 case -1:
@@ -58,6 +60,9 @@ public class LoginAction implements Action {
                 formComponent.setActionParameterString(UrlManager.getRequestParameterString(req));
             } else if ("POST".equals(req.getMethod())) {
                 logger.debug("POST");
+                if (req.getParameter(formComponent.getItem(4).getPlaceholder()) != null ||
+                        req.getParameter(formComponent.getItem(5).getPlaceholder()) != null)
+                    formComponent.getItem(1).setIgnoreValidate(true);
                 if (FormManager.validate(req, formComponent)) {
                     logger.debug("FORM VALID");
                     if (req.getParameter(formComponent.getItem(3).getPlaceholder()) != null) {

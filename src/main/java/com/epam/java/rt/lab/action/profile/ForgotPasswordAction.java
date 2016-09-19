@@ -37,11 +37,13 @@ public class ForgotPasswordAction implements Action {
                     break;
                 case 0:
                     formComponent = FormComponent.set("profile.forgot-password",
-                            new FormComponent.Item("profile.forgot-password.password.label", "password", "profile.forgot-password.password.label"),
-                            new FormComponent.Item("profile.forgot-password.confirm.label", "password", "profile.forgot-password.confirm.label"),
-                            new FormComponent.Item("profile.forgot-password.submit.label", "submit", ""),
+                            new FormComponent.Item("profile.forgot-password.password.label", "password", "profile.forgot-password.password.label",
+                                    FormManager.Validator.getPattern(FormManager.getProperty("password.regex"), "validation.password")),
+                            new FormComponent.Item("profile.forgot-password.confirm.label", "password", "profile.forgot-password.confirm.label",
+                                    FormManager.Validator.getPattern(FormManager.getProperty("password.regex"), "validation.password")),
+                            new FormComponent.Item("profile.forgot-password.submit.label", "submit", "", null),
                             new FormComponent.Item("profile.forgot-password.login.label", "button",
-                                    UrlManager.getContextUri(req, "/profile/login"))
+                                    UrlManager.getContextUri(req, "/profile/login"), null)
                     );
                     break;
                 case -1:

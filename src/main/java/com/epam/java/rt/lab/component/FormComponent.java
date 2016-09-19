@@ -3,7 +3,6 @@ package com.epam.java.rt.lab.component;
 import com.epam.java.rt.lab.util.FormManager;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -104,6 +103,7 @@ public class FormComponent implements Iterable<FormComponent.Item> {
             public boolean hasNext(){
                 return index < itemArray.length;
             }
+
             public Item next(){
                 return itemArray[index++];
             }
@@ -136,8 +136,8 @@ public class FormComponent implements Iterable<FormComponent.Item> {
         private ItemDef itemDef;
         private ItemVal itemVal;
 
-        public Item(String label, String type, String placeholder) {
-            this.itemDef = new ItemDef(label, type, placeholder);
+        public Item(String label, String type, String placeholder, FormManager.Validator validator) {
+            this.itemDef = new ItemDef(label, type, placeholder, validator);
         }
 
         Item(ItemDef itemDef) {
@@ -160,8 +160,8 @@ public class FormComponent implements Iterable<FormComponent.Item> {
             return itemDef.placeholder;
         }
 
-        public ItemDef getValidatorList() {
-            return this.itemDef;
+        public FormManager.Validator getValidator() {
+            return this.itemDef.validator;
         }
 
         private ItemVal val() {
@@ -200,44 +200,29 @@ public class FormComponent implements Iterable<FormComponent.Item> {
         public void setValidationMessageArray(String[] validationMessageArray) {
             val().validationMessageArray = validationMessageArray;
         }
+
+        public boolean getIgnoreValidate() {
+            return val().ignoreValidate;
+        }
+
+        public void setIgnoreValidate(boolean value) {
+            val().ignoreValidate = value;
+        }
     }
 
     // immutable item definition
-    private static class ItemDef implements Iterable<FormManager.Validator> {
+    private static class ItemDef {
         private String label = null;
         private String type = null;
         private String placeholder = null;
-        private List<FormManager.Validator> validatorList;
+        private FormManager.Validator validator;
 
-        private ItemDef(String label, String type, String placeholder, FormManager.Validator... validatorArray) {
+        private ItemDef(String label, String type, String placeholder, FormManager.Validator validator) {
             this.label = label;
             this.type = type;
             this.placeholder = placeholder;
-            if (validatorArray.length > 0) {
-                this.validatorList = new ArrayList<>();
-                Collections.addAll(this.validatorList, validatorArray);
-            }
+            this.validator = validator;
         }
-
-        @Override
-        public Iterator<FormManager.Validator> iterator() {
-            return new Iterator<FormManager.Validator>() {
-                private int index = 0;
-
-                public boolean hasNext() {
-                    return index < validatorList.size();
-                }
-
-                public FormManager.Validator next() {
-                    return validatorList.get(index++);
-                }
-
-                public void remove() {
-                    throw new UnsupportedOperationException();
-                }
-            };
-        }
-
     }
 
     // mutable item values
@@ -246,6 +231,7 @@ public class FormComponent implements Iterable<FormComponent.Item> {
         private String value = null;
         private T genericValue = null;
         private String[] validationMessageArray = null;
+        private boolean ignoreValidate = false;
 
         private ItemVal() {
         }

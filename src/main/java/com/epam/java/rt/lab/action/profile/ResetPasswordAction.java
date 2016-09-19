@@ -37,12 +37,15 @@ public class ResetPasswordAction implements Action {
                     break;
                 case 0:
                     formComponent = FormComponent.set("profile.reset-password",
-                            new FormComponent.Item("profile.reset-password.password.label", "password", "profile.reset-password.password.label"),
-                            new FormComponent.Item("profile.reset-password.confirm.label", "password", "profile.reset-password.confirm.label"),
-                            new FormComponent.Item("profile.reset-password.current.label", "password", "profile.reset-password.current.label"),
-                            new FormComponent.Item("profile.reset-password.submit.label", "submit", ""),
+                            new FormComponent.Item("profile.reset-password.password.label", "password", "profile.reset-password.password.label",
+                                    FormManager.Validator.getPattern(FormManager.getProperty("password.regex"), "validation.password")),
+                            new FormComponent.Item("profile.reset-password.confirm.label", "password", "profile.reset-password.confirm.label",
+                                    FormManager.Validator.getPattern(FormManager.getProperty("password.regex"), "validation.password")),
+                            new FormComponent.Item("profile.reset-password.current.label", "password", "profile.reset-password.current.label",
+                                    FormManager.Validator.getPattern(FormManager.getProperty("password.regex"), "validation.password")),
+                            new FormComponent.Item("profile.reset-password.submit.label", "submit", "", null),
                             new FormComponent.Item("profile.reset-password.view-profile.label", "button",
-                                    UrlManager.getContextUri(req, "/profile/view"))
+                                    UrlManager.getContextUri(req, "/profile/view"), null)
                     );
                     break;
                 case -1:

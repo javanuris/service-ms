@@ -36,16 +36,19 @@ public class EditAction implements Action {
                     break;
                 case 0:
                     formComponent = FormComponent.set("profile.edit",
-                            new FormComponent.Item("profile.edit.first-name.label", "input", "profile.edit.first-name.label"),
-                            new FormComponent.Item("profile.edit.middle-name.label", "input", "profile.edit.middle-name.label"),
-                            new FormComponent.Item("profile.edit.last-name.label", "input", "profile.edit.last-name.label"),
-                            new FormComponent.Item("profile.edit.avatar.label", "image", UrlManager.getContextUri(req, "/file/upload/avatar")),
+                            new FormComponent.Item("profile.edit.first-name.label", "input", "profile.edit.first-name.label",
+                                    FormManager.Validator.getPattern(FormManager.getProperty("name.regex"), "validation.name")),
+                            new FormComponent.Item("profile.edit.middle-name.label", "input", "profile.edit.middle-name.label",
+                                    FormManager.Validator.getPattern(FormManager.getProperty("name.regex"), "validation.name")),
+                            new FormComponent.Item("profile.edit.last-name.label", "input", "profile.edit.last-name.label",
+                                    FormManager.Validator.getPattern(FormManager.getProperty("name.regex"), "validation.name")),
+                            new FormComponent.Item("profile.edit.avatar.label", "image", UrlManager.getContextUri(req, "/file/upload/avatar"), null),
                             new FormComponent.Item("profile.edit.remove-avatar.label", "button",
-                                    UrlManager.getContextUri(req, "/profile/edit", "sub-action=remove-avatar")),
+                                    UrlManager.getContextUri(req, "/profile/edit", "sub-action=remove-avatar"), null),
                             new FormComponent.Item("profile.edit.submit.label", "submit",
-                                    ""),
+                                    "", null),
                             new FormComponent.Item("profile.edit.view-profile.label", "button",
-                                    UrlManager.getContextUri(req, "/profile/view"))
+                                    UrlManager.getContextUri(req, "/profile/view"), null)
                     );
                     break;
                 case -1:
@@ -58,7 +61,7 @@ public class EditAction implements Action {
                 formComponent.getItem(1).setValue(user.getMiddleName());
                 formComponent.getItem(2).setValue(user.getLastName());
                 if (user.getAvatarId() == null) {
-                    formComponent.getItem(3).setValue(UrlManager.getContextUri(req, "/file/download/avatar"));
+                    formComponent.getItem(3).setValue(UrlManager.getContextUri(req, "/file/download/avatar?"));
                 } else {
                     formComponent.getItem(3).setValue(UrlManager.getContextRef(req, "/file/download/avatar", "id", user.getAvatarId()));
                 }
@@ -86,8 +89,15 @@ public class EditAction implements Action {
                     user.setFirstName(formComponent.getItem(0).getValue());
                     user.setMiddleName(formComponent.getItem(1).getValue());
                     user.setLastName(formComponent.getItem(2).getValue());
-                    if (formComponent.getItem(3).getValue().length() > 0)
-                        userService.setAvatar(user, formComponent.getItem(3).getValue());
+                    if (formComponent.getItem(3).getValue().length() == 0) {
+                        userService.removeAvatar(user);
+                    } else {
+                        String[] pair = formComponent.getItem(3).getValue().split("/?");
+                        if (pair.length == 2) {
+                            pair = pair[1].split("=");
+                            if (pair.length == 2) userService.setAvatar(user, pair[1]);
+                        }
+                    }
                     if (userService.updateUser(user) != 1) {
                         logger.debug("UPDATE ERROR");
                         String[] validationMessageArray = {"profile.edit.submit.error-edit"};
@@ -98,6 +108,10 @@ public class EditAction implements Action {
                         resp.sendRedirect(UrlManager.getContextUri(req, "/profile/view"));
                         return;
                     }
+                } else {
+                    // restoring pre-saved image path to download from server
+
+
                 }
             }
             req.getRequestDispatcher("/WEB-INF/jsp/profile/edit.jsp").forward(req, resp);
