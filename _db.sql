@@ -7,7 +7,7 @@ create table if not exists "Permission" (id identity primary key, uri varchar(25
 create table if not exists "Role" (id identity primary key, name varchar(255) unique);
 create table if not exists "RolePermission" (id identity primary key, role_id bigint references "Role" (id), permission_id bigint references "Permission" (id));
 create table if not exists "Login" (id identity primary key, email varchar(255) unique, password varchar(255), attempt_left int, status int);
-create table if not exists "Avatar" (id identity primary key, name varchar(255), type varchar(255), file blob);
+create table if not exists "Avatar" (id identity primary key, name varchar(255), type varchar(255), file blob, modified datetime);
 create table if not exists "User" (id identity primary key, first_name varchar(255), middle_name varchar(255), last_name varchar(255), login_id bigint references "Login" (id), role_id bigint references "Role" (id), avatar_id bigint references "Avatar" (id));
 create table if not exists "Remember" (id identity primary key, user_id bigint unique, name varchar(255), value varchar(255), valid datetime);
 create table if not exists "Activation" (id identity primary key, email varchar(255) unique, password varchar(255), code varchar(255), valid datetime);

@@ -6,6 +6,7 @@ import com.epam.java.rt.lab.dao.query.Set;
 import com.epam.java.rt.lab.entity.rbac.Login;
 import com.epam.java.rt.lab.entity.rbac.Role;
 import com.epam.java.rt.lab.entity.rbac.User;
+import com.epam.java.rt.lab.util.TimestampCompare;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -219,7 +220,7 @@ public class UserJdbcDao extends JdbcDao {
     private Map<String, Object> getAvatar(User user) throws DaoException {
         List<Column> columnList = new ArrayList<>();
         columnList.add(new Column("\"Avatar\".id", user.getAvatarId()));
-        String sqlString = "SELECT name, type, file FROM \"Avatar\""
+        String sqlString = "SELECT name, type, file, modified FROM \"Avatar\""
                 .concat(" WHERE ").concat(Column.columnListToString(columnList, "AND", "="));
         try (PreparedStatement preparedStatement = getConnection().prepareStatement(sqlString);
              ResultSet resultSet = setPreparedStatementValues(preparedStatement, columnList).executeQuery();) {
@@ -228,6 +229,7 @@ public class UserJdbcDao extends JdbcDao {
             avatarMap.put("name", resultSet.getString("name"));
             avatarMap.put("type", resultSet.getString("type"));
             avatarMap.put("file", resultSet.getBinaryStream("file"));
+            avatarMap.put("modified", resultSet.getTimestamp("modified"));
             return avatarMap;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -251,10 +253,11 @@ public class UserJdbcDao extends JdbcDao {
             setList.add(new Set("\"Avatar\".name", fileName));
             setList.add(new Set("\"Avatar\".type", contentType));
             setList.add(new Set("\"Avatar\".file", inputStream));
+            setList.add(new Set("\"Avatar\".modified", TimestampCompare.getCurrentTimestamp()));
             logger.debug("user.getAvatarId() = {}", user.getAvatarId());
             if (user.getAvatarId() == null) {
                 logger.debug("INSERT AVATAR");
-                String sqlString = "INSERT INTO \"Avatar\" (name, type, file) VALUES (?, ?, ?)";
+                String sqlString = "INSERT INTO \"Avatar\" (name, type, file, modified) VALUES (?, ?, ?, ?)";
                 try (PreparedStatement preparedStatement =
                              getConnection().prepareStatement(sqlString, Statement.RETURN_GENERATED_KEYS);
                      ResultSet resultSet =
@@ -269,7 +272,7 @@ public class UserJdbcDao extends JdbcDao {
                 logger.debug("UPDATE AVATAR");
                 List<Column> columnList = new ArrayList<>();
                 columnList.add(new Column("\"Avatar\".id", user.getAvatarId()));
-                String sqlString = "UPDATE \"Avatar\" SET name = ?, type = ?, file = ?"
+                String sqlString = "UPDATE \"Avatar\" SET name = ?, type = ?, file = ?, modified = ?"
                         .concat(" WHERE ").concat(Column.columnListToString(columnList, "AND", "="));
                 try (PreparedStatement preparedStatement = getConnection().prepareStatement(sqlString);) {
                     setPreparedStatementValues(preparedStatement, setList, columnList).executeUpdate();

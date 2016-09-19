@@ -92,9 +92,12 @@ public class EditAction implements Action {
                     if (formComponent.getItem(3).getValue().length() == 0) {
                         userService.removeAvatar(user);
                     } else {
-                        String[] pair = formComponent.getItem(3).getValue().split("/?");
+                        logger.debug("{} = {}", formComponent.getItem(3).getLabel(), formComponent.getItem(3).getValue());
+                        String[] pair = formComponent.getItem(3).getValue().split("\\?");
+                        logger.debug("pair = {}", pair);
                         if (pair.length == 2) {
                             pair = pair[1].split("=");
+                            logger.debug("pair = {}", pair);
                             if (pair.length == 2) userService.setAvatar(user, pair[1]);
                         }
                     }
@@ -108,10 +111,6 @@ public class EditAction implements Action {
                         resp.sendRedirect(UrlManager.getContextUri(req, "/profile/view"));
                         return;
                     }
-                } else {
-                    // restoring pre-saved image path to download from server
-
-
                 }
             }
             req.getRequestDispatcher("/WEB-INF/jsp/profile/edit.jsp").forward(req, resp);

@@ -22,6 +22,7 @@ function uploadToServer(upload) {
         } else {
             $($labelId).text($('#ui-local-upload-error').text());
             $($hiddenId).val('');
+            $($imageId).attr("src", '');
         }
     };
     $xhr.send($formData);
