@@ -1,0 +1,20 @@
+<taglib>
+    <tlib-version>1.0</tlib-version>
+    <jsp-version>2.0</jsp-version>
+    <short-name>ListRowTag</short-name>
+    <tag>
+        <name>ListRow</name>
+        <tag-class>com.epam.java.rt.lab.tag.ListRow</tag-class>
+        <body-content>empty</body-content>
+        <attribute>
+            <name>listColumnList</name>
+            <type>java.util.ArrayList</type>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <name>entityObject</name>
+            <type>java.lang.Object</type>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+    </tag>
+</taglib>

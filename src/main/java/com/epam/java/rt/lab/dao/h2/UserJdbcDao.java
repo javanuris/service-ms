@@ -1,5 +1,6 @@
 package com.epam.java.rt.lab.dao.h2;
 
+import com.epam.java.rt.lab.dao.Argument;
 import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.dao.query.Column;
 import com.epam.java.rt.lab.dao.query.Set;
@@ -26,6 +27,7 @@ import java.util.Map;
  */
 public class UserJdbcDao extends JdbcDao {
     private static final Logger logger = LoggerFactory.getLogger(UserJdbcDao.class);
+    private static final String DEFAULT_FROM = "\"User\"";
 
     public UserJdbcDao(Connection connection) throws DaoException {
         super(connection);
@@ -45,10 +47,10 @@ public class UserJdbcDao extends JdbcDao {
                 case "login":
                      return new Column("login_id", ((Login) fieldValue(field, entity)).getId());
                 default:
-                    throw new DaoException("exception.dao.jdbc.get-entity-column.field-name");
+                    throw new DaoException("exception.dao.jdbc.getTransfer-entity-column.field-name");
             }
         } catch (IllegalAccessException e) {
-            throw new DaoException("exception.dao.jdbc.get-entity-column.add-column", e.getCause());
+            throw new DaoException("exception.dao.jdbc.getTransfer-entity-column.add-column", e.getCause());
         }
     }
 
@@ -73,10 +75,10 @@ public class UserJdbcDao extends JdbcDao {
                 case "avatarId":
                     return new Set("avatar_id", fieldValue(field, entity));
                 default:
-                    throw new DaoException("exception.dao.jdbc.get-entity-set.field-name");
+                    throw new DaoException("exception.dao.jdbc.getTransfer-entity-set.field-name");
             }
         } catch (IllegalAccessException e) {
-            throw new DaoException("exception.dao.jdbc.get-entity-set.add-column", e.getCause());
+            throw new DaoException("exception.dao.jdbc.getTransfer-entity-set.add-column", e.getCause());
         }
     }
 
@@ -100,7 +102,7 @@ public class UserJdbcDao extends JdbcDao {
             return (T) user;
         } catch (SQLException e) {
             e.printStackTrace();
-            throw new DaoException("exception.dao.jdbc.get-entity-from-result-set", e.getCause());
+            throw new DaoException("exception.dao.jdbc.getTransfer-entity-from-result-set", e.getCause());
         }
     }
 
@@ -157,7 +159,7 @@ public class UserJdbcDao extends JdbcDao {
             return rememberMap;
         } catch (SQLException e) {
             e.printStackTrace();
-            throw new DaoException("exception.dao.get-remember", e.getCause());
+            throw new DaoException("exception.dao.getTransfer-remember", e.getCause());
         }
     }
 
@@ -233,7 +235,7 @@ public class UserJdbcDao extends JdbcDao {
             return avatarMap;
         } catch (SQLException e) {
             e.printStackTrace();
-            throw new DaoException("exception.dao.get-avatar", e.getCause());
+            throw new DaoException("exception.dao.getTransfer-avatar", e.getCause());
         }
     }
 
@@ -321,4 +323,111 @@ public class UserJdbcDao extends JdbcDao {
         return "firstName, middleName, lastName, role, login, avatarId";
     }
 
+
+    // newly dao implementation
+
+    @Override
+    <T> List<T> getEntityList(ResultSet resultSet, Argument argument) throws SQLException, DaoException {
+        List<User> userList = new ArrayList<>();
+        while (resultSet.next()) userList.add(getEntity(resultSet, argument));
+        return (List<T>) userList;
+    }
+
+    @Override
+    <T> T getEntity(ResultSet resultSet, Argument argument) throws SQLException, DaoException {
+        Map<String, List<String>> subEntityColumnListMap = new HashMap<>();
+        User user = new User();
+        for (String columnName : (List<String>) argument.get(ArgumentType.SELECT_COLUMN_LIST)) {
+            if (columnName.startsWith(DEFAULT_FROM.concat("."))) {
+                String shortColumnName = columnName.substring(DEFAULT_FROM.length() + 1);
+                switch (shortColumnName) {
+                    case "id":
+                        user.setId(resultSet.getLong(shortColumnName));
+                        break;
+                    case "first_name":
+                        user.setFirstName((String) resultSet.getObject(shortColumnName));
+                        break;
+                    case "middle_name":
+                        user.setMiddleName((String) resultSet.getObject(shortColumnName));
+                        break;
+                    case "last_name":
+                        user.setLastName((String) resultSet.getObject(shortColumnName));
+                        break;
+                    case "avatar_id":
+                        user.setAvatarId((Long) resultSet.getObject(shortColumnName));
+                        break;
+                    case "role_id":
+                        Long role_id = (Long) resultSet.getObject(columnName);
+                        if (role_id != null)
+                            user.setRole(new RoleJdbcDao(getConnection()).getFirst(
+                                    new Argument().put(ArgumentType.WHERE_LIST, Argument.Field.set("id", role_id))
+                            ));
+                        break;
+                    case "login_id":
+                        Long login_id = (Long) resultSet.getObject(columnName);
+                        if (login_id != null) {
+                            user.setLogin(new LoginJdbcDao(getConnection()).getFirst(
+                                    new Argument().put(ArgumentType.WHERE_LIST, Argument.Field.set("id", login_id))
+                            ));
+                        }
+                        break;
+                }
+            } else {
+                String subEntityName = columnName.split("\\.")[0];
+                List<String> subEntityColumnList = subEntityColumnListMap.get(subEntityName);
+                if (subEntityColumnList == null) {
+                    subEntityColumnList = new ArrayList<>();
+                    subEntityColumnListMap.put(subEntityName, subEntityColumnList);
+                }
+                subEntityColumnList.add(columnName);
+            }
+        }
+        for (Map.Entry<String, List<String>> subEntityEntry : subEntityColumnListMap.entrySet()) {
+            switch (subEntityEntry.getKey()) {
+                case "\"Role\"":
+                    user.setRole(new RoleJdbcDao(getConnection()).getEntity(
+                            resultSet,
+                            new Argument().put(ArgumentType.SELECT_COLUMN_LIST, subEntityEntry.getValue())
+                    ));
+                    break;
+                case "\"Login\"":
+                    user.setLogin(new LoginJdbcDao(getConnection()).getEntity(
+                            resultSet,
+                            new Argument().put(ArgumentType.SELECT_COLUMN_LIST, subEntityEntry.getValue())
+                    ));
+                    break;
+            }
+        }
+        return (T) user;
+    }
+
+    @Override
+    Argument.Field getJoinWhere(String joinTable) throws DaoException {
+        logger.debug("getJoinTable {}", joinTable);
+        switch (joinTable) {
+            case "\"Role\"":
+                return Argument.Field.set(DEFAULT_FROM.concat(".role_id"), null, joinTable.concat(".id"));
+            case "\"Login\"":
+                return Argument.Field.set(DEFAULT_FROM.concat(".login_id"), null, joinTable.concat(".id"));
+        }
+        throw new DaoException("exception.dao.jdbc.get-join-where");
+    }
+
+    @Override
+    String getDefaultFrom() {
+        return DEFAULT_FROM;
+    }
+
+    @Override
+    List<String> getAllSelectColumnList() {
+        List<String> columnList = new ArrayList<>();
+        columnList.add(DEFAULT_FROM.concat(".id"));
+        columnList.add(DEFAULT_FROM.concat(".first_name"));
+        columnList.add(DEFAULT_FROM.concat(".middle_name"));
+        columnList.add(DEFAULT_FROM.concat(".last_name"));
+        columnList.add(DEFAULT_FROM.concat(".role_id"));
+        columnList.add(DEFAULT_FROM.concat(".login_id"));
+        columnList.add(DEFAULT_FROM.concat(".avatar_id"));
+        return columnList;
+    }
 }

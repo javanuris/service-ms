@@ -1,8 +1,11 @@
 package com.epam.java.rt.lab.dao.h2;
 
+import com.epam.java.rt.lab.dao.Argument;
 import com.epam.java.rt.lab.dao.Dao;
 import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.dao.query.*;
+import com.epam.java.rt.lab.dao.query.Set;
+import com.epam.java.rt.lab.util.StringArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,10 +17,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * service-ms
@@ -27,7 +27,6 @@ public abstract class JdbcDao implements Dao {
     private static Map<String, String> cachedQueryMap = new HashMap<>();
     private static Map<Type, Method> preparedStatementMethodMap = new HashMap<>();
     private Connection connection = null;
-    private Long selectCount;
 
     private enum CRUD {
         CREATE, READ, UPDATE, DELETE, COUNT
@@ -89,34 +88,34 @@ public abstract class JdbcDao implements Dao {
             case CREATE:
                 query = new Create(getEntityTableName());
                 fitQueryToEntity(query, entity, setNames, fieldNames);
-                query.setSql(queryString == null ? query.create() : queryString);
+//                query.setSql(queryString == null ? query.create() : queryString);
                 break;
             case READ:
                 query = new Select(getEntityTableName(), columnNames, offset, count, order);
                 fitQueryToEntity(query, entity, setNames, fieldNames);
-                query.setSql(queryString == null ? query.create() : queryString);
+//                query.setSql(queryString == null ? query.create() : queryString);
                 break;
             case UPDATE:
                 query = new Update(getEntityTableName());
                 fitQueryToEntity(query, entity, setNames, fieldNames);
-                query.setSql(queryString == null ? query.create() : queryString);
+//                query.setSql(queryString == null ? query.create() : queryString);
                 break;
             case DELETE:
                 break;
             case COUNT:
                 query = new Select(getEntityTableName(), columnNames, null, null, null);
-                query.setSql(queryString == null ? query.createCount() : queryString);
+//                query.setSql(queryString == null ? query.createCount() : queryString);
                 break;
         }
         if (queryString == null && query != null) {
             JdbcDao.cachedQueryMap.put(queryKey, query.getSql());
-            queryString = query.getSql();
+//            queryString = query.getSql();
         }
         if (crud.equals(CRUD.READ) && offset != null && count != null) {
-            queryString.concat(new StringBuilder().append(" LIMIT ").append(offset).append(", ").append(count).toString());
-            query.setSql(queryString);
+//            queryString.concat(new StringBuilder().append(" LIMIT ").append(offset).append(", ").append(count).toString());
+//            query.setSql(queryString);
         }
-        logger.debug(queryString);
+//        logger.debug(queryString);
         return query;
     }
 
@@ -156,7 +155,7 @@ public abstract class JdbcDao implements Dao {
                 entityClass = entityClass.getSuperclass();
             }
         }
-        throw new NoSuchFieldException("exception.dao.query.reflect.get-field: " + fieldName);
+        throw new NoSuchFieldException("exception.dao.query.reflect.getTransfer-field: " + fieldName);
     }
 
     <T> T fieldValue(Field field, Object entity) throws IllegalAccessException {
@@ -243,13 +242,13 @@ public abstract class JdbcDao implements Dao {
     @Override
     public <T> T getFirst(T entity, String fieldNames, String columnNames, String order) throws DaoException {
         Query query = getCachedQuery(CRUD.READ, entity, fieldNames, columnNames, null, order, null, null);
-        try (PreparedStatement preparedStatement = getConnection().prepareStatement(query.getSql());
+        try (PreparedStatement preparedStatement = getConnection().prepareStatement(query.create());
              ResultSet resultSet = setPreparedStatementValues(preparedStatement, query).executeQuery();) {
             if (resultSet == null || !resultSet.first()) return null;
             return getEntityFromResultSet(entity, resultSet);
         } catch (SQLException e) {
             e.printStackTrace();
-            throw new DaoException("exception.dao.jdbc.get-first.get-result-set", e.getCause());
+            throw new DaoException("exception.dao.jdbc.getTransfer-first.getTransfer-result-set", e.getCause());
         }
     }
 
@@ -271,17 +270,7 @@ public abstract class JdbcDao implements Dao {
     @Override
     public <T> List<T> getAll(T entity, String fieldNames, String columnNames, String order, Long offset, Long count) throws DaoException {
         Query query = getCachedQuery(CRUD.READ, entity, fieldNames, columnNames, null, order, offset, count);
-        if (offset != null && count != null) {
-            try (PreparedStatement countStatement = getConnection().prepareStatement(query.createCount());
-                 ResultSet resultSet = countStatement.executeQuery();) {
-                if (resultSet == null) return null;
-                if (countStatement.getResultSet().next())
-                    this.selectCount = countStatement.getResultSet().getLong("count");
-            } catch (SQLException eCount) {
-                throw new DaoException("exception.dao.get-all.count", eCount.getCause());
-            }
-        }
-        try (PreparedStatement preparedStatement = getConnection().prepareStatement(query.getSql());
+        try (PreparedStatement preparedStatement = getConnection().prepareStatement(query.create());
              ResultSet resultSet = setPreparedStatementValues(preparedStatement, query).executeQuery();) {
             if (resultSet == null) return null;
             List<T> entityList = new ArrayList<>();
@@ -289,13 +278,20 @@ public abstract class JdbcDao implements Dao {
             return entityList;
         } catch (SQLException e) {
             e.printStackTrace();
-            throw new DaoException("exception.dao.get-all");
+            throw new DaoException("exception.dao.getTransfer-all");
         }
     }
 
     @Override
-    public Long getSelectCount() {
-        return this.selectCount;
+    public <T> Long count(T entity, String columnNames) throws DaoException {
+        Query query = getCachedQuery(CRUD.READ, entity, null, columnNames, null, null, null, null);
+        try (PreparedStatement countStatement = getConnection().prepareStatement(query.createCount());
+             ResultSet resultSet = countStatement.executeQuery();) {
+            if (resultSet == null || !countStatement.getResultSet().next()) return null;
+            return countStatement.getResultSet().getLong("count");
+        } catch (SQLException e) {
+            throw new DaoException("exception.dao.jdbc.count", e.getCause());
+        }
     }
 
     abstract String getEntityTableName();
@@ -306,7 +302,8 @@ public abstract class JdbcDao implements Dao {
 
     private <T> int updateQuery(T entity, String fieldNames, String setNames) throws DaoException {
         Query query = getCachedQuery(CRUD.UPDATE, entity, fieldNames, null, setNames, null, null, null);
-        try (PreparedStatement preparedStatement = getConnection().prepareStatement(query.getSql());) {
+        logger.debug("UPDATE_QUERY {}", query.create());
+        try (PreparedStatement preparedStatement = getConnection().prepareStatement(query.create());) {
             return setPreparedStatementValues(preparedStatement, query).executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -343,7 +340,7 @@ public abstract class JdbcDao implements Dao {
     @Override
     public <T> int create(T entity) throws DaoException {
         Query query = getCachedQuery(CRUD.CREATE, entity, null, null, getEntitySetNames(entity), null, null, null);
-        try (PreparedStatement preparedStatement = getConnection().prepareStatement(query.getSql());) {
+        try (PreparedStatement preparedStatement = getConnection().prepareStatement(query.create());) {
             return setPreparedStatementValues(preparedStatement, query).executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -352,5 +349,205 @@ public abstract class JdbcDao implements Dao {
     }
 
     abstract <T> String getEntitySetNames(T entity);
+
+
+    // newly dao implementation
+
+    private <T> void setStatementValue(PreparedStatement preparedStatement, int setIndex, T setValue)
+            throws SQLException, InvocationTargetException, IllegalAccessException {
+        if (setValue == null) {
+            preparedStatement.setNull(setIndex, Types.NULL);
+        } else {
+            Method method = preparedStatementMethodMap.get(setValue.getClass());
+            if (method == null) throw new SQLException();
+            method.invoke(preparedStatement, setIndex, setValue);
+        }
+    }
+
+    private PreparedStatement setStatementValues(PreparedStatement preparedStatement, Argument argument) throws DaoException {
+        logger.debug("STMT: {}", preparedStatement);
+        try {
+            int setIndex = 1;
+            Object fieldArgument = argument.get(ArgumentType.SET_FIELD_LIST);
+            if (fieldArgument != null) {
+                if (!(fieldArgument instanceof ArrayList<?>))
+                    throw new DaoException("exception.dao.jdbc.set-statement-values.field-list");
+                for (Argument.Field field : (List<Argument.Field>) fieldArgument) {
+                    setStatementValue(preparedStatement, setIndex, field.getValue());
+                    setIndex++;
+                }
+            }
+            Object whereArgument = argument.get(ArgumentType.WHERE_LIST);
+            if (whereArgument != null) {
+                if (!(whereArgument instanceof ArrayList<?>))
+                    throw new DaoException("exception.dao.jdbc.set-statement-values.where-list");
+                for (Argument.Field field : (List<Argument.Field>) whereArgument) {
+                    if (field.getCompareFieldName() == null) {
+                        setStatementValue(preparedStatement, setIndex, field.getValue());
+                        setIndex++;
+                    }
+                }
+            }
+            logger.debug("VALUED: {}", preparedStatement);
+            return preparedStatement;
+        } catch (IllegalAccessException | SQLException | InvocationTargetException e) {
+            e.printStackTrace();
+            throw new DaoException("exception.dao.jdbc.set-statement-values.set-statement-value", e.getCause());
+        }
+    }
+
+    @Override
+    public Long count(Argument argument) throws DaoException {
+        if (argument == null)
+            throw new DaoException("exception.dao.jdbc.count.argument");
+        extendArgument(argument);
+        argument.put(ArgumentType.QUERY_TYPE, QueryType.FUNC);
+        argument.put(ArgumentType.FUNC_NAME, "COUNT");
+        String sql = _query.create(argument);
+        try (PreparedStatement statement = getConnection().prepareStatement(sql);
+             ResultSet resultSet = statement.executeQuery()) {
+            if (resultSet == null || !resultSet.next()) return null;
+            return resultSet.getLong("count");
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new DaoException("exception.dao.jdbc.count.sql", e.getCause());
+        }
+    }
+
+    @Override
+    public <T> List<T> getAll(Argument argument) throws DaoException {
+        if (argument == null)
+            throw new DaoException("exception.dao.jdbc.get-all.argument");
+        extendArgument(argument);
+        argument.put(ArgumentType.QUERY_TYPE, QueryType.READ);
+        logger.debug("argument: {}", argument);
+        String sql = _query.create(argument);
+        try (PreparedStatement preparedStatement = getConnection().prepareStatement(sql);
+             ResultSet resultSet = setStatementValues(preparedStatement, argument).executeQuery()) {
+            if (resultSet == null) return null;
+            return getEntityList(resultSet, argument);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new DaoException("exception.dao.getTransfer-all");
+        }
+    }
+
+    @Override
+    public <T> T getFirst(Argument argument) throws DaoException {
+        if (argument == null)
+            throw new DaoException("exception.dao.jdbc.get-first.argument");
+        extendArgument(argument);
+        argument.put(ArgumentType.QUERY_TYPE, QueryType.READ);
+        logger.debug("argument: {}", argument);
+        String sql = _query.create(argument);
+        try (PreparedStatement preparedStatement = getConnection().prepareStatement(sql);
+             ResultSet resultSet = setStatementValues(preparedStatement, argument).executeQuery()) {
+            if (resultSet == null || !resultSet.first()) return null;
+            return getEntity(resultSet, argument);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new DaoException("exception.dao.getTransfer-all");
+        }
+    }
+
+    abstract <T> List<T> getEntityList(ResultSet resultSet, Argument argument) throws SQLException, DaoException;
+
+    abstract <T> T getEntity(ResultSet resultSet, Argument argument) throws SQLException, DaoException;
+
+    abstract String getDefaultFrom();
+
+    abstract Argument.Field getJoinWhere(String joinTable) throws DaoException;
+
+    abstract List<String> getAllSelectColumnList();
+
+    private List<String> getSelectColumnList(Object resultFieldArgument) throws DaoException {
+        if (resultFieldArgument instanceof String) {
+            return new ArrayList<>(Arrays.asList(((String) resultFieldArgument).replaceAll(" ", "").split(",")));
+        } else if (resultFieldArgument instanceof ArrayList<?>) {
+            return new ArrayList<>((List<String>) resultFieldArgument);
+        } else {
+            throw new DaoException("exception.dao.jdbc.get-select-column-list");
+        }
+    }
+
+    private void fillJoinTableWhereList(List<String> joinTableList, List<Argument.Field> joinWhereList,
+                                        List<String> columnList) throws DaoException {
+        for (int i = 0; i < columnList.size(); i++) {
+            String[] split = Argument.splitSelectColumn(columnList.get(i));
+            if (split[0].length() == 0) {
+                columnList.set(i, getDefaultFrom().concat(split[1]));
+            } else {
+                columnList.set(i, split[1]);
+            }
+            if (!joinTableList.contains(split[0])) {
+                joinTableList.add(split[0]);
+                if (split[0].length() > 0 ) joinWhereList.add(getJoinWhere(split[0]));
+            }
+        }
+    }
+
+    private List<Argument.Field> getWhereList(Object whereListArgument) throws DaoException {
+        if (whereListArgument == null) {
+            return new ArrayList<>();
+        } else if (whereListArgument != null && whereListArgument instanceof ArrayList<?>) {
+            return (List<Argument.Field>) whereListArgument;
+        } else {
+            throw new DaoException("exception.dao.jdbc.get-where-list");
+        }
+    }
+
+    private void fillJoinTableList(List<String> joinTableList,
+                                   List<Argument.Field> whereList) throws DaoException {
+        for (Argument.Field where : whereList) {
+            String tableName = where.getName().split("\\.")[0];
+            if (!joinTableList.contains(tableName)) joinTableList.add(tableName);
+        }
+    }
+
+    private void fillWhereList(List<Argument.Field> whereList, List<Argument.Field> joinWhereList) {
+        for (Argument.Field joinWhere : joinWhereList) {
+            boolean exists = false;
+            for (Argument.Field where : whereList) {
+                if (joinWhere.equals(where)) {
+                    exists = true;
+                    break;
+                }
+            }
+            if (!exists) whereList.add(joinWhere);
+        }
+    }
+
+    private void extendArgument(Argument argument) throws DaoException {
+        Object resultFieldArgument = argument.get(ArgumentType.RESULT_FIELDS);
+        List<String> selectColumnList = null;
+        if (resultFieldArgument == null) {
+            argument.put(ArgumentType.FROM_TABLE, getDefaultFrom());
+            argument.put(ArgumentType.SELECT_COLUMN_LIST, getAllSelectColumnList());
+        } else {
+            List<String> joinTableList = new ArrayList<>();
+            List<Argument.Field> joinWhereList = new ArrayList<>();
+            selectColumnList = getSelectColumnList(resultFieldArgument);
+            fillJoinTableWhereList(joinTableList, joinWhereList, selectColumnList);
+            Object whereListArgument = argument.get(ArgumentType.WHERE_LIST);
+            List<Argument.Field> whereList = getWhereList(whereListArgument);
+            argument.put(ArgumentType.WHERE_LIST, whereList);
+            fillJoinTableList(joinTableList, whereList);
+            if (joinTableList.contains("")) {
+                argument.put(ArgumentType.FROM_TABLE, getDefaultFrom());
+                joinTableList.remove("");
+            } else {
+                if (joinTableList.size() > 0) {
+                    argument.put(ArgumentType.FROM_TABLE, joinTableList.get(0));
+                    joinTableList.remove(0);
+                }
+            }
+            if (joinTableList.size() > 0) {
+                argument.put(ArgumentType.JOIN_TABLES,
+                        StringArray.combineList(joinTableList, StringArray.DELIMITER_COMMA_AND_SPACE));
+                fillWhereList(whereList, joinWhereList);
+            }
+        }
+        argument.put(ArgumentType.SELECT_COLUMN_LIST, selectColumnList);
+    }
 
 }

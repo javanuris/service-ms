@@ -1,8 +1,10 @@
 package com.epam.java.rt.lab.dao.h2;
 
+import com.epam.java.rt.lab.dao.Argument;
 import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.dao.query.Column;
 import com.epam.java.rt.lab.dao.query.Set;
+import com.epam.java.rt.lab.entity.rbac.Permission;
 import com.epam.java.rt.lab.entity.rbac.Role;
 
 import java.lang.reflect.Field;
@@ -10,13 +12,13 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * service-ms
  */
 public class RoleJdbcDao extends JdbcDao {
+    private static final String DEFAULT_FROM = "\"Role\"";
 
     public RoleJdbcDao(Connection connection) throws DaoException {
         super(connection);
@@ -36,10 +38,10 @@ public class RoleJdbcDao extends JdbcDao {
                 case "name":
                     return new Column("name", fieldValue(field, entity));
                 default:
-                    throw new DaoException("exception.dao.jdbc.get-entity-column.field-name");
+                    throw new DaoException("exception.dao.jdbc.getTransfer-entity-column.field-name");
             }
         } catch (IllegalAccessException e) {
-            throw new DaoException("exception.dao.jdbc.get-entity-column.add-column", e.getCause());
+            throw new DaoException("exception.dao.jdbc.getTransfer-entity-column.add-column", e.getCause());
         }
     }
 
@@ -52,10 +54,10 @@ public class RoleJdbcDao extends JdbcDao {
                 case "name":
                     return new Set("name", fieldValue(field, entity));
                 default:
-                    throw new DaoException("exception.dao.jdbc.get-entity-set.field-name");
+                    throw new DaoException("exception.dao.jdbc.getTransfer-entity-set.field-name");
             }
         } catch (IllegalAccessException e) {
-            throw new DaoException("exception.dao.jdbc.get-entity-set.add-column", e.getCause());
+            throw new DaoException("exception.dao.jdbc.getTransfer-entity-set.add-column", e.getCause());
         }
     }
 
@@ -80,11 +82,11 @@ public class RoleJdbcDao extends JdbcDao {
                 return (T) role;
             } catch (SQLException e) {
                 e.printStackTrace();
-                throw new DaoException("exception.dao.get-entity-from-result-set.uri-list", e.getCause());
+                throw new DaoException("exception.dao.getTransfer-entity-from-result-set.uri-list", e.getCause());
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            throw new DaoException("exception.dao.jdbc.get-entity-from-result-set.role", e.getCause());
+            throw new DaoException("exception.dao.jdbc.getTransfer-entity-from-result-set.role", e.getCause());
         }
     }
 
@@ -159,4 +161,64 @@ public class RoleJdbcDao extends JdbcDao {
     <T> String getEntitySetNames(T entity) {
         return null;
     }
+
+
+    // newly dao implementation
+
+    @Override
+    <T> List<T> getEntityList(ResultSet resultSet, Argument argument) throws SQLException, DaoException {
+        List<Role> roleList = new ArrayList<>();
+        while (resultSet.next()) {
+            Role role = getEntity(resultSet, argument);
+            List<Permission> permissionList = new PermissionJdbcDao(getConnection()).getAll(new Argument()
+                    .put(ArgumentType.RESULT_FIELDS, "permission.uri")
+                    .put(ArgumentType.WHERE_LIST, new ArrayList<>
+                            (Arrays.asList(Argument.Field.set("rolePermission.role_id", role.getId()))))
+            );
+            List<String> uriList = new ArrayList<>();
+            for (Permission permission : permissionList) uriList.add(permission.getUri());
+            role.setUriList(uriList);
+            roleList.add(role);
+        }
+        return (List<T>) roleList;
+    }
+
+    @Override
+    <T> T getEntity(ResultSet resultSet, Argument argument) throws SQLException, DaoException {
+        Map<String, List<String>> subEntityColumnListMap = new HashMap<>();
+        Role role = new Role();
+        for (String columnName : (List<String>) argument.get(ArgumentType.SELECT_COLUMN_LIST)) {
+            if (columnName.startsWith(DEFAULT_FROM.concat("."))) {
+                String shortColumnName = columnName.substring(DEFAULT_FROM.length() + 1);
+                switch (shortColumnName) {
+                    case "id":
+                        role.setId(resultSet.getLong(shortColumnName));
+                        break;
+                    case "name":
+                        role.setName((String) resultSet.getObject(shortColumnName));
+                        break;
+                }
+            }
+        }
+        return (T) role;
+    }
+
+    @Override
+    Argument.Field getJoinWhere(String joinTable) throws DaoException {
+        throw new DaoException("exception.dao.jdbc.get-join-where");
+    }
+
+    @Override
+    String getDefaultFrom() {
+        return DEFAULT_FROM;
+    }
+
+    @Override
+    List<String> getAllSelectColumnList() {
+        List<String> columnList = new ArrayList<>();
+        columnList.add(DEFAULT_FROM.concat(".id"));
+        columnList.add(DEFAULT_FROM.concat(".name"));
+        return columnList;
+    }
+
 }

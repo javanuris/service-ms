@@ -7,17 +7,17 @@ import java.util.Map;
 /**
  * service-ms
  */
-public class ListComponent {
-    public static final Long MAX_LIST_ITEM_ON_PAGE = 10L;
+public class ListComponent <T> {
     private List<ListColumn> listColumnList = new ArrayList<>();
-    private List<Map<String, String>> valueMapList = new ArrayList<>();
+    private List<T> entityList;
+    private String hrefPrefix;
 
-    public void addValueMap(Map<String, String> valueMap) {
-        this.valueMapList.add(valueMap);
+    public List<T> getEntityList() {
+        return entityList;
     }
 
-    public List<Map<String, String>> getValueMapList() {
-        return valueMapList;
+    public void setEntityList(List<T> entityList) {
+        this.entityList = entityList;
     }
 
     public void addColumn(int width, String header, String fieldName) {
@@ -26,6 +26,14 @@ public class ListComponent {
 
     public List<ListColumn> getListColumnList() {
         return listColumnList;
+    }
+
+    public void setHrefPrefix(String hrefPrefix) {
+        this.hrefPrefix = hrefPrefix;
+    }
+
+    public String getHrefPrefix() {
+        return hrefPrefix;
     }
 
     public static class ListColumn {

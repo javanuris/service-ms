@@ -2,14 +2,12 @@ package com.epam.java.rt.lab.service;
 
 import com.epam.java.rt.lab.component.PageComponent;
 import com.epam.java.rt.lab.connection.ConnectionException;
-import com.epam.java.rt.lab.dao.DaoException;
-import com.epam.java.rt.lab.dao.Dao;
+import com.epam.java.rt.lab.dao.*;
 import com.epam.java.rt.lab.entity.rbac.Login;
 import com.epam.java.rt.lab.entity.rbac.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -88,11 +86,15 @@ public class UserService extends BaseService {
     }
 
     public List<User> getUserList(PageComponent pageComponent) throws DaoException {
-        Dao dao = daoFactory.createDao("User");
-        List<User> userList = dao.getAll(null, null, null, "first_name ASC",
-                (pageComponent.getCurrentPage() - 1) * pageComponent.getItemsOnPage(), pageComponent.getItemsOnPage());
-        pageComponent.setCountPages((long) Math.ceil((dao.getSelectCount() * 1.0) / pageComponent.getItemsOnPage()));
-        return userList;
+        Dao dao = dao("User");
+        pageComponent.setCountItems(dao.count(new Argument()));
+        System.out.println("countItems = " + pageComponent.getCountItems());
+        return dao.getAll(new Argument()
+                .put(Dao.ArgumentType.LIMIT_OFFSET, (pageComponent.getCurrentPage() - 1) * pageComponent.getItemsOnPage())
+                .put(Dao.ArgumentType.LIMIT_COUNT, pageComponent.getItemsOnPage())
+                .put(Dao.ArgumentType.RESULT_FIELDS, "id", "firstName", "middleName", "lastName",
+                        "role.name")//, "login.email", "login.attemptLeft", "login.status")
+        );
     }
 
     public Map<String, Object> getAvatar(User user) throws DaoException {

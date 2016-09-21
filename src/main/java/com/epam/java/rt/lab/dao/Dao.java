@@ -1,14 +1,41 @@
 package com.epam.java.rt.lab.dao;
 
-import com.epam.java.rt.lab.dao.h2.JdbcDao;
-import com.epam.java.rt.lab.entity.rbac.User;
-
 import java.util.List;
+import java.util.Map;
 
 /**
  * service-ms
  */
 public interface Dao {
+
+    enum ArgumentType {
+        QUERY_TYPE,
+        FUNC_NAME,
+        LIMIT_OFFSET,
+        LIMIT_COUNT,
+        ORDER_COLUMNS,
+        ORDER_TYPE,
+        FROM_TABLE,
+        JOIN_TABLES,
+        RESULT_FIELDS,
+        SELECT_COLUMN_LIST,
+        SET_FIELD_LIST,
+        WHERE_LIST,
+        CUSTOM
+    }
+
+    enum QueryType {
+        CREATE,
+        READ,
+        UPDATE,
+        DELETE,
+        FUNC
+    }
+
+    enum OrderType {
+        ASC,
+        DESC
+    }
 
     <T> T getFirst(T entity, String fieldNames, String order) throws DaoException;
 
@@ -22,7 +49,7 @@ public interface Dao {
 
     <T> List<T> getAll(T entity, String fieldNames, String columnNames, String order, Long offset, Long count) throws DaoException;
 
-    Long getSelectCount();
+    public <T> Long count(T entity, String columnNames) throws DaoException;
 
     <T> int update(T entity, String fieldNames, String setNames) throws DaoException;
 
@@ -33,4 +60,11 @@ public interface Dao {
     <T> int removeRelEntity(T entity, String relEntityName) throws DaoException;
 
     <T> int create(T entity) throws DaoException;
+
+    Long count(Argument argument) throws DaoException;
+
+    <T> List<T> getAll(Argument argument) throws DaoException;
+
+    <T> T getFirst(Argument argument) throws DaoException;
+
 }

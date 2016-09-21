@@ -22,25 +22,26 @@ public class JdbcDaoFactory extends AbstractDaoFactory {
     @Override
     public Dao createDao(String daoShortName) throws DaoException {
         try {
-            logger.debug("createDao: {}", daoShortName);
-            Class daoClass = Class.forName
-                    (JdbcDaoFactory.getDatabaseProperty("management-system.package")
-                            .concat(".").concat(daoShortName).concat("JdbcDao"));
-            logger.debug("daoClass: {}", daoClass.getName());
-            Constructor<?> daoClassConstructor = daoClass.getConstructor(Connection.class);
+            Constructor<?> daoClassConstructor = getDaoConstructor(daoShortName);
             logger.debug("daoClassConstructor: {}", daoClassConstructor.getName());
-            Dao dao = (Dao) daoClassConstructor.newInstance(getConnection());
-            logger.debug("dao: {}", dao.getClass().getName());
-            return dao;
-        } catch (ClassNotFoundException e) {
-            throw new DaoException("exception.dao.factory.jdbc.for-name", e.getCause());
-        } catch (NoSuchMethodException e) {
-            throw new DaoException("exception.dao.factory.jdbc.get-constructor", e.getCause());
+            return (Dao) daoClassConstructor.newInstance(getConnection());
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
             throw new DaoException("exception.dao.factory.jdbc.new-instance", e.getCause());
         } catch (DaoException e) {
             e.printStackTrace();
-            throw new DaoException();
+            throw e;
+        }
+    }
+
+    public static Constructor<?> getDaoConstructor(String daoShortName) throws DaoException {
+        try {
+            Class daoClass = Class.forName
+                    (JdbcDaoFactory.getDatabaseProperty("management-system.package")
+                            .concat(".").concat(daoShortName).concat("JdbcDao"));
+            return daoClass.getConstructor(Connection.class);
+        } catch (NoSuchMethodException | DaoException | ClassNotFoundException e) {
+            e.printStackTrace();
+            throw new DaoException("exception.dao.jdbc.get-dao-constructor", e.getCause());
         }
     }
 

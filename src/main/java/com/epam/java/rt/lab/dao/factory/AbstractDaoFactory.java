@@ -44,7 +44,7 @@ public abstract class AbstractDaoFactory implements DaoFactory {
         } catch (ClassNotFoundException e) {
             throw new DaoException("exception.dao.factory.for-name", e.getCause());
         } catch (NoSuchMethodException e) {
-            throw new DaoException("exception.dao.factory.get-constructor", e.getCause());
+            throw new DaoException("exception.dao.factory.getTransfer-constructor", e.getCause());
         } catch (SQLException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
             e.printStackTrace();
             throw new DaoException("exception.dao.factory.new-instance", e.getCause());
@@ -63,14 +63,14 @@ public abstract class AbstractDaoFactory implements DaoFactory {
 
     @Override
     public Connection getConnection() throws DaoException {
-        if (this.connection == null) throw new DaoException("exception.dao.connection.get");
+        if (this.connection == null) throw new DaoException("exception.dao.connection.getTransfer");
         return this.connection;
     }
 
     @Override
     public void beginTransaction(int transactionIsolation) throws DaoException {
         try {
-            if (this.connection == null) throw new DaoException("exception.dao.connection.get");
+            if (this.connection == null) throw new DaoException("exception.dao.connection.getTransfer");
             this.connection.setAutoCommit(false);
             this.connection.setTransactionIsolation(transactionIsolation);
         } catch (SQLException e) {
@@ -81,7 +81,7 @@ public abstract class AbstractDaoFactory implements DaoFactory {
     @Override
     public void commitTransaction() throws DaoException {
         try {
-            if (this.connection == null) throw new DaoException("exception.dao.connection.get");
+            if (this.connection == null) throw new DaoException("exception.dao.connection.getTransfer");
             this.connection.commit();
         } catch (SQLException e) {
             throw new DaoException("exception.dao.connection.transaction.commit", e.getCause());
@@ -91,7 +91,7 @@ public abstract class AbstractDaoFactory implements DaoFactory {
     @Override
     public void rollbackTransaction() throws DaoException {
         try {
-            if (this.connection == null) throw new DaoException("exception.dao.connection.get");
+            if (this.connection == null) throw new DaoException("exception.dao.connection.getTransfer");
             this.connection.rollback();
         } catch (SQLException e) {
             throw new DaoException("exception.dao.connection.transaction.rollback", e.getCause());

@@ -86,7 +86,7 @@ public class RbacFilter implements Filter {
                     }
                 } catch (DaoException e) {
                     e.printStackTrace();
-                    throw new ServletException("exception.servlet.rbac.get-anonymous", e.getCause());
+                    throw new ServletException("exception.servlet.rbac.getTransfer-anonymous", e.getCause());
                 }
             } else {
                 if (user == null) user = userService.getUser(userId);

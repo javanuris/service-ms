@@ -8,8 +8,8 @@
         <tags:nav navCurrent="/rbac/user/list"/>
         ${requestScope.userList.addColumn(1, 'list.header.id.label', 'id')}
         ${requestScope.userList.addColumn(5, 'list.header.user-name.label', 'name')}
-        ${requestScope.userList.addColumn(3, 'list.header.role-name.label', 'role')}
-        ${requestScope.userList.addColumn(3, 'list.header.login-email.label', 'login')}
-        <tags:list listComponent="${requestScope.userList}" pageComponent="${requestScope.userListPage}" uriWithParameterPrefix="${pageContext.request.contextPath}/rbac/user/list?page="/>
+        ${requestScope.userList.addColumn(3, 'list.header.role-name.label', 'role.name')}
+        ${requestScope.userList.addColumn(3, 'list.header.login-email.label', 'login.email')}
+        <tags:list listComponent="${requestScope.userList}" pageComponent="${requestScope.userListPage}" uriWithQuestionMark="${pageContext.request.contextPath}/rbac/user/list?"/>
     </jsp:body>
 </tags:template>

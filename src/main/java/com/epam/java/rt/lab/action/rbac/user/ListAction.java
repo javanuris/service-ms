@@ -31,41 +31,25 @@ public class ListAction implements Action {
 
     @Override
     public void execute(HttpServletRequest req, HttpServletResponse resp) throws ActionException {
-        UserService userService = null;
-        try {
-            logger.debug("/WEB-INF/jsp/rbac/user/list.jsp");
+        try (UserService userService = new UserService()) {
             req.setAttribute("navItemArray", NavigationComponent.getNavItemArray("nav.rbac"));
-            ListComponent listComponent = new ListComponent();
-            userService = new UserService();
             String page = req.getParameter("page");
-            Long pageIndex = 1L;
-            if (FormManager.isOnlyDigits(page)) pageIndex = Long.valueOf(page);
-            PageComponent pageComponent = new PageComponent(pageIndex, ListComponent.MAX_LIST_ITEM_ON_PAGE);
-            for (User user : userService.getUserList(pageComponent)) {
-                Map<String, String> valueMap = new HashMap<>();
-                valueMap.put("id", user.getId().toString());
-                valueMap.put("firstName", user.getFirstName());
-                valueMap.put("middleName", user.getMiddleName());
-                valueMap.put("lastName", user.getLastName());
-                valueMap.put("name", user.getName());
-                valueMap.put("role", user.getRole().getName());
-                valueMap.put("href", UrlManager.getContextUri(req,
-                        "/rbac/user/view?id=".concat(String.valueOf(user.getId()))));
-                if (user.getLogin() != null) valueMap.put("login", user.getLogin().getEmail());
-                listComponent.addValueMap(valueMap);
-            }
+            String items = req.getParameter("items");
+            PageComponent pageComponent = new PageComponent(
+                    !FormManager.isOnlyDigits(page) ? 1L : Long.valueOf(page),
+                    !FormManager.isOnlyDigits(items) ? null : Long.valueOf(items));
+            ListComponent listComponent = new ListComponent();
+            listComponent.setEntityList(userService.getUserList(pageComponent));
+            listComponent.setHrefPrefix(UrlManager.getContextUri(req,"/rbac/user/view?id="));
             req.setAttribute("userList", listComponent);
             req.setAttribute("userListPage", pageComponent);
             req.getRequestDispatcher("/WEB-INF/jsp/rbac/user/list.jsp").forward(req, resp);
-        } catch (ServletException | IOException | ConnectionException | DaoException e) {
+        } catch (ConnectionException | DaoException e) {
             e.printStackTrace();
-            throw new ActionException("exception.action.rbac.user.list", e.getCause());
-        } finally {
-            try {
-                if (userService != null) userService.close();
-            } catch (DaoException e) {
-                e.printStackTrace();
-            }
+            throw new ActionException("exception.action.rbac.user.list.user-service", e.getCause());
+        } catch (ServletException | IOException e) {
+            e.printStackTrace();
+            throw new ActionException("exception.action.rbac.user.list.forward", e.getCause());
         }
     }
 

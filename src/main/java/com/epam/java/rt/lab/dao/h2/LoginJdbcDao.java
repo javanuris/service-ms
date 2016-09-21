@@ -1,5 +1,6 @@
 package com.epam.java.rt.lab.dao.h2;
 
+import com.epam.java.rt.lab.dao.Argument;
 import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.dao.query.Column;
 import com.epam.java.rt.lab.dao.query.Set;
@@ -20,6 +21,7 @@ import java.util.Map;
  * service-ms
  */
 public class LoginJdbcDao extends JdbcDao {
+    private static final String DEFAULT_FROM = "\"Login\"";
     private static final Logger logger = LoggerFactory.getLogger(LoginJdbcDao.class);
 
     public LoginJdbcDao(Connection connection) throws DaoException {
@@ -42,10 +44,10 @@ public class LoginJdbcDao extends JdbcDao {
                 case "password":
                     return new Column("password", fieldValue(field, entity));
                 default:
-                    throw new DaoException("exception.dao.jdbc.get-entity-column.field-name");
+                    throw new DaoException("exception.dao.jdbc.getTransfer-entity-column.field-name");
             }
         } catch (IllegalAccessException e) {
-            throw new DaoException("exception.dao.jdbc.get-entity-column.add-column", e.getCause());
+            throw new DaoException("exception.dao.jdbc.getTransfer-entity-column.add-column", e.getCause());
         }
     }
 
@@ -64,10 +66,10 @@ public class LoginJdbcDao extends JdbcDao {
                 case "status":
                     return new Set("status", fieldValue(field, entity));
                 default:
-                    throw new DaoException("exception.dao.jdbc.get-entity-column.field-name");
+                    throw new DaoException("exception.dao.jdbc.getTransfer-entity-column.field-name");
             }
         } catch (IllegalAccessException e) {
-            throw new DaoException("exception.dao.jdbc.get-entity-set.add-column", e.getCause());
+            throw new DaoException("exception.dao.jdbc.getTransfer-entity-set.add-column", e.getCause());
         }
     }
 
@@ -83,7 +85,7 @@ public class LoginJdbcDao extends JdbcDao {
             login.setStatus(resultSet.getInt("status"));
             return (T) login;
         } catch (SQLException e) {
-            throw new DaoException("exception.dao.jdbc.get-entity-from-result-set", e.getCause());
+            throw new DaoException("exception.dao.jdbc.getTransfer-entity-from-result-set", e.getCause());
         }
     }
 
@@ -141,7 +143,7 @@ public class LoginJdbcDao extends JdbcDao {
             return activationMap;
         } catch (SQLException e) {
             e.printStackTrace();
-            throw new DaoException("exception.dao.get-activation", e.getCause());
+            throw new DaoException("exception.dao.getTransfer-activation", e.getCause());
         }
     }
 
@@ -221,7 +223,7 @@ public class LoginJdbcDao extends JdbcDao {
             return forgotMap;
         } catch (SQLException e) {
             e.printStackTrace();
-            throw new DaoException("exception.dao.get-activation", e.getCause());
+            throw new DaoException("exception.dao.getTransfer-activation", e.getCause());
         }
     }
 
@@ -287,4 +289,65 @@ public class LoginJdbcDao extends JdbcDao {
     <T> String getEntitySetNames(T entity) {
         return "email, password, attemptLeft, status";
     }
+
+
+    // newly dao implementation
+
+    @Override
+    <T> List<T> getEntityList(ResultSet resultSet, Argument argument) throws SQLException, DaoException {
+        List<Login> loginList = new ArrayList<>();
+        while (resultSet.next()) loginList.add(getEntity(resultSet, argument));
+        return (List<T>) loginList;
+    }
+
+    @Override
+    <T> T getEntity(ResultSet resultSet, Argument argument) throws SQLException, DaoException {
+        Login login = new Login();
+        for (String columnName : (List<String>) argument.get(ArgumentType.SELECT_COLUMN_LIST)) {
+            if (columnName.startsWith(DEFAULT_FROM.concat("."))) {
+                String shortColumnName = columnName.substring(DEFAULT_FROM.length() + 1);
+                switch (shortColumnName) {
+                    case "id":
+                        login.setId(resultSet.getLong(shortColumnName));
+                        break;
+                    case "email":
+                        login.setEmail((String) resultSet.getObject(shortColumnName));
+                        break;
+                    case "password":
+                        login.setPassword((String) resultSet.getObject(shortColumnName));
+                        break;
+                    case "attempt_left":
+                        login.setAttemptLeft((Integer) resultSet.getObject(shortColumnName));
+                        break;
+                    case "status":
+                        login.setStatus((Integer) resultSet.getObject(shortColumnName));
+                        break;
+                }
+            }
+        }
+        return (T) login;
+    }
+
+    @Override
+    Argument.Field getJoinWhere(String joinTable) throws DaoException {
+        throw new DaoException("exception.dao.jdbc.get-join-where");
+    }
+
+    @Override
+    String getDefaultFrom() {
+        return DEFAULT_FROM;
+    }
+
+    @Override
+    List<String> getAllSelectColumnList() {
+        List<String> columnList = new ArrayList<>();
+        columnList.add(DEFAULT_FROM.concat(".id"));
+        columnList.add(DEFAULT_FROM.concat(".email"));
+        columnList.add(DEFAULT_FROM.concat(".password"));
+        columnList.add(DEFAULT_FROM.concat(".attemptLeft"));
+        columnList.add(DEFAULT_FROM.concat(".status"));
+        return columnList;
+    }
+
+
 }
