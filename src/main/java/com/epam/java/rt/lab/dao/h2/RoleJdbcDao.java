@@ -1,7 +1,7 @@
 package com.epam.java.rt.lab.dao.h2;
 
-import com.epam.java.rt.lab.dao.Argument;
 import com.epam.java.rt.lab.dao.DaoException;
+import com.epam.java.rt.lab.dao.Parameter;
 import com.epam.java.rt.lab.dao.query.Column;
 import com.epam.java.rt.lab.dao.query.Set;
 import com.epam.java.rt.lab.entity.rbac.Permission;
@@ -166,14 +166,14 @@ public class RoleJdbcDao extends JdbcDao {
     // newly dao implementation
 
     @Override
-    <T> List<T> getEntityList(ResultSet resultSet, Argument argument) throws SQLException, DaoException {
+    <T> List<T> getEntityList(ResultSet resultSet, Parameter parameter) throws SQLException, DaoException {
         List<Role> roleList = new ArrayList<>();
         while (resultSet.next()) {
-            Role role = getEntity(resultSet, argument);
-            List<Permission> permissionList = new PermissionJdbcDao(getConnection()).getAll(new Argument()
-                    .put(ArgumentType.RESULT_FIELDS, "permission.uri")
-                    .put(ArgumentType.WHERE_LIST, new ArrayList<>
-                            (Arrays.asList(Argument.Field.set("rolePermission.role_id", role.getId()))))
+            Role role = getEntity(resultSet, parameter);
+            List<Permission> permissionList = new PermissionJdbcDao(getConnection()).getAll(new Parameter()
+                    .put(Parameter.Type.RESULT_FIELD_ARRAY, "permission.uri")
+                    .put(Parameter.Type._WHERE_COLUMN_LIST, new ArrayList<>
+                            (Arrays.asList(Parameter.Field.set("rolePermission.role_id", role.getId()))))
             );
             List<String> uriList = new ArrayList<>();
             for (Permission permission : permissionList) uriList.add(permission.getUri());
@@ -184,10 +184,10 @@ public class RoleJdbcDao extends JdbcDao {
     }
 
     @Override
-    <T> T getEntity(ResultSet resultSet, Argument argument) throws SQLException, DaoException {
+    <T> T getEntity(ResultSet resultSet, Parameter parameter) throws SQLException, DaoException {
         Map<String, List<String>> subEntityColumnListMap = new HashMap<>();
         Role role = new Role();
-        for (String columnName : (List<String>) argument.get(ArgumentType.SELECT_COLUMN_LIST)) {
+        for (String columnName : (List<String>) parameter.get(Parameter.Type._SELECT_COLUMN_LIST)) {
             if (columnName.startsWith(DEFAULT_FROM.concat("."))) {
                 String shortColumnName = columnName.substring(DEFAULT_FROM.length() + 1);
                 switch (shortColumnName) {
@@ -204,8 +204,8 @@ public class RoleJdbcDao extends JdbcDao {
     }
 
     @Override
-    Argument.Field getJoinWhere(String joinTable) throws DaoException {
-        throw new DaoException("exception.dao.jdbc.get-join-where");
+    Parameter.Field getJoinWhereItem(String joinTable) throws DaoException {
+        throw new DaoException("exception.dao.jdbc.getSql-join-where");
     }
 
     @Override

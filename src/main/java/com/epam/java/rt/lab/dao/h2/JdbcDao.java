@@ -1,8 +1,8 @@
 package com.epam.java.rt.lab.dao.h2;
 
-import com.epam.java.rt.lab.dao.Argument;
 import com.epam.java.rt.lab.dao.Dao;
 import com.epam.java.rt.lab.dao.DaoException;
+import com.epam.java.rt.lab.dao.Parameter;
 import com.epam.java.rt.lab.dao.query.*;
 import com.epam.java.rt.lab.dao.query.Set;
 import com.epam.java.rt.lab.util.StringArray;
@@ -14,7 +14,6 @@ import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.sql.*;
 import java.util.*;
@@ -25,7 +24,7 @@ import java.util.*;
 public abstract class JdbcDao implements Dao {
     private static final Logger logger = LoggerFactory.getLogger(JdbcDao.class);
     private static Map<String, String> cachedQueryMap = new HashMap<>();
-    private static Map<Type, Method> preparedStatementMethodMap = new HashMap<>();
+    private static Map<java.lang.reflect.Type, Method> preparedStatementMethodMap = new HashMap<>();
     private Connection connection = null;
 
     private enum CRUD {
@@ -88,17 +87,17 @@ public abstract class JdbcDao implements Dao {
             case CREATE:
                 query = new Create(getEntityTableName());
                 fitQueryToEntity(query, entity, setNames, fieldNames);
-//                query.setSql(queryString == null ? query.create() : queryString);
+//                query.setSql(queryString == null ? query.getSql() : queryString);
                 break;
             case READ:
                 query = new Select(getEntityTableName(), columnNames, offset, count, order);
                 fitQueryToEntity(query, entity, setNames, fieldNames);
-//                query.setSql(queryString == null ? query.create() : queryString);
+//                query.setSql(queryString == null ? query.getSql() : queryString);
                 break;
             case UPDATE:
                 query = new Update(getEntityTableName());
                 fitQueryToEntity(query, entity, setNames, fieldNames);
-//                query.setSql(queryString == null ? query.create() : queryString);
+//                query.setSql(queryString == null ? query.getSql() : queryString);
                 break;
             case DELETE:
                 break;
@@ -218,7 +217,7 @@ public abstract class JdbcDao implements Dao {
     PreparedStatement setPreparedStatementValues(PreparedStatement preparedStatement,
                                                  List<?> setOrColumnList) throws DaoException {
         // it could be List<T> instead List<?>, and then it should be <T extend someParentClass>, but in this case
-        // it is too expensive to create extra number of classes which do almost similar job
+        // it is too expensive to getSql extra number of classes which do almost similar job
         if (setOrColumnList == null) return setPreparedStatementValues(preparedStatement, null, null);
         switch (setOrColumnList.get(0).getClass().getSimpleName()) {
             case "Set":
@@ -364,24 +363,24 @@ public abstract class JdbcDao implements Dao {
         }
     }
 
-    private PreparedStatement setStatementValues(PreparedStatement preparedStatement, Argument argument) throws DaoException {
+    private PreparedStatement setStatementValues(PreparedStatement preparedStatement, Parameter parameter) throws DaoException {
         logger.debug("STMT: {}", preparedStatement);
         try {
             int setIndex = 1;
-            Object fieldArgument = argument.get(ArgumentType.SET_FIELD_LIST);
+            Object fieldArgument = parameter.get(Parameter.Type.SET_FIELD_ARRAY);
             if (fieldArgument != null) {
                 if (!(fieldArgument instanceof ArrayList<?>))
                     throw new DaoException("exception.dao.jdbc.set-statement-values.field-list");
-                for (Argument.Field field : (List<Argument.Field>) fieldArgument) {
+                for (Parameter.Field field : (List<Parameter.Field>) fieldArgument) {
                     setStatementValue(preparedStatement, setIndex, field.getValue());
                     setIndex++;
                 }
             }
-            Object whereArgument = argument.get(ArgumentType.WHERE_LIST);
+            Object whereArgument = parameter.get(Parameter.Type._WHERE_COLUMN_LIST);
             if (whereArgument != null) {
                 if (!(whereArgument instanceof ArrayList<?>))
                     throw new DaoException("exception.dao.jdbc.set-statement-values.where-list");
-                for (Argument.Field field : (List<Argument.Field>) whereArgument) {
+                for (Parameter.Field field : (List<Parameter.Field>) whereArgument) {
                     if (field.getCompareFieldName() == null) {
                         setStatementValue(preparedStatement, setIndex, field.getValue());
                         setIndex++;
@@ -397,14 +396,13 @@ public abstract class JdbcDao implements Dao {
     }
 
     @Override
-    public Long count(Argument argument) throws DaoException {
-        if (argument == null)
-            throw new DaoException("exception.dao.jdbc.count.argument");
-        extendArgument(argument);
-        argument.put(ArgumentType.QUERY_TYPE, QueryType.FUNC);
-        argument.put(ArgumentType.FUNC_NAME, "COUNT");
-        String sql = _query.create(argument);
-        try (PreparedStatement statement = getConnection().prepareStatement(sql);
+    public Long count(Parameter parameter) throws DaoException {
+        if (parameter == null)
+            throw new DaoException("exception.dao.jdbc.count.parameter");
+        extendArgument(parameter);
+        parameter.put(Parameter.Type._QUERY_TYPE, QueryBuilder.Type.FUNC);
+        parameter.put(Parameter.Type._FUNC_NAME, "COUNT");
+        try (PreparedStatement statement = getConnection().prepareStatement(QueryBuilder.getSql(parameter));
              ResultSet resultSet = statement.executeQuery()) {
             if (resultSet == null || !resultSet.next()) return null;
             return resultSet.getLong("count");
@@ -415,65 +413,70 @@ public abstract class JdbcDao implements Dao {
     }
 
     @Override
-    public <T> List<T> getAll(Argument argument) throws DaoException {
-        if (argument == null)
-            throw new DaoException("exception.dao.jdbc.get-all.argument");
-        extendArgument(argument);
-        argument.put(ArgumentType.QUERY_TYPE, QueryType.READ);
-        logger.debug("argument: {}", argument);
-        String sql = _query.create(argument);
-        try (PreparedStatement preparedStatement = getConnection().prepareStatement(sql);
-             ResultSet resultSet = setStatementValues(preparedStatement, argument).executeQuery()) {
+    public <T> List<T> getAll(Parameter parameter) throws DaoException {
+        if (parameter == null)
+            throw new DaoException("exception.dao.jdbc.get-all.parameter");
+        extendArgument(parameter);
+        parameter.put(Parameter.Type._QUERY_TYPE, QueryBuilder.Type.READ);
+        logger.debug("parameter: {}", parameter);
+        try (PreparedStatement preparedStatement = getConnection().prepareStatement(QueryBuilder.getSql(parameter));
+             ResultSet resultSet = setStatementValues(preparedStatement, parameter).executeQuery()) {
             if (resultSet == null) return null;
-            return getEntityList(resultSet, argument);
+            return getEntityList(resultSet, parameter);
         } catch (SQLException e) {
             e.printStackTrace();
-            throw new DaoException("exception.dao.getTransfer-all");
+            throw new DaoException("exception.dao.jdbc.get-all.sql");
         }
     }
 
     @Override
-    public <T> T getFirst(Argument argument) throws DaoException {
-        if (argument == null)
-            throw new DaoException("exception.dao.jdbc.get-first.argument");
-        extendArgument(argument);
-        argument.put(ArgumentType.QUERY_TYPE, QueryType.READ);
-        logger.debug("argument: {}", argument);
-        String sql = _query.create(argument);
+    public <T> T getFirst(Parameter parameter) throws DaoException {
+        if (parameter == null)
+            throw new DaoException("exception.dao.jdbc.get-first.parameter");
+        extendArgument(parameter);
+        parameter.put(Parameter.Type._QUERY_TYPE, QueryBuilder.Type.READ);
+        logger.debug("parameter: {}", parameter);
+        String sql = QueryBuilder.getSql(parameter);
         try (PreparedStatement preparedStatement = getConnection().prepareStatement(sql);
-             ResultSet resultSet = setStatementValues(preparedStatement, argument).executeQuery()) {
+             ResultSet resultSet = setStatementValues(preparedStatement, parameter).executeQuery()) {
             if (resultSet == null || !resultSet.first()) return null;
-            return getEntity(resultSet, argument);
+            return getEntity(resultSet, parameter);
         } catch (SQLException e) {
             e.printStackTrace();
-            throw new DaoException("exception.dao.getTransfer-all");
+            throw new DaoException("exception.dao.jdbc.get-first");
         }
     }
 
-    abstract <T> List<T> getEntityList(ResultSet resultSet, Argument argument) throws SQLException, DaoException;
+    abstract <T> List<T> getEntityList(ResultSet resultSet, Parameter parameter) throws SQLException, DaoException;
 
-    abstract <T> T getEntity(ResultSet resultSet, Argument argument) throws SQLException, DaoException;
+    abstract <T> T getEntity(ResultSet resultSet, Parameter parameter) throws SQLException, DaoException;
 
     abstract String getDefaultFrom();
 
-    abstract Argument.Field getJoinWhere(String joinTable) throws DaoException;
+    abstract Parameter.Field getJoinWhereItem(String joinTable) throws DaoException;
 
     abstract List<String> getAllSelectColumnList();
 
-    private List<String> getSelectColumnList(Object resultFieldArgument) throws DaoException {
-        if (resultFieldArgument instanceof String) {
-            return new ArrayList<>(Arrays.asList(((String) resultFieldArgument).replaceAll(" ", "").split(",")));
-        } else if (resultFieldArgument instanceof ArrayList<?>) {
-            return new ArrayList<>((List<String>) resultFieldArgument);
-        } else {
-            throw new DaoException("exception.dao.jdbc.get-select-column-list");
+    private List<String> getStringList(Object delimitedWithCommasStringOrArray) {
+        if (delimitedWithCommasStringOrArray instanceof String) {
+            return new ArrayList<>(Arrays.asList(((String) delimitedWithCommasStringOrArray)
+                    .replaceAll(" ", "").split(",")));
+        } else if (delimitedWithCommasStringOrArray instanceof String[]) {
+            return new ArrayList<>(Arrays.asList((String[]) delimitedWithCommasStringOrArray));
         }
+        return null;
     }
 
-    private void fillJoinTableWhereList(List<String> joinTableList, List<Argument.Field> joinWhereList,
-                                        List<String> columnList) throws DaoException {
+    private List<String> getSelectColumnList(Object resultFieldParameter) throws DaoException {
+        List<String> selectColumnList = getStringList(resultFieldParameter);
+        if (selectColumnList != null) return selectColumnList;
+        throw new DaoException("exception.dao.jdbc.get-select-column-list");
+    }
+
+    private void fillJoinTableListAndJoinWhereList(List<String> joinTableList, List<Parameter.Field> joinWhereList,
+                                                   List<String> columnList) throws DaoException {
         for (int i = 0; i < columnList.size(); i++) {
-            String[] split = Argument.splitSelectColumn(columnList.get(i));
+            String[] split = Parameter.splitAndConvertFieldNames(columnList.get(i));
             if (split[0].length() == 0) {
                 columnList.set(i, getDefaultFrom().concat(split[1]));
             } else {
@@ -481,73 +484,113 @@ public abstract class JdbcDao implements Dao {
             }
             if (!joinTableList.contains(split[0])) {
                 joinTableList.add(split[0]);
-                if (split[0].length() > 0 ) joinWhereList.add(getJoinWhere(split[0]));
+                if (split[0].length() > 0 ) joinWhereList.add(getJoinWhereItem(split[0]));
             }
         }
     }
 
-    private List<Argument.Field> getWhereList(Object whereListArgument) throws DaoException {
-        if (whereListArgument == null) {
+    private List<Parameter.Field> getWhereColumnList(Object whereFieldArrayParameter) throws DaoException {
+        if (whereFieldArrayParameter == null) {
             return new ArrayList<>();
-        } else if (whereListArgument != null && whereListArgument instanceof ArrayList<?>) {
-            return (List<Argument.Field>) whereListArgument;
+        } else if (whereFieldArrayParameter instanceof Parameter.Field[]) {
+            return new ArrayList<>(Arrays.asList((Parameter.Field[]) whereFieldArrayParameter));
         } else {
-            throw new DaoException("exception.dao.jdbc.get-where-list");
+            throw new DaoException("exception.dao.jdbc.get-where-column-list");
         }
     }
 
     private void fillJoinTableList(List<String> joinTableList,
-                                   List<Argument.Field> whereList) throws DaoException {
-        for (Argument.Field where : whereList) {
+                                   List<Parameter.Field> whereColumnList) throws DaoException {
+        for (Parameter.Field where : whereColumnList) {
             String tableName = where.getName().split("\\.")[0];
             if (!joinTableList.contains(tableName)) joinTableList.add(tableName);
         }
     }
 
-    private void fillWhereList(List<Argument.Field> whereList, List<Argument.Field> joinWhereList) {
-        for (Argument.Field joinWhere : joinWhereList) {
+    private void fillWhereColumnList(List<Parameter.Field> whereColumnList, List<Parameter.Field> joinWhereList) {
+        for (Parameter.Field joinWhere : joinWhereList) {
             boolean exists = false;
-            for (Argument.Field where : whereList) {
+            for (Parameter.Field where : whereColumnList) {
                 if (joinWhere.equals(where)) {
                     exists = true;
                     break;
                 }
             }
-            if (!exists) whereList.add(joinWhere);
+            if (!exists) whereColumnList.add(joinWhere);
         }
     }
 
-    private void extendArgument(Argument argument) throws DaoException {
-        Object resultFieldArgument = argument.get(ArgumentType.RESULT_FIELDS);
-        List<String> selectColumnList = null;
-        if (resultFieldArgument == null) {
-            argument.put(ArgumentType.FROM_TABLE, getDefaultFrom());
-            argument.put(ArgumentType.SELECT_COLUMN_LIST, getAllSelectColumnList());
-        } else {
-            List<String> joinTableList = new ArrayList<>();
-            List<Argument.Field> joinWhereList = new ArrayList<>();
-            selectColumnList = getSelectColumnList(resultFieldArgument);
-            fillJoinTableWhereList(joinTableList, joinWhereList, selectColumnList);
-            Object whereListArgument = argument.get(ArgumentType.WHERE_LIST);
-            List<Argument.Field> whereList = getWhereList(whereListArgument);
-            argument.put(ArgumentType.WHERE_LIST, whereList);
-            fillJoinTableList(joinTableList, whereList);
-            if (joinTableList.contains("")) {
-                argument.put(ArgumentType.FROM_TABLE, getDefaultFrom());
-                joinTableList.remove("");
+    private List<String> getOrderColumnList(Object orderFieldNameArrayParameter) {
+        if (orderFieldNameArrayParameter == null) return null;
+        List<String> orderColumnList = getStringList(orderFieldNameArrayParameter);
+        if (orderColumnList == null) return null;
+        for (int i = 0; i < orderColumnList.size(); i++) {
+            String[] split = Parameter.splitAndConvertFieldNames(orderColumnList.get(i));
+            if (split[0].length() == 0) {
+                orderColumnList.set(i, getDefaultFrom().concat(split[1]));
             } else {
-                if (joinTableList.size() > 0) {
-                    argument.put(ArgumentType.FROM_TABLE, joinTableList.get(0));
-                    joinTableList.remove(0);
-                }
-            }
-            if (joinTableList.size() > 0) {
-                argument.put(ArgumentType.JOIN_TABLES,
-                        StringArray.combineList(joinTableList, StringArray.DELIMITER_COMMA_AND_SPACE));
-                fillWhereList(whereList, joinWhereList);
+                orderColumnList.set(i, split[1]);
             }
         }
-        argument.put(ArgumentType.SELECT_COLUMN_LIST, selectColumnList);
+        return orderColumnList;
     }
 
+    private void fillSelectColumnList(List<String> selectColumnList, Object generateValueArrayParameter) {
+        if (generateValueArrayParameter != null) {
+            List<QueryBuilder.GenerateValueType> generateValueList =
+                    (List<QueryBuilder.GenerateValueType>) generateValueArrayParameter;
+            for (QueryBuilder.GenerateValueType generateValue : generateValueList) {
+                String selectColumn = null;
+                switch (generateValue) {
+                    case SERIAL_NUMBER:
+                        selectColumn = "ROW_NUMBER () AS serial";
+                        break;
+                }
+                if (selectColumn != null && !selectColumnList.contains(selectColumn))
+                    selectColumnList.add(selectColumn);
+            }
+        }
+    }
+
+    private void extendArgument(Parameter parameter) throws DaoException {
+        List<String> selectColumnList;
+        Object resultFieldArrayParameter = parameter.get(Parameter.Type.RESULT_FIELD_ARRAY);
+        if (resultFieldArrayParameter == null) {
+            parameter.put(Parameter.Type._FROM_TABLE, getDefaultFrom());
+            selectColumnList = getAllSelectColumnList();
+        } else {
+            // prepare join section and where section according to join
+            selectColumnList = getSelectColumnList(resultFieldArrayParameter);
+            List<String> joinTableList = new ArrayList<>();
+            List<Parameter.Field> joinWhereList = new ArrayList<>();
+            fillJoinTableListAndJoinWhereList(joinTableList, joinWhereList, selectColumnList);
+            // prepare where section
+            Object whereFieldArrayParameter = parameter.get(Parameter.Type.WHERE_FIELD_ARRAY);
+            List<Parameter.Field> whereColumnList = getWhereColumnList(whereFieldArrayParameter);
+            parameter.put(Parameter.Type._WHERE_COLUMN_LIST, whereColumnList);
+            // another prepare join section
+            fillJoinTableList(joinTableList, whereColumnList);
+            if (joinTableList.contains("")) { // removing empty joinTable meaning defaultFrom
+                parameter.put(Parameter.Type._FROM_TABLE, getDefaultFrom());
+                joinTableList.remove("");
+            } else if (joinTableList.size() > 0) { // removing index #0 joinTable meaning defaultFrom
+                parameter.put(Parameter.Type._FROM_TABLE, joinTableList.get(0));
+                joinTableList.remove(0);
+            }
+            // complete join section and where section
+            if (joinTableList.size() > 0) {
+                parameter.put(Parameter.Type._JOIN_TABLES,
+                        StringArray.combine(joinTableList, StringArray.DELIMITER_COMMA_AND_SPACE));
+                fillWhereColumnList(whereColumnList, joinWhereList);
+            }
+        }
+        // prepare order section
+        Object orderFieldNameArrayParameter = parameter.get(Parameter.Type.ORDER_FIELD_NAME_ARRAY);
+        parameter.put(Parameter.Type._ORDER_COLUMN_LIST, getOrderColumnList(orderFieldNameArrayParameter));
+        // extend select section with generate values
+        Object generateValueArrayParameter = parameter.get(Parameter.Type.GENERATE_VALUE_ARRAY);
+        fillSelectColumnList(selectColumnList, generateValueArrayParameter);
+        // complete select section
+        parameter.put(Parameter.Type._SELECT_COLUMN_LIST, selectColumnList);
+    }
 }

@@ -1,41 +1,11 @@
 package com.epam.java.rt.lab.dao;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * service-ms
  */
 public interface Dao {
-
-    enum ArgumentType {
-        QUERY_TYPE,
-        FUNC_NAME,
-        LIMIT_OFFSET,
-        LIMIT_COUNT,
-        ORDER_COLUMNS,
-        ORDER_TYPE,
-        FROM_TABLE,
-        JOIN_TABLES,
-        RESULT_FIELDS,
-        SELECT_COLUMN_LIST,
-        SET_FIELD_LIST,
-        WHERE_LIST,
-        CUSTOM
-    }
-
-    enum QueryType {
-        CREATE,
-        READ,
-        UPDATE,
-        DELETE,
-        FUNC
-    }
-
-    enum OrderType {
-        ASC,
-        DESC
-    }
 
     <T> T getFirst(T entity, String fieldNames, String order) throws DaoException;
 
@@ -61,10 +31,10 @@ public interface Dao {
 
     <T> int create(T entity) throws DaoException;
 
-    Long count(Argument argument) throws DaoException;
+    Long count(Parameter parameter) throws DaoException;
 
-    <T> List<T> getAll(Argument argument) throws DaoException;
+    <T> List<T> getAll(Parameter parameter) throws DaoException;
 
-    <T> T getFirst(Argument argument) throws DaoException;
+    <T> T getFirst(Parameter parameter) throws DaoException;
 
 }

@@ -41,7 +41,7 @@ public class JdbcDaoFactory extends AbstractDaoFactory {
             return daoClass.getConstructor(Connection.class);
         } catch (NoSuchMethodException | DaoException | ClassNotFoundException e) {
             e.printStackTrace();
-            throw new DaoException("exception.dao.jdbc.get-dao-constructor", e.getCause());
+            throw new DaoException("exception.dao.jdbc.getSql-dao-constructor", e.getCause());
         }
     }
 

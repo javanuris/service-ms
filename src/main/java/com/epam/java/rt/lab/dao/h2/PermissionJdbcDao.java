@@ -1,16 +1,13 @@
 package com.epam.java.rt.lab.dao.h2;
 
-import com.epam.java.rt.lab.dao.Argument;
 import com.epam.java.rt.lab.dao.DaoException;
+import com.epam.java.rt.lab.dao.Parameter;
 import com.epam.java.rt.lab.dao.query.Column;
-import com.epam.java.rt.lab.dao.query.Select;
 import com.epam.java.rt.lab.dao.query.Set;
 import com.epam.java.rt.lab.entity.rbac.Permission;
-import com.epam.java.rt.lab.entity.rbac.Role;
 
 import java.lang.reflect.Field;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
@@ -83,16 +80,16 @@ public class PermissionJdbcDao extends JdbcDao {
     // newly dao implementation
 
     @Override
-    <T> List<T> getEntityList(ResultSet resultSet, Argument argument) throws SQLException, DaoException {
+    <T> List<T> getEntityList(ResultSet resultSet, Parameter parameter) throws SQLException, DaoException {
         List<Permission> permissionList = new ArrayList<>();
-        while (resultSet.next()) permissionList.add(getEntity(resultSet, argument));
+        while (resultSet.next()) permissionList.add(getEntity(resultSet, parameter));
         return (List<T>) permissionList;
     }
 
     @Override
-    <T> T getEntity(ResultSet resultSet, Argument argument) throws SQLException, DaoException {
+    <T> T getEntity(ResultSet resultSet, Parameter parameter) throws SQLException, DaoException {
         Permission permission = new Permission();
-        for (String columnName : (List<String>) argument.get(ArgumentType.SELECT_COLUMN_LIST)) {
+        for (String columnName : (List<String>) parameter.get(Parameter.Type._SELECT_COLUMN_LIST)) {
             if (columnName.startsWith(DEFAULT_FROM.concat("."))) {
                 String shortColumnName = columnName.substring(DEFAULT_FROM.length() + 1);
                 switch (shortColumnName) {
@@ -109,8 +106,8 @@ public class PermissionJdbcDao extends JdbcDao {
     }
 
     @Override
-    Argument.Field getJoinWhere(String joinTable) throws DaoException {
-        throw new DaoException("exception.dao.jdbc.get-join-where");
+    Parameter.Field getJoinWhereItem(String joinTable) throws DaoException {
+        throw new DaoException("exception.dao.jdbc.getSql-join-where");
     }
 
     @Override

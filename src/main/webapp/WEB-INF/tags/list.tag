@@ -20,7 +20,7 @@
                 <a href="${listComponent.hrefPrefix.concat(item.id)}" class="list-group-item col-xs-12" style="border-left: hidden; border-right: hidden;">
                     <list:ListRow listColumnList="${listComponent.listColumnList}" entityObject="${item}"/>
                     <%--<c:forEach var="listColumn" items="${listComponent.listColumnList}">--%>
-                        <%--<div class="col-xs-${listColumn.width}">${item.get(listColumn.fieldName)}</div>--%>
+                        <%--<div class="col-xs-${listColumn.width}">${item.getSql(listColumn.fieldName)}</div>--%>
                     <%--</c:forEach>--%>
                 </a>
             </c:forEach>

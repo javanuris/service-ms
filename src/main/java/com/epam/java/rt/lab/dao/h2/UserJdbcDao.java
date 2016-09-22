@@ -1,7 +1,7 @@
 package com.epam.java.rt.lab.dao.h2;
 
-import com.epam.java.rt.lab.dao.Argument;
 import com.epam.java.rt.lab.dao.DaoException;
+import com.epam.java.rt.lab.dao.Parameter;
 import com.epam.java.rt.lab.dao.query.Column;
 import com.epam.java.rt.lab.dao.query.Set;
 import com.epam.java.rt.lab.entity.rbac.Login;
@@ -327,17 +327,17 @@ public class UserJdbcDao extends JdbcDao {
     // newly dao implementation
 
     @Override
-    <T> List<T> getEntityList(ResultSet resultSet, Argument argument) throws SQLException, DaoException {
+    <T> List<T> getEntityList(ResultSet resultSet, Parameter parameter) throws SQLException, DaoException {
         List<User> userList = new ArrayList<>();
-        while (resultSet.next()) userList.add(getEntity(resultSet, argument));
+        while (resultSet.next()) userList.add(getEntity(resultSet, parameter));
         return (List<T>) userList;
     }
 
     @Override
-    <T> T getEntity(ResultSet resultSet, Argument argument) throws SQLException, DaoException {
+    <T> T getEntity(ResultSet resultSet, Parameter parameter) throws SQLException, DaoException {
         Map<String, List<String>> subEntityColumnListMap = new HashMap<>();
         User user = new User();
-        for (String columnName : (List<String>) argument.get(ArgumentType.SELECT_COLUMN_LIST)) {
+        for (String columnName : (List<String>) parameter.get(Parameter.Type._SELECT_COLUMN_LIST)) {
             if (columnName.startsWith(DEFAULT_FROM.concat("."))) {
                 String shortColumnName = columnName.substring(DEFAULT_FROM.length() + 1);
                 switch (shortColumnName) {
@@ -360,14 +360,14 @@ public class UserJdbcDao extends JdbcDao {
                         Long role_id = (Long) resultSet.getObject(columnName);
                         if (role_id != null)
                             user.setRole(new RoleJdbcDao(getConnection()).getFirst(
-                                    new Argument().put(ArgumentType.WHERE_LIST, Argument.Field.set("id", role_id))
+                                    new Parameter().put(Parameter.Type._WHERE_COLUMN_LIST, Parameter.Field.set("id", role_id))
                             ));
                         break;
                     case "login_id":
                         Long login_id = (Long) resultSet.getObject(columnName);
                         if (login_id != null) {
                             user.setLogin(new LoginJdbcDao(getConnection()).getFirst(
-                                    new Argument().put(ArgumentType.WHERE_LIST, Argument.Field.set("id", login_id))
+                                    new Parameter().put(Parameter.Type._WHERE_COLUMN_LIST, Parameter.Field.set("id", login_id))
                             ));
                         }
                         break;
@@ -383,17 +383,18 @@ public class UserJdbcDao extends JdbcDao {
             }
         }
         for (Map.Entry<String, List<String>> subEntityEntry : subEntityColumnListMap.entrySet()) {
+            logger.debug("{}", subEntityEntry.getKey());
             switch (subEntityEntry.getKey()) {
                 case "\"Role\"":
                     user.setRole(new RoleJdbcDao(getConnection()).getEntity(
                             resultSet,
-                            new Argument().put(ArgumentType.SELECT_COLUMN_LIST, subEntityEntry.getValue())
+                            new Parameter().put(Parameter.Type._SELECT_COLUMN_LIST, subEntityEntry.getValue())
                     ));
                     break;
                 case "\"Login\"":
                     user.setLogin(new LoginJdbcDao(getConnection()).getEntity(
                             resultSet,
-                            new Argument().put(ArgumentType.SELECT_COLUMN_LIST, subEntityEntry.getValue())
+                            new Parameter().put(Parameter.Type._SELECT_COLUMN_LIST, subEntityEntry.getValue())
                     ));
                     break;
             }
@@ -402,15 +403,15 @@ public class UserJdbcDao extends JdbcDao {
     }
 
     @Override
-    Argument.Field getJoinWhere(String joinTable) throws DaoException {
+    Parameter.Field getJoinWhereItem(String joinTable) throws DaoException {
         logger.debug("getJoinTable {}", joinTable);
         switch (joinTable) {
             case "\"Role\"":
-                return Argument.Field.set(DEFAULT_FROM.concat(".role_id"), null, joinTable.concat(".id"));
+                return Parameter.Field.set(DEFAULT_FROM.concat(".role_id"), null, joinTable.concat(".id"));
             case "\"Login\"":
-                return Argument.Field.set(DEFAULT_FROM.concat(".login_id"), null, joinTable.concat(".id"));
+                return Parameter.Field.set(DEFAULT_FROM.concat(".login_id"), null, joinTable.concat(".id"));
         }
-        throw new DaoException("exception.dao.jdbc.get-join-where");
+        throw new DaoException("exception.dao.jdbc.getSql-join-where");
     }
 
     @Override

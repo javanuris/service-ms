@@ -2,7 +2,7 @@
 drop table "Permission"; drop table "Role"; drop table "RolePermission"; drop table "Login"; drop table "Avatar"; drop table "User"; drop table "Remember"; drop table "Activation"; drop table "Forgot";
 
 
-//create tables
+//getSql tables
 create table if not exists "Permission" (id identity primary key, uri varchar(255) unique);
 create table if not exists "Role" (id identity primary key, name varchar(255) unique);
 create table if not exists "RolePermission" (id identity primary key, role_id bigint references "Role" (id), permission_id bigint references "Permission" (id));

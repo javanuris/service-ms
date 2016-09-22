@@ -1,7 +1,8 @@
 package com.epam.java.rt.lab.dao;
 
-import java.util.ArrayList;
-import java.util.Arrays;
+import com.epam.java.rt.lab.dao.h2.QueryBuilder;
+import com.epam.java.rt.lab.dao.query.Query;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -10,40 +11,94 @@ import java.util.regex.Pattern;
 /**
  * service-ms
  */
-public class Argument {
-    private Map<Dao.ArgumentType, Object> argumentMap;
+public class Parameter {
 
-    public Argument() {
+    public enum Type {
+        // special types used to prepare sql query
+        _QUERY_TYPE,
+        _FUNC_NAME,
+        _SELECT_COLUMN_LIST,
+        _SET_FIELD_LIST,
+        _FROM_TABLE,
+        _JOIN_TABLES,
+        _WHERE_COLUMN_LIST,
+        _ORDER_COLUMN_LIST,
+        // user/client types to set sql/dao parameters/arguments
+        GENERATE_VALUE_ARRAY,   // String with generate values delimited by comma or string array of generate values
+        RESULT_FIELD_ARRAY,     // String with field names delimited by comma or string array of field names
+        LIMIT_OFFSET,           // Long value of offset
+        LIMIT_COUNT,            // Long value of count
+        ORDER_TYPE,             // Enum OrderType, could be ASC or DESC
+        ORDER_FIELD_NAME_ARRAY, // String with field names delimited by comma or string array of field names
+        SET_FIELD_ARRAY,        // Array of wrapper class type
+        WHERE_FIELD_ARRAY,      // Array of wrapper class type
+        CUSTOM                  // Extra type used to store mapped values/objects
+    }
+
+    private Map<Type, Object> argumentMap;
+
+    public Parameter() {
         this.argumentMap = new HashMap<>();
     }
 
-    public Argument put(Dao.ArgumentType type, Object... valueArray) {
-        this.argumentMap.put(type, valueArray.length == 1 ?
-                valueArray[0] : new ArrayList<>(Arrays.asList(valueArray)));
+    public Parameter put(Type type, Object... valueArray) {
+        this.argumentMap.put(type, valueArray.length == 1 ? valueArray[0] : valueArray);
         return this;
     }
 
-    public Object get(Dao.ArgumentType type) {
+    public Parameter generate(QueryBuilder.GenerateValueType... generateValueArray) {
+        this.argumentMap.put(Type.GENERATE_VALUE_ARRAY, generateValueArray);
+        return this;
+    }
+
+    public Parameter result(String... fieldNameArray) {
+        this.argumentMap.put(Type.RESULT_FIELD_ARRAY, fieldNameArray);
+        return this;
+    }
+
+    public Parameter limit(Long offset, Long count) {
+        this.argumentMap.put(Type.LIMIT_OFFSET, offset);
+        this.argumentMap.put(Type.LIMIT_COUNT, count);
+        return this;
+    }
+
+    public Parameter order(QueryBuilder.OrderType orderType, String... fieldNames) {
+        this.argumentMap.put(Type.ORDER_TYPE, orderType);
+        this.argumentMap.put(Type.ORDER_FIELD_NAME_ARRAY, fieldNames);
+        return this;
+    }
+
+    public Parameter values(Field... fieldArray) {
+        this.argumentMap.put(Type.SET_FIELD_ARRAY, fieldArray);
+        return this;
+    }
+
+    public Parameter filter(Field... fieldArray) {
+        this.argumentMap.put(Type.WHERE_FIELD_ARRAY, fieldArray);
+        return this;
+    }
+
+    public Object get(Type type) {
         return this.argumentMap.get(type);
     }
 
     @Override
     public String toString() {
         StringBuilder result = new StringBuilder();
-        for (Map.Entry<Dao.ArgumentType, Object> argument : this.argumentMap.entrySet())
+        for (Map.Entry<Type, Object> argument : this.argumentMap.entrySet())
             result.append("\n").append(argument.getKey()).append("=").append(argument.getValue());
         return result.toString();
     }
 
-    public static String[] splitSelectColumn(String fieldName) {
+    public static String[] splitAndConvertFieldNames(String fieldName) {
         System.out.println("fieldName = " + fieldName);
         String[] result = {"", ""};
         String[] split = fieldName.split("\\.");
         if (split.length == 1) {
-            result[1] = ".".concat(Argument.getColumnName(split[0]));
+            result[1] = ".".concat(Parameter.getColumnName(split[0]));
         } else if (split.length == 2) {
             result[0] = "\"".concat(split[0].substring(0, 1).toUpperCase()).concat(split[0].substring(1)).concat("\"");
-            result[1] = result[0].concat(".").concat(Argument.getColumnName(split[1]));
+            result[1] = result[0].concat(".").concat(Parameter.getColumnName(split[1]));
         }
         return result;
     }

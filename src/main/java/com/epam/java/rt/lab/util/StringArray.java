@@ -1,5 +1,7 @@
 package com.epam.java.rt.lab.util;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -12,16 +14,16 @@ public class StringArray {
         return source.replaceAll(" ", "").split(regex);
     }
 
-    public static String combineList(List<?> stringList, String delimiter) {
+    public static <T> String combine(List<T> sourceList, String delimiter) {
         StringBuilder result = new StringBuilder();
         boolean first = true;
-        for (Object string : stringList) {
+        for (T source : sourceList) {
             if (first) {
                 first = false;
             } else {
                 result.append(delimiter);
             }
-            result.append(string);
+            result.append(source);
         }
         return result.toString();
     }
