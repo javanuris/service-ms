@@ -89,9 +89,11 @@ public class UserService extends BaseService {
 
     public List<User> getUserList(PageComponent pageComponent) throws DaoException {
         Dao dao = dao("User");
-        pageComponent.setCountItems(dao.count(new Parameter()));
+        pageComponent.setCountItems(dao.count(new Parameter()
+                .result("id", "firstName", "middleName", "lastName", "role.name", "login.email", "login.attemptLeft", "login.status"))
+        );
+        logger.debug("COUNT = {}", pageComponent.getCountItems());
         return dao.getAll(new Parameter()
-                .generate(QueryBuilder.GenerateValueType.SERIAL_NUMBER)
                 .result("id", "firstName", "middleName", "lastName", "role.name", "login.email", "login.attemptLeft", "login.status")
                 .limit((pageComponent.getCurrentPage() - 1) * pageComponent.getItemsOnPage(), pageComponent.getItemsOnPage())
                 .order(QueryBuilder.OrderType.ASC, "firstName", "middleName", "lastName")

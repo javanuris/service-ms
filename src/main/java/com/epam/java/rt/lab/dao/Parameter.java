@@ -24,7 +24,6 @@ public class Parameter {
         _WHERE_COLUMN_LIST,
         _ORDER_COLUMN_LIST,
         // user/client types to set sql/dao parameters/arguments
-        GENERATE_VALUE_ARRAY,   // String with generate values delimited by comma or string array of generate values
         RESULT_FIELD_ARRAY,     // String with field names delimited by comma or string array of field names
         LIMIT_OFFSET,           // Long value of offset
         LIMIT_COUNT,            // Long value of count
@@ -43,11 +42,6 @@ public class Parameter {
 
     public Parameter put(Type type, Object... valueArray) {
         this.argumentMap.put(type, valueArray.length == 1 ? valueArray[0] : valueArray);
-        return this;
-    }
-
-    public Parameter generate(QueryBuilder.GenerateValueType... generateValueArray) {
-        this.argumentMap.put(Type.GENERATE_VALUE_ARRAY, generateValueArray);
         return this;
     }
 
@@ -91,7 +85,6 @@ public class Parameter {
     }
 
     public static String[] splitAndConvertFieldNames(String fieldName) {
-        System.out.println("fieldName = " + fieldName);
         String[] result = {"", ""};
         String[] split = fieldName.split("\\.");
         if (split.length == 1) {

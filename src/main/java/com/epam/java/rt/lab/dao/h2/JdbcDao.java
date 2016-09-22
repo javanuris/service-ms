@@ -364,7 +364,7 @@ public abstract class JdbcDao implements Dao {
     }
 
     private PreparedStatement setStatementValues(PreparedStatement preparedStatement, Parameter parameter) throws DaoException {
-        logger.debug("STMT: {}", preparedStatement);
+        logger.debug("STATEMENT: {}", preparedStatement);
         try {
             int setIndex = 1;
             Object fieldArgument = parameter.get(Parameter.Type.SET_FIELD_ARRAY);
@@ -387,7 +387,6 @@ public abstract class JdbcDao implements Dao {
                     }
                 }
             }
-            logger.debug("VALUED: {}", preparedStatement);
             return preparedStatement;
         } catch (IllegalAccessException | SQLException | InvocationTargetException e) {
             e.printStackTrace();
@@ -403,7 +402,7 @@ public abstract class JdbcDao implements Dao {
         parameter.put(Parameter.Type._QUERY_TYPE, QueryBuilder.Type.FUNC);
         parameter.put(Parameter.Type._FUNC_NAME, "COUNT");
         try (PreparedStatement statement = getConnection().prepareStatement(QueryBuilder.getSql(parameter));
-             ResultSet resultSet = statement.executeQuery()) {
+             ResultSet resultSet = setStatementValues(statement, parameter).executeQuery()) {
             if (resultSet == null || !resultSet.next()) return null;
             return resultSet.getLong("count");
         } catch (SQLException e) {
@@ -419,8 +418,8 @@ public abstract class JdbcDao implements Dao {
         extendArgument(parameter);
         parameter.put(Parameter.Type._QUERY_TYPE, QueryBuilder.Type.READ);
         logger.debug("parameter: {}", parameter);
-        try (PreparedStatement preparedStatement = getConnection().prepareStatement(QueryBuilder.getSql(parameter));
-             ResultSet resultSet = setStatementValues(preparedStatement, parameter).executeQuery()) {
+        try (PreparedStatement statement = getConnection().prepareStatement(QueryBuilder.getSql(parameter));
+             ResultSet resultSet = setStatementValues(statement, parameter).executeQuery()) {
             if (resultSet == null) return null;
             return getEntityList(resultSet, parameter);
         } catch (SQLException e) {
@@ -437,8 +436,8 @@ public abstract class JdbcDao implements Dao {
         parameter.put(Parameter.Type._QUERY_TYPE, QueryBuilder.Type.READ);
         logger.debug("parameter: {}", parameter);
         String sql = QueryBuilder.getSql(parameter);
-        try (PreparedStatement preparedStatement = getConnection().prepareStatement(sql);
-             ResultSet resultSet = setStatementValues(preparedStatement, parameter).executeQuery()) {
+        try (PreparedStatement statement = getConnection().prepareStatement(sql);
+             ResultSet resultSet = setStatementValues(statement, parameter).executeQuery()) {
             if (resultSet == null || !resultSet.first()) return null;
             return getEntity(resultSet, parameter);
         } catch (SQLException e) {
@@ -535,23 +534,6 @@ public abstract class JdbcDao implements Dao {
         return orderColumnList;
     }
 
-    private void fillSelectColumnList(List<String> selectColumnList, Object generateValueArrayParameter) {
-        if (generateValueArrayParameter != null) {
-            List<QueryBuilder.GenerateValueType> generateValueList =
-                    (List<QueryBuilder.GenerateValueType>) generateValueArrayParameter;
-            for (QueryBuilder.GenerateValueType generateValue : generateValueList) {
-                String selectColumn = null;
-                switch (generateValue) {
-                    case SERIAL_NUMBER:
-                        selectColumn = "ROW_NUMBER () AS serial";
-                        break;
-                }
-                if (selectColumn != null && !selectColumnList.contains(selectColumn))
-                    selectColumnList.add(selectColumn);
-            }
-        }
-    }
-
     private void extendArgument(Parameter parameter) throws DaoException {
         List<String> selectColumnList;
         Object resultFieldArrayParameter = parameter.get(Parameter.Type.RESULT_FIELD_ARRAY);
@@ -587,9 +569,6 @@ public abstract class JdbcDao implements Dao {
         // prepare order section
         Object orderFieldNameArrayParameter = parameter.get(Parameter.Type.ORDER_FIELD_NAME_ARRAY);
         parameter.put(Parameter.Type._ORDER_COLUMN_LIST, getOrderColumnList(orderFieldNameArrayParameter));
-        // extend select section with generate values
-        Object generateValueArrayParameter = parameter.get(Parameter.Type.GENERATE_VALUE_ARRAY);
-        fillSelectColumnList(selectColumnList, generateValueArrayParameter);
         // complete select section
         parameter.put(Parameter.Type._SELECT_COLUMN_LIST, selectColumnList);
     }

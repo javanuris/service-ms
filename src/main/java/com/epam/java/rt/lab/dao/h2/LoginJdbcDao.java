@@ -302,6 +302,7 @@ public class LoginJdbcDao extends JdbcDao {
 
     @Override
     <T> T getEntity(ResultSet resultSet, Parameter parameter) throws SQLException, DaoException {
+        logger.debug("loginJdbcDao.getEntity");
         Login login = new Login();
         for (String columnName : (List<String>) parameter.get(Parameter.Type._SELECT_COLUMN_LIST)) {
             if (columnName.startsWith(DEFAULT_FROM.concat("."))) {
@@ -311,6 +312,7 @@ public class LoginJdbcDao extends JdbcDao {
                         login.setId(resultSet.getLong(shortColumnName));
                         break;
                     case "email":
+                        logger.debug("email = {}", resultSet.getObject(shortColumnName));
                         login.setEmail((String) resultSet.getObject(shortColumnName));
                         break;
                     case "password":

@@ -1,20 +1,22 @@
 <taglib>
     <tlib-version>1.0</tlib-version>
     <jsp-version>2.0</jsp-version>
-    <short-name>ListRowTag</short-name>
+    <short-name>reflectValue</short-name>
     <tag>
-        <name>ListRow</name>
-        <tag-class>com.epam.java.rt.lab.tag.ListRow</tag-class>
+        <name>reflectValue</name>
+        <tag-class>com.epam.java.rt.lab.tag.ReflectValue</tag-class>
         <body-content>empty</body-content>
         <attribute>
-            <name>listColumnList</name>
-            <type>java.util.ArrayList</type>
+            <name>entityMethod</name>
+            <type>java.lang.String</type>
             <rtexprvalue>true</rtexprvalue>
+            <required>true</required>
         </attribute>
         <attribute>
             <name>entityObject</name>
             <type>java.lang.Object</type>
             <rtexprvalue>true</rtexprvalue>
+            <required>true</required>
         </attribute>
     </tag>
 </taglib>

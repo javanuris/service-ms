@@ -25,10 +25,6 @@ public class QueryBuilder {
         DESC
     }
 
-    public enum GenerateValueType {
-        SERIAL_NUMBER
-    }
-
     public static String getSql(Parameter parameter) {
         StringBuilder result = new StringBuilder();
         switch ((Type) parameter.get(_QUERY_TYPE)) {
@@ -49,7 +45,11 @@ public class QueryBuilder {
     private static StringBuilder funcQuery(StringBuilder result, Parameter parameter) {
         switch ((String) parameter.get(_FUNC_NAME)) {
             case "COUNT":
-                return result.append("SELECT COUNT(*) AS count FROM ").append(parameter.get(_FROM_TABLE)).append(";");
+                return result
+                        .append("SELECT COUNT(*) AS count")
+                        .append(from(parameter))
+                        .append(join(parameter))
+                        .append(where(parameter));
         }
         return result;
     }
