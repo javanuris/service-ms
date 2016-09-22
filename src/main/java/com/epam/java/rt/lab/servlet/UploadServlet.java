@@ -19,7 +19,7 @@ import java.util.*;
 /**
  * service-ms
  */
-@MultipartConfig
+@MultipartConfig(maxFileSize = 10485760)
 @WebServlet(urlPatterns = "/file/upload/*")
 public class UploadServlet extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(UploadServlet.class);

@@ -27,22 +27,15 @@ public class ViewAction implements Action {
 
     @Override
     public void execute(HttpServletRequest req, HttpServletResponse resp) throws ActionException {
-        UserService userService = null;
-        try {
+        try (UserService userService = new UserService()) {
             logger.debug("/WEB-INF/jsp/rbac/user/view.jsp");
             String id = req.getParameter("id");
-            if (id == null || !FormManager.isOnlyDigits(id) || req.getParameter("cancel") != null) {
-                req.getSession().removeAttribute("profileView");
-                resp.sendRedirect(UrlManager.getContextUri(req, "/rbac/user/list"));
+            if (id == null || !FormManager.isOnlyDigits(id)) {
+                resp.sendRedirect("");
                 return;
             }
-            userService = new UserService();
             User user = userService.getUser(Long.valueOf(id));
-            if (user == null) {
-                resp.sendRedirect(UrlManager.getContextUri(req, "/rbac/user/list"));
-                return;
-            }
-            req.getSession().setAttribute("profileView", new ViewComponent(
+            req.setAttribute("userProfileView", new ViewComponent(
                     new ViewComponent.ViewItem
                             ("profile.view.first-name.label", "input", user.getFirstName()),
                     new ViewComponent.ViewItem
@@ -50,23 +43,23 @@ public class ViewAction implements Action {
                     new ViewComponent.ViewItem
                             ("profile.view.last-name.label", "input", user.getLastName()),
                     new ViewComponent.ViewItem
-                            ("profile.view.avatar.label", "image", UrlManager.getContextUri(req, "/file/download/avatar?id=" + user.getAvatarId())),
+                            ("profile.view.avatar.label", "image",
+                                    UrlManager.getContextRef(req, "/file/download/avatar", "id", user.getAvatarId())),
                     new ViewComponent.ViewItem
                             ("profile.view.role-name.label", "input", user.getRole().getName()),
                     new ViewComponent.ViewItem
                             ("profile.view.login-email.label", "input", user.getLogin().getEmail()),
                     new ViewComponent.ViewItem
-                            ("profile.view.cancel.label", "button", "")));
+                            ("profile.view.reset-password.label", "button", UrlManager.getContextUri(req, "/profile/reset-password")),
+                    new ViewComponent.ViewItem
+                            ("profile.view.edit-profile.label", "button", UrlManager.getContextUri(req, "/profile/edit"))));
             req.getRequestDispatcher("/WEB-INF/jsp/rbac/user/view.jsp").forward(req, resp);
-        } catch (ServletException | IOException | ConnectionException | DaoException e) {
+        } catch (ConnectionException | DaoException e) {
             e.printStackTrace();
-            throw new ActionException("exception.action.rbac.user.view", e.getCause());
-        } finally {
-            try {
-                if (userService != null) userService.close();
-            } catch (DaoException e) {
-                e.printStackTrace();
-            }
+            throw new ActionException("exception.action.rbac.user.view.user-service", e.getCause());
+        } catch (ServletException | IOException e) {
+            e.printStackTrace();
+            throw new ActionException("exception.action.rbac.user.view.forward", e.getCause());
         }
     }
 

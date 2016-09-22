@@ -26,12 +26,10 @@ public class ViewAction implements Action {
 
     @Override
     public void execute(HttpServletRequest req, HttpServletResponse resp) throws ActionException {
-        UserService userService = null;
-        try {
+        try (UserService userService = new UserService()) {
             logger.debug("/WEB-INF/jsp/profile/view.jsp");
-            userService = new UserService();
             User user = userService.getUser((Long) req.getSession().getAttribute("userId"));
-            req.getSession().setAttribute("profileView", new ViewComponent(
+            req.setAttribute("profileView", new ViewComponent(
                     new ViewComponent.ViewItem
                             ("profile.view.first-name.label", "input", user.getFirstName()),
                     new ViewComponent.ViewItem
@@ -50,14 +48,10 @@ public class ViewAction implements Action {
                     new ViewComponent.ViewItem
                             ("profile.view.edit-profile.label", "button", UrlManager.getContextUri(req, "/profile/edit"))));
             req.getRequestDispatcher("/WEB-INF/jsp/profile/view.jsp").forward(req, resp);
-        } catch (ServletException | IOException | ConnectionException | DaoException e) {
-            throw new ActionException("exception.action.view", e.getCause());
-        } finally {
-            try {
-                if (userService != null) userService.close();
-            } catch (DaoException e) {
-                e.printStackTrace();
-            }
+        } catch (ConnectionException | DaoException e) {
+            throw new ActionException("exception.action.rbac.user.view.user-service", e.getCause());
+        } catch (ServletException | IOException e) {
+            throw new ActionException("exception.action.rbac.user.view.forward", e.getCause());
         }
     }
 
