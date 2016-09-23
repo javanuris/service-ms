@@ -39,7 +39,7 @@ public class LogoutAction implements Action {
             req.getSession().invalidate();
             req.removeAttribute("navbarCurrent");
             CookieManager.removeDependantCookieValue(req, resp, CookieManager.getDependantCookieName(req));
-            resp.setHeader("Cache-Control", "no-cache");
+            resp.setHeader("Cache-FormControl", "no-cache");
             logger.debug("REDIRECTING ({})", req.getContextPath());
             resp.sendRedirect(UrlManager.getContextUri(req, "/"));
         } catch (IOException e) {

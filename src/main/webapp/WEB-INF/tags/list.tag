@@ -7,7 +7,7 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="val" uri="/WEB-INF/reflect_value.tld" %>
 <div class="list-group">
-    <li class="list-group-item col-xs-12" style="border-top: hidden; border-left: hidden; border-right: hidden;">
+    <li class="list-group-formControl col-xs-12" style="border-top: hidden; border-left: hidden; border-right: hidden;">
         <c:forEach var="listColumn" items="${listComponent.listColumnList}">
             <div class="col-xs-${listColumn.width}">
                 <strong><fmt:message bundle="${ui}" key="${listColumn.header}"/></strong>
@@ -16,11 +16,11 @@
     </li>
     <c:choose>
         <c:when test="${listComponent.entityList.size() > 0}">
-            <c:forEach var="item" items="${listComponent.entityList}">
-                <a href="${listComponent.hrefPrefix.concat(item.id)}" class="list-group-item col-xs-12" style="border-left: hidden; border-right: hidden;">
+            <c:forEach var="formControl" items="${listComponent.entityList}">
+                <a href="${listComponent.hrefPrefix.concat(formControl.id)}" class="list-group-formControl col-xs-12" style="border-left: hidden; border-right: hidden;">
                     <c:forEach var="listColumn" items="${listComponent.listColumnList}">
                         <div class="col-xs-${listColumn.width}">
-                            <val:reflectValue entityMethod="${listColumn.fieldName}" entityObject="${item}"/>
+                            <val:reflectValue entityMethod="${listColumn.fieldName}" entityObject="${formControl}"/>
                         </div>
                     </c:forEach>
                 </a>
@@ -28,7 +28,7 @@
             <tags:page pageComponent="${pageComponent}" uriWithQuestionMark="${uriWithQuestionMark}"/>
         </c:when>
         <c:otherwise>
-            <li class="list-group-item col-xs-12" style="text-align: center;" disabled="">
+            <li class="list-group-formControl col-xs-12" style="text-align: center;" disabled="">
                 <em><fmt:message bundle="${ui}" key="list.empty.label"/></em>
             </li>
         </c:otherwise>

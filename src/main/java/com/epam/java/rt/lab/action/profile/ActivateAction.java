@@ -15,7 +15,6 @@ import com.epam.java.rt.lab.util.UrlManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -34,7 +33,7 @@ public class ActivateAction implements Action {
              UserService userService = new UserService();) {
             if ("GET".equals(req.getMethod())) {
                 logger.debug("GET");
-                String activationEmail = req.getParameter("email");
+                String activationEmail = req.getParameter("email.regex");
                 String activationCode = req.getParameter("code");
                 logger.debug("email: {}, code: {}", activationEmail, activationCode);
                 req.getSession().removeAttribute("activationEmail");

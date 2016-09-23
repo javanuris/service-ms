@@ -8,7 +8,7 @@ import com.epam.java.rt.lab.connection.ConnectionException;
 import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.entity.rbac.User;
 import com.epam.java.rt.lab.service.UserService;
-import com.epam.java.rt.lab.util.FormManager;
+import com.epam.java.rt.lab.util.validator.ValidatorFactory;
 import com.epam.java.rt.lab.util.UrlManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +17,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * Service Management System
@@ -29,9 +30,10 @@ public class ViewAction implements Action {
     public void execute(HttpServletRequest req, HttpServletResponse resp) throws ActionException {
         try (UserService userService = new UserService()) {
             logger.debug("/WEB-INF/jsp/rbac/user/view.jsp");
-            String id = req.getParameter("id");
-            if (id == null || !FormManager.isOnlyDigits(id)) {
-                resp.sendRedirect("");
+            Map<String, String> parameterMap = UrlManager.getRequestParameterMap(req.getQueryString());
+            String id = parameterMap.remove("id");
+            if (id == null || !ValidatorFactory.isOnlyDigits(id)) {
+                resp.sendRedirect(UrlManager.getContextUri(req, "/rbac/user/list", parameterMap));
                 return;
             }
             User user = userService.getUser(Long.valueOf(id));
@@ -52,7 +54,9 @@ public class ViewAction implements Action {
                     new ViewComponent.ViewItem
                             ("profile.view.reset-password.label", "button", UrlManager.getContextUri(req, "/profile/reset-password")),
                     new ViewComponent.ViewItem
-                            ("profile.view.edit-profile.label", "button", UrlManager.getContextUri(req, "/profile/edit"))));
+                            ("profile.view.edit-profile.label", "button", UrlManager.getContextUri(req, "/profile/edit")),
+                    new ViewComponent.ViewItem
+                            ("rbac.user.view.view-list.label", "button", UrlManager.getContextUri(req, "/rbac/user/list", parameterMap))));
             req.getRequestDispatcher("/WEB-INF/jsp/rbac/user/view.jsp").forward(req, resp);
         } catch (ConnectionException | DaoException e) {
             e.printStackTrace();

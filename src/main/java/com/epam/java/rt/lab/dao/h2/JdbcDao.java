@@ -414,7 +414,7 @@ public abstract class JdbcDao implements Dao {
     @Override
     public <T> List<T> getAll(Parameter parameter) throws DaoException {
         if (parameter == null)
-            throw new DaoException("exception.dao.jdbc.get-all.parameter");
+            throw new DaoException("exception.dao.jdbc.create-all.parameter");
         extendArgument(parameter);
         parameter.put(Parameter.Type._QUERY_TYPE, QueryBuilder.Type.READ);
         logger.debug("parameter: {}", parameter);
@@ -424,14 +424,14 @@ public abstract class JdbcDao implements Dao {
             return getEntityList(resultSet, parameter);
         } catch (SQLException e) {
             e.printStackTrace();
-            throw new DaoException("exception.dao.jdbc.get-all.sql");
+            throw new DaoException("exception.dao.jdbc.create-all.sql");
         }
     }
 
     @Override
     public <T> T getFirst(Parameter parameter) throws DaoException {
         if (parameter == null)
-            throw new DaoException("exception.dao.jdbc.get-first.parameter");
+            throw new DaoException("exception.dao.jdbc.create-first.parameter");
         extendArgument(parameter);
         parameter.put(Parameter.Type._QUERY_TYPE, QueryBuilder.Type.READ);
         logger.debug("parameter: {}", parameter);
@@ -442,7 +442,7 @@ public abstract class JdbcDao implements Dao {
             return getEntity(resultSet, parameter);
         } catch (SQLException e) {
             e.printStackTrace();
-            throw new DaoException("exception.dao.jdbc.get-first");
+            throw new DaoException("exception.dao.jdbc.create-first");
         }
     }
 
@@ -469,7 +469,7 @@ public abstract class JdbcDao implements Dao {
     private List<String> getSelectColumnList(Object resultFieldParameter) throws DaoException {
         List<String> selectColumnList = getStringList(resultFieldParameter);
         if (selectColumnList != null) return selectColumnList;
-        throw new DaoException("exception.dao.jdbc.get-select-column-list");
+        throw new DaoException("exception.dao.jdbc.create-select-column-list");
     }
 
     private void fillJoinTableListAndJoinWhereList(List<String> joinTableList, List<Parameter.Field> joinWhereList,
@@ -494,7 +494,7 @@ public abstract class JdbcDao implements Dao {
         } else if (whereFieldArrayParameter instanceof Parameter.Field[]) {
             return new ArrayList<>(Arrays.asList((Parameter.Field[]) whereFieldArrayParameter));
         } else {
-            throw new DaoException("exception.dao.jdbc.get-where-column-list");
+            throw new DaoException("exception.dao.jdbc.create-where-column-list");
         }
     }
 

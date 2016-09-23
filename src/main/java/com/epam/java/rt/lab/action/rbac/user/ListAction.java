@@ -8,9 +8,8 @@ import com.epam.java.rt.lab.component.NavigationComponent;
 import com.epam.java.rt.lab.component.PageComponent;
 import com.epam.java.rt.lab.connection.ConnectionException;
 import com.epam.java.rt.lab.dao.DaoException;
-import com.epam.java.rt.lab.entity.rbac.User;
 import com.epam.java.rt.lab.service.UserService;
-import com.epam.java.rt.lab.util.FormManager;
+import com.epam.java.rt.lab.util.validator.ValidatorFactory;
 import com.epam.java.rt.lab.util.UrlManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,8 +18,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Service Management System
@@ -36,11 +33,14 @@ public class ListAction implements Action {
             String page = req.getParameter("page");
             String items = req.getParameter("items");
             PageComponent pageComponent = new PageComponent(
-                    !FormManager.isOnlyDigits(page) ? 1L : Long.valueOf(page),
-                    !FormManager.isOnlyDigits(items) ? null : Long.valueOf(items));
+                    !ValidatorFactory.isOnlyDigits(page) ? 1L : Long.valueOf(page),
+                    !ValidatorFactory.isOnlyDigits(items) ? null : Long.valueOf(items));
             ListComponent listComponent = new ListComponent();
             listComponent.setEntityList(userService.getUserList(pageComponent));
-            listComponent.setHrefPrefix(UrlManager.getContextUri(req,"/rbac/user/view?id="));
+            listComponent.setHrefPrefix(UrlManager.getContextUri(req, "/rbac/user/view",
+                    "page=".concat(String.valueOf(pageComponent.getCurrentPage())),
+                    "items=".concat(String.valueOf(pageComponent.getItemsOnPage())),
+                    "id="));
             req.setAttribute("userList", listComponent);
             req.setAttribute("userListPage", pageComponent);
             req.getRequestDispatcher("/WEB-INF/jsp/rbac/user/list.jsp").forward(req, resp);

@@ -27,7 +27,7 @@ public class LoginService extends BaseService {
         Login login = new Login();
         login.setEmail(email);
         Dao dao = daoFactory.createDao("Login");
-        login = dao.getFirst(login, "email", "email ASC");
+        login = dao.getFirst(login, "email.regex", "email ASC");
         return login;
     }
 
@@ -40,7 +40,7 @@ public class LoginService extends BaseService {
             throws DaoException, SQLException, ConnectionException {
         logger.debug("updateLogin");
         Dao dao = daoFactory.createDao("Login");
-        return dao.update(login, "id", "password");
+        return dao.update(login, "id", "password.regex");
     }
 
     public int updateAttemptLeft(Login login)
@@ -54,7 +54,7 @@ public class LoginService extends BaseService {
         Login login = new Login();
         login.setEmail(email);
         Dao dao = daoFactory.createDao("Login");
-        if (dao.getFirst(login, "email", null) != null) return true;
+        if (dao.getFirst(login, "email.regex", null) != null) return true;
         Map<String, Object> activationMap = (Map<String, Object>) dao.getRelEntity(login, "Activation");
         return activationMap != null;
     }
@@ -103,7 +103,7 @@ public class LoginService extends BaseService {
         if (activationMap == null || !activationCode.equals(activationMap.get("code")) ||
                 TimestampCompare.secondsBetweenTimestamps(TimestampCompare.getCurrentTimestamp(),
                 (Timestamp) activationMap.get("valid")) <= 0) return null;
-        login.setPassword((String) activationMap.get("password"));
+        login.setPassword((String) activationMap.get("password.regex"));
         login.setAttemptLeft(Integer.valueOf(GlobalProperties.getProperty("login.attempt.max")));
         login.setStatus(0);
         return login;

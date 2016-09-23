@@ -3,8 +3,10 @@ package com.epam.java.rt.lab.action.profile;
 import com.epam.java.rt.lab.action.Action;
 import com.epam.java.rt.lab.action.ActionException;
 import com.epam.java.rt.lab.action.WebAction;
-import com.epam.java.rt.lab.component.FormComponent;
+import com.epam.java.rt.lab.component.ComponentException;
+import com.epam.java.rt.lab.component.form.Form;
 import com.epam.java.rt.lab.component.NavigationComponent;
+import com.epam.java.rt.lab.component.form.FormFactory;
 import com.epam.java.rt.lab.connection.ConnectionException;
 import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.entity.rbac.Login;
@@ -12,6 +14,7 @@ import com.epam.java.rt.lab.entity.rbac.User;
 import com.epam.java.rt.lab.service.LoginService;
 import com.epam.java.rt.lab.service.UserService;
 import com.epam.java.rt.lab.util.*;
+import com.epam.java.rt.lab.util.validator.ValidatorFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,53 +37,53 @@ public class LoginAction implements Action {
     @Override
     public void execute(HttpServletRequest req, HttpServletResponse resp) throws ActionException {
         try (LoginService loginService = new LoginService()) {
-            FormComponent formComponent = null;
-            switch (FormComponent.getStatus("profile.login", UrlManager.getContextPathInfo(req), 100)) {
-                case 1:
-                    formComponent = FormComponent.get("profile.login");
-                    break;
-                case 0:
-                    formComponent = FormComponent.set("profile.login",
-                            new FormComponent.Item("profile.login.email.label", "input", "profile.login.email.label",
-                                    FormManager.Validator.getPattern(FormManager.getProperty("email.regex"), "validation.email")),
-                            new FormComponent.Item("profile.login.password.label", "password", "profile.login.password.label",
-                                    FormManager.Validator.getPattern(FormManager.getProperty("password.regex"), "validation.password")),
-                            new FormComponent.Item("profile.login.remember.label", "checkbox", "profile.login.remember.label", null),
-                            new FormComponent.Item("profile.login.submit-login.label", "submit", "submit-login", null),
-                            new FormComponent.Item("profile.login.submit-forgot.label", "submit", "submit-forgot", null),
-                            new FormComponent.Item("profile.login.submit-register.label", "submit", "submit-register", null)
-                    );
-                    break;
-                case -1:
-                    throw new ActionException("exception.action.login.form-status");
-            }
-            req.setAttribute("loginForm", formComponent);
+            Form form = FormFactory.getInstance().create("profile-login");
+//            switch (Form.getStatus("profile.login", UrlManager.getContextPathInfo(req), 100)) {
+//                case 1:
+//                    form = Form.create("profile.login");
+//                    break;
+//                case 0:
+//                    form = Form.set("profile.login",
+//                            new Form.Item("profile.login.email.label", "input", "profile.login.email.label",
+//                                    ValidatorFactory.Validator.getRegex(ValidatorFactory.getRegex("email.regex"), "validation.email")),
+//                            new Form.Item("profile.login.password.label", "password", "profile.login.password.label",
+//                                    ValidatorFactory.Validator.getRegex(ValidatorFactory.getRegex("password.regex"), "validation.password")),
+//                            new Form.Item("profile.login.remember.label", "checkbox", "profile.login.remember.label", null),
+//                            new Form.Item("profile.login.submit-login.label", "submit", "submit-login", null),
+//                            new Form.Item("profile.login.submit-forgot.label", "submit", "submit-forgot", null),
+//                            new Form.Item("profile.login.submit-register.label", "submit", "submit-register", null)
+//                    );
+//                    break;
+//                case -1:
+//                    throw new ActionException("exception.action.login.form-status");
+//            }
+            req.setAttribute("loginForm", form);
             if ("GET".equals(req.getMethod())) {
                 logger.debug("GET");
-                formComponent.setActionParameterString(UrlManager.getRequestParameterString(req));
+                form.setActionParameterString(UrlManager.getRequestParameterString(req));
             } else if ("POST".equals(req.getMethod())) {
                 logger.debug("POST");
-                if (req.getParameter(formComponent.getItem(4).getPlaceholder()) != null ||
-                        req.getParameter(formComponent.getItem(5).getPlaceholder()) != null)
-                    formComponent.getItem(1).setIgnoreValidate(true);
-                if (FormManager.validate(req, formComponent)) {
+                if (req.getParameter(form.getItem(4).getPlaceholder()) != null ||
+                        req.getParameter(form.getItem(5).getPlaceholder()) != null)
+                    form.getItem(1).setIgnoreValidate(true);
+                if (ValidatorFactory.validate(req, form)) {
                     logger.debug("FORM VALID");
-                    if (req.getParameter(formComponent.getItem(3).getPlaceholder()) != null) {
+                    if (req.getParameter(form.getItem(3).getPlaceholder()) != null) {
                         logger.debug("SUBMIT-LOGIN");
-                        Login login = loginService.getLogin(formComponent.getItem(0).getValue());
-                        if (login == null || !login.getPassword().equals(formComponent.getItem(1).getValue()) ||
+                        Login login = loginService.getLogin(form.getItem(0).getValue());
+                        if (login == null || !login.getPassword().equals(form.getItem(1).getValue()) ||
                                 login.getAttemptLeft() == 0 || login.getStatus() < 0) {
                             logger.debug("DENIED");
                             if (login != null && (login.getAttemptLeft() <= 0 || login.getStatus() < 0)) {
                                 String[] validationMessageArray = {"profile.login.submit-login.error-blocked"};
-                                formComponent.getItem(3).setValidationMessageArray(validationMessageArray);
+                                form.getItem(3).setValidationMessageArray(validationMessageArray);
                             } else {
                                 if (login != null && login.getAttemptLeft() > 0) {
                                     login.setAttemptLeft(login.getAttemptLeft() - 1);
                                     loginService.updateAttemptLeft(login);
                                 }
                                 String[] validationMessageArray = {"profile.login.submit-login.error-denied"};
-                                formComponent.getItem(3).setValidationMessageArray(validationMessageArray);
+                                form.getItem(3).setValidationMessageArray(validationMessageArray);
                             }
                         } else {
                             logger.debug("GRANTED");
@@ -93,7 +96,7 @@ public class LoginAction implements Action {
                             req.getSession().setAttribute("userId", user.getId());
                             req.getSession().setAttribute("userName", user.getName());
                             req.getSession().setAttribute("navbarItemArray", NavigationComponent.getNavbarItemArray(user.getRole()));
-                            if (formComponent.getItem(2).getValue() != null) {
+                            if (form.getItem(2).getValue() != null) {
                                 logger.debug("REMEMBER ME");
                                 try {
                                     String rememberCookieName = CookieManager.getDependantCookieName(req);
@@ -102,7 +105,7 @@ public class LoginAction implements Action {
                                             Integer.valueOf(GlobalProperties.getProperty("remember.days.valid")) * 86400);
                                     Map<String, Object> rememberValueMap = new HashMap<>();
                                     rememberValueMap.put("userId", user.getId());
-                                    rememberValueMap.put("name", rememberCookieName);
+                                    rememberValueMap.put("name.regex", rememberCookieName);
                                     rememberValueMap.put("value", rememberCookieValue);
                                     rememberValueMap.put("valid",
                                             TimestampCompare.daysToTimestamp(TimestampCompare.getCurrentTimestamp(),
@@ -118,13 +121,13 @@ public class LoginAction implements Action {
                             resp.sendRedirect(UrlManager.getContextUri(req, redirect, parameterMap));
                             return;
                         }
-                    } else if (req.getParameter(formComponent.getItem(4).getPlaceholder()) != null) {
+                    } else if (req.getParameter(form.getItem(4).getPlaceholder()) != null) {
                         logger.debug("SUBMIT-FORGOT");
-                        Login login = loginService.getLogin(formComponent.getItem(0).getValue());
+                        Login login = loginService.getLogin(form.getItem(0).getValue());
                         if (login == null) {
                             logger.debug("EMAIL NOT EXISTS");
                             String[] validationMessageArray = {"profile.login.email.error-exists-forgot"};
-                            formComponent.getItem(0).setValidationMessageArray(validationMessageArray);
+                            form.getItem(0).setValidationMessageArray(validationMessageArray);
                         } else {
                             if (login.getAttemptLeft() > 0 && login.getStatus() >= 0) {
                                 try {
@@ -132,12 +135,12 @@ public class LoginAction implements Action {
                                     String forgotCookieValue = HashGenerator.hashString(UUID.randomUUID().toString());
                                     CookieManager.setDependantCookieValue(req, resp, forgotCookieName, forgotCookieValue,
                                             Integer.valueOf(GlobalProperties.getProperty("forgot.seconds.valid")));
-                                    loginService.setForgotCode(formComponent.getItem(0).getValue(), forgotCookieValue);
-                                    req.getSession().setAttribute("forgotEmail", formComponent.getItem(0).getValue());
+                                    loginService.setForgotCode(form.getItem(0).getValue(), forgotCookieValue);
+                                    req.getSession().setAttribute("forgotEmail", form.getItem(0).getValue());
                                     req.getSession().setAttribute("forgotCode", forgotCookieValue);
                                     req.getSession().setAttribute("forgotRef",
                                             UrlManager.getContextRef(req, "/profile/forgot-password", "email, code",
-                                                    formComponent.getItem(0).getValue(), forgotCookieValue));
+                                                    form.getItem(0).getValue(), forgotCookieValue));
                                     resp.sendRedirect(UrlManager.getContextUri(req, "/home"));
                                     return;
                                 } catch (Exception e) {
@@ -145,23 +148,23 @@ public class LoginAction implements Action {
                                 }
                             } else {
                                 String[] validationMessageArray = {"profile.login.email.error-block-forgot"};
-                                formComponent.getItem(0).setValidationMessageArray(validationMessageArray);
+                                form.getItem(0).setValidationMessageArray(validationMessageArray);
                             }
                         }
-                    } else if (req.getParameter(formComponent.getItem(5).getPlaceholder()) != null) {
+                    } else if (req.getParameter(form.getItem(5).getPlaceholder()) != null) {
                         logger.debug("SUBMIT-REGISTER");
-                        if (loginService.isLoginExists(formComponent.getItem(0).getValue())) {
+                        if (loginService.isLoginExists(form.getItem(0).getValue())) {
                             logger.debug("EMAIL EXISTS ERROR");
                             String[] validationMessageArray = {"profile.login.email.error-exists-register"};
-                            formComponent.getItem(0).setValidationMessageArray(validationMessageArray);
+                            form.getItem(0).setValidationMessageArray(validationMessageArray);
                         } else {
                             String activationCode = loginService.createActivationCode
-                                    (formComponent.getItem(0).getValue(), formComponent.getItem(1).getValue());
-                            req.getSession().setAttribute("activationEmail", formComponent.getItem(0).getValue());
+                                    (form.getItem(0).getValue(), form.getItem(1).getValue());
+                            req.getSession().setAttribute("activationEmail", form.getItem(0).getValue());
                             req.getSession().setAttribute("activationCode", activationCode);
                             req.getSession().setAttribute("activationRef",
                                     UrlManager.getContextRef(req, "/profile/activate", "email, code",
-                                            formComponent.getItem(0).getValue(), activationCode));
+                                            form.getItem(0).getValue(), activationCode));
                             resp.sendRedirect(UrlManager.getContextUri(req, "/home"));
                             return;
                         }
@@ -178,6 +181,8 @@ public class LoginAction implements Action {
         } catch (SQLException e) {
             e.printStackTrace();
             throw new ActionException("exception.action.login.update", e.getCause());
+        } catch (ComponentException e) {
+            e.printStackTrace();
         }
     }
 

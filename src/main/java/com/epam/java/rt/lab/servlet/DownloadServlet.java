@@ -3,7 +3,7 @@ package com.epam.java.rt.lab.servlet;
 import com.epam.java.rt.lab.connection.ConnectionException;
 import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.service.UserService;
-import com.epam.java.rt.lab.util.FormManager;
+import com.epam.java.rt.lab.util.validator.ValidatorFactory;
 import org.h2.util.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +35,7 @@ public class DownloadServlet extends HttpServlet {
                         String avatarPath = req.getParameter("path");
                         if (avatarId != null) {
                             logger.debug("AVATAR BY ID: {}", avatarId);
-                            if (FormManager.isOnlyDigits(avatarId)) {
+                            if (ValidatorFactory.isOnlyDigits(avatarId)) {
                                 try {
                                     Map<String, Object> avatarMap = (new UserService()).getAvatar(Long.valueOf(avatarId));
                                     resp.setContentType((String) avatarMap.get("type"));

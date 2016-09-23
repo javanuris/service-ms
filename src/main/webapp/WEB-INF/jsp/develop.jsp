@@ -8,10 +8,10 @@
     <jsp:body>
         <tags:nav navCurrent="/develop"/>
         <form action="${pageContext.request.contextPath}/develop" method="POST">
-            <div class="form-control">
-                <input type="text" class="form-control"/>
+            <div class="form-formControl">
+                <input type="text" class="form-formControl"/>
             </div>
-            <div class="form-control">
+            <div class="form-formControl">
                 <div id="label-browse-file" hidden>BROWSE FILE...</div>
                 <div id="label-file-uploading" hidden>FILE UPLOADING...</div>
                 <div id="label-upload-error" hidden>FILE UPLOAD ERROR</div>

@@ -31,7 +31,7 @@ public class RoleService extends BaseService {
         Role role = new Role();
         role.setName(GlobalProperties.getProperty("role.authorized"));
         Dao dao = daoFactory.createDao("Role");
-        role = dao.getFirst(role, "name", "name ASC");
+        role = dao.getFirst(role, "name.regex", "name ASC");
         return role;
     }
 

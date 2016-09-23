@@ -144,7 +144,7 @@ public class UserJdbcDao extends JdbcDao {
 
     private Map<String, Object> getRemember(String rememberName) throws DaoException {
         List<Column> columnList = new ArrayList<>();
-        columnList.add(new Column("name", rememberName));
+        columnList.add(new Column("name.regex", rememberName));
         String sqlString = "SELECT * FROM \"Remember\""
                 .concat(" WHERE ").concat(Column.columnListToString(columnList, "AND", "="));
         try (PreparedStatement preparedStatement = getConnection().prepareStatement(sqlString);
@@ -153,7 +153,7 @@ public class UserJdbcDao extends JdbcDao {
             Map<String, Object> rememberMap = new HashMap<>();
             rememberMap.put("id", resultSet.getLong("id"));
             rememberMap.put("userId", resultSet.getLong("user_id"));
-            rememberMap.put("name", resultSet.getString("name"));
+            rememberMap.put("name.regex", resultSet.getString("name.regex"));
             rememberMap.put("value", resultSet.getString("value"));
             rememberMap.put("valid", resultSet.getTimestamp("valid"));
             return rememberMap;
@@ -179,7 +179,7 @@ public class UserJdbcDao extends JdbcDao {
         }
         List<Set> setList = new ArrayList<>();
         setList.add(new Set("user_id", rememberValueMap.get("userId")));
-        setList.add(new Set("name", rememberValueMap.get("name")));
+        setList.add(new Set("name.regex", rememberValueMap.get("name.regex")));
         setList.add(new Set("value", rememberValueMap.get("value")));
         setList.add(new Set("valid", rememberValueMap.get("valid")));
         if (rememberValueMap.get("id") == null) {
@@ -228,7 +228,7 @@ public class UserJdbcDao extends JdbcDao {
              ResultSet resultSet = setPreparedStatementValues(preparedStatement, columnList).executeQuery();) {
             if (resultSet == null || !resultSet.first()) return null;
             Map<String, Object> avatarMap = new HashMap<>();
-            avatarMap.put("name", resultSet.getString("name"));
+            avatarMap.put("name.regex", resultSet.getString("name.regex"));
             avatarMap.put("type", resultSet.getString("type"));
             avatarMap.put("file", resultSet.getBinaryStream("file"));
             avatarMap.put("modified", resultSet.getTimestamp("modified"));

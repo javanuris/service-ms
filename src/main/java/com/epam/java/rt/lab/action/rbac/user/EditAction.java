@@ -1,8 +1,9 @@
-package com.epam.java.rt.lab.action.profile;
+package com.epam.java.rt.lab.action.rbac.user;
 
 import com.epam.java.rt.lab.action.Action;
 import com.epam.java.rt.lab.action.ActionException;
 import com.epam.java.rt.lab.action.WebAction;
+import com.epam.java.rt.lab.action.profile.LoginAction;
 import com.epam.java.rt.lab.component.ComponentException;
 import com.epam.java.rt.lab.component.form.Form;
 import com.epam.java.rt.lab.component.form.FormFactory;
@@ -19,6 +20,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * service-ms
@@ -30,9 +32,15 @@ public class EditAction implements Action {
     @Override
     public void execute(HttpServletRequest req, HttpServletResponse resp) throws ActionException {
         try (UserService userService = new UserService()) {
-            User user = userService.getUser((Long) req.getSession().getAttribute("userId"));
-            Form form = FormFactory.getInstance().create("profile-edit");
-//            switch (Form.getStatus("profile.edit", UrlManager.getContextPathInfo(req), 100)) {
+            Map<String, String> parameterMap = UrlManager.getRequestParameterMap(req.getQueryString());
+            String id = parameterMap.remove("id");
+            if (id == null || !ValidatorFactory.isOnlyDigits(id)) {
+                resp.sendRedirect(UrlManager.getContextUri(req, "/rbac/user/list", parameterMap));
+                return;
+            }
+            User user = userService.getUser(Long.valueOf(id));
+            Form form = FormFactory.getInstance().create("user-profile-edit");
+//            switch (Form.getStatus("userProfile.edit", UrlManager.getContextPathInfo(req), 100)) {
 //                case 1:
 //                    form = Form.create("profile.edit");
 //                    break;

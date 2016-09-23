@@ -35,8 +35,8 @@ public class RoleJdbcDao extends JdbcDao {
             switch (field.getName()) {
                 case "id":
                     return new Column("id", fieldValue(field, entity));
-                case "name":
-                    return new Column("name", fieldValue(field, entity));
+                case "name.regex":
+                    return new Column("name.regex", fieldValue(field, entity));
                 default:
                     throw new DaoException("exception.dao.jdbc.getTransfer-entity-column.field-name");
             }
@@ -51,8 +51,8 @@ public class RoleJdbcDao extends JdbcDao {
             switch (field.getName()) {
                 case "id":
                     return new Set("id", fieldValue(field, entity));
-                case "name":
-                    return new Set("name", fieldValue(field, entity));
+                case "name.regex":
+                    return new Set("name.regex", fieldValue(field, entity));
                 default:
                     throw new DaoException("exception.dao.jdbc.getTransfer-entity-set.field-name");
             }
@@ -67,7 +67,7 @@ public class RoleJdbcDao extends JdbcDao {
             Role role = (Role) entity;
             if (role == null) role = new Role();
             role.setId(resultSet.getLong("id"));
-            role.setName(resultSet.getString("name"));
+            role.setName(resultSet.getString("name.regex"));
             List<Column> columnList = new ArrayList<>();
             columnList.add(new Column("\"RolePermission\".permission_id", "\"Permission\".id", true));
             columnList.add(new Column("\"RolePermission\".role_id", role.getId()));
@@ -194,7 +194,7 @@ public class RoleJdbcDao extends JdbcDao {
                     case "id":
                         role.setId(resultSet.getLong(shortColumnName));
                         break;
-                    case "name":
+                    case "name.regex":
                         role.setName((String) resultSet.getObject(shortColumnName));
                         break;
                 }

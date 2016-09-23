@@ -3,13 +3,15 @@ package com.epam.java.rt.lab.action.profile;
 import com.epam.java.rt.lab.action.Action;
 import com.epam.java.rt.lab.action.ActionException;
 import com.epam.java.rt.lab.action.WebAction;
-import com.epam.java.rt.lab.component.FormComponent;
+import com.epam.java.rt.lab.component.ComponentException;
+import com.epam.java.rt.lab.component.form.Form;
+import com.epam.java.rt.lab.component.form.FormFactory;
 import com.epam.java.rt.lab.connection.ConnectionException;
 import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.entity.rbac.Login;
 import com.epam.java.rt.lab.service.LoginService;
 import com.epam.java.rt.lab.util.CookieManager;
-import com.epam.java.rt.lab.util.FormManager;
+import com.epam.java.rt.lab.util.validator.ValidatorFactory;
 import com.epam.java.rt.lab.util.UrlManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,27 +32,27 @@ public class ForgotPasswordAction implements Action {
     @Override
     public void execute(HttpServletRequest req, HttpServletResponse resp) throws ActionException {
         try (LoginService loginService = new LoginService()) {
-            FormComponent formComponent = null;
-            switch (FormComponent.getStatus("profile.forgot-password", UrlManager.getContextPathInfo(req), 100)) {
-                case 1:
-                    formComponent = FormComponent.get("profile.forgot-password");
-                    break;
-                case 0:
-                    formComponent = FormComponent.set("profile.forgot-password",
-                            new FormComponent.Item("profile.forgot-password.password.label", "password", "profile.forgot-password.password.label",
-                                    FormManager.Validator.getPattern(FormManager.getProperty("password.regex"), "validation.password")),
-                            new FormComponent.Item("profile.forgot-password.confirm.label", "password", "profile.forgot-password.confirm.label",
-                                    FormManager.Validator.getPattern(FormManager.getProperty("password.regex"), "validation.password")),
-                            new FormComponent.Item("profile.forgot-password.submit.label", "submit", "", null),
-                            new FormComponent.Item("profile.forgot-password.login.label", "button",
-                                    UrlManager.getContextUri(req, "/profile/login"), null)
-                    );
-                    break;
-                case -1:
-                    throw new ActionException("exception.action.forgot-password.form-status");
-            }
-            req.setAttribute("forgotPasswordForm", formComponent);
-            String forgotEmail = req.getParameter("email");
+            Form form = FormFactory.getInstance().create("profile-forgot-password");
+//            switch (Form.getStatus("profile.forgot-password", UrlManager.getContextPathInfo(req), 100)) {
+//                case 1:
+//                    form = Form.create("profile.forgot-password");
+//                    break;
+//                case 0:
+//                    form = Form.set("profile.forgot-password",
+//                            new Form.Item("profile.forgot-password.password.label", "password", "profile.forgot-password.password.label",
+//                                    ValidatorFactory.Validator.getRegex(ValidatorFactory.getRegex("password.regex"), "validation.password")),
+//                            new Form.Item("profile.forgot-password.confirm.label", "password", "profile.forgot-password.confirm.label",
+//                                    ValidatorFactory.Validator.getRegex(ValidatorFactory.getRegex("password.regex"), "validation.password")),
+//                            new Form.Item("profile.forgot-password.submit.label", "submit", "", null),
+//                            new Form.Item("profile.forgot-password.login.label", "button",
+//                                    UrlManager.getContextUri(req, "/profile/login"), null)
+//                    );
+//                    break;
+//                case -1:
+//                    throw new ActionException("exception.action.forgot-password.form-status");
+//            }
+            req.setAttribute("forgotPasswordForm", form);
+            String forgotEmail = req.getParameter("email.regex");
             String forgotCode = req.getParameter("code");
             logger.debug("email: {}, code: {}", forgotEmail, forgotCode);
             req.getSession().removeAttribute("forgotEmail");
@@ -75,23 +77,23 @@ public class ForgotPasswordAction implements Action {
                     resp.sendRedirect(UrlManager.getContextUri(req, "/home"));
                     return;
                 }
-                formComponent.setActionParameterString(UrlManager.getRequestParameterString(req));
+                form.setActionParameterString(UrlManager.getRequestParameterString(req));
             } else if ("POST".equals(req.getMethod())) {
                 logger.debug("POST");
                 String[] parameterArray = {
-                        "email=".concat(req.getParameter("email")),
+                        "email=".concat(req.getParameter("email.regex")),
                         "code=".concat(req.getParameter("code"))
                 };
-                formComponent.setActionParameterString(UrlManager.getRequestParameterString(parameterArray));
-                if (FormManager.validate(req, formComponent)) {
+                form.setActionParameterString(UrlManager.getRequestParameterString(parameterArray));
+                if (ValidatorFactory.validate(req, form)) {
                     logger.debug("FORM VALID");
-                    if (formComponent.getItem(0).getValue().equals(formComponent.getItem(1).getValue())) {
+                    if (form.getItem(0).getValue().equals(form.getItem(1).getValue())) {
                         logger.debug("PASSWORD AND CONFIRM EQUAL");
-                        login.setPassword(formComponent.getItem(0).getValue());
+                        login.setPassword(form.getItem(0).getValue());
                         if (loginService.updatePassword(login) != 1) {
                             logger.debug("UPDATE ERROR");
                             String[] validationMessageArray = {"profile.reset-password.submit.error-reset-password"};
-                            formComponent.getItem(2).setValidationMessageArray(validationMessageArray);
+                            form.getItem(2).setValidationMessageArray(validationMessageArray);
                         } else {
                             logger.debug("UPDATE SUCCESS");
                             loginService.removeForgotCode(login.getEmail());
@@ -102,7 +104,7 @@ public class ForgotPasswordAction implements Action {
                     } else {
                         logger.debug("PASSWORD AND CONFIRM NOT EQUAL");
                         String[] validationMessageArray = {"profile.reset-password.confirm.error-not-equal"};
-                        formComponent.getItem(1).setValidationMessageArray(validationMessageArray);
+                        form.getItem(1).setValidationMessageArray(validationMessageArray);
                     }
                 }
             }
@@ -116,6 +118,8 @@ public class ForgotPasswordAction implements Action {
         } catch (SQLException e) {
             e.printStackTrace();
             throw new ActionException("exception.action.forgot-password.update-login", e.getCause());
+        } catch (ComponentException e) {
+            e.printStackTrace();
         }
     }
 }

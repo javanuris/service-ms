@@ -1,70 +1,70 @@
 <%@tag pageEncoding="UTF-8" %>
-<%@attribute name="formComponent" type="com.epam.java.rt.lab.component.FormComponent" %>
+<%@attribute name="form" type="com.epam.java.rt.lab.component.form.Form" %>
 <%@ taglib prefix="tags" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<form name="${formComponent.name}" action="<c:url value="${formComponent.action}"/>" method="POST">
-    <c:forEach var="item" items="${formComponent.iterator()}">
+<form name="${form.name}" action="<c:url value="${form.action}"/>" method="POST">
+    <c:forEach var="formControl" items="${form.iterator()}">
         <c:choose>
-            <c:when test="${item.type.equals('submit') || item.type.equals('button')}">
+            <c:when test="${formControl.type.equals('submit') || formControl.type.equals('button')}">
                 <div class="col-xs-12" style="padding: 5px 0;">
-                    <tags:validation validationMessageArray="${item.validationMessageArray}"/>
+                    <tags:validation validationMessageArray="${formControl.validationMessageArray}"/>
                     <c:choose>
-                        <c:when test="${item.type.equals('submit')}">
-                            <button type="${item.type}" class="btn btn-default col-xs-12" name="${item.placeholder}">
-                                <fmt:message bundle="${ui}" key="${item.label}"/>
+                        <c:when test="${formControl.type.equals('submit')}">
+                            <button type="${formControl.type}" class="btn btn-default col-xs-12" name="${formControl.placeholder}">
+                                <fmt:message bundle="${ui}" key="${formControl.label}"/>
                             </button>
                         </c:when>
-                        <c:when test="${item.type.equals('button')}">
-                            <a href="${item.placeholder}" role="${item.type}" class="btn btn-default col-xs-12" name="${item.placeholder}">
-                                <fmt:message bundle="${ui}" key="${item.label}"/>
+                        <c:when test="${formControl.type.equals('button')}">
+                            <a href="${formControl.placeholder}" role="${formControl.type}" class="btn btn-default col-xs-12" name="${formControl.placeholder}">
+                                <fmt:message bundle="${ui}" key="${formControl.label}"/>
                             </a>
                         </c:when>
                     </c:choose>
                 </div>
             </c:when>
-            <c:when test="${item.type.equals('checkbox')}">
+            <c:when test="${formControl.type.equals('checkbox')}">
                 <div class="form-group">
                     <div class="checkbox">
                         <label>
-                            <input type="checkbox" name="${item.label}" value="${item.value}">
-                            <fmt:message bundle="${ui}" key="${item.label}"/>
+                            <input type="checkbox" name="${formControl.label}" value="${formControl.value}">
+                            <fmt:message bundle="${ui}" key="${formControl.label}"/>
                         </label>
                     </div>
                 </div>
             </c:when>
-            <c:when test="${item.type.equals('file')}">
-                <div class="form-group${not empty item.validationMessageArray ? ' has-error' : ''}">
-                    <label for="${item.label}"><fmt:message bundle="${ui}" key="${item.label}"/></label>
+            <c:when test="${formControl.type.equals('file')}">
+                <div class="form-group${not empty formControl.validationMessageArray ? ' has-error' : ''}">
+                    <label for="${formControl.label}"><fmt:message bundle="${ui}" key="${formControl.label}"/></label>
                     <label class="btn btn-default btn-file">
-                        <input id="${item.label}" onchange="uploadToServer(this)" type="file" name="${item.placeholder}"/>
-                        <div id="${item.label}-label"><fmt:message bundle="${ui}" key="message.browse-file"/></div>
-                        <input id="${item.label}-hidden" name="${item.label}" hidden/>
+                        <input id="${formControl.label}" onchange="uploadToServer(this)" type="file" name="${formControl.placeholder}"/>
+                        <div id="${formControl.label}-label"><fmt:message bundle="${ui}" key="message.browse-file"/></div>
+                        <input id="${formControl.label}-hidden" name="${formControl.label}" hidden/>
                     </label>
-                    <tags:validation validationMessageArray="${item.validationMessageArray}"/>
+                    <tags:validation validationMessageArray="${formControl.validationMessageArray}"/>
                 </div>
             </c:when>
-            <c:when test="${item.type.equals('image')}">
-                <div class="form-group${not empty item.validationMessageArray ? ' has-error' : ''}">
-                    <label for="${item.label}"><fmt:message bundle="${ui}" key="${item.label}"/></label>
+            <c:when test="${formControl.type.equals('image')}">
+                <div class="form-group${not empty formControl.validationMessageArray ? ' has-error' : ''}">
+                    <label for="${formControl.label}"><fmt:message bundle="${ui}" key="${formControl.label}"/></label>
                     <label class="btn btn-default btn-file">
-                        <input id="${item.label}" onchange="uploadToServer(this)" type="file" name="${item.placeholder}"/>
+                        <input id="${formControl.label}" onchange="uploadToServer(this)" type="file" name="${formControl.placeholder}"/>
                         <div style="width: 100%; text-align: center;">
-                            <img id="${item.label}-image" src="${item.value}" alt="<fmt:message bundle="${ui}" key="message.avatar-empty"/>"
+                            <img id="${formControl.label}-image" src="${formControl.value}" alt="<fmt:message bundle="${ui}" key="message.avatar-empty"/>"
                                  class="img-thumbnail" style="max-width: 100%; min-width: 100%; height: auto; align-content: center;">
                         </div>
-                        <div id="${item.label}-label"><fmt:message bundle="${ui}" key="message.browse-file"/></div>
-                        <input id="${item.label}-hidden" name="${item.label}" hidden/>
+                        <div id="${formControl.label}-label"><fmt:message bundle="${ui}" key="message.browse-file"/></div>
+                        <input id="${formControl.label}-hidden" name="${formControl.label}" hidden/>
                     </label>
-                    <tags:validation validationMessageArray="${item.validationMessageArray}"/>
+                    <tags:validation validationMessageArray="${formControl.validationMessageArray}"/>
                 </div>
             </c:when>
             <c:otherwise>
-                <div class="form-group${not empty item.validationMessageArray ? ' has-error' : ''}">
-                    <label for="${item.label}"><fmt:message bundle="${ui}" key="${item.label}"/></label>
-                    <c:set var="placeholder"><fmt:message bundle="${ui}" key="${item.placeholder}"/></c:set>
-                    <input type="${item.type}" class="form-control" name="${item.label}" placeholder="${placeholder}" value="${item.value}"/>
-                    <tags:validation validationMessageArray="${item.validationMessageArray}"/>
+                <div class="form-group${not empty formControl.validationMessageArray ? ' has-error' : ''}">
+                    <label for="${formControl.label}"><fmt:message bundle="${ui}" key="${formControl.label}"/></label>
+                    <c:set var="placeholder"><fmt:message bundle="${ui}" key="${formControl.placeholder}"/></c:set>
+                    <input type="${formControl.type}" class="form-formControl" name="${formControl.label}" placeholder="${placeholder}" value="${formControl.value}"/>
+                    <tags:validation validationMessageArray="${formControl.validationMessageArray}"/>
                 </div>
             </c:otherwise>
         </c:choose>

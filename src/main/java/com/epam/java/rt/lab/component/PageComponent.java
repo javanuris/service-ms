@@ -1,7 +1,5 @@
 package com.epam.java.rt.lab.component;
 
-import com.epam.java.rt.lab.util.FormManager;
-
 /**
  * service-ms
  */

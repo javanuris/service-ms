@@ -16,13 +16,13 @@
         <div class="collapse navbar-collapse" id="app-navbar-collapse" aria-expanded="false">
             <c:if test="${sessionScope.navbarItemArray != null}">
                 <ul class="nav navbar-nav">
-                    <c:forEach var="item" items="${sessionScope.navbarItemArray}">
+                    <c:forEach var="formControl" items="${sessionScope.navbarItemArray}">
                         <c:choose>
-                            <c:when test="${navbarCurrent.equals(item.link)}">
-                                <li class="active"><a href="#"><fmt:message bundle="${ui}" key="${item.name}"/></a></li>
+                            <c:when test="${navbarCurrent.equals(formControl.link)}">
+                                <li class="active"><a href="#"><fmt:message bundle="${ui}" key="${formControl.name}"/></a></li>
                             </c:when>
                             <c:otherwise>
-                                <li><a href="<c:url value="${item.link}"/>"><fmt:message bundle="${ui}" key="${item.name}"/></a></li>
+                                <li><a href="<c:url value="${formControl.link}"/>"><fmt:message bundle="${ui}" key="${formControl.name}"/></a></li>
                             </c:otherwise>
                         </c:choose>
                     </c:forEach>

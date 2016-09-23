@@ -39,10 +39,10 @@ public class LoginJdbcDao extends JdbcDao {
             switch (field.getName()) {
                 case "id":
                     return new Column("id", fieldValue(field, entity));
-                case "email":
-                    return new Column("email", fieldValue(field, entity));
-                case "password":
-                    return new Column("password", fieldValue(field, entity));
+                case "email.regex":
+                    return new Column("email.regex", fieldValue(field, entity));
+                case "password.regex":
+                    return new Column("password.regex", fieldValue(field, entity));
                 default:
                     throw new DaoException("exception.dao.jdbc.getTransfer-entity-column.field-name");
             }
@@ -57,10 +57,10 @@ public class LoginJdbcDao extends JdbcDao {
             switch (field.getName()) {
                 case "id":
                     return new Set("id", fieldValue(field, entity));
-                case "email":
-                    return new Set("email", fieldValue(field, entity));
-                case "password":
-                    return new Set("password", fieldValue(field, entity));
+                case "email.regex":
+                    return new Set("email.regex", fieldValue(field, entity));
+                case "password.regex":
+                    return new Set("password.regex", fieldValue(field, entity));
                 case "attemptLeft":
                     return new Set("attempt_left", fieldValue(field, entity));
                 case "status":
@@ -79,8 +79,8 @@ public class LoginJdbcDao extends JdbcDao {
             Login login = (Login) entity;
             if (login == null) login = new Login();
             login.setId(resultSet.getLong("id"));
-            login.setEmail(resultSet.getString("email"));
-            login.setPassword(resultSet.getString("password"));
+            login.setEmail(resultSet.getString("email.regex"));
+            login.setPassword(resultSet.getString("password.regex"));
             login.setAttemptLeft(resultSet.getInt("attempt_left"));
             login.setStatus(resultSet.getInt("status"));
             return (T) login;
@@ -128,7 +128,7 @@ public class LoginJdbcDao extends JdbcDao {
     private <T> Map<String, Object> getActivation(T entity) throws DaoException {
         Login login = (Login) entity;
         List<Column> columnList = new ArrayList<>();
-        columnList.add(new Column("email", login.getEmail()));
+        columnList.add(new Column("email.regex", login.getEmail()));
         String sqlString = "SELECT * FROM \"Activation\""
                 .concat(" WHERE ").concat(Column.columnListToString(columnList, "AND", "="));
         try (PreparedStatement preparedStatement = getConnection().prepareStatement(sqlString);
@@ -136,8 +136,8 @@ public class LoginJdbcDao extends JdbcDao {
             if (resultSet == null || !resultSet.first()) return null;
             Map<String, Object> activationMap = new HashMap<>();
             activationMap.put("id", resultSet.getLong("id"));
-            activationMap.put("email", resultSet.getString("email"));
-            activationMap.put("password", resultSet.getString("password"));
+            activationMap.put("email.regex", resultSet.getString("email.regex"));
+            activationMap.put("password.regex", resultSet.getString("password.regex"));
             activationMap.put("code", resultSet.getString("code"));
             activationMap.put("valid", resultSet.getTimestamp("valid"));
             return activationMap;
@@ -152,7 +152,7 @@ public class LoginJdbcDao extends JdbcDao {
         String activationCode = (String) relEntity;
         Long id = null;
         List<Column> columnList = new ArrayList<>();
-        columnList.add(new Column("email", login.getEmail()));
+        columnList.add(new Column("email.regex", login.getEmail()));
         String sqlString = "SELECT id FROM \"Activation\""
                 .concat(" WHERE ").concat(Column.columnListToString(columnList, "AND", "="));
         try (PreparedStatement preparedStatement = getConnection().prepareStatement(sqlString);
@@ -164,8 +164,8 @@ public class LoginJdbcDao extends JdbcDao {
             throw new DaoException("exception.dao.set-activation.sql-select", e.getCause());
         }
         List<Set> setList = new ArrayList<>();
-        setList.add(new Set("email", login.getEmail()));
-        setList.add(new Set("password", login.getPassword()));
+        setList.add(new Set("email.regex", login.getEmail()));
+        setList.add(new Set("password.regex", login.getPassword()));
         setList.add(new Set("code", activationCode));
         setList.add(new Set("valid", TimestampCompare.daysToTimestamp(TimestampCompare.getCurrentTimestamp(),
                 Integer.valueOf(GlobalProperties.getProperty("activation.days.valid")))));
@@ -195,7 +195,7 @@ public class LoginJdbcDao extends JdbcDao {
     private <T> int removeActivation(T entity) throws DaoException {
         Login login = (Login) entity;
         List<Column> columnList = new ArrayList<>();
-        columnList.add(new Column("email", login.getEmail()));
+        columnList.add(new Column("email.regex", login.getEmail()));
         String sqlString = "DELETE FROM \"Activation\""
                 .concat(" WHERE ").concat(Column.columnListToString(columnList, "AND", "="));
         try (PreparedStatement deleteStatement = getConnection().prepareStatement(sqlString);) {
@@ -209,7 +209,7 @@ public class LoginJdbcDao extends JdbcDao {
     private <T> Map<String, Object> getForgot(T entity) throws DaoException {
         Login login = (Login) entity;
         List<Column> columnList = new ArrayList<>();
-        columnList.add(new Column("email", login.getEmail()));
+        columnList.add(new Column("email.regex", login.getEmail()));
         String sqlString = "SELECT * FROM \"Forgot\""
                 .concat(" WHERE ").concat(Column.columnListToString(columnList, "AND", "="));
         try (PreparedStatement preparedStatement = getConnection().prepareStatement(sqlString);
@@ -217,7 +217,7 @@ public class LoginJdbcDao extends JdbcDao {
             if (resultSet == null || !resultSet.first()) return null;
             Map<String, Object> forgotMap = new HashMap<>();
             forgotMap.put("id", resultSet.getLong("id"));
-            forgotMap.put("email", resultSet.getString("email"));
+            forgotMap.put("email.regex", resultSet.getString("email.regex"));
             forgotMap.put("code", resultSet.getString("code"));
             forgotMap.put("valid", resultSet.getTimestamp("valid"));
             return forgotMap;
@@ -232,7 +232,7 @@ public class LoginJdbcDao extends JdbcDao {
         String forgotCode = (String) relEntity;
         Long id = null;
         List<Column> columnList = new ArrayList<>();
-        columnList.add(new Column("email", login.getEmail()));
+        columnList.add(new Column("email.regex", login.getEmail()));
         String sqlString = "SELECT id FROM \"Forgot\""
                 .concat(" WHERE ").concat(Column.columnListToString(columnList, "AND", "="));
         try (PreparedStatement preparedStatement = getConnection().prepareStatement(sqlString);
@@ -244,7 +244,7 @@ public class LoginJdbcDao extends JdbcDao {
             throw new DaoException("exception.dao.set-forgot.sql-select", e.getCause());
         }
         List<Set> setList = new ArrayList<>();
-        setList.add(new Set("email", login.getEmail()));
+        setList.add(new Set("email.regex", login.getEmail()));
         setList.add(new Set("code", forgotCode));
         setList.add(new Set("valid", TimestampCompare.daysToTimestamp(TimestampCompare.getCurrentTimestamp(),
                 Integer.valueOf(GlobalProperties.getProperty("forgot.seconds.valid")))));
@@ -274,7 +274,7 @@ public class LoginJdbcDao extends JdbcDao {
     private <T> int removeForgot(T entity) throws DaoException {
         Login login = (Login) entity;
         List<Column> columnList = new ArrayList<>();
-        columnList.add(new Column("email", login.getEmail()));
+        columnList.add(new Column("email.regex", login.getEmail()));
         String sqlString = "DELETE FROM \"Forgot\""
                 .concat(" WHERE ").concat(Column.columnListToString(columnList, "AND", "="));
         try (PreparedStatement deleteStatement = getConnection().prepareStatement(sqlString);) {
@@ -311,11 +311,11 @@ public class LoginJdbcDao extends JdbcDao {
                     case "id":
                         login.setId(resultSet.getLong(shortColumnName));
                         break;
-                    case "email":
+                    case "email.regex":
                         logger.debug("email = {}", resultSet.getObject(shortColumnName));
                         login.setEmail((String) resultSet.getObject(shortColumnName));
                         break;
-                    case "password":
+                    case "password.regex":
                         login.setPassword((String) resultSet.getObject(shortColumnName));
                         break;
                     case "attempt_left":
