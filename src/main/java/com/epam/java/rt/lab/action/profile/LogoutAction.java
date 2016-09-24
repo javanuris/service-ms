@@ -24,27 +24,27 @@ public class LogoutAction implements Action {
 
     @Override
     public void execute(HttpServletRequest req, HttpServletResponse resp) throws ActionException {
-        try {
-            logger.debug("LOGOUT");
-            try (UserService userService = new UserService();) {
-                Long userId = (Long) req.getSession().getAttribute("userId");
-                userService.removeRemember(userId);
-            } catch (ConnectionException | DaoException e) {
-                e.printStackTrace();
-                throw new ActionException("exception.action.logout.user-service", e.getCause());
-            }
-            req.getSession().removeAttribute("userId");
-            req.getSession().removeAttribute("userName");
-            req.getSession().removeAttribute("navbarItemArray");
-            req.getSession().invalidate();
-            req.removeAttribute("navbarCurrent");
-            CookieManager.removeDependantCookieValue(req, resp, CookieManager.getDependantCookieName(req));
-            resp.setHeader("Cache-FormControl", "no-cache");
-            logger.debug("REDIRECTING ({})", req.getContextPath());
-            resp.sendRedirect(UrlManager.getContextUri(req, "/"));
-        } catch (IOException e) {
-            throw new ActionException(e.getMessage());
-        }
+//        try {
+//            logger.debug("LOGOUT");
+//            try (UserService userService = new UserService();) {
+//                Long userId = (Long) req.getSession().getAttribute("userId");
+//                userService.removeRemember(userId);
+//            } catch (ConnectionException | DaoException e) {
+//                e.printStackTrace();
+//                throw new ActionException("exception.action.logout.user-service", e.getCause());
+//            }
+//            req.getSession().removeAttribute("userId");
+//            req.getSession().removeAttribute("userName");
+//            req.getSession().removeAttribute("navbarItemArray");
+//            req.getSession().invalidate();
+//            req.removeAttribute("navbarCurrent");
+//            CookieManager.removeDependantCookieValue(req, resp, CookieManager.getDependantCookieName(req));
+//            resp.setHeader("Cache-FormControl", "no-cache");
+//            logger.debug("REDIRECTING ({})", req.getContextPath());
+//            resp.sendRedirect(UrlManager.getContextUri(req, "/"));
+//        } catch (IOException e) {
+//            throw new ActionException(e.getMessage());
+//        }
     }
 
 }

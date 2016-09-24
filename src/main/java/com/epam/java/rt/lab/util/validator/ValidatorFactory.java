@@ -16,6 +16,7 @@ import java.util.Properties;
  * service-ms
  */
 public class ValidatorFactory {
+
     private static class Holder { // Initialization-on-demand holder
         private static final ValidatorFactory INSTANCE = new ValidatorFactory();
     }
@@ -35,7 +36,6 @@ public class ValidatorFactory {
 
     private Map<String, Validator> validatorMap;
     private Throwable constructorThrowable;
-
 
     private ValidatorFactory() {
         loadProperties();

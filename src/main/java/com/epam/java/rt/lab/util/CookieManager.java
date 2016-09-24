@@ -1,5 +1,7 @@
 package com.epam.java.rt.lab.util;
 
+import com.epam.java.rt.lab.entity.rbac.Remember;
+
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -26,7 +28,11 @@ public class CookieManager {
         }
     }
 
-    public static String getDependantCookieName(HttpServletRequest req) {
+    public static void removeCookie(HttpServletRequest req, HttpServletResponse resp, String cookieName) {
+        setCookie(resp, cookieName, null, 0, UrlManager.getContextUri(req, "/"));
+    }
+
+    public static String getRememberCookieName(HttpServletRequest req) {
         if (req.getCookies() == null) return null;
         String ip = req.getHeader("X-FORWARDED-FOR");
         if (ip == null) ip = req.getRemoteAddr();
@@ -38,18 +44,16 @@ public class CookieManager {
         return null;
     }
 
-    public static String getDependantCookieValue(HttpServletRequest req, String dependantCookieName) {
-        Cookie rememberCookie = getCookie(req, dependantCookieName);
-        return rememberCookie == null ? null : rememberCookie.getValue();
+    public static String getCookieValue(HttpServletRequest req, String cookieName) {
+        Cookie cookie = getCookie(req, cookieName);
+        return cookie == null ? null : cookie.getValue();
     }
 
-    public static void removeDependantCookieValue(HttpServletRequest req, HttpServletResponse resp, String dependantCookieName) {
-        setCookie(resp, dependantCookieName, null, 0, UrlManager.getContextUri(req, "/"));
-    }
-
-    public static void setDependantCookieValue(HttpServletRequest req, HttpServletResponse resp,
-                                               String dependantCookieName, String dependantCookieValue, int maxAge) {
-        setCookie(resp, dependantCookieName, dependantCookieValue, maxAge, UrlManager.getContextUri(req, "/"));
+    public static void setRememberCookieValue(HttpServletRequest req, HttpServletResponse resp,
+                                              String rememberCookieName, String rememberCookieValue) {
+        setCookie(resp, rememberCookieName, rememberCookieValue,
+                Integer.valueOf(GlobalProperties.getProperty("remember.days.valid")) * 86400,
+                UrlManager.getContextUri(req, "/"));
     }
 
 }

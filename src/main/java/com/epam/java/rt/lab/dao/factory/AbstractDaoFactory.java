@@ -23,7 +23,7 @@ public abstract class AbstractDaoFactory implements DaoFactory {
     private static DataSource connectionPool = null;
     private Connection connection = null;
 
-    public static DaoFactory createDaoFactory() throws DaoException, ConnectionException {
+    public static DaoFactory createDaoFactory() throws DaoException {
         logger.debug("createDaoFactory");
         try {
             if (AbstractDaoFactory.databaseProperties == null) {
@@ -48,6 +48,8 @@ public abstract class AbstractDaoFactory implements DaoFactory {
         } catch (SQLException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
             e.printStackTrace();
             throw new DaoException("exception.dao.factory.new-instance", e.getCause());
+        } catch (ConnectionException e) {
+            throw new DaoException("exception.dao.factory.connection", e.getCause());
         }
     }
 

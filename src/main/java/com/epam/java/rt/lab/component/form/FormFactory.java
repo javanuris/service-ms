@@ -2,6 +2,7 @@ package com.epam.java.rt.lab.component.form;
 
 import com.epam.java.rt.lab.component.ComponentException;
 import com.epam.java.rt.lab.util.StringArray;
+import com.epam.java.rt.lab.util.validator.ValidatorException;
 import com.epam.java.rt.lab.util.validator.ValidatorFactory;
 
 import java.io.IOException;
@@ -48,6 +49,7 @@ public class FormFactory {
                     String propertyPrefix = formName.concat(".").concat(controlName).concat(".");
                     formControlList.add(
                             new FormControl(
+                                    controlName,
                                     formProperties.getProperty(propertyPrefix.concat(CONTROL_LABEL)),
                                     formProperties.getProperty(propertyPrefix.concat(CONTROL_TYPE)),
                                     formProperties.getProperty(propertyPrefix.concat(CONTROL_PLACEHOLDER)),
@@ -61,7 +63,7 @@ public class FormFactory {
                 form.setFormControlArray((FormControl[]) formControlList.toArray());
                 this.formMap.put(formName, form);
             }
-        } catch (IOException e) {
+        } catch (IOException | ValidatorException e) {
             this.constructorThrowable = e.getCause();
         }
     }

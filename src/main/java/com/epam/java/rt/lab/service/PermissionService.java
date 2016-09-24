@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 public class PermissionService extends BaseService {
     private static final Logger logger = LoggerFactory.getLogger(PermissionService.class);
 
-    public PermissionService() throws ConnectionException, DaoException {
+    public PermissionService() throws ServiceException {
     }
 
 }

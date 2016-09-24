@@ -1,13 +1,14 @@
 package com.epam.java.rt.lab.util;
 
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 /**
  * service-ms
  */
 public class HashGenerator {
 
-    public static String hashString(String sourceString) throws Exception {
+    public static String hashString(String sourceString) throws NoSuchAlgorithmException {
         MessageDigest md = MessageDigest.getInstance("SHA-256");
         md.update(sourceString.getBytes());
         byte byteData[] = md.digest();
@@ -20,7 +21,8 @@ public class HashGenerator {
         return hexString.toString();
     }
 
-    public static boolean compareHashToSource(String hashString, String sourceString) throws Exception {
+    public static boolean compareHashToSource(String hashString, String sourceString)
+            throws NoSuchAlgorithmException {
         String hashSourceString = HashGenerator.hashString(sourceString);
         return hashString.equals(hashSourceString);
     }

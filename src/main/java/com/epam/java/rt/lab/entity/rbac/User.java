@@ -1,8 +1,7 @@
 package com.epam.java.rt.lab.entity.rbac;
 
+import com.epam.java.rt.lab.entity.EntityProperty;
 import com.epam.java.rt.lab.entity.BaseEntity;
-
-import java.sql.Blob;
 
 /**
  * service-ms
@@ -14,6 +13,16 @@ public class User extends BaseEntity {
     private Login login;
     private Role role;
     private Long avatarId;
+
+    public enum Property implements EntityProperty {
+        ID,
+        FIRST_NAME,
+        MIDDLE_NAME,
+        LAST_NAME,
+        LOGIN,
+        ROLE,
+        AVATAR_ID
+    }
 
     public User() {
     }

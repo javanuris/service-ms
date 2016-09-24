@@ -8,10 +8,11 @@ import java.util.List;
  * service-ms
  */
 public class StringArray {
-    public static final String DELIMITER_COMMA_AND_SPACE = ", ";
+    public static final String SPACE = " ";
+    public static final String COMMA_DELIMITER = ", ";
 
     public static String[] splitSpaceLessNames(String source, String regex) {
-        return source.replaceAll(" ", "").split(regex);
+        return source.replaceAll(SPACE, "").split(regex);
     }
 
     public static <T> String combine(List<T> sourceList, String delimiter) {

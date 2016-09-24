@@ -1,8 +1,9 @@
 package com.epam.java.rt.lab.service;
 
-import com.epam.java.rt.lab.connection.ConnectionException;
-import com.epam.java.rt.lab.dao.Dao;
 import com.epam.java.rt.lab.dao.DaoException;
+import com.epam.java.rt.lab.dao.Parameter;
+import com.epam.java.rt.lab.dao.types.OrderType;
+import com.epam.java.rt.lab.entity.EntityProperty;
 import com.epam.java.rt.lab.entity.rbac.Role;
 import com.epam.java.rt.lab.util.GlobalProperties;
 import org.slf4j.Logger;
@@ -16,29 +17,50 @@ import java.util.List;
 public class RoleService extends BaseService {
     private static final Logger logger = LoggerFactory.getLogger(RoleService.class);
 
-    public RoleService() throws ConnectionException, DaoException {
+    public RoleService()
+            throws ServiceException {
     }
 
-    public Role getRole(Long id) throws DaoException {
-        Role role = new Role();
-        role.setId(id);
-        Dao dao = daoFactory.createDao("Role");
-        role = dao.getFirst(role, "id", "name ASC");
-        return role;
+    public Role getRole(Long id)
+            throws ServiceException {
+        try {
+            return dao("Role").getFirst(new Parameter()
+                    .filter(Parameter.Field.set(
+                            Role.Property.ID, id
+                    ))
+            );
+        } catch (DaoException e) {
+            throw new ServiceException("exception.service.role.get-role.dao", e.getCause());
+        }
     }
 
-    public Role getRoleAuthorized() throws DaoException {
-        Role role = new Role();
-        role.setName(GlobalProperties.getProperty("role.authorized"));
-        Dao dao = daoFactory.createDao("Role");
-        role = dao.getFirst(role, "name.regex", "name ASC");
-        return role;
+    public Role getRoleAuthorized()
+            throws ServiceException {
+        try {
+            return dao("Role").getFirst(new Parameter()
+                    .filter(Parameter.Field.set(
+                            Role.Property.NAME,
+                            GlobalProperties.getProperty("role.authorized")
+                    ))
+            );
+        } catch (DaoException e) {
+            throw new ServiceException("exception.service.role.get-role-authorized.dao", e.getCause());
+        }
     }
 
-    public List<Role> getRoleList() throws DaoException {
-        Dao dao = daoFactory.createDao("Role");
-        List<Role> roleList = dao.getAll("name ASC");
-        return roleList;
+    public List<Role> getRoleList(OrderType orderType, EntityProperty... orderBy)
+            throws ServiceException {
+        try {
+            if (orderType == null || orderBy.length == 0) {
+                return dao("Role").getAll(new Parameter());
+            } else {
+                return dao("Role").getAll(new Parameter()
+                        .order(orderType, orderBy)
+                );
+            }
+        } catch (DaoException e) {
+            throw new ServiceException("exception.service.role.get-role-list.dao", e.getCause());
+        }
     }
 
 }

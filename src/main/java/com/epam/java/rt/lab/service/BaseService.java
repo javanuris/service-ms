@@ -14,16 +14,28 @@ import java.util.Map;
 abstract class BaseService implements AutoCloseable{
     DaoFactory daoFactory;
 
-    BaseService() throws ConnectionException, DaoException {
-        daoFactory = AbstractDaoFactory.createDaoFactory();
+    BaseService() throws ServiceException {
+        try {
+            daoFactory = AbstractDaoFactory.createDaoFactory();
+        } catch (DaoException e) {
+            throw new ServiceException("exception.service.base.dao");
+        }
     }
 
-    public void close() throws DaoException {
-        daoFactory.close();
+    public void close() throws ServiceException {
+        try {
+            daoFactory.close();
+        } catch (DaoException e) {
+            throw new ServiceException("exception.service.base.close.dao", e.getCause());
+        }
     }
 
-    Dao dao(String name) throws DaoException {
-        return daoFactory.createDao(name);
+    Dao dao(String name) throws ServiceException {
+        try {
+            return daoFactory.createDao(name);
+        } catch (DaoException e) {
+            throw new ServiceException("exception.service.base.dao.dao", e.getCause());
+        }
     }
 
 }

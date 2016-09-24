@@ -25,41 +25,41 @@ public class DownloadServlet extends HttpServlet {
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        if (req.getSession().getAttribute("userId") != null) {
-            if (req.getMethod().equals("GET")) {
-                logger.debug("DOWNLOAD REQUESTED: {}", req.getPathInfo());
-                InputStream inputStream = null;
-                switch (req.getPathInfo()) {
-                    case "/avatar":
-                        String avatarId = req.getParameter("id");
-                        String avatarPath = req.getParameter("path");
-                        if (avatarId != null) {
-                            logger.debug("AVATAR BY ID: {}", avatarId);
-                            if (ValidatorFactory.isOnlyDigits(avatarId)) {
-                                try {
-                                    Map<String, Object> avatarMap = (new UserService()).getAvatar(Long.valueOf(avatarId));
-                                    resp.setContentType((String) avatarMap.get("type"));
-                                    inputStream = (InputStream) avatarMap.get("file");
-                                } catch (DaoException | ConnectionException e) {
-                                    e.printStackTrace();
-                                    throw new ServletException(e.getMessage(), e.getCause());
-                                }
-                            }
-                        } else if (avatarPath != null) {
-                            logger.debug("AVATAR BY PATH: {}", avatarPath);
-                            resp.setContentType(avatarPath.substring(avatarPath.lastIndexOf(".") + 1).replaceAll("_", "/"));
-                            inputStream = new FileInputStream(new File(avatarPath));
-                        }
-                }
-                if (inputStream != null) {
-                    logger.debug("READY TO DOWNLOAD");
-                    IOUtils.copy(inputStream, resp.getOutputStream());
-                    inputStream.close();
-                    resp.getOutputStream().close();
-                    logger.debug("DOWNLOAD COMPLETE");
-                }
-            }
-        }
+//        if (req.getSession().getAttribute("userId") != null) {
+//            if (req.getMethod().equals("GET")) {
+//                logger.debug("DOWNLOAD REQUESTED: {}", req.getPathInfo());
+//                InputStream inputStream = null;
+//                switch (req.getPathInfo()) {
+//                    case "/avatar":
+//                        String avatarId = req.getParameter("id");
+//                        String avatarPath = req.getParameter("path");
+//                        if (avatarId != null) {
+//                            logger.debug("AVATAR BY ID: {}", avatarId);
+//                            if (ValidatorFactory.isOnlyDigits(avatarId)) {
+//                                try {
+//                                    Map<String, Object> avatarMap = (new UserService()).getAvatar(Long.valueOf(avatarId));
+//                                    resp.setContentType((String) avatarMap.get("type"));
+//                                    inputStream = (InputStream) avatarMap.get("file");
+//                                } catch (DaoException | ConnectionException e) {
+//                                    e.printStackTrace();
+//                                    throw new ServletException(e.getMessage(), e.getCause());
+//                                }
+//                            }
+//                        } else if (avatarPath != null) {
+//                            logger.debug("AVATAR BY PATH: {}", avatarPath);
+//                            resp.setContentType(avatarPath.substring(avatarPath.lastIndexOf(".") + 1).replaceAll("_", "/"));
+//                            inputStream = new FileInputStream(new File(avatarPath));
+//                        }
+//                }
+//                if (inputStream != null) {
+//                    logger.debug("READY TO DOWNLOAD");
+//                    IOUtils.copy(inputStream, resp.getOutputStream());
+//                    inputStream.close();
+//                    resp.getOutputStream().close();
+//                    logger.debug("DOWNLOAD COMPLETE");
+//                }
+//            }
+//        }
     }
 
 }

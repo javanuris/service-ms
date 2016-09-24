@@ -1,5 +1,6 @@
 package com.epam.java.rt.lab.entity.rbac;
 
+import com.epam.java.rt.lab.entity.EntityProperty;
 import com.epam.java.rt.lab.entity.BaseEntity;
 
 /**
@@ -10,6 +11,14 @@ public class Login extends BaseEntity {
     private String password;
     private int attemptLeft;
     private int status;
+
+    public enum Property implements EntityProperty {
+        ID,
+        EMAIL,
+        PASSWORD,
+        ATTEMPT_LEFT,
+        STATUS
+    }
 
     public Login() {
     }

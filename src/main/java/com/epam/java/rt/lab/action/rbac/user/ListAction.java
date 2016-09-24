@@ -28,29 +28,29 @@ public class ListAction implements Action {
 
     @Override
     public void execute(HttpServletRequest req, HttpServletResponse resp) throws ActionException {
-        try (UserService userService = new UserService()) {
-            req.setAttribute("navItemArray", NavigationComponent.getNavItemArray("nav.rbac"));
-            String page = req.getParameter("page");
-            String items = req.getParameter("items");
-            PageComponent pageComponent = new PageComponent(
-                    !ValidatorFactory.isOnlyDigits(page) ? 1L : Long.valueOf(page),
-                    !ValidatorFactory.isOnlyDigits(items) ? null : Long.valueOf(items));
-            ListComponent listComponent = new ListComponent();
-            listComponent.setEntityList(userService.getUserList(pageComponent));
-            listComponent.setHrefPrefix(UrlManager.getContextUri(req, "/rbac/user/view",
-                    "page=".concat(String.valueOf(pageComponent.getCurrentPage())),
-                    "items=".concat(String.valueOf(pageComponent.getItemsOnPage())),
-                    "id="));
-            req.setAttribute("userList", listComponent);
-            req.setAttribute("userListPage", pageComponent);
-            req.getRequestDispatcher("/WEB-INF/jsp/rbac/user/list.jsp").forward(req, resp);
-        } catch (ConnectionException | DaoException e) {
-            e.printStackTrace();
-            throw new ActionException("exception.action.rbac.user.list.user-service", e.getCause());
-        } catch (ServletException | IOException e) {
-            e.printStackTrace();
-            throw new ActionException("exception.action.rbac.user.list.forward", e.getCause());
-        }
+//        try (UserService userService = new UserService()) {
+//            req.setAttribute("navItemArray", NavigationComponent.getNavItemArray("nav.rbac"));
+//            String page = req.getParameter("page");
+//            String items = req.getParameter("items");
+//            PageComponent pageComponent = new PageComponent(
+//                    !ValidatorFactory.isOnlyDigits(page) ? 1L : Long.valueOf(page),
+//                    !ValidatorFactory.isOnlyDigits(items) ? null : Long.valueOf(items));
+//            ListComponent listComponent = new ListComponent();
+//            listComponent.setEntityList(userService.getUserList(pageComponent));
+//            listComponent.setHrefPrefix(UrlManager.getContextUri(req, "/rbac/user/view",
+//                    "page=".concat(String.valueOf(pageComponent.getCurrentPage())),
+//                    "items=".concat(String.valueOf(pageComponent.getItemsOnPage())),
+//                    "id="));
+//            req.setAttribute("userList", listComponent);
+//            req.setAttribute("userListPage", pageComponent);
+//            req.getRequestDispatcher("/WEB-INF/jsp/rbac/user/list.jsp").forward(req, resp);
+//        } catch (ConnectionException | DaoException e) {
+//            e.printStackTrace();
+//            throw new ActionException("exception.action.rbac.user.list.user-service", e.getCause());
+//        } catch (ServletException | IOException e) {
+//            e.printStackTrace();
+//            throw new ActionException("exception.action.rbac.user.list.forward", e.getCause());
+//        }
     }
 
 }

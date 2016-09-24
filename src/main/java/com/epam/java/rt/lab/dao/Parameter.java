@@ -1,7 +1,8 @@
 package com.epam.java.rt.lab.dao;
 
-import com.epam.java.rt.lab.dao.h2.QueryBuilder;
-import com.epam.java.rt.lab.dao.query.Query;
+import com.epam.java.rt.lab.dao.types.OrderType;
+import com.epam.java.rt.lab.dao.types.ParameterType;
+import com.epam.java.rt.lab.entity.EntityProperty;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,73 +14,52 @@ import java.util.regex.Pattern;
  */
 public class Parameter {
 
-    public enum Type {
-        // special types used to prepare sql query
-        _QUERY_TYPE,
-        _FUNC_NAME,
-        _SELECT_COLUMN_LIST,
-        _SET_FIELD_LIST,
-        _FROM_TABLE,
-        _JOIN_TABLES,
-        _WHERE_COLUMN_LIST,
-        _ORDER_COLUMN_LIST,
-        // user/client types to set sql/dao parameters/arguments
-        RESULT_FIELD_ARRAY,     // String with field names delimited by comma or string array of field names
-        LIMIT_OFFSET,           // Long value of offset
-        LIMIT_COUNT,            // Long value of count
-        ORDER_TYPE,             // Enum OrderType, could be ASC or DESC
-        ORDER_FIELD_NAME_ARRAY, // String with field names delimited by comma or string array of field names
-        SET_FIELD_ARRAY,        // Array of wrapper class type
-        WHERE_FIELD_ARRAY,      // Array of wrapper class type
-        CUSTOM                  // Extra type used to store mapped values/objects
-    }
-
-    private Map<Type, Object> argumentMap;
+    private Map<ParameterType, Object> parameterMap;
 
     public Parameter() {
-        this.argumentMap = new HashMap<>();
+        this.parameterMap = new HashMap<>();
     }
 
-    public Parameter put(Type type, Object... valueArray) {
-        this.argumentMap.put(type, valueArray.length == 1 ? valueArray[0] : valueArray);
+    public Parameter put(ParameterType type, Object... valueArray) {
+        this.parameterMap.put(type, valueArray.length == 1 ? valueArray[0] : valueArray);
         return this;
     }
 
-    public Parameter result(String... fieldNameArray) {
-        this.argumentMap.put(Type.RESULT_FIELD_ARRAY, fieldNameArray);
+    public Parameter result(EntityProperty... entityPropertyArray) {
+        this.parameterMap.put(ParameterType.RESULT_PROPERTY_ARRAY, entityPropertyArray);
         return this;
     }
 
     public Parameter limit(Long offset, Long count) {
-        this.argumentMap.put(Type.LIMIT_OFFSET, offset);
-        this.argumentMap.put(Type.LIMIT_COUNT, count);
+        this.parameterMap.put(ParameterType.LIMIT_OFFSET, offset);
+        this.parameterMap.put(ParameterType.LIMIT_COUNT, count);
         return this;
     }
 
-    public Parameter order(QueryBuilder.OrderType orderType, String... fieldNames) {
-        this.argumentMap.put(Type.ORDER_TYPE, orderType);
-        this.argumentMap.put(Type.ORDER_FIELD_NAME_ARRAY, fieldNames);
+    public Parameter order(OrderType orderType, EntityProperty... entityPropertyArray) {
+        this.parameterMap.put(ParameterType.ORDER_TYPE, orderType);
+        this.parameterMap.put(ParameterType.ORDER_PROPERTY_ARRAY, entityPropertyArray);
         return this;
     }
 
     public Parameter values(Field... fieldArray) {
-        this.argumentMap.put(Type.SET_FIELD_ARRAY, fieldArray);
+        this.parameterMap.put(ParameterType.SET_FIELD_ARRAY, fieldArray);
         return this;
     }
 
     public Parameter filter(Field... fieldArray) {
-        this.argumentMap.put(Type.WHERE_FIELD_ARRAY, fieldArray);
+        this.parameterMap.put(ParameterType.WHERE_FIELD_ARRAY, fieldArray);
         return this;
     }
 
-    public Object get(Type type) {
-        return this.argumentMap.get(type);
+    public Object get(ParameterType type) {
+        return this.parameterMap.get(type);
     }
 
     @Override
     public String toString() {
         StringBuilder result = new StringBuilder();
-        for (Map.Entry<Type, Object> argument : this.argumentMap.entrySet())
+        for (Map.Entry<ParameterType, Object> argument : this.parameterMap.entrySet())
             result.append("\n").append(argument.getKey()).append("=").append(argument.getValue());
         return result.toString();
     }
@@ -110,52 +90,51 @@ public class Parameter {
     }
 
     public static class Field <T> {
-        private String name;
+        private EntityProperty entityProperty;
         private T value;
-        private String compareFieldName;
+        private EntityProperty compareEntityProperty;
 
-        private Field(String name, T value, String compareFieldName) {
-            this.name = name;
+        private Field(EntityProperty entityProperty, T value, EntityProperty compareEntityProperty) {
+            this.entityProperty = entityProperty;
             this.value = value;
-            this.compareFieldName = compareFieldName;
+            this.compareEntityProperty = compareEntityProperty;
         }
 
-        public static <T> Field set(String name, T value, String compareFieldName) {
-            if (name == null || name.length() == 0) return null;
-            return new Field(name, value, compareFieldName);
+        public static <T> Field set(EntityProperty entityProperty, EntityProperty compareEntityProperty) {
+            if (entityProperty == null || compareEntityProperty == null) return null;
+            return new Field(entityProperty, null, compareEntityProperty);
         }
 
-        public static <T> Field set(String name, T value) {
-            if (name == null || name.length() == 0) return null;
-            return new Field(name, value, null);
+        public static <T> Field set(EntityProperty entityProperty, T value) {
+            if (entityProperty == null) return null;
+            return new Field(entityProperty, value, null);
         }
 
-        public String getName() {
-            return name;
+        public EntityProperty getEntityProperty() {
+            return this.entityProperty;
         }
 
         public T getValue() {
             return value;
         }
 
-        public String getCompareFieldName() {
-            return compareFieldName;
+        public EntityProperty getCompareEntityProperty() {
+            return this.compareEntityProperty;
         }
 
         @Override
         public boolean equals(Object obj) {
             Field field = (Field) obj;
-            return field.getName().equals(this.name) &&
-                    field.getValue().equals(this.value) &&
-                    field.getCompareFieldName().equals(this.compareFieldName);
+            return field != null && (field.entityProperty.equals(this.entityProperty) &&
+                    field.value.equals(this.value) && field.compareEntityProperty.equals(this.compareEntityProperty));
         }
 
         @Override
         public String toString() {
-            return this.name.concat(
-                    this.value == null && this.compareFieldName == null ?
-                            " is null" : this.compareFieldName == null ?
-                            " = ?" : " = ".concat(this.compareFieldName)
+            return this.entityProperty.toString().concat(
+                    this.value == null && this.compareEntityProperty == null ?
+                            " is null" : this.compareEntityProperty == null ?
+                            " = ?" : " = ".concat(this.compareEntityProperty.toString())
             );
         }
     }

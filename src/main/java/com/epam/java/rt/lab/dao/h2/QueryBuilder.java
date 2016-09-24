@@ -1,92 +1,122 @@
 package com.epam.java.rt.lab.dao.h2;
 
-import com.epam.java.rt.lab.dao.Parameter;
+import com.epam.java.rt.lab.dao.h2.jdbc.JdbcParameter;
+import com.epam.java.rt.lab.dao.types.FunctionType;
+import com.epam.java.rt.lab.dao.types.JdbcParameterType;
+import com.epam.java.rt.lab.dao.types.OrderType;
+import com.epam.java.rt.lab.dao.types.QueryType;
 import com.epam.java.rt.lab.util.StringArray;
 
 import java.util.List;
 
-import static com.epam.java.rt.lab.dao.Parameter.Type.*;
-
 /**
- * service-ms
+ * The {@code QueryBuilder} class represents private static methods
+ * to generate sql query to sql-database and one public static method
+ * {@code getSql} to return generated sql query.
+ *
+ * @author Rollan Taigulov
+ * @see JdbcParameter
+ * @see JdbcParameterType
+ * @see QueryType
+ * @see FunctionType
+ * @see OrderType
  */
 public class QueryBuilder {
 
-    public enum Type {
-        CREATE,
-        READ,
-        UPDATE,
-        DELETE,
-        FUNC
-    }
+    private static final String SELECT = "SELECT ";
+    private static final String FROM = " FROM ";
+    private static final String JOIN = " JOIN ";
+    private static final String WHERE = " WHERE ";
+    private static final String ORDER_BY = " ORDER BY ";
+    private static final String LIMIT = " LIMIT ";
+    private static final String AND_DELIMITER = " AND ";
 
-    public enum OrderType {
-        ASC,
-        DESC
-    }
+    public static final String COMMA_DELIMITER = ", ";
+    public static final String SPACE = " ";
 
-    public static String getSql(Parameter parameter) {
+    public static final String FUNCTION_COUNT_RESULT = "count";
+    private static final String FUNCTION_COUNT_SELECT = "SELECT COUNT(*) AS ";
+
+    /**
+     * Appends all generated parts of sql query according to {@code QueryType}.
+     *
+     * @param jdbcParameter
+     *        The value object to exchange necessary data between jdbc-methods,
+     *        stores {@code JdbcParameterType} data
+     * @see JdbcParameter
+     * @see JdbcParameterType
+     * @see QueryType
+     * @see FunctionType
+     * @see OrderType
+     */
+    public static String getSql(JdbcParameter jdbcParameter) {
         StringBuilder result = new StringBuilder();
-        switch ((Type) parameter.get(_QUERY_TYPE)) {
-            case FUNC:
-                return funcQuery(result, parameter).toString();
+        switch ((QueryType) jdbcParameter.get(JdbcParameterType.QUERY_TYPE)) {
+            case FUNCTION:
+                return funcQuery(result, jdbcParameter).toString();
             case READ:
                 return result
-                        .append(select(parameter))
-                        .append(from(parameter))
-                        .append(join(parameter))
-                        .append(where(parameter))
-                        .append(order(parameter))
-                        .append(limit(parameter)).toString();
+                        .append(select(jdbcParameter))
+                        .append(from(jdbcParameter))
+                        .append(join(jdbcParameter))
+                        .append(where(jdbcParameter))
+                        .append(order(jdbcParameter))
+                        .append(limit(jdbcParameter)).toString();
         }
         return null;
     }
 
-    private static StringBuilder funcQuery(StringBuilder result, Parameter parameter) {
-        switch ((String) parameter.get(_FUNC_NAME)) {
-            case "COUNT":
+    private static StringBuilder funcQuery(StringBuilder result, JdbcParameter jdbcParameter) {
+        switch ((FunctionType) jdbcParameter.get(JdbcParameterType.FUNCTION)) {
+            case COUNT:
                 return result
-                        .append("SELECT COUNT(*) AS count")
-                        .append(from(parameter))
-                        .append(join(parameter))
-                        .append(where(parameter));
+                        .append(FUNCTION_COUNT_SELECT).append(SPACE).append(FUNCTION_COUNT_RESULT)
+                        .append(from(jdbcParameter))
+                        .append(join(jdbcParameter))
+                        .append(where(jdbcParameter));
         }
         return result;
     }
 
-    private static String select(Parameter parameter) {
-        return "SELECT ".concat(StringArray.combine((List<String>) parameter.get(_SELECT_COLUMN_LIST), ", "));
+    private static String select(JdbcParameter jdbcParameter) {
+        return SELECT.concat(StringArray.combine(
+                (List<?>) jdbcParameter.get(JdbcParameterType.SELECT_COLUMN_LIST),
+                COMMA_DELIMITER
+        ));
     }
 
-    private static String from(Parameter parameter) {
-        return " FROM ".concat((String) parameter.get(_FROM_TABLE));
+    private static String from(JdbcParameter jdbcParameter) {
+        return FROM.concat((String) jdbcParameter.get(JdbcParameterType.FROM_TABLE));
     }
 
-    private static String join(Parameter parameter) {
-        Object joinTables = parameter.get(_JOIN_TABLES);
-        return joinTables == null ? "" : " JOIN ".concat((String) joinTables);
+    private static String join(JdbcParameter jdbcParameter) {
+        Object joinTables = jdbcParameter.get(JdbcParameterType.JOIN_TABLES);
+        return joinTables == null ? "" : JOIN.concat((String) joinTables);
     }
 
-    private static String where(Parameter parameter) {
-        Object whereColumnList = parameter.get(_WHERE_COLUMN_LIST);
-        return whereColumnList == null ? "" :
-                " WHERE ".concat(StringArray.combine((List<Parameter.Field>) whereColumnList, " AND "));
+    private static String where(JdbcParameter jdbcParameter) {
+        Object whereColumnList = jdbcParameter.get(JdbcParameterType.WHERE_FIELD_LIST);
+        return whereColumnList == null ? "" : WHERE.concat(StringArray.combine(
+                (List<?>) whereColumnList,
+                AND_DELIMITER
+        ));
     }
 
-    private static String order(Parameter parameter) {
-        Object orderColumnList = parameter.get(_ORDER_COLUMN_LIST);
-        Object orderType = parameter.get(ORDER_TYPE);
+    private static String order(JdbcParameter jdbcParameter) {
+        Object orderColumnList = jdbcParameter.get(JdbcParameterType.ORDER_COLUMN_LIST);
+        Object orderType = jdbcParameter.get(JdbcParameterType.ORDER_TYPE);
         return orderColumnList == null || orderType == null ? "" :
-                " ORDER BY ".concat(StringArray.combine((List<String>) orderColumnList, ", "))
-                        .concat(orderType == OrderType.ASC ? " ASC" :
-                                (orderType == OrderType.DESC ? " DESC" :
-                                        (String) orderType));
+                ORDER_BY.concat(StringArray.combine(
+                        (List<?>) orderColumnList,
+                        COMMA_DELIMITER
+                )).concat(orderType instanceof OrderType ? SPACE.concat(orderType.toString()) : "");
     }
 
-    private static String limit(Parameter parameter) {
-        return (parameter.get(LIMIT_OFFSET) == null) || (parameter.get(LIMIT_COUNT) == null) ? "" :
-                " LIMIT ".concat(String.valueOf(parameter.get(LIMIT_OFFSET)))
-                        .concat(", ").concat(String.valueOf(parameter.get(LIMIT_COUNT)));
+    private static String limit(JdbcParameter jdbcParameter) {
+        return (jdbcParameter.get(JdbcParameterType.LIMIT_OFFSET) == null) ||
+                jdbcParameter.get(JdbcParameterType.LIMIT_COUNT) == null ? "" :
+                LIMIT.concat(String.valueOf(jdbcParameter.get(JdbcParameterType.LIMIT_OFFSET))).concat(COMMA_DELIMITER)
+                        .concat(String.valueOf(jdbcParameter.get(JdbcParameterType.LIMIT_COUNT)));
     }
 
 }

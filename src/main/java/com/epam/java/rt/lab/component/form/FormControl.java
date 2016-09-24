@@ -2,6 +2,8 @@ package com.epam.java.rt.lab.component.form;
 
 import com.epam.java.rt.lab.util.validator.Validator;
 
+import java.util.List;
+
 /**
  * service-ms
  */
@@ -10,6 +12,7 @@ public class FormControl {
     private ControlVal controlVal;
 
     public FormControl(
+            String name,
             String label,
             String type,
             String placeholder,
@@ -19,6 +22,7 @@ public class FormControl {
     ) {
 
         this.controlDef = new ControlDef(
+                name,
                 label,
                 type,
                 placeholder,
@@ -34,6 +38,10 @@ public class FormControl {
 
     ControlDef getControlDef() {
         return this.controlDef;
+    }
+
+    public String getName() {
+        return controlDef.name;
     }
 
     public String getLabel() {
@@ -65,12 +73,12 @@ public class FormControl {
         return this.controlVal;
     }
 
-    public String[] getAvailableValueArray() {
-        return val().availableValueArray;
+    public List<String> getAvailableValueList() {
+        return val().availableValueList;
     }
 
-    public void setAvailableValueArray(String[] availableValueArray) {
-        val().availableValueArray = availableValueArray;
+    public void setAvailableValueList(List<String> availableValueList) {
+        val().availableValueList = availableValueList;
     }
 
     public String getValue() {
@@ -89,12 +97,12 @@ public class FormControl {
         val().genericValue = genericValue;
     }
 
-    public String[] getValidationMessageArray() {
-        return val().validationMessageArray;
+    public List<String> getValidationMessageList() {
+        return val().validationMessageList;
     }
 
-    public void setValidationMessageArray(String[] validationMessageArray) {
-        val().validationMessageArray = validationMessageArray;
+    public void setValidationMessageList(List<String> validationMessageList) {
+        val().validationMessageList = validationMessageList;
     }
 
     public boolean getIgnoreValidate() {
@@ -108,6 +116,7 @@ public class FormControl {
 
     // immutable item definition
     private static class ControlDef {
+        private String name = null;
         private String label = null;
         private String type = null;
         private String placeholder = null;
@@ -116,6 +125,7 @@ public class FormControl {
         private Validator validator = null;
 
         private ControlDef(
+                String name,
                 String label,
                 String type,
                 String placeholder,
@@ -123,6 +133,7 @@ public class FormControl {
                 String subAction,
                 Validator validator
         ) {
+            this.name = name;
             this.label = label;
             this.type = type;
             this.placeholder = placeholder;
@@ -134,10 +145,10 @@ public class FormControl {
 
     // mutable item values
     private static class ControlVal<T> {
-        private String[] availableValueArray = null;
+        private List<String> availableValueList = null;
         private String value = null;
         private T genericValue = null;
-        private String[] validationMessageArray = null;
+        private List<String> validationMessageList = null;
         private boolean ignoreValidate = false;
 
         private ControlVal() {
