@@ -18,9 +18,11 @@ import java.util.Properties;
  * service-ms
  */
 public abstract class AbstractDaoFactory implements DaoFactory {
+
     private static final Logger logger = LoggerFactory.getLogger(AbstractDaoFactory.class);
     private static Properties databaseProperties = null;
     private static DataSource connectionPool = null;
+
     private Connection connection = null;
 
     public static DaoFactory createDaoFactory() throws DaoException {
@@ -53,13 +55,13 @@ public abstract class AbstractDaoFactory implements DaoFactory {
         }
     }
 
-    static String getDatabaseProperty(String key) throws DaoException {
+    public static String getDatabaseProperty(String key) throws DaoException {
         String databaseProperty = AbstractDaoFactory.databaseProperties.getProperty(key);
         if (databaseProperty == null) throw new DaoException("exception.dao.properties.key");
         return databaseProperty;
     }
 
-    public AbstractDaoFactory(Connection connection) {
+    AbstractDaoFactory(Connection connection) {
         this.connection = connection;
     }
 

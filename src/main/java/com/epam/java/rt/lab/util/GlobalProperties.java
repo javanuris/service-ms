@@ -8,7 +8,7 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * service-ms
  */
-public class GlobalProperties {
+public final class GlobalProperties {
     private static Properties globalProperties = new Properties();
     private static Lock propertiesLock = new ReentrantLock();
 

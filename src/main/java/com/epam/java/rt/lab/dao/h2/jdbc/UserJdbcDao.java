@@ -1,29 +1,24 @@
 package com.epam.java.rt.lab.dao.h2.jdbc;
 
 import com.epam.java.rt.lab.dao.DaoException;
-import com.epam.java.rt.lab.dao.Parameter;
-import com.epam.java.rt.lab.dao.types.JdbcParameterType;
-import com.epam.java.rt.lab.entity.rbac.User;
-import com.epam.java.rt.lab.util.CastManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.sql.Connection;
 
 /**
  * service-ms
  */
-public class UserJdbcDao extends JdbcDao {
+public class UserJdbcDao {
 
     private static final String DEFAULT_TABLE = "\"User\"";
-    private static final String DEFAULT_JOIN_COLUMN = "id";
+    private static final String DEFAULT_ROLE_JOIN_COLUMN = "role_id";
+    private static final String DEFAULT_LOGIN_JOIN_COLUMN = "login_id";
+    private static final String ROLE_TABLE = "\"Role\"";
+    private static final String ROLE_JOIN_COLUMN = "id";
+    private static final String LOGIN_TABLE = "\"Login\"";
+    private static final String LOGIN_JOIN_COLUMN = "id";
 
     public UserJdbcDao(Connection connection) throws DaoException {
-        super(connection);
+//        super(connection);
     }
 
 //    @Override
@@ -91,7 +86,7 @@ public class UserJdbcDao extends JdbcDao {
 //            user.setRole((new RoleJdbcDao(getConnection())).getFirst(role, "id", ""));
 //            Login login = new Login();
 //            login.setId(resultSet.getLong("login_id"));
-//            user.setLogin((new LoginJdbcDao(getConnection())).getFirst(login, "id", ""));
+//            user.setLogin((new LoginJdbcDao_(getConnection())).getFirst(login, "id", ""));
 //            return (T) user;
 //        } catch (SQLException e) {
 //            e.printStackTrace();
@@ -168,7 +163,7 @@ public class UserJdbcDao extends JdbcDao {
 //                rememberValueMap.put("id", resultSet.getLong("id"));
 //        } catch (SQLException e) {
 //            e.printStackTrace();
-//            throw new DaoException("exception.dao.set-remember.sql-select", e.getCause());
+//            throw new DaoException("exception.dao.set-remember.sql-Select", e.getCause());
 //        }
 //        List<Set> setList = new ArrayList<>();
 //        setList.add(new Set("user_id", rememberValueMap.get("userId")));
@@ -179,7 +174,7 @@ public class UserJdbcDao extends JdbcDao {
 //            logger.debug("INSERT REMEMBER");
 //            sqlString = "INSERT INTO \"Remember\" (user_id, name, value, valid) VALUES (?, ?, ?, ?)";
 //            try (PreparedStatement preparedStatement =
-//                         getConnection().prepareStatement(sqlString, Statement.RETURN_GENERATED_KEYS);) {
+//                         getConnection().prepareStatement(sqlString, SqlBuilder.RETURN_GENERATED_KEYS);) {
 //                return setPreparedStatementValues(preparedStatement, setList).executeUpdate();
 //            } catch (SQLException e) {
 //                e.printStackTrace();
@@ -254,7 +249,7 @@ public class UserJdbcDao extends JdbcDao {
 //                logger.debug("INSERT AVATAR");
 //                String sqlString = "INSERT INTO \"Avatar\" (name, type, file, modified) VALUES (?, ?, ?, ?)";
 //                try (PreparedStatement preparedStatement =
-//                             getConnection().prepareStatement(sqlString, Statement.RETURN_GENERATED_KEYS);
+//                             getConnection().prepareStatement(sqlString, SqlBuilder.RETURN_GENERATED_KEYS);
 //                     ResultSet resultSet =
 //                             getGeneratedKeysAfterUpdate(setPreparedStatementValues(preparedStatement, setList));) {
 //                    if (resultSet.first()) user.setAvatarId(resultSet.getLong(1));
@@ -318,111 +313,110 @@ public class UserJdbcDao extends JdbcDao {
 //
 
     // newly dao implementation
-
-    @Override
-    <T> List<T> getEntityList(ResultSet resultSet, JdbcParameter jdbcParameter)
-            throws SQLException, DaoException {
-        List<User> userList = new ArrayList<>();
-        while (resultSet.next()) userList.add(getEntity(resultSet, jdbcParameter));
-        return (List<T>) userList;
-    }
-
-    @Override
-    <T> T getEntity(ResultSet resultSet, JdbcParameter jdbcParameter) throws SQLException, DaoException {
-        User user = new User();
-        List<JdbcParameter.Column> columnList =
-                CastManager.getList(jdbcParameter.get(JdbcParameterType.SELECT_COLUMN_LIST), JdbcParameter.Column.class);
-        for (JdbcParameter.Column column : columnList) {
-            if (column.getTableName().equals(DEFAULT_TABLE)) {
-                switch (column.getColumnName()) {
-                    case "id":
-                        user.setId(resultSet.getLong(column.getColumnName()));
-                        break;
-                    case "first_name":
-                        user.setFirstName((String) resultSet.getObject(column.getColumnName()));
-                        break;
-                    case "middle_name":
-                        user.setMiddleName((String) resultSet.getObject(column.getColumnName()));
-                        break;
-                    case "last_name":
-                        user.setLastName((String) resultSet.getObject(column.getColumnName()));
-                        break;
-                    case "avatar_id":
-                        user.setAvatarId((Long) resultSet.getObject(column.getColumnName()));
-                        break;
-                    case "role_id":
-                        Long role_id = (Long) resultSet.getObject(column.getColumnName());
-                        if (role_id != null)
-                            user.setRole(new RoleJdbcDao(getConnection()).getFirst(
-                                    new Parameter().put(Parameter.Type._WHERE_COLUMN_LIST, Parameter.Field.set("id", role_id))
-                            ));
-                        break;
-                    case "login_id":
-                        Long login_id = (Long) resultSet.getObject(column.getColumnName());
-                        if (login_id != null) {
-                            user.setLogin(new LoginJdbcDao(getConnection()).getFirst(
-                                    new Parameter().put(Parameter.Type._WHERE_COLUMN_LIST, Parameter.Field.set("id", login_id))
-                            ));
-                        }
-                        break;
-                }
-            } else {
-                String subEntityName = columnName.split("\\.")[0];
-                List<String> subEntityColumnList = subEntityColumnListMap.get(subEntityName);
-                if (subEntityColumnList == null) {
-                    subEntityColumnList = new ArrayList<>();
-                    subEntityColumnListMap.put(subEntityName, subEntityColumnList);
-                }
-                subEntityColumnList.add(columnName);
-            }
-        }
-        for (Map.Entry<String, List<String>> subEntityEntry : subEntityColumnListMap.entrySet()) {
-            logger.debug("{}", subEntityEntry.getKey());
-            switch (subEntityEntry.getKey()) {
-                case "\"Role\"":
-                    user.setRole(new RoleJdbcDao(getConnection()).getEntity(
-                            resultSet,
-                            new Parameter().put(Parameter.Type._SELECT_COLUMN_LIST, subEntityEntry.getValue())
-                    ));
-                    break;
-                case "\"Login\"":
-                    user.setLogin(new LoginJdbcDao(getConnection()).getEntity(
-                            resultSet,
-                            new Parameter().put(Parameter.Type._SELECT_COLUMN_LIST, subEntityEntry.getValue())
-                    ));
-                    break;
-            }
-        }
-        return (T) user;
-    }
-
-    @Override
-    Parameter.Field getParameterJoinWhereField(String joinTable) throws DaoException {
-        logger.debug("getJoinTable {}", joinTable);
-        switch (joinTable) {
-            case "\"Role\"":
-                return Parameter.Field.set(DEFAULT_FROM.concat(".role_id"), null, joinTable.concat(".id"));
-            case "\"Login\"":
-                return Parameter.Field.set(DEFAULT_FROM.concat(".login_id"), null, joinTable.concat(".id"));
-        }
-        throw new DaoException("exception.dao.jdbc.getSql-join-where");
-    }
-
-    @Override
-    String getParameterDefaultFrom() {
-        return DEFAULT_FROM;
-    }
-
-    @Override
-    List<String> getParameterAllSelectColumnList() {
-        List<String> columnList = new ArrayList<>();
-        columnList.add(DEFAULT_FROM.concat(".id"));
-        columnList.add(DEFAULT_FROM.concat(".first_name"));
-        columnList.add(DEFAULT_FROM.concat(".middle_name"));
-        columnList.add(DEFAULT_FROM.concat(".last_name"));
-        columnList.add(DEFAULT_FROM.concat(".role_id"));
-        columnList.add(DEFAULT_FROM.concat(".login_id"));
-        columnList.add(DEFAULT_FROM.concat(".avatar_id"));
-        return columnList;
-    }
+//
+//    @Override
+//    <T> List<T> getEntityList(ResultSet resultSet, JdbcParameter jdbcParameter)
+//            throws SQLException, DaoException {
+//        List<User> userList = new ArrayList<>();
+//        while (resultSet.next()) userList.add(getEntity(resultSet, jdbcParameter));
+//        return (List<T>) userList;
+//    }
+//
+//    @Override
+//    <T> T getEntity(ResultSet resultSet, JdbcParameter jdbcParameter) throws SQLException, DaoException {
+//        User user = new User();
+//        List<JdbcParameter.Column> columnList =
+//                CastManager.getList(jdbcParameter.get(JdbcParameterType.SELECT_COLUMN_LIST), JdbcParameter.Column.class);
+//        for (JdbcParameter.Column column : columnList) {
+//            if (column.getTableName().equals(DEFAULT_TABLE)) {
+//                switch (column.getColumnName()) {
+//                    case "id":
+//                        user.setId(resultSet.getLong(column.getColumnName()));
+//                        break;
+//                    case "first_name":
+//                        user.setFirstName((String) resultSet.getObject(column.getColumnName()));
+//                        break;
+//                    case "middle_name":
+//                        user.setMiddleName((String) resultSet.getObject(column.getColumnName()));
+//                        break;
+//                    case "last_name":
+//                        user.setLastName((String) resultSet.getObject(column.getColumnName()));
+//                        break;
+//                    case "avatar_id":
+//                        user.setAvatarId((Long) resultSet.getObject(column.getColumnName()));
+//                        break;
+//                    case "role_id":
+//                        Long role_id = (Long) resultSet.getObject(column.getColumnName());
+//                        if (role_id != null)
+//                            user.setRole(new RoleJdbcDao(getConnection()).getFirst(
+//                                    new Parameter_().put(Parameter_.Type._WHERE_COLUMN_LIST, Parameter_.Field.set("id", role_id))
+//                            ));
+//                        break;
+//                    case "login_id":
+//                        Long login_id = (Long) resultSet.getObject(column.getColumnName());
+//                        if (login_id != null) {
+//                            user.setLogin(new LoginJdbcDao_(getConnection()).getFirst(
+//                                    new Parameter_().put(Parameter_.Type._WHERE_COLUMN_LIST, Parameter_.Field.set("id", login_id))
+//                            ));
+//                        }
+//                        break;
+//                }
+//            } else {
+//                String subEntityName = columnName.split("\\.")[0];
+//                List<String> subEntityColumnList = subEntityColumnListMap.get(subEntityName);
+//                if (subEntityColumnList == null) {
+//                    subEntityColumnList = new ArrayList<>();
+//                    subEntityColumnListMap.put(subEntityName, subEntityColumnList);
+//                }
+//                subEntityColumnList.add(columnName);
+//            }
+//        }
+//        for (Map.Entry<String, List<String>> subEntityEntry : subEntityColumnListMap.entrySet()) {
+//            logger.debug("{}", subEntityEntry.getKey());
+//            switch (subEntityEntry.getKey()) {
+//                case "\"Role\"":
+//                    user.setRole(new RoleJdbcDao(getConnection()).getEntity(
+//                            resultSet,
+//                            new Parameter_().put(Parameter_.Type._SELECT_COLUMN_LIST, subEntityEntry.getValue())
+//                    ));
+//                    break;
+//                case "\"Login\"":
+//                    user.setLogin(new LoginJdbcDao_(getConnection()).getEntity(
+//                            resultSet,
+//                            new Parameter_().put(Parameter_.Type._SELECT_COLUMN_LIST, subEntityEntry.getValue())
+//                    ));
+//                    break;
+//            }
+//        }
+//        return (T) user;
+//    }
+//
+//    @Override
+//    JdbcParameter.Field getParameterJoinWhereField(String joinTable) throws DaoException {
+//        switch (joinTable) {
+//            case "\"Role\"":
+//                return new JdbcParameter.Field(null, DEFAULT_TABLE.concat(".role_id"), );
+//            case "\"Login\"":
+//                return Parameter_.Field.set(DEFAULT_TABLE.concat(".login_id"), null, joinTable.concat(".id"));
+//        }
+//        throw new DaoException("exception.dao.jdbc.getSql-join-where");
+//    }
+//
+//    @Override
+//    String getParameterDefaultFrom() {
+//        return DEFAULT_TABLE;
+//    }
+//
+//    @Override
+//    List<String> getParameterAllSelectColumnList() {
+//        List<String> columnList = new ArrayList<>();
+//        columnList.add(DEFAULT_TABLE.concat(".id"));
+//        columnList.add(DEFAULT_TABLE.concat(".first_name"));
+//        columnList.add(DEFAULT_TABLE.concat(".middle_name"));
+//        columnList.add(DEFAULT_TABLE.concat(".last_name"));
+//        columnList.add(DEFAULT_TABLE.concat(".role_id"));
+//        columnList.add(DEFAULT_TABLE.concat(".login_id"));
+//        columnList.add(DEFAULT_TABLE.concat(".avatar_id"));
+//        return columnList;
+//    }
 }

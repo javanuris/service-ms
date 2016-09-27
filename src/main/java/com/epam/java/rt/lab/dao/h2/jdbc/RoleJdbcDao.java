@@ -1,13 +1,8 @@
 package com.epam.java.rt.lab.dao.h2.jdbc;
 
 import com.epam.java.rt.lab.dao.DaoException;
-import com.epam.java.rt.lab.dao.Parameter;
-import com.epam.java.rt.lab.dao.h2.QueryBuilder;
-import com.epam.java.rt.lab.dao.types.JdbcParameterType;
-import com.epam.java.rt.lab.dao.types.OrderType;
-import com.epam.java.rt.lab.entity.rbac.Permission;
+import com.epam.java.rt.lab.entity.EntityProperty;
 import com.epam.java.rt.lab.entity.rbac.Role;
-import com.epam.java.rt.lab.util.CastManager;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -18,7 +13,7 @@ import java.util.List;
 /**
  * service-ms
  */
-public class RoleJdbcDao extends JdbcDao {
+public class RoleJdbcDao extends JdbcDao_ {
 
     private static final String DEFAULT_TABLE = "\"Role\"";
     private static final String DEFAULT_JOIN_COLUMN = "id";
@@ -170,80 +165,81 @@ public class RoleJdbcDao extends JdbcDao {
 
     // newly dao implementation
 
-    @Override
-    <T> List<T> getEntityList(ResultSet resultSet, JdbcParameter jdbcParameter) throws SQLException, DaoException {
-        List<Role> roleList = new ArrayList<>();
-        while (resultSet.next()) roleList.add(getEntity(resultSet, jdbcParameter));
-        return (List<T>) roleList;
-    }
-
-    @Override
-    <T> T getEntity(ResultSet resultSet, JdbcParameter jdbcParameter) throws SQLException, DaoException {
-        Role role = new Role();
-        List<JdbcParameter.Column> columnList =
-                CastManager.getList(jdbcParameter.get(JdbcParameterType.SELECT_COLUMN_LIST), JdbcParameter.Column.class);
-        for (JdbcParameter.Column column : columnList) {
-            if (column.getTableName().equals(DEFAULT_TABLE)) {
-                switch (column.getColumnName()) {
-                    case "id":
-                        role.setId(resultSet.getLong(column.getColumnName()));
-                        break;
-                    case "name":
-                        role.setName((String) resultSet.getObject(column.getColumnName()));
-                        break;
-                    case "uri_list":
-                        JdbcDao jdbcDao = new PermissionJdbcDao(getConnection());
-                        JdbcParameter permissionJdbcParameter = JdbcParameter.of(new Parameter()
-                                        .result(Permission.Property.URI)
-                                        .filter(Parameter.Field.set(Role.Property.ID, role.getId()))
-                                        .order(OrderType.ASC, Permission.Property.URI),
-                                jdbcDao
-                        );
-                        String joinTables = (String) permissionJdbcParameter.get(JdbcParameterType.JOIN_TABLES);
-                        joinTables = joinTables.concat(QueryBuilder.COMMA_DELIMITER).concat(ROLE_PERMISSION_TABLE);
-                        permissionJdbcParameter.put(JdbcParameterType.JOIN_TABLES, joinTables);
-                        List<JdbcParameter.Field> fieldList =
-                                CastManager.getList(permissionJdbcParameter.get(JdbcParameterType.WHERE_FIELD_LIST), JdbcParameter.Field.class);
-                        fieldList.add(new JdbcParameter.Field(
-                                null,
-                                new JdbcParameter.Column(ROLE_PERMISSION_TABLE, ROLE_PERMISSION_JOIN_COLUMN),
-                                new JdbcParameter.Column(DEFAULT_TABLE, DEFAULT_JOIN_COLUMN)
-                        ));
-                        List<Permission> permissionList = jdbcDao.getAll(permissionJdbcParameter);
-                        List<String> uriList = new ArrayList<>();
-                        for (Permission permission : permissionList) uriList.add(permission.getUri());
-                        role.setUriList(uriList);
-                        break;
-                }
-            }
-        }
-        return (T) role;
-    }
-
-    @Override
-    String getTableName(String entityClassName) {
-        if (entityClassName.equals(Role.class.getSimpleName())) {
-            return DEFAULT_TABLE;
-        }
-        return "";
-    }
-
-    @Override
-    JdbcParameter.Field getParameterJoinWhereField(String joinTable) throws DaoException {
-        throw new DaoException("exception.dao.role.get-parameter-join-where-field");
-    }
-
-    @Override
-    String getParameterDefaultFrom() {
-        return DEFAULT_TABLE;
-    }
-
-    @Override
-    List<String> getParameterAllSelectColumnList() {
-        List<String> columnList = new ArrayList<>();
-        columnList.add(DEFAULT_TABLE.concat(".id"));
-        columnList.add(DEFAULT_TABLE.concat(".name"));
-        return columnList;
-    }
-
+//    @Override
+//    <T> List<T> getEntityList(ResultSet resultSet, JdbcParameter jdbcParameter) throws SQLException, DaoException {
+//        List<Role> roleList = new ArrayList<>();
+//        while (resultSet.next()) roleList.add(getEntity(resultSet, jdbcParameter));
+//        return (List<T>) roleList;
+//    }
+//
+//    @Override
+//    <T> T getEntity(ResultSet resultSet, JdbcParameter jdbcParameter) throws SQLException, DaoException {
+////        Role role = new Role();
+////        List<JdbcParameter.Column> columnList =
+////                CastManager.getList(jdbcParameter.get(JdbcParameterType.SELECT_COLUMN_LIST), JdbcParameter.Column.class);
+////        for (JdbcParameter.Column column : columnList) {
+////            if (column.getTableName().equals(DEFAULT_TABLE)) {
+////                switch (column.getColumnName()) {
+////                    case "id":
+////                        role.setId(resultSet.getLong(column.getColumnName()));
+////                        break;
+////                    case "name":
+////                        role.setName((String) resultSet.getObject(column.getColumnName()));
+////                        break;
+////                    case "uri_list":
+////                        JdbcDao_ jdbcDao = new PermissionJdbcDao(getConnection());
+////                        JdbcParameter permissionJdbcParameter = JdbcParameter.of(new Parameter_()
+////                                        .result(Permission.Property.URI)
+////                                        .filter(Parameter_.Field.set(Role.Property.ID, role.getId()))
+////                                        .order(OrderType.ASC, Permission.Property.URI),
+////                                jdbcDao
+////                        );
+////                        String joinTables = (String) permissionJdbcParameter.get(JdbcParameterType.JOIN_TABLES);
+////                        joinTables = joinTables.concat(QueryBuilder_.COMMA_DELIMITER).concat(ROLE_PERMISSION_TABLE);
+////                        permissionJdbcParameter.put(JdbcParameterType.JOIN_TABLES, joinTables);
+////                        List<JdbcParameter.Field> fieldList =
+////                                CastManager.getList(permissionJdbcParameter.get(JdbcParameterType.WHERE_FIELD_LIST), JdbcParameter.Field.class);
+////                        fieldList.add(new JdbcParameter.Field(
+////                                null,
+////                                new JdbcParameter.Column(ROLE_PERMISSION_TABLE, ROLE_PERMISSION_JOIN_COLUMN),
+////                                new JdbcParameter.Column(DEFAULT_TABLE, DEFAULT_JOIN_COLUMN)
+////                        ));
+////                        List<Permission> permissionList = jdbcDao.getAll(permissionJdbcParameter);
+////                        List<String> uriList = new ArrayList<>();
+////                        for (Permission permission : permissionList) uriList.add(permission.getUri());
+////                        role.setUriList(uriList);
+////                        break;
+////                }
+////            }
+////        }
+////        return (T) role;
+//        return null;
+//    }
+//
+//    @Override
+//    JdbcParameter.Column getColumn(EntityProperty entityProperty) {
+//        String entityName = entityProperty.getClass().getSuperclass().getSimpleName();
+//        if (entityName.equals(Role.class.getSimpleName()))
+//            return new JdbcParameter.Column(DEFAULT_TABLE, entityProperty.toString().toLowerCase());
+//        return null;
+//    }
+//
+//    @Override
+//    JdbcParameter.Field getParameterJoinWhereField(String joinTable) throws DaoException {
+//        throw new DaoException("exception.dao.role.get-parameter-join-where-field");
+//    }
+//
+//    @Override
+//    String getParameterDefaultFrom() {
+//        return DEFAULT_TABLE;
+//    }
+//
+//    @Override
+//    List<String> getParameterAllSelectColumnList() {
+//        List<String> columnList = new ArrayList<>();
+//        columnList.add(DEFAULT_TABLE.concat(".id"));
+//        columnList.add(DEFAULT_TABLE.concat(".name"));
+//        return columnList;
+//    }
+//
 }

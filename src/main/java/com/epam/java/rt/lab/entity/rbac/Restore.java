@@ -14,6 +14,15 @@ public class Restore extends BaseEntity {
     private String cookieValue;
     private Timestamp valid;
 
+    public enum Property {
+        ID,
+        LOGIN,
+        CODE,
+        COOKIE_NAME,
+        COOKIE_VALUE,
+        VALID
+    }
+
     public Restore() {
     }
 

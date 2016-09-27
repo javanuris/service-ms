@@ -4,6 +4,8 @@ import com.epam.java.rt.lab.connection.ConnectionException;
 import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.entity.rbac.Role;
 import com.epam.java.rt.lab.service.RoleService;
+import com.epam.java.rt.lab.service.ServiceException;
+import com.epam.java.rt.lab.util.validator.ValidatorException;
 import com.epam.java.rt.lab.util.validator.ValidatorFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,6 +64,10 @@ public class NavigationComponent {
                         navItemMap.put(prefix.substring(0, prefix.length() - 1), navbarNavItemList.toArray());
                 }
             }
+        } catch (ServiceException e) {
+            e.printStackTrace();
+        } catch (ValidatorException e) {
+            e.printStackTrace();
         } finally {
             updateMapLock.unlock();
         }
@@ -95,9 +101,9 @@ public class NavigationComponent {
         private String name;
         private String link;
 
-        public NavigationItem(String name, String link) {
+        public NavigationItem(String name, String link) throws ValidatorException {
             String index = name.substring(name.lastIndexOf(".") + 1);
-            if (ValidatorFactory.isOnlyDigits(index)) {
+            if (ValidatorFactory.getInstance().create("digits").validate(index) == null) {
                 this.index = Integer.valueOf(index);
                 this.name = name.substring(0, name.length() - index.length() - 1);
             } else {

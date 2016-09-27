@@ -1,6 +1,6 @@
 package com.epam.java.rt.lab.action;
 
-import com.epam.java.rt.lab.dao.h2.QueryBuilder;
+import com.epam.java.rt.lab.dao.h2.QueryBuilder_;
 import com.epam.java.rt.lab.entity.rbac.Role;
 import com.epam.java.rt.lab.service.RoleService;
 import com.epam.java.rt.lab.service.ServiceException;
@@ -24,7 +24,7 @@ public class DevelopAction implements Action {
     public void execute(HttpServletRequest req, HttpServletResponse resp) throws ActionException {
         try {
             RoleService roleService = new RoleService();
-            List<Role> roleList = roleService.getRoleList(QueryBuilder.OrderType.ASC, RoleService.OrderBy.NAME);
+            List<Role> roleList = roleService.getRoleList(QueryBuilder_.OrderType.ASC, RoleService.OrderBy.NAME);
             req.setAttribute("roleList", roleList);
 
             req.getRequestDispatcher("/WEB-INF/jsp/develop.jsp").forward(req, resp);

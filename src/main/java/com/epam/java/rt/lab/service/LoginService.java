@@ -1,7 +1,7 @@
 package com.epam.java.rt.lab.service;
 
 import com.epam.java.rt.lab.dao.DaoException;
-import com.epam.java.rt.lab.dao.Parameter;
+import com.epam.java.rt.lab.dao.DaoParameter;
 import com.epam.java.rt.lab.entity.rbac.Login;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,59 +19,57 @@ public class LoginService extends BaseService {
     public Login getLogin(String email)
             throws ServiceException {
         try {
-            return dao("Login").getFirst(new Parameter()
-                    .filter(Parameter.Field.set(
-                            Login.Property.EMAIL, email
-                    ))
-            );
+            return dao("Login").read(new DaoParameter()
+                    .setWhere(new DaoParameter.Where().andEqual(Login.Property.EMAIL, email)
+                    ));
         } catch (DaoException e) {
             throw new ServiceException("exception.service.login.get-login.dao", e.getCause());
         }
     }
 
 //    public int addLogin(Login login) throws DaoException {
-//        Dao dao = daoFactory.createDao("Login");
+//        Dao_ dao = daoFactory.createDao("Login");
 //        return dao.create(login);
 //    }
 //
 //    public int updatePassword(Login login)
 //            throws DaoException, SQLException, ConnectionException {
 //        logger.debug("updateLogin");
-//        Dao dao = daoFactory.createDao("Login");
+//        Dao_ dao = daoFactory.createDao("Login");
 //        return dao.update(login, "id", "password.regex");
 //    }
 //
 //    public int updateAttemptLeft(Login login)
 //            throws DaoException, SQLException, ConnectionException {
 //        logger.debug("updateLogin");
-//        Dao dao = daoFactory.createDao("Login");
+//        Dao_ dao = daoFactory.createDao("Login");
 //        return dao.update(login, "id", "attemptLeft");
 //    }
 //
 //    public boolean isLoginExists(String email) throws DaoException {
 //        Login login = new Login();
 //        login.setEmail(email);
-//        Dao dao = daoFactory.createDao("Login");
+//        Dao_ dao = daoFactory.createDao("Login");
 //        if (dao.getFirst(login, "email.regex", null) != null) return true;
 //        Map<String, Object> activationMap = (Map<String, Object>) dao.getRelEntity(login, "Activation");
 //        return activationMap != null;
 //    }
 //
 //    private <T> Map<String, Object> getRelEntity(T entity, String relEntityName) throws DaoException {
-//        Dao dao = daoFactory.createDao("Login");
+//        Dao_ dao = daoFactory.createDao("Login");
 //        Map<String, Object> relEntityMap = (Map<String, Object>) dao.getRelEntity(entity, relEntityName);
 //        return relEntityMap;
 //    }
 //
 //    private <T> void setRelEntity(T entity, String relEntityName, Object relEntity) throws DaoException {
 //        if (relEntity != null) {
-//            Dao dao = daoFactory.createDao("Login");
+//            Dao_ dao = daoFactory.createDao("Login");
 //            dao.setRelEntity(entity, relEntityName, relEntity);
 //        }
 //    }
 //
 //    private <T> void removeRelEntity(T entity, String relEntityName) throws DaoException {
-//        Dao dao = daoFactory.createDao("Login");
+//        Dao_ dao = daoFactory.createDao("Login");
 //        dao.removeRelEntity(entity, relEntityName);
 //    }
 //

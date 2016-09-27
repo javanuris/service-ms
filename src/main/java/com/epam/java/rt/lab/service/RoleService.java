@@ -1,8 +1,8 @@
 package com.epam.java.rt.lab.service;
 
 import com.epam.java.rt.lab.dao.DaoException;
-import com.epam.java.rt.lab.dao.Parameter;
-import com.epam.java.rt.lab.dao.types.OrderType;
+import com.epam.java.rt.lab.dao.DaoParameter;
+import com.epam.java.rt.lab.dao.Parameter_;
 import com.epam.java.rt.lab.entity.EntityProperty;
 import com.epam.java.rt.lab.entity.rbac.Role;
 import com.epam.java.rt.lab.util.GlobalProperties;
@@ -23,38 +23,42 @@ public class RoleService extends BaseService {
 
     public Role getRole(Long id)
             throws ServiceException {
-        try {
-            return dao("Role").getFirst(new Parameter()
-                    .filter(Parameter.Field.set(
-                            Role.Property.ID, id
-                    ))
-            );
-        } catch (DaoException e) {
-            throw new ServiceException("exception.service.role.get-role.dao", e.getCause());
-        }
+//        try {
+            return null;
+//            return dao("Role").getFirst(new Parameter_()
+//                    .filter(Parameter_.Field.set(
+//                            Role.Property.ID, id
+//                    ))
+//            );
+//        } catch (DaoException e) {
+//            throw new ServiceException("exception.service.role.get-role.dao", e.getCause());
+//        }
     }
 
     public Role getRoleAuthorized()
             throws ServiceException {
-        try {
-            return dao("Role").getFirst(new Parameter()
-                    .filter(Parameter.Field.set(
-                            Role.Property.NAME,
-                            GlobalProperties.getProperty("role.authorized")
-                    ))
-            );
-        } catch (DaoException e) {
-            throw new ServiceException("exception.service.role.get-role-authorized.dao", e.getCause());
-        }
+//        try {
+//            return dao("Role").getFirst(new Parameter_()
+//                    .filter(Parameter_.Field.set(
+//                            Role.Property.NAME,
+//                            GlobalProperties.getProperty("role.authorized")
+//                    ))
+//            );
+//        } catch (DaoException e) {
+//            throw new ServiceException("exception.service.role.get-role-authorized.dao", e.getCause());
+//        }
+        return null;
     }
 
-    public List<Role> getRoleList(OrderType orderType, EntityProperty... orderBy)
+    public List<Role> getRoleListOrderedByName()
             throws ServiceException {
         try {
+            return dao("Role").read()
+
             if (orderType == null || orderBy.length == 0) {
-                return dao("Role").getAll(new Parameter());
+                return dao("Role").read(new DaoParameter().setWhere(new DaoParameter.Where().));
             } else {
-                return dao("Role").getAll(new Parameter()
+                return dao("Role").getAll(new Parameter_()
                         .order(orderType, orderBy)
                 );
             }

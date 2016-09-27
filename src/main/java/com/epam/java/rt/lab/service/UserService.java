@@ -1,7 +1,7 @@
 package com.epam.java.rt.lab.service;
 
 import com.epam.java.rt.lab.dao.*;
-import com.epam.java.rt.lab.dao.Parameter;
+import com.epam.java.rt.lab.dao.Parameter_;
 import com.epam.java.rt.lab.entity.rbac.Login;
 import com.epam.java.rt.lab.entity.rbac.Remember;
 import com.epam.java.rt.lab.entity.rbac.User;
@@ -19,23 +19,25 @@ public class UserService extends BaseService {
     }
 
     public User getUser(Login login) throws ServiceException {
-        try {
-            return dao("User").getFirst(new Parameter()
-                    .filter(Parameter.Field.set(User.Property.LOGIN, login))
-            );
-        } catch (DaoException e) {
-            throw new ServiceException("exception.service.user.get-user.dao", e.getCause());
-        }
+//        try {
+//            return dao("User").getFirst(new Parameter_()
+//                    .filter(Parameter_.Field.set(User.Property.LOGIN, login))
+//            );
+//        } catch (DaoException e) {
+//            throw new ServiceException("exception.service.user.get-user.dao", e.getCause());
+//        }
+        return null;
     }
 
     public User getUser(Long id) throws ServiceException {
-        try {
-            return dao("User").getFirst(new Parameter()
-                    .filter(Parameter.Field.set(User.Property.ID, id))
-            );
-        } catch (DaoException e) {
-            throw new ServiceException("exception.service.user.get-user.dao", e.getCause());
-        }
+//        try {
+//            return dao("User").getFirst(new Parameter_()
+//                    .filter(Parameter_.Field.set(User.Property.ID, id))
+//            );
+//        } catch (DaoException e) {
+//            throw new ServiceException("exception.service.user.get-user.dao", e.getCause());
+//        }
+        return null;
     }
 
     public User getAnonymous() throws ServiceException {
@@ -44,11 +46,11 @@ public class UserService extends BaseService {
 
     public Remember getRemember(String rememberCookieName, String rememberCookieValue) throws ServiceException {
 //        try {
-//            Dao dao = dao("User");
-//            Remember remember = dao.getFirst(new Parameter()
+//            Dao_ dao = dao("User");
+//            Remember remember = dao.getFirst(new Parameter_()
 //                    .result("id", "firstName", "middleName", "lastName", "role",
 //                            "remember.id", "remember.cookieName", "remember.cookieValue", "remember.valid")
-//                    .filter(Parameter.Property.set("remember.cookieName", rememberCookieName))
+//                    .filter(Parameter_.Property.set("remember.cookieName", rememberCookieName))
 //            );
 //            if (remember == null) return null;
 //            if (remember.getCookieValue().equals(rememberCookieValue) && TimestampCompare.secondsBetweenTimestamps
@@ -70,7 +72,7 @@ public class UserService extends BaseService {
 
     public void setRemember(Remember remember) throws ServiceException {
 //        try {
-//            Dao dao = dao("User");
+//            Dao_ dao = dao("User");
 //            remember.setCookieValue(HashGenerator.hashString(UUID.randomUUID().toString()));
 ////            dao.update()
 //
@@ -82,25 +84,25 @@ public class UserService extends BaseService {
     }
 
 //    public int addUser(User user) throws DaoException {
-//        Dao dao = daoFactory.createDao("User");
+//        Dao_ dao = daoFactory.createDao("User");
 //        return dao.create(user);
 //    }
 //
 //    private <T> Map<String, Object> getRelEntity(T entity, String relEntityName) throws DaoException {
-//        Dao dao = daoFactory.createDao("User");
+//        Dao_ dao = daoFactory.createDao("User");
 //        Map<String, Object> relEntityMap = (Map<String, Object>) dao.getRelEntity(entity, relEntityName);
 //        return relEntityMap;
 //    }
 //
 //    private <T> void setRelEntity(T entity, String relEntityName, Object relEntity) throws DaoException {
 //        if (relEntity != null) {
-//            Dao dao = daoFactory.createDao("User");
+//            Dao_ dao = daoFactory.createDao("User");
 //            dao.setRelEntity(entity, relEntityName, relEntity);
 //        }
 //    }
 //
 //    private <T> void removeRelEntity(T entity, String relEntityName) throws DaoException {
-//        Dao dao = daoFactory.createDao("User");
+//        Dao_ dao = daoFactory.createDao("User");
 //        dao.removeRelEntity(entity, relEntityName);
 //    }
 //
@@ -109,21 +111,21 @@ public class UserService extends BaseService {
 //    }
 //
 //    public int updateUser(User user) throws DaoException {
-//        Dao dao = daoFactory.createDao("User");
+//        Dao_ dao = daoFactory.createDao("User");
 //        int updateCount = dao.update(user, "id", "firstName, middleName, lastName, avatarId");
 //        return updateCount;
 //    }
 //
 //    public List<User> getUserList(PageComponent pageComponent) throws DaoException {
-//        Dao dao = dao("User");
-//        pageComponent.setCountItems(dao.count(new Parameter()
+//        Dao_ dao = dao("User");
+//        pageComponent.setCountItems(dao.count(new Parameter_()
 //                .result("id", "firstName", "middleName", "lastName", "role.name", "login.email", "login.attemptLeft", "login.status"))
 //        );
 //        logger.debug("COUNT = {}", pageComponent.getCountItems());
-//        return dao.getAll(new Parameter()
+//        return dao.getAll(new Parameter_()
 //                .result("id", "firstName", "middleName", "lastName", "role.name", "login.email", "login.attemptLeft", "login.status")
 //                .limit((pageComponent.getCurrentPage() - 1) * pageComponent.getItemsOnPage(), pageComponent.getItemsOnPage())
-//                .order(QueryBuilder.OrderType.ASC, "firstName", "middleName", "lastName")
+//                .order(QueryBuilder_.OrderType.ASC, "firstName", "middleName", "lastName")
 //        );
 //    }
 //

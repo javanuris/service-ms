@@ -10,10 +10,10 @@ create table if not exists "Permission" (id identity primary key, uri varchar(25
 create table if not exists "Role" (id identity primary key, name varchar(255) unique);
 create table if not exists "RolePermission" (id identity primary key, role_id bigint references "Role" (id), permission_id bigint references "Permission" (id));
 create table if not exists "Login" (id identity primary key, email varchar(255) unique, password varchar(255), attempt_left int, status int);
-create table if not exists "Restore" (id identity primary key, login_id bigint unique, code varchar(255), cookie_name varchar(255), cookie_value varchar(255), valid datetime);
-create table if not exists "User" (id identity primary key, first_name varchar(255), middle_name varchar(255), last_name varchar(255), login_id bigint references "Login" (id), role_id bigint references "Role" (id), avatar_id bigint references "Avatar" (id));
+create table if not exists "Restore" (id identity primary key, login_id bigint references "Login" (id), code varchar(255), cookie_name varchar(255), cookie_value varchar(255), valid datetime);
 create table if not exists "Avatar" (id identity primary key, name varchar(255), type varchar(255), file blob, modified datetime);
-create table if not exists "Remember" (id identity primary key, user_id bigint unique, cookie_name varchar(255), cookie_value varchar(255), valid datetime);
+create table if not exists "User" (id identity primary key, first_name varchar(255), middle_name varchar(255), last_name varchar(255), login_id bigint references "Login" (id), role_id bigint references "Role" (id), avatar_id bigint references "Avatar" (id));
+create table if not exists "Remember" (id identity primary key, user_id bigint references "User" (id), cookie_name varchar(255), cookie_value varchar(255), valid datetime);
 create table if not exists "Activate" (id identity primary key, email varchar(255) unique, password varchar(255), code varchar(255), valid datetime);
 
 
@@ -87,7 +87,7 @@ insert into "User" (first_name, middle_name, last_name, login_id, role_id) value
 insert into "User" (first_name, middle_name, last_name, login_id, role_id) values ('Latisha', 'P.', 'Morrisson', select id from "Login" where email is 'test@test.com', select id from "Role" where name is 'admin');
 
 
-//select data
+//Select data
 select r.id, r.name, p.id, p.uri from "Role" as r join "Permission" as p, "RolePermission" as rp where r.id = rp.role_id and p.id = rp.permission_id;
 select u.id, u.first_name, u.middle_name, u.last_name, r.id, r.name, p.id, p.uri from "User" as u join "Role" as r, "Permission" as p, "RolePermission" as rp where r.id = u.role_id and r.id=rp.role_id and p.id = rp.permission_id;
 select u.id, u.first_name, u.middle_name, u.last_name, l.email, l.password from "User" as u join "Login" as l where u.login_id = l.id;
