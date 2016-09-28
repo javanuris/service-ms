@@ -59,7 +59,7 @@ public abstract class Sql {
     }
 
     static Column getColumn(EntityProperty entityProperty) throws DaoException {
-        String entityClassName = entityProperty.getEntityClass().getName();
+        String entityClassName = entityProperty.getEntityClassName();
         String tableName = getProperty(entityClassName);
         String columnName = getProperty(entityClassName.concat(SIGN_POINT).concat(entityProperty.toString()));
         if (tableName == null || columnName == null)

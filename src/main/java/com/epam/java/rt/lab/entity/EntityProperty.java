@@ -9,6 +9,6 @@ public interface EntityProperty {
      * which need to implement name-safe entity fields usage
      */
 
-    Class getEntityClass();
+    String getEntityClassName();
 
 }

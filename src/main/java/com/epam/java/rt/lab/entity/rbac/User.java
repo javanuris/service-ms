@@ -24,8 +24,8 @@ public class User extends BaseEntity {
         AVATAR_ID;
 
         @Override
-        public Class getEntityClass() {
-            return User.class;
+        public String getEntityClassName() {
+            return User.class.getName();
         }
     }
 

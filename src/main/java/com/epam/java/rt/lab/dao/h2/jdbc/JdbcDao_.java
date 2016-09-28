@@ -20,10 +20,9 @@ public abstract class JdbcDao_ implements Dao_ {
         ROLE_ID,
         PERMISSION_ID;
 
-
         @Override
-        public Class getEntityClass() {
-            return null;
+        public String getEntityClassName() {
+            return "com.epam.java.rt.lab.entity.rbac.RolePermission";
         }
     }
 

@@ -14,8 +14,8 @@ public class Permission extends BaseEntity {
         URI;
 
         @Override
-        public Class getEntityClass() {
-            return Permission.class;
+        public String getEntityClassName() {
+            return Permission.class.getName();
         }
     }
 
