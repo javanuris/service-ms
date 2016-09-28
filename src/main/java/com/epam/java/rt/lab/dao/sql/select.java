@@ -134,13 +134,17 @@ public class Select extends Sql implements Iterable<Column> {
 
         Where.Predicate getPredicate() throws DaoException {
             List<Where.Predicate> predicateList = new ArrayList<>();
-            for (String join : this.joinList) {
-                System.out.println(join);
-                System.out.println(from);
-                String joinExpression = getProperty(this.from.concat(JOIN_AMPERSAND).concat(join));
-                if (joinExpression == null) joinExpression = getProperty(join.concat(JOIN_AMPERSAND).concat(this.from));
-//                if (joinExpression == null)
-//                    throw new DaoException("exception.dao.sql.join.not-found-relation");
+            getPredicate(predicateList, this.from, 0);
+            for (int i = 0; i < this.joinList.size() - 1; i++)
+                getPredicate(predicateList, this.joinList.get(i), i + 1);
+            return Where.Predicate.get(predicateList);
+        }
+
+        private void getPredicate(List<Where.Predicate> predicateList, String tableName, int startIndex) throws DaoException {
+            for (int i = startIndex; i < this.joinList.size(); i++) {
+                String joinTableName = this.joinList.get(i);
+                String joinExpression = getProperty(tableName.concat(JOIN_AMPERSAND).concat(joinTableName));
+                if (joinExpression == null) joinExpression = getProperty(joinTableName.concat(JOIN_AMPERSAND).concat(tableName));
                 if (joinExpression != null) {
                     String[] split = StringArray.splitSpaceLessNames(joinExpression, JOIN_AMPERSAND);
                     predicateList.add(new Where.Predicate(
@@ -150,7 +154,6 @@ public class Select extends Sql implements Iterable<Column> {
                     ));
                 }
             }
-            return Where.Predicate.get(predicateList);
         }
 
         @Override

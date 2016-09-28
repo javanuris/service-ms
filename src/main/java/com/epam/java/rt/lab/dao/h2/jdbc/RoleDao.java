@@ -1,11 +1,14 @@
 package com.epam.java.rt.lab.dao.h2.jdbc;
 
+import com.epam.java.rt.lab.dao.Dao;
 import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.dao.DaoParameter;
 import com.epam.java.rt.lab.dao.sql.Column;
 import com.epam.java.rt.lab.dao.sql.Select;
 import com.epam.java.rt.lab.dao.sql.Sql;
+import com.epam.java.rt.lab.dao.sql.Where;
 import com.epam.java.rt.lab.entity.rbac.Login;
+import com.epam.java.rt.lab.entity.rbac.Permission;
 import com.epam.java.rt.lab.entity.rbac.Role;
 
 import java.sql.Connection;
@@ -50,7 +53,7 @@ public class RoleDao extends JdbcDao {
     @Override
     <T> List<T> getEntity(ResultSet resultSet, Sql sql) throws DaoException {
         Select select = (Select) sql;
-        String roleTableName = Sql.getProperty(Login.class.getName());
+        String roleTableName = Sql.getProperty(Role.class.getName());
         List<Role> roleList = new ArrayList<>();
         try {
             while (resultSet.next()) {
@@ -65,8 +68,19 @@ public class RoleDao extends JdbcDao {
                         // another entity
                     }
                 }
-                // permissionList
+                Dao dao = new PermissionDao(getConnection());
+                List<Permission> permissionList = dao.read(new DaoParameter()
+                        .setWherePredicate(Where.Predicate.get(
+                                Role.Property.ID,
+                                Where.Predicate.PredicateOperator.EQUAL,
+                                role.getId()
+                        ))
 
+                );
+                List<String> uriList = new ArrayList<>();
+                for (Permission permission : permissionList)
+                        uriList.add(permission.getUri());
+                role.setUriList(uriList);
                 roleList.add(role);
             }
             return (List<T>) roleList;

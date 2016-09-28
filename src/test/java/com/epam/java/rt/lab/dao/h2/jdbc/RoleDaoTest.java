@@ -6,13 +6,19 @@ import com.epam.java.rt.lab.dao.DaoParameter;
 import com.epam.java.rt.lab.dao.factory.AbstractDaoFactory;
 import com.epam.java.rt.lab.dao.factory.DaoFactory;
 import com.epam.java.rt.lab.dao.sql.OrderBy;
+import com.epam.java.rt.lab.dao.sql.Sql;
 import com.epam.java.rt.lab.dao.sql.Where;
 import com.epam.java.rt.lab.entity.rbac.Login;
+import com.epam.java.rt.lab.entity.rbac.Permission;
 import com.epam.java.rt.lab.entity.rbac.Role;
 import com.epam.java.rt.lab.service.ServiceException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -84,7 +90,24 @@ public class RoleDaoTest {
 
     @Test
     public void getEntity() throws Exception {
-
+        dao = daoFactory.createDao("Role");
+        this.daoParameter = new DaoParameter()
+                .setWherePredicate(
+                        Where.Predicate.get(
+                                Role.Property.ID,
+                                Where.Predicate.PredicateOperator.EQUAL,
+                                1L
+                        )
+                );
+        Sql sql = ((RoleDao) dao).getSqlRead(this.daoParameter);
+        PreparedStatement statement = ((RoleDao) dao).getConnection().prepareStatement(sql.create());
+        statement.setLong(1, (Long) sql.getWildValueList().get(0).getVal());
+        ResultSet resultSet = statement.executeQuery();
+        List<Role> roleList = ((RoleDao) dao).getEntity(resultSet, sql);
+        Role role = roleList.get(0);
+        assertNotNull("getEntity() failed", role);
+        assertNotNull("getEntity(uriList) failed", role.getUriList());
+        assertTrue("getEntity(uriList.size() > 0) failed", role.getUriList().size() > 0);
     }
 
 }
