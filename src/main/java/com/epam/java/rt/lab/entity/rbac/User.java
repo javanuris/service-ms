@@ -19,8 +19,8 @@ public class User extends BaseEntity {
         FIRST_NAME,
         MIDDLE_NAME,
         LAST_NAME,
-        LOGIN,
-        ROLE,
+        LOGIN_ID,
+        ROLE_ID,
         AVATAR_ID;
 
         @Override

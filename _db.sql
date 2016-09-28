@@ -69,7 +69,8 @@ insert into "RolePermission" (role_id, permission_id) values (select id from "Ro
 insert into "RolePermission" (role_id, permission_id) values (select id from "Role" where name is 'admin', select id from "Permission" where uri is '/employee/list');
 insert into "RolePermission" (role_id, permission_id) values (select id from "Role" where name is 'admin', select id from "Permission" where uri is '/service/list');
 insert into "Login" (email, password, attempt_left, status) values ('test@test.com', 'test', 5, 0);
-insert into "User" (first_name, role_id) values ('anonymous', select id from "Role" where name is 'anonymous');
+insert into "Login" (email, password, attempt_left, status) values ('', '', 5, 0);
+insert into "User" (first_name, login_id, role_id) values ('anonymous', select id from "Login" where email is '', select id from "Role" where name is 'anonymous');
 insert into "User" (first_name, middle_name, last_name, login_id, role_id) values ('John', 'M.', 'Dow', select id from "Login" where email is 'test@test.com', select id from "Role" where name is 'admin');
 insert into "User" (first_name, middle_name, last_name, login_id, role_id) values ('Peter', 'A.', 'Hoff', select id from "Login" where email is 'test@test.com', select id from "Role" where name is 'admin');
 insert into "User" (first_name, middle_name, last_name, login_id, role_id) values ('Joseph', 'K.', 'Lemon', select id from "Login" where email is 'test@test.com', select id from "Role" where name is 'admin');

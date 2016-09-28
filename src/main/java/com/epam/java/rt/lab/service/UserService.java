@@ -1,12 +1,16 @@
 package com.epam.java.rt.lab.service;
 
-import com.epam.java.rt.lab.dao.*;
-import com.epam.java.rt.lab.dao.Parameter_;
+import com.epam.java.rt.lab.dao.DaoException;
+import com.epam.java.rt.lab.dao.DaoParameter;
+import com.epam.java.rt.lab.dao.sql.Where;
 import com.epam.java.rt.lab.entity.rbac.Login;
 import com.epam.java.rt.lab.entity.rbac.Remember;
+import com.epam.java.rt.lab.entity.rbac.Role;
 import com.epam.java.rt.lab.entity.rbac.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 /**
  * service-ms
@@ -19,29 +23,48 @@ public class UserService extends BaseService {
     }
 
     public User getUser(Login login) throws ServiceException {
-//        try {
-//            return dao("User").getFirst(new Parameter_()
-//                    .filter(Parameter_.Field.set(User.Property.LOGIN, login))
-//            );
-//        } catch (DaoException e) {
-//            throw new ServiceException("exception.service.user.get-user.dao", e.getCause());
-//        }
-        return null;
+        try {
+            List<User> userList = dao("User").read(new DaoParameter()
+                    .setWherePredicate(Where.Predicate.get(
+                            User.Property.LOGIN_ID,
+                            Where.Predicate.PredicateOperator.EQUAL,
+                            login.getId()
+                    ))
+            );
+            return userList != null && userList.size() > 0 ? userList.get(0) : null;
+        } catch (DaoException e) {
+            throw new ServiceException("exception.service.user.get-user.dao", e.getCause());
+        }
     }
 
     public User getUser(Long id) throws ServiceException {
-//        try {
-//            return dao("User").getFirst(new Parameter_()
-//                    .filter(Parameter_.Field.set(User.Property.ID, id))
-//            );
-//        } catch (DaoException e) {
-//            throw new ServiceException("exception.service.user.get-user.dao", e.getCause());
-//        }
-        return null;
+        try {
+            List<User> userList = dao("User").read(new DaoParameter()
+                    .setWherePredicate(Where.Predicate.get(
+                            User.Property.ID,
+                            Where.Predicate.PredicateOperator.EQUAL,
+                            id
+                    ))
+            );
+            return userList != null && userList.size() > 0 ? userList.get(0) : null;
+        } catch (DaoException e) {
+            throw new ServiceException("exception.service.user.get-user.dao", e.getCause());
+        }
     }
 
     public User getAnonymous() throws ServiceException {
-        return getUser(new Login());
+        try {
+            List<User> userList = dao("User").read(new DaoParameter()
+                    .setWherePredicate(Where.Predicate.get(
+                            Login.Property.EMAIL,
+                            Where.Predicate.PredicateOperator.EQUAL,
+                            ""
+                    ))
+            );
+            return userList != null && userList.size() > 0 ? userList.get(0) : null;
+        } catch (DaoException e) {
+            throw new ServiceException("exception.service.user.get-user.dao", e.getCause());
+        }
     }
 
     public Remember getRemember(String rememberCookieName, String rememberCookieValue) throws ServiceException {

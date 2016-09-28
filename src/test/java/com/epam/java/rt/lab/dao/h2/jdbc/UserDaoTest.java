@@ -64,7 +64,7 @@ public class UserDaoTest {
                         Where.Predicate.get(
                                 User.Property.ID,
                                 Where.Predicate.PredicateOperator.EQUAL,
-                                1
+                                1L
                         )
                 );
         assertEquals("getSqlRead(WHERE) failed", USER_READ_A, ((UserDao) dao).getSqlRead(this.daoParameter).create());
