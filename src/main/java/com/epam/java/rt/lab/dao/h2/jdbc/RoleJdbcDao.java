@@ -5,7 +5,6 @@ import com.epam.java.rt.lab.dao.DaoParameter;
 import com.epam.java.rt.lab.dao.sql.Column;
 import com.epam.java.rt.lab.dao.sql.Select;
 import com.epam.java.rt.lab.dao.sql.Sql;
-import com.epam.java.rt.lab.entity.EntityProperty;
 import com.epam.java.rt.lab.entity.rbac.Login;
 import com.epam.java.rt.lab.entity.rbac.Role;
 
@@ -49,7 +48,7 @@ public class RoleJdbcDao extends JdbcDao {
     }
 
     @Override
-    <T> T getEntity(ResultSet resultSet, Sql sql) throws DaoException {
+    <T> List<T> getEntity(ResultSet resultSet, Sql sql) throws DaoException {
         String entityTable = Sql.getProperty("Login");
         Select select = (Select) sql;
         List<Login> loginList = new ArrayList<>();

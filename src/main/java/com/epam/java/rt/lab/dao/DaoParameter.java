@@ -36,22 +36,18 @@ public class DaoParameter {
         return this;
     }
 
+    public DaoParameter setLimit(Integer offset, Integer count) {
+        this.limitOffset = offset;
+        this.limitCount = count;
+        return this;
+    }
+
     public Integer getLimitOffset() {
         return this.limitOffset;
     }
 
-    public DaoParameter setLimitOffset(Integer limitOffset) {
-        this.limitOffset = limitOffset;
-        return this;
-    }
-
     public Integer getLimitCount() {
-        return limitCount;
-    }
-
-    public DaoParameter setLimitCount(Integer limitCount) {
-        this.limitCount = limitCount;
-        return this;
+        return this.limitCount;
     }
 
 }

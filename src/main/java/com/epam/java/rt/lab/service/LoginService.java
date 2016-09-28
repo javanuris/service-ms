@@ -7,6 +7,8 @@ import com.epam.java.rt.lab.entity.rbac.Login;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
+
 /**
  * service-ms
  */
@@ -20,13 +22,14 @@ public class LoginService extends BaseService {
     public Login getLogin(String email)
             throws ServiceException {
         try {
-            return dao("Login").read(new DaoParameter()
+            List<Login> loginList = dao("Login").read(new DaoParameter()
                     .setWherePredicate(Where.Predicate.get(
                             Login.Property.EMAIL,
                             Where.Predicate.PredicateOperator.EQUAL,
                             email
                     ))
             );
+            return loginList != null && loginList.size() > 0 ? loginList.get(0) : null;
         } catch (DaoException e) {
             throw new ServiceException("exception.service.login.get-login.dao", e.getCause());
         }

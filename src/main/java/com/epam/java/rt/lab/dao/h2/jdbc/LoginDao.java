@@ -47,43 +47,30 @@ public class LoginDao extends JdbcDao {
     }
 
     @Override
-    <T> T getEntity(ResultSet resultSet, Sql sql) throws DaoException {
-        String entityTable = Sql.getProperty("Login");
+    <T> List<T> getEntity(ResultSet resultSet, Sql sql) throws DaoException {
         Select select = (Select) sql;
+        String loginTableName = Sql.getProperty(Login.class.getName());
         List<Login> loginList = new ArrayList<>();
         try {
             while (resultSet.next()) {
                 int columnIndex = 0;
-                Login login = new Login();
+                Login login = null;
                 for (Column column : select) {
                     columnIndex++;
-                    if (column.getTableName().equals(entityTable)) {
-                        switch (column.getColumnName()) {
-                            case "id":
-                                login.setId(resultSet.getLong(columnIndex));
-                                break;
-                            case "email":
-                                login.setEmail((String) resultSet.getObject(columnIndex));
-                                break;
-                            case "password":
-                                login.setPassword((String) resultSet.getObject(columnIndex));
-                                break;
-                            case "attempt_left":
-                                login.setAttemptLeft((Integer) resultSet.getObject(columnIndex));
-                                break;
-                            case "status":
-                                login.setStatus((Integer) resultSet.getObject(columnIndex));
-                                break;
-                        }
+                    if (loginTableName.equals(column.getTableName())) {
+                        if (login == null) login = new Login();
+                        setEntityProperty(column.getTableName(), column.getColumnName(), login, resultSet.getObject(columnIndex));
                     } else {
-                        // there are no referenced entities for login
+                        // another entity
                     }
                 }
+                loginList.add(login);
             }
-            return null;
+            return (List<T>) loginList;
         } catch (SQLException e) {
             throw new DaoException("exception.dao.jdbc.login.get-entity", e.getCause());
         }
     }
+
 
 }

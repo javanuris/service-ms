@@ -38,11 +38,12 @@ public abstract class Sql {
     private static void init() {
         if (propertiesLock.tryLock()) {
             try {
-                sqlProperties.load(GlobalProperties.class.getClassLoader().getResourceAsStream("sql.properties"));
+                sqlProperties.load(Sql.class.getClassLoader().getResourceAsStream("sql.properties"));
             } catch (IOException e) {
                 e.printStackTrace();
+            } finally {
+                propertiesLock.unlock();
             }
-            propertiesLock.unlock();
         }
     }
 
