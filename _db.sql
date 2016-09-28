@@ -6,10 +6,10 @@ drop table "Activate";
 
 
 //create tables
-create table if not exists "Permission" (id identity primary key, uri varchar(255) unique);
-create table if not exists "Role" (id identity primary key, name varchar(255) unique);
+create table if not exists "Permission" (id identity primary key, uri varchar(255) unique not null);
+create table if not exists "Role" (id identity primary key, name varchar(255) unique not null);
 create table if not exists "RolePermission" (id identity primary key, role_id bigint references "Role" (id), permission_id bigint references "Permission" (id));
-create table if not exists "Login" (id identity primary key, email varchar(255) unique, password varchar(255), attempt_left int, status int);
+create table if not exists "Login" (id identity primary key, email varchar(255) unique not null, password varchar(255) not null, attempt_left int not null, status int not null);
 create table if not exists "Restore" (id identity primary key, login_id bigint references "Login" (id), code varchar(255), cookie_name varchar(255), cookie_value varchar(255), valid datetime);
 create table if not exists "Avatar" (id identity primary key, name varchar(255), type varchar(255), file blob, modified datetime);
 create table if not exists "User" (id identity primary key, first_name varchar(255), middle_name varchar(255), last_name varchar(255), login_id bigint references "Login" (id), role_id bigint references "Role" (id), avatar_id bigint references "Avatar" (id));

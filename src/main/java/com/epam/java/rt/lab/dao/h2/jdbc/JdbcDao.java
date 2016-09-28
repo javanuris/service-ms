@@ -159,7 +159,6 @@ public abstract class JdbcDao implements Dao {
 
         private EntityMethod(Class entityClass, String methodData) throws DaoException {
             try {
-
                 String[] split = StringArray.splitSpaceLessNames(methodData, ",");
                 switch (split[0]) {
                     case "boolean":
