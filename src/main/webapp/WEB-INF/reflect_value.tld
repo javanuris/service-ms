@@ -4,7 +4,7 @@
     <short-name>reflectValue</short-name>
     <tag>
         <name>reflectValue</name>
-        <tag-class>com.epam.java.rt.lab.tag.ReflectValue</tag-class>
+        <tag-class>com.epam.java.rt.lab.web.tag.ReflectValue</tag-class>
         <body-content>empty</body-content>
         <attribute>
             <name>entityMethod</name>

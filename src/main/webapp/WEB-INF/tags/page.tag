@@ -1,5 +1,5 @@
 <%@tag pageEncoding="UTF-8" %>
-<%@attribute name="pageComponent" type="com.epam.java.rt.lab.component.PageComponent" %>
+<%@attribute name="pageComponent" type="com.epam.java.rt.lab.web.component.PageComponent" %>
 <%@attribute name="uriWithQuestionMark" type="java.lang.String" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>

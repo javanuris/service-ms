@@ -1,7 +1,7 @@
 package com.epam.java.rt.lab.util.validator;
 
-import com.epam.java.rt.lab.component.form.Form;
-import com.epam.java.rt.lab.component.form.FormControl;
+import com.epam.java.rt.lab.web.component.form.Form;
+import com.epam.java.rt.lab.web.component.form.FormControl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

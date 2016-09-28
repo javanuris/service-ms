@@ -1,6 +1,6 @@
 package com.epam.java.rt.lab.util.validator;
 
-import com.epam.java.rt.lab.component.form.FormFactory;
+import com.epam.java.rt.lab.web.component.form.FormFactory;
 import com.epam.java.rt.lab.util.StringArray;
 import com.epam.java.rt.lab.util.validator.Validator.ValidatorType;
 

@@ -58,6 +58,7 @@ public class Select extends Sql implements Iterable<Column> {
             if (this.where != null) this.where.appendClause(result);
             if (this.orderBy != null) this.orderBy.appendClause(result);
             if (this.limit != null) this.limit.appendClause(result);
+//            System.out.println(result.toString());
             return result.toString();
         } catch (Exception e) {
             throw new DaoException("exception.dao.sql.select.combine", e.getCause());

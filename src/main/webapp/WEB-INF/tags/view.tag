@@ -1,5 +1,5 @@
 <%@tag pageEncoding="UTF-8" %>
-<%@attribute name="viewComponent" type="com.epam.java.rt.lab.component.ViewComponent" %>
+<%@attribute name="viewComponent" type="com.epam.java.rt.lab.web.component.ViewComponent" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <c:forEach var="formControl" items="${viewComponent.viewItemArray}">
