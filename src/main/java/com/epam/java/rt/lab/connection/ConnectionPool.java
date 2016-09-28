@@ -43,8 +43,8 @@ public class ConnectionPool implements DataSource {
         String databaseUsername = properties.getProperty("username");
         String databasePassword = properties.getProperty("password.regex");
         String databaseMaxConnections = properties.getProperty("max-connections");
-        if (databaseUrl == null || databaseUsername == null || databasePassword == null ||
-                databaseMaxConnections == null) throw new ConnectionException("exception.connection.init-properties");
+        if (databaseUrl == null || databaseMaxConnections == null)
+            throw new ConnectionException("exception.connection.init-properties");
         ConnectionPool.databaseUrl = databaseUrl;
         ConnectionPool.databaseUsername = databaseUsername;
         ConnectionPool.databasePassword = databasePassword;

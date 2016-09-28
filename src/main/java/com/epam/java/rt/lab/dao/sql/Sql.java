@@ -106,7 +106,7 @@ public abstract class Sql {
                 StringArray.splitSpaceLessNames(
                         getProperty(
                                 entityClass
-                                        .getSimpleName()
+                                        .getName()
                                         .concat(SIGN_POINT)
                                         .concat(ALL_COLUMNS)
                         ),

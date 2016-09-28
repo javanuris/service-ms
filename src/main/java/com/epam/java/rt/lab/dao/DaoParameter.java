@@ -22,7 +22,7 @@ public class DaoParameter {
         return this.wherePredicate;
     }
 
-    public DaoParameter setWherePredicate(Where.Predicate predicate) {
+    public DaoParameter setWherePredicate(Where.Predicate wherePredicate) {
         this.wherePredicate = wherePredicate;
         return this;
     }

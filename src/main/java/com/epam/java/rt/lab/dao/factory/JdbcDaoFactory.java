@@ -38,7 +38,7 @@ public class JdbcDaoFactory extends AbstractDaoFactory {
         try {
             Class daoClass = Class.forName
                     (JdbcDaoFactory.getDatabaseProperty("management-system.package")
-                            .concat(".").concat(daoShortName).concat("JdbcDao_"));
+                            .concat(".jdbc.").concat(daoShortName).concat("Dao"));
             return daoClass.getConstructor(Connection.class);
         } catch (NoSuchMethodException | DaoException | ClassNotFoundException e) {
             e.printStackTrace();

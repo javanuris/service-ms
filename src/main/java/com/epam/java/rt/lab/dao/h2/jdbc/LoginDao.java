@@ -16,9 +16,9 @@ import java.util.List;
 /**
  * service-ms
  */
-public class LoginJdbcDao extends JdbcDao {
+public class LoginDao extends JdbcDao {
 
-    public LoginJdbcDao(Connection connection) {
+    public LoginDao(Connection connection) {
         super(connection);
     }
 

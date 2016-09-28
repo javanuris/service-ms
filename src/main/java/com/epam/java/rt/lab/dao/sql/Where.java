@@ -47,7 +47,7 @@ public class Where implements Clause {
     }
 
     void linkWildValue(List<WildValue> wildValueList) {
-        linkWildValue(wildValueList, this.predicate);
+        if (this.predicate != null) linkWildValue(wildValueList, this.predicate);
     }
 
     private void linkWildValue(List<WildValue> wildValueList, Predicate predicate) {

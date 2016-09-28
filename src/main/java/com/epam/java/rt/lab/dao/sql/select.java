@@ -4,93 +4,191 @@ import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.util.StringArray;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
  * service-ms
  */
-public class Select extends Sql {
+public class Select extends Sql implements Iterable<Column> {
 
     private static final String SELECT = "SELECT ";
 
     private List<Column> columnList;
     private From from;
+    private Join join;
     private Where where;
+    private OrderBy orderBy;
+    private Limit limit;
 
     Select(List<Column> columnList) throws DaoException {
         if (columnList == null || columnList.size() == 0)
             throw new DaoException("exception.dao.sql.select.empty-column-list");
         this.columnList = columnList;
-        this.from = new From(columnList);
+        this.join = new Join();
+        this.from = new From(columnList, join);
     }
 
     public Select where(Where.Predicate predicate) throws DaoException {
-        this.where = new Where(from.getJoinPredicate(), predicate);
+        this.where = new Where(join, predicate);
+        this.where.linkWildValue(getWildValueList());
         return this;
     }
 
-    public Select orderBy() {
+    public Select orderBy(OrderBy.Criteria[] criteriaArray) {
+        this.orderBy = new OrderBy(criteriaArray);
         return this;
     }
 
-    public Select limit() {
+    public Select limit(Integer offset, Integer count) {
+        this.limit = new Limit(offset, count);
         return this;
     }
 
     @Override
-    public String toString() {
-        return SELECT.concat(StringArray.combine(this.columnList, SIGN_COMMA)).concat(from.toString());
+    public String create() throws DaoException {
+        try {
+            StringBuilder result = new StringBuilder();
+            result = this.from.appendClause(StringArray.combine(result.append(SELECT), this.columnList, COMMA_DELIMITER));
+            if (this.join != null) {
+                this.join.appendClause(result);
+                if (this.where == null)
+                    this.where = new Where(this.join, null);
+            }
+            if (this.where != null) this.where.appendClause(result);
+            if (this.orderBy != null) this.orderBy.appendClause(result);
+            if (this.limit != null) this.limit.appendClause(result);
+            return result.toString();
+        } catch (Exception e) {
+            throw new DaoException("exception.dao.sql.select.combine", e.getCause());
+        }
+    }
+
+    @Override
+    public Iterator<Column> iterator() {
+        return new Iterator<Column>() {
+            private int index = 0;
+
+            public boolean hasNext(){
+                return index < columnList.size();
+            }
+
+            public Column next(){
+                return columnList.get(index++);
+            }
+
+            public void remove(){
+                throw new UnsupportedOperationException();
+            }
+        };
+    }
+
+    /**
+     * The usage is only in select statement
+     */
+    static class From implements Clause {
+
+        private static final String FROM = " FROM ";
+
+        private String from;
+
+        From(List<Column> columnList, Join join) {
+            this.from = columnList.get(0).getTableName();
+            join.setFrom(this.from);
+            for (Column column : columnList) join.addJoin(column.getTableName());
+        }
+
+        @Override
+        public StringBuilder appendClause(StringBuilder result) {
+            return result.append(FROM).append(this.from );
+        }
+
     }
 
     /**
      *
      */
-    private static class From {
+    static class Join implements Clause {
 
-        private static final String FROM = " FROM ";
         private static final String JOIN = " JOIN ";
 
         private String from;
         private List<String> joinList;
-        private Where.Predicate joinPredicate;
 
-        private From(List<Column> columnList) {
-            this.from = columnList.get(0).getTableName();
+        Join() {
             this.joinList = new ArrayList<>();
-            for (Column column : columnList) {
-                if (!column.getTableName().equals(this.from) &&
-                        !this.joinList.contains(column.getTableName()))
-                    this.joinList.add(column.getTableName());
-            }
         }
 
-        private void fillJoinPredicateList() throws DaoException {
-            if (this.joinList.size() == 0) return;
-            List<Where.Predicate> joinPredicateList = new ArrayList<>();
+        public String getFrom() {
+            return from;
+        }
+
+        public void setFrom(String from) {
+            this.from = from;
+        }
+
+        void addJoin(String join) {
+            if (!from.equals(join) && !this.joinList.contains(join))
+                this.joinList.add(join);
+        }
+
+        Where.Predicate getPredicate() throws DaoException {
+            List<Where.Predicate> predicateList = new ArrayList<>();
             for (String join : this.joinList) {
-                String predicate = getProperty(this.from.concat(join));
-                if (predicate == null) predicate = getProperty(join.concat(this.from));
-                if (predicate == null)
-                    throw new DaoException("exception.dao.sql.select.join.predicate");
-                String[] split = StringArray.splitSpaceLessNames(predicate, SIGN_EQUAL);
-                joinPredicateList.add(new Where.Predicate(
-                        Column.of(split[0]),
-                        Where.Predicate.PredicateOperator.EQUAL,
-                        Column.of(split[1])
-                ));
+                System.out.println(join);
+                System.out.println(from);
+                String joinExpression = getProperty(this.from.concat(JOIN_AMPERSAND).concat(join));
+                if (joinExpression == null) joinExpression = getProperty(join.concat(JOIN_AMPERSAND).concat(this.from));
+//                if (joinExpression == null)
+//                    throw new DaoException("exception.dao.sql.join.not-found-relation");
+                if (joinExpression != null) {
+                    String[] split = StringArray.splitSpaceLessNames(joinExpression, JOIN_AMPERSAND);
+                    predicateList.add(new Where.Predicate(
+                            Column.of(split[0]),
+                            Where.Predicate.PredicateOperator.EQUAL,
+                            Column.of(split[1])
+                    ));
+                }
             }
-            this.joinPredicate = Where.Predicate.get(joinPredicateList);
-        }
-
-        public Where.Predicate getJoinPredicate() {
-            return this.joinPredicate;
+            return Where.Predicate.get(predicateList);
         }
 
         @Override
-        public String toString() {
-            return FROM.concat(this.from).concat(this.joinList.size() == 0 ? "" :
-                    JOIN.concat(StringArray.combine(this.joinList, SIGN_COMMA)));
+        public StringBuilder appendClause(StringBuilder result) throws DaoException {
+            try {
+                return joinList.size() == 0 ? result :
+                        result.append(JOIN).append(StringArray.combine(this.joinList, COMMA_DELIMITER));
+            } catch (Exception e) {
+                throw new DaoException("exception.dao.sql.join.combine", e.getCause());
+            }
         }
 
     }
+
+    /**
+     * The usage is only in select statement
+     */
+    static class Limit implements Clause {
+
+        private static final String LIMIT = " LIMIT ";
+
+        private Integer offset;
+        private Integer count;
+
+        Limit(Integer offset, Integer count) {
+            this.offset = offset;
+            this.count = count;
+        }
+
+        @Override
+        public StringBuilder appendClause(StringBuilder result) throws DaoException {
+            return offset == null || count == null || offset < 0 || count <= 0 ? result :
+                    result.append(LIMIT)
+                            .append(String.valueOf(this.offset))
+                            .append(Sql.COMMA_DELIMITER)
+                            .append(String.valueOf(this.count));
+        }
+
+    }
+
 }

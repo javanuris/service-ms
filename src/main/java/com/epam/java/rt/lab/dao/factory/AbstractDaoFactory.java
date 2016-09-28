@@ -51,6 +51,7 @@ public abstract class AbstractDaoFactory implements DaoFactory {
             e.printStackTrace();
             throw new DaoException("exception.dao.factory.new-instance", e.getCause());
         } catch (ConnectionException e) {
+            e.printStackTrace();
             throw new DaoException("exception.dao.factory.connection", e.getCause());
         }
     }
