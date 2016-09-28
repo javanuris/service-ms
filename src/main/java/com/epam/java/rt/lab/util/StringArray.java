@@ -1,5 +1,7 @@
 package com.epam.java.rt.lab.util;
 
+import com.epam.java.rt.lab.dao.sql.Clause;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -15,8 +17,11 @@ public class StringArray {
         return source.replaceAll(SPACE, "").split(regex);
     }
 
-    public static <T> String combine(List<T> sourceList, String delimiter) {
-        StringBuilder result = new StringBuilder();
+    public static <T> String combine(List<T> sourceList, String delimiter) throws Exception {
+        return combine(new StringBuilder(), sourceList, delimiter).toString();
+    }
+
+    public static <T> StringBuilder combine(StringBuilder result, List<T> sourceList, String delimiter) throws Exception {
         boolean first = true;
         for (T source : sourceList) {
             if (first) {
@@ -24,9 +29,13 @@ public class StringArray {
             } else {
                 result.append(delimiter);
             }
-            result.append(source);
+            if (source instanceof Clause) {
+                ((Clause) source).appendClause(result);
+            } else {
+                result.append(source.toString());
+            }
         }
-        return result.toString();
+        return result;
     }
 
 }

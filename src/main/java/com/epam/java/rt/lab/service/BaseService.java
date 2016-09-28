@@ -16,7 +16,7 @@ abstract class BaseService implements AutoCloseable{
         try {
             daoFactory = AbstractDaoFactory.createDaoFactory();
         } catch (DaoException e) {
-            throw new ServiceException("exception.service.base.dao");
+            throw new ServiceException("exception.service.base.dao", e.getCause());
         }
     }
 

@@ -16,7 +16,12 @@ public class Role extends BaseEntity {
     public enum Property implements EntityProperty {
         ID,
         NAME,
-        URI_LIST
+        URI_LIST;
+
+        @Override
+        public Class getEntityClass() {
+            return Role.class;
+        }
     }
 
     public Role() {

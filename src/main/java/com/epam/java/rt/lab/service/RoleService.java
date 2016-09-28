@@ -50,18 +50,10 @@ public class RoleService extends BaseService {
         return null;
     }
 
-    public List<Role> getRoleListOrderedByName()
+    public List<Role> getRoleList()
             throws ServiceException {
         try {
-            return dao("Role").read()
-
-            if (orderType == null || orderBy.length == 0) {
-                return dao("Role").read(new DaoParameter().setWhere(new DaoParameter.Where().));
-            } else {
-                return dao("Role").getAll(new Parameter_()
-                        .order(orderType, orderBy)
-                );
-            }
+            return dao("Role").read(new DaoParameter());
         } catch (DaoException e) {
             throw new ServiceException("exception.service.role.get-role-list.dao", e.getCause());
         }

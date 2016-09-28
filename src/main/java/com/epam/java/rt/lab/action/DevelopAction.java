@@ -22,18 +22,7 @@ public class DevelopAction implements Action {
 
     @Override
     public void execute(HttpServletRequest req, HttpServletResponse resp) throws ActionException {
-        try {
-            RoleService roleService = new RoleService();
-            List<Role> roleList = roleService.getRoleList(QueryBuilder_.OrderType.ASC, RoleService.OrderBy.NAME);
-            req.setAttribute("roleList", roleList);
 
-            req.getRequestDispatcher("/WEB-INF/jsp/develop.jsp").forward(req, resp);
-        } catch (ServletException | IOException e) {
-            e.printStackTrace();
-            throw new ActionException("exception.action.develop", e.getCause());
-        } catch (ServiceException e) {
-            throw new ActionException("exception", e.getCause());
-        }
     }
 
 }

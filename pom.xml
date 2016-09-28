@@ -14,12 +14,12 @@
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
 
-    <jsp-config>
-        <jsp-property-group>
-            <url-pattern>*.jsp</url-pattern>
-            <page-encoding>UTF-8</page-encoding>
-        </jsp-property-group>
-    </jsp-config>
+    <!--<jsp-config>-->
+        <!--<jsp-property-group>-->
+            <!--<url-pattern>*.jsp</url-pattern>-->
+            <!--<page-encoding>UTF-8</page-encoding>-->
+        <!--</jsp-property-group>-->
+    <!--</jsp-config>-->
 
     <dependencies>
         <dependency>
@@ -63,6 +63,12 @@
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
             <version>2.9.4</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.11</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

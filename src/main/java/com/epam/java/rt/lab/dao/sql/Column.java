@@ -4,11 +4,12 @@ import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.util.StringArray;
 
 import static com.epam.java.rt.lab.dao.sql.Sql.SIGN_POINT;
+import static com.epam.java.rt.lab.dao.sql.Sql.SIGN_POINT_REGEX;
 
 /**
  * service-ms
  */
-class Column {
+public class Column implements Clause {
 
     private String tableName;
     private String columnName;
@@ -21,21 +22,22 @@ class Column {
     static Column of(String tableAndColumnName) throws DaoException {
         if (tableAndColumnName == null || !tableAndColumnName.contains(SIGN_POINT))
             throw new DaoException("exception.dao.sql.column.table-and-column-name");
-        String[] split = StringArray.splitSpaceLessNames(tableAndColumnName, SIGN_POINT);
-        return new Column(split[0], split[1]);
+        String tableName = tableAndColumnName.substring(0, tableAndColumnName.lastIndexOf("."));
+        String columnName = tableAndColumnName.substring(tableAndColumnName.lastIndexOf(".") + 1);
+        return new Column(tableName, columnName);
     }
 
-    String getTableName() {
-        return tableName;
+    public String getTableName() {
+        return this.tableName;
     }
 
-    String getColumnName() {
-        return columnName;
+    public String getColumnName() {
+        return this.columnName;
     }
 
     @Override
-    public String toString() {
-        return this.tableName.concat(this.columnName);
+    public StringBuilder appendClause(StringBuilder result) throws DaoException {
+        return result.append(this.tableName).append(SIGN_POINT).append(this.columnName);
     }
 
 }

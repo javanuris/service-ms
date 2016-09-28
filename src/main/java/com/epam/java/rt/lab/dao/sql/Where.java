@@ -9,22 +9,41 @@ import java.util.List;
 /**
  * service-ms
  */
-public class Where {
+public class Where implements Clause {
 
     private static final String WHERE = " WHERE ";
 
+    private Select.Join join;
     private Predicate predicate;
 
-    Where(Predicate joinPredicate, Predicate predicate) throws DaoException {
-        if (joinPredicate == null) {
-            this.predicate = predicate;
-        } else {
+    Where(Select.Join join, Predicate predicate) throws DaoException {
+        this.join = join;
+        Predicate joinPredicate = join.getPredicate();
+        if (joinPredicate == null && predicate == null) return;
+        if (predicate != null) addJoinFromPredicate(predicate);
+        joinPredicate = join.getPredicate(); // checked join from where clause predicate's columns
+        if (joinPredicate != null && predicate != null) {
             this.predicate = Predicate.get(
                     joinPredicate,
                     Predicate.PredicateOperator.AND,
                     predicate
             );
+        } else if (predicate != null) {
+            this.predicate = predicate;
+        } else {
+            this.predicate = joinPredicate;
         }
+    }
+
+    void addPredicate(Predicate predicate) {
+
+    }
+
+    private void addJoinFromPredicate(Predicate predicate) {
+        if (predicate.predicate != null) addJoinFromPredicate(predicate.predicate);
+        if (predicate.comparePredicate != null) addJoinFromPredicate(predicate.comparePredicate);
+        if (predicate.column != null) this.join.addJoin(predicate.column.getTableName());
+        if (predicate.compareColumn != null) this.join.addJoin(predicate.compareColumn.getTableName());
     }
 
     void linkWildValue(List<WildValue> wildValueList) {
@@ -39,11 +58,12 @@ public class Where {
     }
 
     @Override
-    public String toString() {
-        return WHERE.concat(this.predicate.toString());
+    public StringBuilder appendClause(StringBuilder result) throws DaoException {
+        return this.predicate == null ? result :
+                this.predicate.appendClause(result.append(WHERE));
     }
 
-    public static class Predicate {
+    public static class Predicate implements Clause {
 
         private static final String EQUAL = " = ";
         private static final String NOT_EQUAL = " <> ";
@@ -56,8 +76,8 @@ public class Where {
         private static final String AND = " AND ";
         private static final String BETWEEN = " BETWEEN ";
         private static final String LIKE = " LIKE ";
-        private static final String IS_NULL = " IS NULL ";
-        private static final String IS_NOT_NULL = " IS NOT NULL ";
+        private static final String IS_NULL = " IS NULL";
+        private static final String IS_NOT_NULL = " IS NOT NULL";
         private static final String PAR_OPEN = "(";
         private static final String PAR_CLOSE = ")";
 
@@ -80,7 +100,7 @@ public class Where {
         private Column column;
         private Predicate predicate;
         private PredicateOperator operator;
-        private WildValue[] wildValueArray;
+        WildValue[] wildValueArray;
         private Column compareColumn;
         private Predicate comparePredicate;
 
@@ -102,7 +122,7 @@ public class Where {
             this.wildValueArray = wildValueArray;
         }
 
-        private Predicate(Column column, PredicateOperator operator) {
+        Predicate(Column column, PredicateOperator operator) {
             this.column = column;
             this.operator = operator;
         }
@@ -132,18 +152,19 @@ public class Where {
                 throw new DaoException("exception.dao.sql.where.value");
             List<WildValue> wildValueList = new ArrayList<>();
             for (T val : valArray) wildValueList.add(new WildValue(val));
+            WildValue[] wildValueArray = {};
             return new Predicate(
                     Sql.getColumn(entityProperty),
                     operator,
-                    (WildValue[]) wildValueList.toArray()
+                    wildValueList.toArray(wildValueArray)
             );
         }
 
-        public static Predicate isNull(EntityProperty entityProperty) {
+        public static Predicate isNull(EntityProperty entityProperty) throws DaoException {
             return new Predicate(Sql.getColumn(entityProperty), PredicateOperator.IS_NULL);
         }
 
-        public static Predicate isNotNull(EntityProperty entityProperty) {
+        public static Predicate isNotNull(EntityProperty entityProperty) throws DaoException {
             return new Predicate(Sql.getColumn(entityProperty), PredicateOperator.IS_NOT_NULL);
         }
 
@@ -167,7 +188,7 @@ public class Where {
 
         // combines
 
-        private String getWildcard() {
+        private String getWildcard() throws DaoException {
             if (this.operator == PredicateOperator.IN) {
                 boolean first = true;
                 String result = "";
@@ -188,48 +209,48 @@ public class Where {
             }
         }
 
-        public String left() {
-            return this.column != null ? this.column.toString() :
-                    this.predicate != null ? this.predicate.toString() : getWildcard();
+        private StringBuilder left(StringBuilder result) throws DaoException {
+            return this.column != null ? this.column.appendClause(result) :
+                    this.predicate != null ? this.predicate.appendClause(result) : result.append(getWildcard());
         }
 
-        public String right() {
-            return this.compareColumn != null ? this.compareColumn.toString() :
-                    this.comparePredicate != null ? this.comparePredicate.toString() : getWildcard();
+        private StringBuilder right(StringBuilder result) throws DaoException {
+            return this.compareColumn != null ? this.compareColumn.appendClause(result) :
+                    this.comparePredicate != null ? this.comparePredicate.appendClause(result) : result.append(getWildcard());
         }
 
         @Override
-        public String toString() {
+        public StringBuilder appendClause(StringBuilder result) throws DaoException {
             switch (this.operator) {
                 case EQUAL:
-                    return left().concat(EQUAL).concat(right());
+                    return right(left(result).append(EQUAL));
                 case NOT_EQUAL:
-                    return left().concat(NOT_EQUAL).concat(right());
+                    return right(left(result).append(NOT_EQUAL));
                 case MORE:
-                    return left().concat(MORE).concat(right());
+                    return right(left(result).append(MORE));
                 case MORE_OR_EQUAL:
-                    return left().concat(MORE_OR_EQUAL).concat(right());
+                    return right(left(result).append(MORE_OR_EQUAL));
                 case LESS:
-                    return left().concat(LESS).concat(right());
+                    return right(left(result).append(LESS));
                 case LESS_OR_EQUAL:
-                    return left().concat(LESS_OR_EQUAL).concat(right());
+                    return right(left(result).append(LESS_OR_EQUAL));
                 case IN:
-                    return left().concat(IN).concat(getWildcard());
+                    return left(result).append(IN).append(getWildcard());
                 case OR:
-                    return left().concat(OR).concat(right());
+                    return right(left(result).append(OR));
                 case AND:
-                    return left().concat(AND).concat(right());
+                    return right(left(result).append(AND));
                 case BETWEEN:
-                    return left().concat(BETWEEN).concat(getWildcard());
+                    return left(result).append(BETWEEN).append(getWildcard());
                 case LIKE:
-                    return left().concat(LIKE).concat(right());
+                    return right(left(result).append(LIKE));
                 case IS_NULL:
-                    return left().concat(IS_NULL);
+                    return left(result).append(IS_NULL);
                 case IS_NOT_NULL:
-                    return left().concat(IS_NOT_NULL);
+                    return left(result).append(IS_NOT_NULL);
 
             }
-            return super.toString();
+            return result;
         }
     }
 

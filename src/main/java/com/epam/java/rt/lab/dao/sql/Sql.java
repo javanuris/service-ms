@@ -15,17 +15,21 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * service-ms
  */
-public class Sql {
+public abstract class Sql {
 
     public static final String SIGN_POINT = ".";
+    public static final String SIGN_POINT_REGEX = "\\.";
     public static final String SIGN_COMMA = ",";
     public static final String SIGN_EQUAL = ",";
+    public static final String SIGN_SPACE = " ";
+    public static final String COMMA_DELIMITER = ", ";
     public static final String ALL_COLUMNS = "*";
+    public static final String JOIN_AMPERSAND = "&";
 
     private static Properties sqlProperties = new Properties();
     private static Lock propertiesLock = new ReentrantLock();
 
-    List<WildValue> wildValueList;
+    private List<WildValue> wildValueList;
 
     Sql() {
         this.wildValueList = new ArrayList<>();
@@ -47,30 +51,27 @@ public class Sql {
         return sqlProperties.getProperty(key);
     }
 
-    private static List<Column> getColumnList(EntityProperty[] entityPropertyArray) {
+    private static List<Column> getColumnList(EntityProperty[] entityPropertyArray) throws DaoException {
         List<Column> columnList = new ArrayList<>();
         for (EntityProperty entityProperty : entityPropertyArray)
             columnList.add(getColumn(entityProperty));
         return columnList;
     }
 
-    static Column getColumn(EntityProperty entityProperty) {
-        String entityClassName = entityProperty.getClass().getSuperclass().getSimpleName();
-        return new Column(
-                getProperty(entityClassName),
-                getProperty(entityClassName.concat(SIGN_POINT).concat(entityProperty.toString()))
-        );
+    static Column getColumn(EntityProperty entityProperty) throws DaoException {
+        String entityClassName = entityProperty.getEntityClass().getName();
+        String tableName = getProperty(entityClassName);
+        String columnName = getProperty(entityClassName.concat(SIGN_POINT).concat(entityProperty.toString()));
+        if (tableName == null || columnName == null)
+            throw new DaoException("exception.dao.sql.table-or-column-not-found");
+        return new Column(tableName, columnName);
     }
 
-    private static List<Column> getColumnList(String[] tableAndColumnArray) {
+    private static List<Column> getColumnList(String[] tableAndColumnArray)
+            throws DaoException {
         List<Column> columnList = new ArrayList<>();
-        for (String tableAndColumn : tableAndColumnArray) {
-            String[] split = tableAndColumn.split("\\.");
-            columnList.add(new Column(
-                    split[0],
-                    split[1]
-            ));
-        }
+        for (String tableAndColumn : tableAndColumnArray)
+            columnList.add(Column.of(tableAndColumn));
         return columnList;
     }
 
@@ -120,6 +121,14 @@ public class Sql {
 
     public static Delete delete() {
         return new Delete();
+    }
+
+    // resulting methods
+
+    public abstract String create() throws DaoException;
+
+    public List<WildValue> getWildValueList() {
+        return wildValueList;
     }
 
 }

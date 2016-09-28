@@ -7,18 +7,24 @@ import com.epam.java.rt.lab.entity.BaseEntity;
  * service-ms
  */
 public class Login extends BaseEntity {
-    private String email;
-    private String password;
-    private int attemptLeft;
-    private int status;
 
     public enum Property implements EntityProperty {
         ID,
         EMAIL,
         PASSWORD,
         ATTEMPT_LEFT,
-        STATUS
+        STATUS;
+
+        @Override
+        public Class getEntityClass() {
+            return Login.class;
+        }
     }
+
+    private String email;
+    private String password;
+    private int attemptLeft;
+    private int status;
 
     public Login() {
     }

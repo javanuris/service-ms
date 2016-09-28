@@ -7,4 +7,9 @@ public class Insert extends Sql {
 
     Insert() {
     }
+
+    @Override
+    public String create() {
+        return null;
+    }
 }

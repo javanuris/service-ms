@@ -1,5 +1,7 @@
 package com.epam.java.rt.lab.dao.sql;
 
+import com.epam.java.rt.lab.dao.DaoException;
+
 import java.util.List;
 
 /**
@@ -24,7 +26,9 @@ public class WildValue<T> {
         return val;
     }
 
-    public String makeWildcard() {
+    public String makeWildcard() throws DaoException {
+        if (this.wildValueList == null)
+            throw new DaoException("exception.dao.sql.wild-value-list-empty");
         this.wildValueList.add(this);
         return WILDCARD;
     }

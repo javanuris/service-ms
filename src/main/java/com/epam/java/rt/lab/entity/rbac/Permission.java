@@ -11,7 +11,12 @@ public class Permission extends BaseEntity {
 
     public enum Property implements EntityProperty {
         ID,
-        URI
+        URI;
+
+        @Override
+        public Class getEntityClass() {
+            return Permission.class;
+        }
     }
 
     public Permission() {

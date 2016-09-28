@@ -21,7 +21,12 @@ public class User extends BaseEntity {
         LAST_NAME,
         LOGIN,
         ROLE,
-        AVATAR_ID
+        AVATAR_ID;
+
+        @Override
+        public Class getEntityClass() {
+            return User.class;
+        }
     }
 
     public User() {

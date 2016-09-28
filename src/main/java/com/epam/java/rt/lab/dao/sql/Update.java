@@ -7,4 +7,9 @@ public class Update extends Sql {
 
     Update() {
     }
+
+    @Override
+    public String create() {
+        return null;
+    }
 }

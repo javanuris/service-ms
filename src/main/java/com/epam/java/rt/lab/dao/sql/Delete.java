@@ -7,4 +7,9 @@ public class Delete extends Sql {
 
     Delete() {
     }
+
+    @Override
+    public String create() {
+        return null;
+    }
 }

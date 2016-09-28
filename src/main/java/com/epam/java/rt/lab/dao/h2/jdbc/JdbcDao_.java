@@ -18,7 +18,13 @@ public abstract class JdbcDao_ implements Dao_ {
     public enum RolePermission implements EntityProperty {
         ID,
         ROLE_ID,
-        PERMISSION_ID
+        PERMISSION_ID;
+
+
+        @Override
+        public Class getEntityClass() {
+            return null;
+        }
     }
 
     private Connection connection = null;

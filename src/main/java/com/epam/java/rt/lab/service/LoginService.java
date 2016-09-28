@@ -2,6 +2,7 @@ package com.epam.java.rt.lab.service;
 
 import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.dao.DaoParameter;
+import com.epam.java.rt.lab.dao.sql.Where;
 import com.epam.java.rt.lab.entity.rbac.Login;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,8 +21,12 @@ public class LoginService extends BaseService {
             throws ServiceException {
         try {
             return dao("Login").read(new DaoParameter()
-                    .setWhere(new DaoParameter.Where().andEqual(Login.Property.EMAIL, email)
-                    ));
+                    .setWherePredicate(Where.Predicate.get(
+                            Login.Property.EMAIL,
+                            Where.Predicate.PredicateOperator.EQUAL,
+                            email
+                    ))
+            );
         } catch (DaoException e) {
             throw new ServiceException("exception.service.login.get-login.dao", e.getCause());
         }

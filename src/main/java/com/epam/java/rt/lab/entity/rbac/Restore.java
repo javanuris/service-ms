@@ -1,6 +1,7 @@
 package com.epam.java.rt.lab.entity.rbac;
 
 import com.epam.java.rt.lab.entity.BaseEntity;
+import com.epam.java.rt.lab.entity.EntityProperty;
 
 import java.sql.Timestamp;
 
@@ -14,13 +15,18 @@ public class Restore extends BaseEntity {
     private String cookieValue;
     private Timestamp valid;
 
-    public enum Property {
+    public enum Property implements EntityProperty {
         ID,
         LOGIN,
         CODE,
         COOKIE_NAME,
         COOKIE_VALUE,
-        VALID
+        VALID;
+
+        @Override
+        public Class getEntityClass() {
+            return Restore.class;
+        }
     }
 
     public Restore() {
