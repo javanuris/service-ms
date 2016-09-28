@@ -1,6 +1,5 @@
 package com.epam.java.rt.lab.dao;
 
-import com.epam.java.rt.lab.dao.h2.JdbcParameter;
 import com.epam.java.rt.lab.dao.sql.Sql;
 import com.epam.java.rt.lab.dao.sql.WildValue;
 
@@ -11,6 +10,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.sql.*;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -34,36 +34,37 @@ public class DaoStatement implements AutoCloseable {
 
     private void initStatementMethodMap() throws NoSuchMethodException {
         do {
-            if (mapReady.compareAndSet(0, -1)) {
+            if (DaoStatement.mapReady.compareAndSet(0, -1)) {
                 try {
-                    statementMethodMap.put(int.class, PreparedStatement.class.getMethod("setInt", int.class, int.class));
-                    statementMethodMap.put(Integer.class, PreparedStatement.class.getMethod("setInt", int.class, int.class));
-                    statementMethodMap.put(boolean.class, PreparedStatement.class.getMethod("setBoolean", int.class, boolean.class));
-                    statementMethodMap.put(Boolean.class, PreparedStatement.class.getMethod("setBoolean", int.class, boolean.class));
-                    statementMethodMap.put(byte.class, PreparedStatement.class.getMethod("setByte", int.class, byte.class));
-                    statementMethodMap.put(Byte.class, PreparedStatement.class.getMethod("setByte", int.class, byte.class));
-                    statementMethodMap.put(short.class, PreparedStatement.class.getMethod("setShort", int.class, short.class));
-                    statementMethodMap.put(Short.class, PreparedStatement.class.getMethod("setShort", int.class, short.class));
-                    statementMethodMap.put(long.class, PreparedStatement.class.getMethod("setLong", int.class, long.class));
-                    statementMethodMap.put(Long.class, PreparedStatement.class.getMethod("setLong", int.class, long.class));
-                    statementMethodMap.put(BigDecimal.class, PreparedStatement.class.getMethod("setBigDecimal", int.class, BigDecimal.class));
-                    statementMethodMap.put(double.class, PreparedStatement.class.getMethod("setDouble", int.class, double.class));
-                    statementMethodMap.put(Double.class, PreparedStatement.class.getMethod("setDouble", int.class, double.class));
-                    statementMethodMap.put(float.class, PreparedStatement.class.getMethod("setFloat", int.class, float.class));
-                    statementMethodMap.put(Float.class, PreparedStatement.class.getMethod("setFloat", int.class, float.class));
+                    DaoStatement.statementMethodMap = new HashMap<>();
+                    DaoStatement.statementMethodMap.put(int.class, PreparedStatement.class.getMethod("setInt", int.class, int.class));
+                    DaoStatement.statementMethodMap.put(Integer.class, PreparedStatement.class.getMethod("setInt", int.class, int.class));
+                    DaoStatement.statementMethodMap.put(boolean.class, PreparedStatement.class.getMethod("setBoolean", int.class, boolean.class));
+                    DaoStatement.statementMethodMap.put(Boolean.class, PreparedStatement.class.getMethod("setBoolean", int.class, boolean.class));
+                    DaoStatement.statementMethodMap.put(byte.class, PreparedStatement.class.getMethod("setByte", int.class, byte.class));
+                    DaoStatement.statementMethodMap.put(Byte.class, PreparedStatement.class.getMethod("setByte", int.class, byte.class));
+                    DaoStatement.statementMethodMap.put(short.class, PreparedStatement.class.getMethod("setShort", int.class, short.class));
+                    DaoStatement.statementMethodMap.put(Short.class, PreparedStatement.class.getMethod("setShort", int.class, short.class));
+                    DaoStatement.statementMethodMap.put(long.class, PreparedStatement.class.getMethod("setLong", int.class, long.class));
+                    DaoStatement.statementMethodMap.put(Long.class, PreparedStatement.class.getMethod("setLong", int.class, long.class));
+                    DaoStatement.statementMethodMap.put(BigDecimal.class, PreparedStatement.class.getMethod("setBigDecimal", int.class, BigDecimal.class));
+                    DaoStatement.statementMethodMap.put(double.class, PreparedStatement.class.getMethod("setDouble", int.class, double.class));
+                    DaoStatement.statementMethodMap.put(Double.class, PreparedStatement.class.getMethod("setDouble", int.class, double.class));
+                    DaoStatement.statementMethodMap.put(float.class, PreparedStatement.class.getMethod("setFloat", int.class, float.class));
+                    DaoStatement.statementMethodMap.put(Float.class, PreparedStatement.class.getMethod("setFloat", int.class, float.class));
 //                    statementMethodMap.put(Time.class, PreparedStatement.class.getMethod("setTime", int.class, Time.class));
 //                    statementMethodMap.put(Date.class, PreparedStatement.class.getMethod("setDate", int.class, Date.class));
-                    statementMethodMap.put(Timestamp.class, PreparedStatement.class.getMethod("setTimestamp", int.class, Timestamp.class));
-                    statementMethodMap.put(String.class, PreparedStatement.class.getMethod("setString", int.class, String.class));
-                    statementMethodMap.put(Blob.class, PreparedStatement.class.getMethod("setBlob", int.class, Blob.class));
-                    statementMethodMap.put(Clob.class, PreparedStatement.class.getMethod("setClob", int.class, Clob.class));
-                    statementMethodMap.put(FileInputStream.class, PreparedStatement.class.getMethod("setBinaryStream", int.class, InputStream.class));
-                    mapReady.set(1);
+                    DaoStatement.statementMethodMap.put(Timestamp.class, PreparedStatement.class.getMethod("setTimestamp", int.class, Timestamp.class));
+                    DaoStatement.statementMethodMap.put(String.class, PreparedStatement.class.getMethod("setString", int.class, String.class));
+                    DaoStatement.statementMethodMap.put(Blob.class, PreparedStatement.class.getMethod("setBlob", int.class, Blob.class));
+                    DaoStatement.statementMethodMap.put(Clob.class, PreparedStatement.class.getMethod("setClob", int.class, Clob.class));
+                    DaoStatement.statementMethodMap.put(FileInputStream.class, PreparedStatement.class.getMethod("setBinaryStream", int.class, InputStream.class));
+                    DaoStatement.mapReady.set(1);
                 } finally {
-                    mapReady.set(-2);
+                    DaoStatement.mapReady.set(-2);
                 }
             }
-        } while (mapReady.get() == -1);
+        } while (DaoStatement.mapReady.get() == -1);
     }
 
     private <T> void setValue(int setIndex, T setValue)
@@ -72,7 +73,7 @@ public class DaoStatement implements AutoCloseable {
             if (setValue == null) {
                 this.statement.setNull(setIndex, Types.NULL);
             } else {
-                Method method = statementMethodMap.get(setValue.getClass());
+                Method method = DaoStatement.statementMethodMap.get(setValue.getClass());
                 if (method == null)
                     throw new DaoException("exception.dao.jdbc.dao-statement.set-statement-value.get-method");
                 method.invoke(this.statement, setIndex, setValue);

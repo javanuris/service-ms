@@ -1,7 +1,6 @@
 package com.epam.java.rt.lab.service;
 
 import com.epam.java.rt.lab.dao.Dao;
-import com.epam.java.rt.lab.dao.Dao_;
 import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.dao.factory.AbstractDaoFactory;
 import com.epam.java.rt.lab.dao.factory.DaoFactory;

@@ -1,13 +1,17 @@
 package com.epam.java.rt.lab.dao.h2.jdbc;
 
 import com.epam.java.rt.lab.dao.DaoException;
+import com.epam.java.rt.lab.dao.DaoParameter;
+import com.epam.java.rt.lab.dao.sql.Sql;
 
 import java.sql.Connection;
+import java.sql.ResultSet;
+import java.util.List;
 
 /**
  * service-ms
  */
-public class UserJdbcDao {
+public class UserDao extends JdbcDao {
 
     private static final String DEFAULT_TABLE = "\"User\"";
     private static final String DEFAULT_ROLE_JOIN_COLUMN = "role_id";
@@ -17,8 +21,34 @@ public class UserJdbcDao {
     private static final String LOGIN_TABLE = "\"Login\"";
     private static final String LOGIN_JOIN_COLUMN = "id";
 
-    public UserJdbcDao(Connection connection) throws DaoException {
-//        super(connection);
+    public UserDao(Connection connection) {
+        super(connection);
+    }
+
+
+    @Override
+    Sql getSqlCreate(DaoParameter daoParameter) {
+        return null;
+    }
+
+    @Override
+    Sql getSqlRead(DaoParameter daoParameter) throws DaoException {
+        return null;
+    }
+
+    @Override
+    Sql getSqlUpdate(DaoParameter daoParameter) {
+        return null;
+    }
+
+    @Override
+    Sql getSqlDelete(DaoParameter daoParameter) {
+        return null;
+    }
+
+    @Override
+    <T> List<T> getEntity(ResultSet resultSet, Sql sql) throws DaoException {
+        return null;
     }
 
 //    @Override
@@ -83,7 +113,7 @@ public class UserJdbcDao {
 //            user.setAvatarId((Long) resultSet.getObject("avatar_id"));
 //            Role role = new Role();
 //            role.setId(resultSet.getLong("role_id"));
-//            user.setRole((new RoleJdbcDao(getConnection())).getFirst(role, "id", ""));
+//            user.setRole((new RoleDao(getConnection())).getFirst(role, "id", ""));
 //            Login login = new Login();
 //            login.setId(resultSet.getLong("login_id"));
 //            user.setLogin((new LoginJdbcDao_(getConnection())).getFirst(login, "id", ""));
@@ -348,7 +378,7 @@ public class UserJdbcDao {
 //                    case "role_id":
 //                        Long role_id = (Long) resultSet.getObject(column.getColumnName());
 //                        if (role_id != null)
-//                            user.setRole(new RoleJdbcDao(getConnection()).getFirst(
+//                            user.setRole(new RoleDao(getConnection()).getFirst(
 //                                    new Parameter_().put(Parameter_.Type._WHERE_COLUMN_LIST, Parameter_.Field.set("id", role_id))
 //                            ));
 //                        break;
@@ -375,7 +405,7 @@ public class UserJdbcDao {
 //            logger.debug("{}", subEntityEntry.getKey());
 //            switch (subEntityEntry.getKey()) {
 //                case "\"Role\"":
-//                    user.setRole(new RoleJdbcDao(getConnection()).getEntity(
+//                    user.setRole(new RoleDao(getConnection()).getEntity(
 //                            resultSet,
 //                            new Parameter_().put(Parameter_.Type._SELECT_COLUMN_LIST, subEntityEntry.getValue())
 //                    ));

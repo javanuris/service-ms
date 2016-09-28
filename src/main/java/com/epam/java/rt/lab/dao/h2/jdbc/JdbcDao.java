@@ -7,9 +7,10 @@ import com.epam.java.rt.lab.dao.DaoStatement;
 import com.epam.java.rt.lab.dao.sql.Sql;
 import com.epam.java.rt.lab.util.StringArray;
 
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.URISyntaxException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -23,6 +24,9 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public abstract class JdbcDao implements Dao {
 
+    private static final String SIGN_EQUAL = "=";
+    private static final String SIGN_POINT = ".";
+
     private static Map<String, EntitySetter> entitySetterMap = new HashMap<>();
     private static Lock mapLock = new ReentrantLock();
 
@@ -35,20 +39,25 @@ public abstract class JdbcDao implements Dao {
     private static void init() throws DaoException {
         if (JdbcDao.mapLock.tryLock()) {
             try {
-                Properties daoProperties = new Properties();
-                daoProperties.load(JdbcDao.class.getClassLoader().getResourceAsStream("dao.properties"));
-                Enumeration<?> names = daoProperties.propertyNames();
-                while (names.hasMoreElements()) {
-                    String name = (String) names.nextElement();
-                    if (!name.contains(".")) {
-                        JdbcDao.entitySetterMap.put(name, new EntitySetter(daoProperties.getProperty(name)));
-                    } else {
-                        String[] split = name.split("\\.");
-                        JdbcDao.entitySetterMap.get(split[0]).addMethod(split[1], daoProperties.getProperty(name));
+                File daoPropertyFile = new File(JdbcDao.class.getClassLoader().getResource("dao.properties").toURI());
+                FileReader fileReader = new FileReader(daoPropertyFile);
+                BufferedReader bufferedReader = new BufferedReader(fileReader);
+                String readLine;
+                while ((readLine  = bufferedReader.readLine()) != null) {
+                    String[] readLineArray = readLine.split(SIGN_EQUAL);
+                    if (readLineArray.length == 2) {
+                        if (!readLineArray[0].contains(SIGN_POINT)) {
+                            JdbcDao.entitySetterMap.put(readLineArray[0], new EntitySetter(readLineArray[1]));
+                        } else {
+                            String[] nameArray = readLineArray[0].split("\\.");
+                            JdbcDao.entitySetterMap.get(nameArray[0]).addMethod(nameArray[1], readLineArray[1]);
+                        }
                     }
                 }
             } catch (IOException e) {
-                throw new DaoException("exception.dao.jdbc.properties-not-found", e.getCause());
+                throw new DaoException("exception.dao.jdbc.dao-properties.read-file", e.getCause());
+            } catch (URISyntaxException e) {
+                throw new DaoException("exception.dao.jdbc.dao-properties.resource", e.getCause());
             } finally {
                 JdbcDao.mapLock.unlock();
             }
@@ -79,6 +88,7 @@ public abstract class JdbcDao implements Dao {
         } catch (SQLException e) {
             throw new DaoException("exception.dao.jdbc.read.sql", e.getCause());
         } catch (Exception e) {
+            e.printStackTrace();
             throw new DaoException("exception.dao.jdbc.read.close", e.getCause());
         }
     }

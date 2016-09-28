@@ -31,6 +31,7 @@ public class LoginService extends BaseService {
             );
             return loginList != null && loginList.size() > 0 ? loginList.get(0) : null;
         } catch (DaoException e) {
+            e.printStackTrace();
             throw new ServiceException("exception.service.login.get-login.dao", e.getCause());
         }
     }
