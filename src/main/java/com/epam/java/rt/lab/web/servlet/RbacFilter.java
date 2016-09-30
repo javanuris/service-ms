@@ -38,7 +38,7 @@ public class RbacFilter implements Filter {
             User user = null;
             if (userId == null) {
                 logger.debug("TRYING TO GET USER FROM COOKIE");
-                String rememberCookieName = CookieManager.getRememberCookieName(req);
+                String rememberCookieName = CookieManager.getUserAgentCookieName(req);
                 String rememberCookieValue = CookieManager.getCookieValue(req, rememberCookieName);
                 if (rememberCookieValue != null) {
                     Remember remember = userService.getRemember(rememberCookieName, rememberCookieValue);

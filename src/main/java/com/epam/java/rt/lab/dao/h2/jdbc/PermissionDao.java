@@ -16,6 +16,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * service-ms
@@ -28,8 +29,8 @@ public class PermissionDao extends JdbcDao {
         PERMISSION_ID;
 
         @Override
-        public String getEntityClassName() {
-            return "com.epam.java.rt.lab.entity.rbac.RolePermission";
+        public Class getEntityClass() {
+            return PermissionDao.RolePermissionProperty.class;
         }
     }
 

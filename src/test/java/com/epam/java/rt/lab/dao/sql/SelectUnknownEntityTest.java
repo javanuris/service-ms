@@ -19,8 +19,8 @@ public class SelectUnknownEntityTest {
         PERMISSION_ID;
 
         @Override
-        public String getEntityClassName() {
-            return "com.epam.java.rt.lab.entity.rbac.RolePermission";
+        public Class getEntityClass() {
+            return SelectUnknownEntityTest.RolePermissionProperty.class;
         }
     }
 

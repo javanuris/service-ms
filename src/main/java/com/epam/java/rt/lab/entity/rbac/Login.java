@@ -16,9 +16,10 @@ public class Login extends BaseEntity {
         STATUS;
 
         @Override
-        public String getEntityClassName() {
-            return Login.class.getName();
+        public Class getEntityClass() {
+            return Login.class;
         }
+
     }
 
     private String email;

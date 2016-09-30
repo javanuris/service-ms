@@ -24,7 +24,7 @@ public class UserService extends BaseService {
 
     public User getUser(Login login) throws ServiceException {
         try {
-            List<User> userList = dao("User").read(new DaoParameter()
+            List<User> userList = dao(User.class.getSimpleName()).read(new DaoParameter()
                     .setWherePredicate(Where.Predicate.get(
                             User.Property.LOGIN_ID,
                             Where.Predicate.PredicateOperator.EQUAL,
@@ -39,7 +39,7 @@ public class UserService extends BaseService {
 
     public User getUser(Long id) throws ServiceException {
         try {
-            List<User> userList = dao("User").read(new DaoParameter()
+            List<User> userList = dao(User.class.getSimpleName()).read(new DaoParameter()
                     .setWherePredicate(Where.Predicate.get(
                             User.Property.ID,
                             Where.Predicate.PredicateOperator.EQUAL,
@@ -54,7 +54,7 @@ public class UserService extends BaseService {
 
     public User getAnonymous() throws ServiceException {
         try {
-            List<User> userList = dao("User").read(new DaoParameter()
+            List<User> userList = dao(User.class.getSimpleName()).read(new DaoParameter()
                     .setWherePredicate(Where.Predicate.get(
                             Login.Property.EMAIL,
                             Where.Predicate.PredicateOperator.EQUAL,

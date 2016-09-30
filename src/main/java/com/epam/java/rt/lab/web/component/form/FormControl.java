@@ -2,6 +2,7 @@ package com.epam.java.rt.lab.web.component.form;
 
 import com.epam.java.rt.lab.util.validator.Validator;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -89,8 +90,8 @@ public class FormControl {
         val().value = value;
     }
 
-    public String getGenericValue() {
-        return (String) val().genericValue;
+    public <T> T getGenericValue() {
+        return (T) val().genericValue;
     }
 
     public <T> void setGenericValue(T genericValue) {
@@ -103,6 +104,12 @@ public class FormControl {
 
     public void setValidationMessageList(List<String> validationMessageList) {
         val().validationMessageList = validationMessageList;
+    }
+
+    public void addValidationMessage(String validationMessage) {
+        if (val().validationMessageList == null)
+            val().validationMessageList = new ArrayList<String>();
+        val().validationMessageList.add(validationMessage);
     }
 
     public boolean getIgnoreValidate() {
@@ -153,5 +160,22 @@ public class FormControl {
 
         private ControlVal() {
         }
+    }
+
+    @Override
+    public String toString() {
+        return new StringBuilder()
+                .append("LABEL: ").append(getLabel())
+                .append(", NAME: ").append(getName())
+                .append(", TYPE: ").append(getType())
+                .append(", PLACEHOLDER: ").append(getPlaceholder())
+                .append(", ACTION: ").append(getAction())
+                .append(", SUB-ACTION: ").append(getSubAction())
+                .append(", VALIDATOR: ").append(getValidator())
+                .append(", AVAILABLE-VALUE-LIST: ").append(getAvailableValueList())
+                .append(", VALUE: ").append(getValue())
+                .append(", GENERIC-VALUE: ").append(getGenericValue() == null ? "" : String.valueOf(getGenericValue()))
+                .append(", VALIDATION-MESSAGE-LIST: ").append(getValidationMessageList())
+                .append(", IGNORE-VALIDATE: ").append(getIgnoreValidate()).toString();
     }
 }

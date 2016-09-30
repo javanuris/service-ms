@@ -32,7 +32,7 @@ public class CookieManager {
         setCookie(resp, cookieName, null, 0, UrlManager.getContextUri(req, "/"));
     }
 
-    public static String getRememberCookieName(HttpServletRequest req) {
+    public static String getUserAgentCookieName(HttpServletRequest req) {
         if (req.getCookies() == null) return null;
         String ip = req.getHeader("X-FORWARDED-FOR");
         if (ip == null) ip = req.getRemoteAddr();
@@ -47,13 +47,6 @@ public class CookieManager {
     public static String getCookieValue(HttpServletRequest req, String cookieName) {
         Cookie cookie = getCookie(req, cookieName);
         return cookie == null ? null : cookie.getValue();
-    }
-
-    public static void setRememberCookieValue(HttpServletRequest req, HttpServletResponse resp,
-                                              String rememberCookieName, String rememberCookieValue) {
-        setCookie(resp, rememberCookieName, rememberCookieValue,
-                Integer.valueOf(GlobalProperties.getProperty("remember.days.valid")) * 86400,
-                UrlManager.getContextUri(req, "/"));
     }
 
 }

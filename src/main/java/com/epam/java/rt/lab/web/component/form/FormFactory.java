@@ -10,15 +10,10 @@ import java.util.*;
 /**
  * service-ms
  */
-public class FormFactory {
-    private static class Holder { // Initialization-on-demand holder
-        private static final FormFactory INSTANCE = new FormFactory();
-    }
+public final class FormFactory {
 
-    public static FormFactory getInstance() {
-        return Holder.INSTANCE;
-    }
-
+    private static final String SIGN_POINT = ".";
+    private static final String SIGN_COMMA = ",";
     private static final String FORMS = "forms";
     private static final String FORM_ACTION = ".action";
     private static final String FORM_CONTROLS = ".controls";
@@ -29,47 +24,44 @@ public class FormFactory {
     private static final String CONTROL_SUB_ACTION = ".sub-action";
     private static final String CONTROL_VALIDATOR = ".validator";
 
-    private Map<String, Form> formMap;
-    private Throwable constructorThrowable;
+    private static Map<String, Form> formMap = new HashMap<>();
 
-    private FormFactory() {
-        loadProperties();
-    }
-
-    private void loadProperties() {
+    private static void loadProperties() throws FormException {
         Properties formProperties = new Properties();
         try {
             formProperties.load(FormFactory.class.getClassLoader().getResourceAsStream("form.properties"));
-            this.formMap = new HashMap<>();
-            for (String formName : StringArray.splitSpaceLessNames(formProperties.getProperty(FORMS), ",")) {
-                Form form = new Form(formName, formProperties.getProperty(formName.concat(".").concat(FORM_ACTION)));
+            FormFactory.formMap.clear();
+            for (String formName : StringArray.splitSpaceLessNames(formProperties.getProperty(FORMS), SIGN_COMMA)) {
+                Form form = new Form(formName, formProperties.getProperty(formName.concat(FORM_ACTION)));
                 List<FormControl> formControlList = new ArrayList<>();
-                for (String controlName : StringArray.splitSpaceLessNames(formProperties.getProperty(formName), ",")) {
-                    String propertyPrefix = formName.concat(".").concat(controlName).concat(".");
+                for (String controlName : StringArray.splitSpaceLessNames(formProperties.getProperty(formName.concat(FORM_CONTROLS)), SIGN_COMMA)) {
+                    String propertyPrefix = formName.concat(SIGN_POINT).concat(controlName);
                     formControlList.add(
                             new FormControl(
-                                    controlName,
+                                    propertyPrefix,
                                     formProperties.getProperty(propertyPrefix.concat(CONTROL_LABEL)),
                                     formProperties.getProperty(propertyPrefix.concat(CONTROL_TYPE)),
                                     formProperties.getProperty(propertyPrefix.concat(CONTROL_PLACEHOLDER)),
                                     formProperties.getProperty(propertyPrefix.concat(CONTROL_ACTION)),
                                     formProperties.getProperty(propertyPrefix.concat(CONTROL_SUB_ACTION)),
-                                    ValidatorFactory.getInstance()
-                                            .create(formProperties.getProperty(propertyPrefix.concat(CONTROL_VALIDATOR)))
+                                    ValidatorFactory.create(formProperties.getProperty(propertyPrefix.concat(CONTROL_VALIDATOR)))
                             )
                     );
                 }
-                form.setFormControlArray((FormControl[]) formControlList.toArray());
-                this.formMap.put(formName, form);
+                form.setFormControlList(formControlList);
+                FormFactory.formMap.put(formName, form);
             }
         } catch (IOException | ValidatorException e) {
-            this.constructorThrowable = e.getCause();
+            e.printStackTrace();
+            throw new FormException("exception.component.form.properties", e.getCause());
         }
     }
 
-    public Form create(String formName) throws FormException {
-        Form form = this.formMap.get(formName);
+    public static Form create(String formName) throws FormException {
+        if (FormFactory.formMap.size() == 0) FormFactory.loadProperties();
+        Form form = FormFactory.formMap.get(formName);
         if (form != null) return form.copyDef();
-        throw new FormException("exception.component.form.form-factory.create", this.constructorThrowable);
+        throw new FormException("exception.component.form.form-factory.create");
     }
+
 }

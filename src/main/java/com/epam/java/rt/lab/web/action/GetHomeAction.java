@@ -11,9 +11,8 @@ import java.io.IOException;
 /**
  * Service Management System
  */
-@WebAction
-public class HomeAction implements Action {
-    private static final Logger logger = LoggerFactory.getLogger(HomeAction.class);
+public class GetHomeAction implements Action {
+    private static final Logger logger = LoggerFactory.getLogger(GetHomeAction.class);
 
     @Override
     public void execute(HttpServletRequest req, HttpServletResponse resp) throws ActionException {

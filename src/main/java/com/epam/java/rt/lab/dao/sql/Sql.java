@@ -60,7 +60,7 @@ public abstract class Sql {
     }
 
     static Column getColumn(EntityProperty entityProperty) throws DaoException {
-        String entityClassName = entityProperty.getEntityClassName();
+        String entityClassName = entityProperty.getEntityClass().getName();
         String tableName = getProperty(entityClassName);
         String columnName = getProperty(entityClassName.concat(SIGN_POINT).concat(entityProperty.toString()));
         if (tableName == null || columnName == null)
@@ -116,8 +116,8 @@ public abstract class Sql {
         ));
     }
 
-    public static Update update() {
-        return new Update();
+    public static Update update(Class entityClass) throws DaoException {
+        return new Update(entityClass);
     }
 
     public static Delete delete() {

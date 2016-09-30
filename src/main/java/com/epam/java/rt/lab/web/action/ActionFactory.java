@@ -1,9 +1,13 @@
 package com.epam.java.rt.lab.web.action;
 
+import com.epam.java.rt.lab.entity.rbac.Permission;
+import com.epam.java.rt.lab.service.PermissionService;
+import com.epam.java.rt.lab.service.ServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -11,48 +15,81 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * Service Management System
  */
-public class ActionFactory {
-    private static final Logger logger = LoggerFactory.getLogger(ActionFactory.class);
-    private static final Map<String, Action> actionMap = new HashMap<>();
-    private static final Lock actionMapLock = new ReentrantLock();
+public final class ActionFactory {
 
-    public static Action getAction(String pathInfo) throws ActionException {
-        int i = pathInfo.indexOf("-");
-        while (i > 0 && i < pathInfo.length()) {
-            pathInfo = pathInfo.substring(0, i)
-                    .concat(pathInfo.substring(i + 1, i + 2).toUpperCase())
-                    .concat(pathInfo.substring(i + 2));
-            i = pathInfo.indexOf("-", i);
-        }
-        String actionPath = pathInfo.substring(1).replace("/", ".");
-        int actionNamePoint = actionPath.lastIndexOf(".") + 1;
-        String actionPathAndName = actionPath.substring(0, actionNamePoint)
-                .concat(actionPath.substring(actionNamePoint, actionNamePoint + 1).toUpperCase())
-                .concat(actionPath.substring(actionNamePoint + 1)).concat("Action");
-        logger.debug(actionPathAndName);
-        Action action = ActionFactory.actionMap.get(actionPathAndName);
-        if (action != null) return action;
-        if (ActionFactory.actionMapLock.tryLock()) {
-            action = ActionFactory.actionMap.get(actionPathAndName);
-            if (action != null) {
-                ActionFactory.actionMapLock.unlock();
-                return action;
-            }
-            try {
-                Class<?> actionClass = Class.forName(ActionFactory.class.getPackage()
-                        .getName().concat(".").concat(actionPathAndName));
-                if (actionClass.getAnnotation(WebAction.class) == null)
-                    throw new ActionException("Action '" + actionPathAndName + "' not found");
-                Action actionObject = (Action) actionClass.newInstance();
-                ActionFactory.actionMap.put(actionPathAndName, actionObject);
-                return actionObject;
-            } catch (IllegalAccessException | InstantiationException | ClassNotFoundException e) {
-                throw new ActionException(e.getMessage());
+    private static final String SIGN_POINT = ".";
+    private static final String GET = "Get";
+    private static final String POST = "Post";
+    private static final String ACTION = "Action";
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ActionFactory.class);
+    private static final Map<String, Action> actionMap = new HashMap<>();
+    private static final Lock mapLock = new ReentrantLock();
+
+    /**
+     * @param method
+     * @param pathInfo
+     * @return
+     * @throws ActionException
+     */
+    public static Action getAction(String method, String pathInfo) throws ActionException {
+        if (ActionFactory.actionMap.size() == 0) init();
+        return ActionFactory.actionMap.get(getActionMapKey(method, pathInfo));
+    }
+
+    /**
+     *
+     * @throws ActionException
+     */
+    public static void init() throws ActionException {
+        if (ActionFactory.mapLock.tryLock()) {
+            ActionFactory.actionMap.clear();
+            String actionPackagePath = ActionFactory.class.getPackage().getName().concat(SIGN_POINT);
+            try (PermissionService permissionService = new PermissionService()) {
+                List<Permission> permissionList = permissionService.getPermissionList();
+                for (Permission permission : permissionList) {
+                    ActionFactory.addAction(
+                            GET,
+                            permission.getUri(),
+                            actionPackagePath,
+                            permission.getAction()
+                    );
+                    ActionFactory.addAction(
+                            POST,
+                            permission.getUri(),
+                            actionPackagePath,
+                            permission.getAction()
+                    );
+                }
+            } catch (ServiceException e) {
+                throw new ActionException("exception.action.factory.permission", e.getCause());
             } finally {
-                ActionFactory.actionMapLock.unlock();
+                ActionFactory.mapLock.unlock();
             }
         }
-        throw new ActionException("Action '" + actionPathAndName + "' not found");
+    }
+
+    private static void addAction(String method, String uri, String actionPackage, String action) throws ActionException {
+        try {
+            int pointIndex = action.lastIndexOf(SIGN_POINT) + 1;
+            if (pointIndex > 0) {
+                action = actionPackage.concat(action.substring(0, pointIndex))
+                        .concat(method).concat(action.substring(pointIndex)).concat(ACTION);
+            } else {
+                action = actionPackage.concat(method).concat(action).concat(ACTION);
+            }
+            Class actionClass = Class.forName(action);
+            Action actionObject = (Action) actionClass.newInstance();
+            ActionFactory.actionMap.put(getActionMapKey(method.toUpperCase(), uri), actionObject);
+        } catch (IllegalAccessException | ClassNotFoundException e) {
+            LOGGER.debug("exception.action.factory.not-found: {}", action);
+        } catch (InstantiationException e) {
+            throw new ActionException("exception.action.factory.action-object", e.getCause());
+        }
+    }
+
+    private static String getActionMapKey(String method, String pathInfo) {
+        return method.concat(pathInfo);
     }
 
 }

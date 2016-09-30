@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{5} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="EXCEPTION" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>..\logs\exception.log</file>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <Pattern>%d{yyyy-MM-dd_HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</Pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <FileNamePattern>..\logs\oop.%i.log.zip</FileNamePattern>
+            <MinIndex>1</MinIndex>
+            <MaxIndex>5</MaxIndex>
+        </rollingPolicy>
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <MaxFileSize>1MB</MaxFileSize>
+        </triggeringPolicy>
+    </appender>
+
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>..\logs\exception.log</file>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <Pattern>%d{yyyy-MM-dd_HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</Pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <FileNamePattern>..\logs\oop.%i.log.zip</FileNamePattern>
+            <MinIndex>1</MinIndex>
+            <MaxIndex>5</MaxIndex>
+        </rollingPolicy>
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <MaxFileSize>1MB</MaxFileSize>
+        </triggeringPolicy>
+    </appender>
+
+    <!--
+    exceptions log
+    -->
+    <logger name="com.epam.java.rt.lab.dao.DaoException.ERROR" level="DEBUG" additivity="false">
+        <appender-ref ref="STDOUT" />
+        <appender-ref ref="EXCEPTION" />
+    </logger>
+
+    <!--
+    layers log
+    -->
+    <logger name="com.epam.java.rt.lab.dao.Dao.INFO" level="DEBUG" additivity="false">
+        <appender-ref ref="STDOUT" />
+        <appender-ref ref="FILE" />
+    </logger>
+
+    <logger name="com.epam.java.rt.lab.dao.Dao.DEBUG" level="DEBUG" additivity="false">
+        <appender-ref ref="STDOUT" />
+        <appender-ref ref="FILE" />
+    </logger>
+
+    <!--
+
+    -->
+
+    <!--
+    logger defines what appender will be used to exact NAMED logger in class / LoggerFactory.getLogger(name);
+    in this example we made name by concatenating '.class.getName()' and '.INFO';
+    so Logger('.WARN') outputs to 'STDOUT'-appender and to 'FILE;-appender,
+    but Logger('.INFO') outputs only to 'STDOUT'-appender;
+    -->
+    <logger name="com.epam.java.rt.lab.task.star.system.service.Analyzer.INFO" level="DEBUG" additivity="false">
+        <appender-ref ref="STDOUT" />
+    </logger>
+
+
+    <logger name="LOGGER" level="TRACE" additivity="false">
+        <appender-ref ref="STDOUT" />
+    </logger>
+
+    <!--
+    root defines what appender will be used to output log-message as default, as a result all log-messages wil appear
+    in 'STDOUT'-appender
+    -->
+    <root level="DEBUG">
+        <appender-ref ref="STDOUT" />
+    </root>
+
+</configuration>

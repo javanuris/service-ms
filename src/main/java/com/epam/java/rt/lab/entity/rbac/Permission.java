@@ -8,14 +8,16 @@ import com.epam.java.rt.lab.entity.EntityProperty;
  */
 public class Permission extends BaseEntity {
     private String uri;
+    private String action;
 
     public enum Property implements EntityProperty {
         ID,
-        URI;
+        URI,
+        ACTION;
 
         @Override
-        public String getEntityClassName() {
-            return Permission.class.getName();
+        public Class getEntityClass() {
+            return Permission.class;
         }
     }
 
@@ -33,5 +35,13 @@ public class Permission extends BaseEntity {
 
     public void setUri(String uri) {
         this.uri = uri;
+    }
+
+    public String getAction() {
+        return action;
+    }
+
+    public void setAction(String action) {
+        this.action = action;
     }
 }

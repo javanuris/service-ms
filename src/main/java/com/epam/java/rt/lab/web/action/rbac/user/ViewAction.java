@@ -2,7 +2,6 @@ package com.epam.java.rt.lab.web.action.rbac.user;
 
 import com.epam.java.rt.lab.web.action.Action;
 import com.epam.java.rt.lab.web.action.ActionException;
-import com.epam.java.rt.lab.web.action.WebAction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,7 +11,6 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * Service Management System
  */
-@WebAction
 public class ViewAction implements Action {
     private static final Logger logger = LoggerFactory.getLogger(ViewAction.class);
 

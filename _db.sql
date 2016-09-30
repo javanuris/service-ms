@@ -6,7 +6,7 @@ drop table "Activate";
 
 
 //create tables
-create table if not exists "Permission" (id identity primary key, uri varchar(255) unique not null);
+create table if not exists "Permission" (id identity primary key, uri varchar(255) unique not null, action varchar(255) not null);
 create table if not exists "Role" (id identity primary key, name varchar(255) unique not null);
 create table if not exists "RolePermission" (id identity primary key, role_id bigint references "Role" (id), permission_id bigint references "Permission" (id));
 create table if not exists "Login" (id identity primary key, email varchar(255) unique not null, password varchar(255) not null, attempt_left int not null, status int not null);
@@ -19,24 +19,24 @@ create table if not exists "Activate" (id identity primary key, email varchar(25
 
 //init data
 delete from "Permission";
-insert into "Permission" (uri) values ('/');
-insert into "Permission" (uri) values ('/home');
-insert into "Permission" (uri) values ('/develop');
-insert into "Permission" (uri) values ('/profile/login');
-insert into "Permission" (uri) values ('/profile/forgot-password');
-insert into "Permission" (uri) values ('/profile/activate');
-insert into "Permission" (uri) values ('/profile/view');
-insert into "Permission" (uri) values ('/profile/reset-password');
-insert into "Permission" (uri) values ('/profile/edit');
-insert into "Permission" (uri) values ('/profile/logout');
-insert into "Permission" (uri) values ('/rbac/user/list');
-insert into "Permission" (uri) values ('/rbac/user/view');
-insert into "Permission" (uri) values ('/rbac/role/list');
-insert into "Permission" (uri) values ('/rbac/permission/list');
-insert into "Permission" (uri) values ('/application/list');
-insert into "Permission" (uri) values ('/execution/list');
-insert into "Permission" (uri) values ('/employee/list');
-insert into "Permission" (uri) values ('/service/list');
+insert into "Permission" (uri, action) values ('/', 'Home');
+insert into "Permission" (uri, action) values ('/home', 'Home');
+insert into "Permission" (uri, action) values ('/develop', 'Develop');
+insert into "Permission" (uri, action) values ('/profile/login', 'profile.Login');
+insert into "Permission" (uri, action) values ('/profile/forgot-password', 'profile.ForgotPassword');
+insert into "Permission" (uri, action) values ('/profile/activate', 'profile.Activate');
+insert into "Permission" (uri, action) values ('/profile/view', 'profile.View');
+insert into "Permission" (uri, action) values ('/profile/reset-password', 'profile.ResetPassword');
+insert into "Permission" (uri, action) values ('/profile/edit', 'profile.Edit');
+insert into "Permission" (uri, action) values ('/profile/logout', 'profile.Logout');
+insert into "Permission" (uri, action) values ('/rbac/user/list', 'rbac.user.List');
+insert into "Permission" (uri, action) values ('/rbac/user/view', 'rbac.user.View');
+insert into "Permission" (uri, action) values ('/rbac/role/list', 'rbac.role.List');
+insert into "Permission" (uri, action) values ('/rbac/permission/list', 'rbac.permission.List');
+insert into "Permission" (uri, action) values ('/application/list', 'application.List');
+insert into "Permission" (uri, action) values ('/execution/list', 'execution.List');
+insert into "Permission" (uri, action) values ('/employee/list', 'employee.List');
+insert into "Permission" (uri, action) values ('/service/list', 'service.List');
 delete from "Role";
 insert into "Role" (name) values ('anonymous');
 insert into "Role" (name) values ('authorized');

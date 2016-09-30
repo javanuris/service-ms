@@ -103,7 +103,7 @@ public class NavigationComponent {
 
         public NavigationItem(String name, String link) throws ValidatorException {
             String index = name.substring(name.lastIndexOf(".") + 1);
-            if (ValidatorFactory.getInstance().create("digits").validate(index) == null) {
+            if (ValidatorFactory.create("digits").validate(index) == null) {
                 this.index = Integer.valueOf(index);
                 this.name = name.substring(0, name.length() - index.length() - 1);
             } else {

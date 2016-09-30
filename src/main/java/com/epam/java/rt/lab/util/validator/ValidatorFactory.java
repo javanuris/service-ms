@@ -15,15 +15,7 @@ import java.util.Properties;
 /**
  * service-ms
  */
-public class ValidatorFactory {
-
-    private static class Holder { // Initialization-on-demand holder
-        private static final ValidatorFactory INSTANCE = new ValidatorFactory();
-    }
-
-    public static ValidatorFactory getInstance() {
-        return Holder.INSTANCE;
-    }
+public final class ValidatorFactory {
 
     private static final String VALIDATORS = "validators";
     private static final String VALIDATOR_TYPE = ".type";
@@ -34,14 +26,9 @@ public class ValidatorFactory {
     private static final String VALIDATOR_TIMESTAMP = ".timestamp";
     private static final String VALIDATOR_REGEX = ".regex";
 
-    private Map<String, Validator> validatorMap;
-    private Throwable constructorThrowable;
+    private static Map<String, Validator> validatorMap = new HashMap<>();
 
-    private ValidatorFactory() {
-        loadProperties();
-    }
-
-    private <T> T getNumberValue(String numberClassName, String stringValue) throws ValidatorException {
+    private static <T> T getNumberValue(String numberClassName, String stringValue) throws ValidatorException {
         try {
             Class numberClass = Class.forName(numberClassName);
             Method numberMethod = numberClass.getMethod("valueOf", String.class);
@@ -53,11 +40,11 @@ public class ValidatorFactory {
         }
     }
 
-    private void loadProperties() {
+    private static void loadProperties() throws ValidatorException {
         Properties properties = new Properties();
         try {
             properties.load(FormFactory.class.getClassLoader().getResourceAsStream("validator.properties"));
-            this.validatorMap = new HashMap<>();
+            ValidatorFactory.validatorMap.clear();
             for (String validatorName : StringArray.splitSpaceLessNames(properties.getProperty(VALIDATORS), ",")) {
                 ValidatorType type = ValidatorType.valueOf(properties.getProperty(validatorName.concat(VALIDATOR_TYPE)));
                 Validator validator = null;
@@ -118,14 +105,17 @@ public class ValidatorFactory {
                 if (validator != null) validatorMap.put(validatorName, validator);
             }
         } catch (IOException | ValidatorException e) {
-            this.constructorThrowable = e.getCause();
+            e.printStackTrace();
+            throw new ValidatorException("exception.validator.properties", e.getCause());
         }
     }
 
-    public Validator create(String validatorName) throws ValidatorException {
-        Validator validator = this.validatorMap.get(validatorName);
+    public static Validator create(String validatorName) throws ValidatorException {
+        if (validatorName == null) return null;
+        if (ValidatorFactory.validatorMap.size() == 0) ValidatorFactory.loadProperties();
+        Validator validator = ValidatorFactory.validatorMap.get(validatorName);
         if (validator != null) return validator;
-        throw new ValidatorException("exception.util.validator.validator-factory.create", this.constructorThrowable);
+        throw new ValidatorException("exception.util.validator.validator-factory.create: " +validatorName);
     }
 
 }

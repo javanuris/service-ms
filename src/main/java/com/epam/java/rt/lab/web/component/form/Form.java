@@ -10,7 +10,7 @@ import java.util.List;
 public class Form implements Iterable<FormControl> {
     private Def fieldDef;
     private Val fieldVal;
-    private FormControl[] formControlArray;
+    private List<FormControl> formControlList;
 
     Form(String name, String actionUri) {
         this.fieldDef = new Def();
@@ -23,9 +23,8 @@ public class Form implements Iterable<FormControl> {
         // with definitions and newly created fields or objects for mutable values
         Form form = new Form(this.fieldDef.name, this.fieldDef.actionUri);
         List<FormControl> formControlList = new ArrayList<>();
-        for (FormControl formControl : this.formControlArray) formControlList.add(new FormControl(formControl.getControlDef()));
-        FormControl[] formControlArray = new FormControl[formControlList.size()];
-        form.setFormControlArray(formControlList.toArray(formControlArray));
+        for (FormControl formControl : this.formControlList) formControlList.add(new FormControl(formControl.getControlDef()));
+        form.setFormControlList(formControlList);
         return form;
     }
 
@@ -47,16 +46,16 @@ public class Form implements Iterable<FormControl> {
         val().actionParameterString = actionParameterString;
     }
 
-    public int getItemArrayLength() {
-        return this.formControlArray != null ? this.formControlArray.length : -1;
+    public int getItemListSize() {
+        return this.formControlList != null ? this.formControlList.size() : -1;
     }
 
     public FormControl getItem(int index) {
-        return this.formControlArray != null && 0 <= index && index < this.formControlArray.length ? this.formControlArray[index] : null;
+        return this.formControlList != null && 0 <= index && index < this.formControlList.size() ? this.formControlList.get(index) : null;
     }
 
-    protected void setFormControlArray(FormControl[] formControlArray) {
-        this.formControlArray = formControlArray;
+    protected void setFormControlList(List<FormControl> formControlList) {
+        this.formControlList = formControlList;
     }
 
     @Override
@@ -65,11 +64,11 @@ public class Form implements Iterable<FormControl> {
             private int index = 0;
 
             public boolean hasNext(){
-                return index < formControlArray.length;
+                return index < formControlList.size();
             }
 
             public FormControl next(){
-                return formControlArray[index++];
+                return formControlList.get(index++);
             }
 
             public void remove(){
@@ -95,7 +94,15 @@ public class Form implements Iterable<FormControl> {
         }
     }
 
-//    // form item
+    @Override
+    public String toString() {
+        StringBuilder result = new StringBuilder();
+        result.append("NAME: ").append(getName()).append(", ACTION: ").append(getAction());
+        for (FormControl formControl : this) result.append("\nFORM-CONTROL: ").append(formControl);
+        return result.toString();
+    }
+
+    //    // form item
 //    public static class FormControl {
 //        private ItemDef itemDef;
 //        private ItemVal itemVal;

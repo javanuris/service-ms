@@ -11,7 +11,7 @@ public interface Dao {
 
     <T> List<T> read(DaoParameter daoParameter) throws DaoException;
 
-    int update(DaoParameter daoParameter);
+    int update(DaoParameter daoParameter) throws DaoException;
 
     int delete(DaoParameter daoParameter);
 

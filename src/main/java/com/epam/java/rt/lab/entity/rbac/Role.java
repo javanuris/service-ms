@@ -20,8 +20,8 @@ public class Role extends BaseEntity {
         URI_LIST;
 
         @Override
-        public String getEntityClassName() {
-            return Role.class.getName();
+        public Class getEntityClass() {
+            return Role.class;
         }
     }
 

@@ -123,25 +123,29 @@ public class Validator<T extends Number> {
         } else if (this.type.equals(ValidatorType.NUMBER) ||
                 this.type.equals(ValidatorType.NUMBER_OR_NULL)) {
             if (isParsable(value) || this.type.equals(ValidatorType.NUMBER)) {
-                if (!isParsable(value)) return new String[]{this.msg};
-                Number number = NumberCompare.getNumber(value, this.numberMin);
-                NumberCompare numberCompare = new NumberCompare();
-                if ((this.numberMin != null && (numberCompare.compare(this.numberMin, number) > 0)) ||
-                        (this.numberMax != null && (numberCompare.compare(number, this.numberMax) > 0))) {
-                    if (this.numberMin != null || this.numberMax != null) {
-                        String range;
-                        if (this.numberMin != null && this.numberMax != null) {
-                            range = this.numberMin.toString().concat(" .. ")
-                                    .concat(this.numberMax.toString());
-                        } else if (this.numberMin != null) {
-                            range = ">= ".concat(this.numberMin.toString());
+                try {
+                    if (!isParsable(value)) return new String[]{this.msg};
+                    Number number = NumberCompare.getNumber(value, this.numberMin);
+                    NumberCompare numberCompare = new NumberCompare();
+                    if ((this.numberMin != null && (numberCompare.compare(this.numberMin, number) > 0)) ||
+                            (this.numberMax != null && (numberCompare.compare(number, this.numberMax) > 0))) {
+                        if (this.numberMin != null || this.numberMax != null) {
+                            String range;
+                            if (this.numberMin != null && this.numberMax != null) {
+                                range = this.numberMin.toString().concat(" .. ")
+                                        .concat(this.numberMax.toString());
+                            } else if (this.numberMin != null) {
+                                range = ">= ".concat(this.numberMin.toString());
+                            } else {
+                                range = "<= ".concat(this.numberMax.toString());
+                            }
+                            return new String[]{this.msg, range};
                         } else {
-                            range = "<= ".concat(this.numberMax.toString());
+                            return new String[]{this.msg};
                         }
-                        return new String[]{this.msg, range};
-                    } else {
-                        return new String[]{this.msg};
                     }
+                } catch (ClassCastException | NumberFormatException e) {
+                    return new String[]{this.msg};
                 }
             }
             // TODO: FUTURE AND PAST VALIDATION (EMPTY TIMESTAMP MEANS CURRENT)

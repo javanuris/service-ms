@@ -2,6 +2,8 @@ package com.epam.java.rt.lab.dao;
 
 import com.epam.java.rt.lab.dao.sql.Sql;
 import com.epam.java.rt.lab.dao.sql.WildValue;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -19,6 +21,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  * service-ms
  */
 public class DaoStatement implements AutoCloseable {
+
+    private static final Logger LOG = LoggerFactory.getLogger(Dao.class);
 
     private static AtomicInteger mapReady = new AtomicInteger(0);
     private static Map<Type, Method> statementMethodMap;

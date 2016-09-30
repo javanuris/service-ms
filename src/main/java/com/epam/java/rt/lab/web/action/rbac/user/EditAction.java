@@ -2,7 +2,6 @@ package com.epam.java.rt.lab.web.action.rbac.user;
 
 import com.epam.java.rt.lab.web.action.Action;
 import com.epam.java.rt.lab.web.action.ActionException;
-import com.epam.java.rt.lab.web.action.WebAction;
 import com.epam.java.rt.lab.web.action.profile.GetLoginAction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +12,6 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * service-ms
  */
-@WebAction
 public class EditAction implements Action {
     private static final Logger logger = LoggerFactory.getLogger(GetLoginAction.class);
 

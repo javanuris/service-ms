@@ -5,6 +5,7 @@ import com.epam.java.rt.lab.dao.DaoParameter;
 import com.epam.java.rt.lab.dao.sql.Column;
 import com.epam.java.rt.lab.dao.sql.Select;
 import com.epam.java.rt.lab.dao.sql.Sql;
+import com.epam.java.rt.lab.dao.sql.Update;
 import com.epam.java.rt.lab.entity.rbac.Login;
 
 import java.sql.Connection;
@@ -37,8 +38,11 @@ public class LoginDao extends JdbcDao {
     }
 
     @Override
-    Sql getSqlUpdate(DaoParameter daoParameter) {
-        return null;
+    Sql getSqlUpdate(DaoParameter daoParameter) throws DaoException {
+        return Sql
+                .update(Login.class)
+                .set(daoParameter.getSetValueArray())
+                .where(daoParameter.getWherePredicate());
     }
 
     @Override

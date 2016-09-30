@@ -24,8 +24,8 @@ public class Restore extends BaseEntity {
         VALID;
 
         @Override
-        public String getEntityClassName() {
-            return Restore.class.getName();
+        public Class getEntityClass() {
+            return Restore.class;
         }
     }
 

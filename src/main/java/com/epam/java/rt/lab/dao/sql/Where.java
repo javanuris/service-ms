@@ -18,10 +18,10 @@ public class Where implements Clause {
 
     Where(Select.Join join, Predicate predicate) throws DaoException {
         this.join = join;
-        Predicate joinPredicate = join.getPredicate();
-        if (joinPredicate == null && predicate == null) return;
+        Predicate joinPredicate = null;
+        if (join == null && predicate == null) return;
         if (predicate != null) addJoinFromPredicate(predicate);
-        joinPredicate = join.getPredicate(); // checked join from where clause predicate's columns
+        if (join != null) joinPredicate = join.getPredicate(); // checked join from where clause predicate's columns
         if (joinPredicate != null && predicate != null) {
             this.predicate = Predicate.get(
                     joinPredicate,
@@ -35,15 +35,13 @@ public class Where implements Clause {
         }
     }
 
-    void addPredicate(Predicate predicate) {
-
-    }
-
     private void addJoinFromPredicate(Predicate predicate) {
         if (predicate.predicate != null) addJoinFromPredicate(predicate.predicate);
         if (predicate.comparePredicate != null) addJoinFromPredicate(predicate.comparePredicate);
-        if (predicate.column != null) this.join.addJoin(predicate.column.getTableName());
-        if (predicate.compareColumn != null) this.join.addJoin(predicate.compareColumn.getTableName());
+        if (predicate.column != null && this.join != null)
+            this.join.addJoin(predicate.column.getTableName());
+        if (predicate.compareColumn != null && this.join != null)
+            this.join.addJoin(predicate.compareColumn.getTableName());
     }
 
     void linkWildValue(List<WildValue> wildValueList) {

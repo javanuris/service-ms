@@ -14,6 +14,7 @@ import java.util.List;
  * service-ms
  */
 public class RoleService extends BaseService {
+
     private static final Logger logger = LoggerFactory.getLogger(RoleService.class);
 
     public RoleService()
@@ -23,7 +24,7 @@ public class RoleService extends BaseService {
     public Role getRole(Long id)
             throws ServiceException {
         try {
-            List<Role> roleList = dao("Role").read(new DaoParameter()
+            List<Role> roleList = dao(Role.class.getSimpleName()).read(new DaoParameter()
                     .setWherePredicate(Where.Predicate.get(
                             Role.Property.ID,
                             Where.Predicate.PredicateOperator.EQUAL,
@@ -39,7 +40,7 @@ public class RoleService extends BaseService {
     public Role getRoleAuthorized()
             throws ServiceException {
         try {
-            List<Role> roleList = dao("Role").read(new DaoParameter()
+            List<Role> roleList = dao(Role.class.getSimpleName()).read(new DaoParameter()
                     .setWherePredicate(Where.Predicate.get(
                             Role.Property.NAME,
                             Where.Predicate.PredicateOperator.EQUAL,
@@ -55,7 +56,7 @@ public class RoleService extends BaseService {
     public List<Role> getRoleList()
             throws ServiceException {
         try {
-            return dao("Role").read(new DaoParameter());
+            return dao(Role.class.getSimpleName()).read(new DaoParameter());
         } catch (DaoException e) {
             throw new ServiceException("exception.service.role.get-role-list.dao", e.getCause());
         }

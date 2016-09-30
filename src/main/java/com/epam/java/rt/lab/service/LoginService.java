@@ -2,6 +2,7 @@ package com.epam.java.rt.lab.service;
 
 import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.dao.DaoParameter;
+import com.epam.java.rt.lab.dao.sql.Update;
 import com.epam.java.rt.lab.dao.sql.Where;
 import com.epam.java.rt.lab.entity.rbac.Login;
 import org.slf4j.Logger;
@@ -13,6 +14,7 @@ import java.util.List;
  * service-ms
  */
 public class LoginService extends BaseService {
+
     private static final Logger logger = LoggerFactory.getLogger(LoginService.class);
 
     public LoginService()
@@ -22,7 +24,7 @@ public class LoginService extends BaseService {
     public Login getLogin(String email)
             throws ServiceException {
         try {
-            List<Login> loginList = dao("Login").read(new DaoParameter()
+            List<Login> loginList = dao(Login.class.getSimpleName()).read(new DaoParameter()
                     .setWherePredicate(Where.Predicate.get(
                             Login.Property.EMAIL,
                             Where.Predicate.PredicateOperator.EQUAL,
@@ -33,6 +35,23 @@ public class LoginService extends BaseService {
         } catch (DaoException e) {
             e.printStackTrace();
             throw new ServiceException("exception.service.login.get-login.dao", e.getCause());
+        }
+    }
+
+    public int updateAttemptLeft(Login login)
+            throws ServiceException {
+        try {
+            return dao(Login.class.getSimpleName()).update(new DaoParameter()
+                    .setSetValueArray(new Update.SetValue(Login.Property.ATTEMPT_LEFT, login.getAttemptLeft()))
+                    .setWherePredicate(Where.Predicate.get(
+                            Login.Property.ID,
+                            Where.Predicate.PredicateOperator.EQUAL,
+                            login.getId()
+                    ))
+            );
+        } catch (DaoException e) {
+            e.printStackTrace();
+            throw new ServiceException("exception.service.login.update-attempt-left.dao", e.getCause());
         }
     }
 
@@ -48,12 +67,6 @@ public class LoginService extends BaseService {
 //        return dao.update(login, "id", "password.regex");
 //    }
 //
-//    public int updateAttemptLeft(Login login)
-//            throws DaoException, SQLException, ConnectionException {
-//        logger.debug("updateLogin");
-//        Dao_ dao = daoFactory.createDao("Login");
-//        return dao.update(login, "id", "attemptLeft");
-//    }
 //
 //    public boolean isLoginExists(String email) throws DaoException {
 //        Login login = new Login();
