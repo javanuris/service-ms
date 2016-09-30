@@ -153,9 +153,9 @@ public class PostLoginAction implements Action {
                 restore.setCode(UUID.randomUUID().toString());
                 restore.setCookieName(CookieManager.getUserAgentCookieName(req));
                 restore.setCookieValue(HashGenerator.hashString(restore.getCode()));
-                restore.setValid(TimestampCompare.daysToTimestamp(
+                restore.setValid(TimestampCompare.secondsToTimestamp(
                         TimestampCompare.getCurrentTimestamp(),
-                        Integer.valueOf(GlobalProperties.getProperty("forgot.seconds.valid"))
+                        Integer.valueOf(GlobalProperties.getProperty("restore.seconds.valid"))
                 ));
                 if (loginService.addRestore(restore) == 0) {
                     logger.debug("STORING RESTORE CODE FAILED");
@@ -172,10 +172,9 @@ public class PostLoginAction implements Action {
                             req.getContextPath()
                     );
                     req.getSession().setAttribute("restoreEmail", form.getItem(0).getValue());
-                    req.getSession().setAttribute("restoreCode", restore.getCookieValue());
-                    req.getSession().setAttribute("RestoreRef",
-                            UrlManager.getContextRef(req, "/profile/restore", "email, code",
-                                    form.getItem(0).getValue(), restore.getCookieValue()));
+                    req.getSession().setAttribute("restoreRef",
+                            UrlManager.getContextRef(req, "/profile/restore-password", "email, code",
+                                    form.getItem(0).getValue(), restore.getCode()));
                     return true;
                 }
             } catch (Exception e) {
@@ -206,7 +205,6 @@ public class PostLoginAction implements Action {
                     // TODO: need some reaction
                 } else {
                     req.getSession().setAttribute("activationEmail", form.getItem(0).getValue());
-                    req.getSession().setAttribute("activationCode", activate.getCode());
                     req.getSession().setAttribute("activationRef",
                             UrlManager.getContextRef(req, "/profile/activate", "email, code",
                                     form.getItem(0).getValue(), activate.getCode()));

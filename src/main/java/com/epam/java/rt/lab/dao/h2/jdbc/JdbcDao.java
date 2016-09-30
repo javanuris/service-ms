@@ -5,6 +5,9 @@ import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.dao.DaoParameter;
 import com.epam.java.rt.lab.dao.DaoStatement;
 import com.epam.java.rt.lab.dao.sql.Sql;
+import com.epam.java.rt.lab.dao.sql.Where;
+import com.epam.java.rt.lab.entity.BaseEntity;
+import com.epam.java.rt.lab.entity.rbac.Login;
 import com.epam.java.rt.lab.util.StringArray;
 
 import java.io.*;
@@ -119,8 +122,18 @@ public abstract class JdbcDao implements Dao {
     }
 
     @Override
-    public int delete(DaoParameter daoParameter) {
-        return 0;
+    public int delete(DaoParameter daoParameter) throws DaoException {
+        Sql sql = getSqlDelete(daoParameter);
+        try (DaoStatement statement = new DaoStatement(this.connection, sql, Statement.NO_GENERATED_KEYS)) {
+            return statement.executeUpdate();
+        } catch (NoSuchMethodException e) {
+            throw new DaoException("exception.dao.jdbc.delete.statement-method", e.getCause());
+        } catch (SQLException e) {
+            throw new DaoException("exception.dao.jdbc.delete.sql", e.getCause());
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new DaoException("exception.dao.jdbc.delete.close", e.getCause());
+        }
     }
 
     abstract Sql getSqlCreate(DaoParameter daoParameter) throws DaoException;

@@ -52,10 +52,12 @@ public class Insert extends Sql {
                 result.append(COMMA_DELIMITER);
                 values.append(COMMA_DELIMITER);
             }
-            result.append(getColumn(insertValue.entityProperty));
+            result.append(getColumn(insertValue.entityProperty).getColumnName());
             values.append(insertValue.value.makeWildcard());
         }
-        return result.append(values).append(AFTER_VALUES).toString();
+        result.append(values).append(AFTER_VALUES);
+        System.out.println(result);
+        return result.toString();
     }
 
     /**

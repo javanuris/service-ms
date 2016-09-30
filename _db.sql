@@ -23,7 +23,7 @@ insert into "Permission" (uri, action) values ('/', 'Home');
 insert into "Permission" (uri, action) values ('/home', 'Home');
 insert into "Permission" (uri, action) values ('/develop', 'Develop');
 insert into "Permission" (uri, action) values ('/profile/login', 'profile.Login');
-insert into "Permission" (uri, action) values ('/profile/forgot-password', 'profile.ForgotPassword');
+insert into "Permission" (uri, action) values ('/profile/restore-password', 'profile.RestorePassword');
 insert into "Permission" (uri, action) values ('/profile/activate', 'profile.Activate');
 insert into "Permission" (uri, action) values ('/profile/view', 'profile.View');
 insert into "Permission" (uri, action) values ('/profile/reset-password', 'profile.ResetPassword');
@@ -46,7 +46,7 @@ insert into "RolePermission" (role_id, permission_id) values (select id from "Ro
 insert into "RolePermission" (role_id, permission_id) values (select id from "Role" where name is 'anonymous', select id from "Permission" where uri is '/home');
 insert into "RolePermission" (role_id, permission_id) values (select id from "Role" where name is 'anonymous', select id from "Permission" where uri is '/profile/login');
 insert into "RolePermission" (role_id, permission_id) values (select id from "Role" where name is 'anonymous', select id from "Permission" where uri is '/profile/activate');
-insert into "RolePermission" (role_id, permission_id) values (select id from "Role" where name is 'anonymous', select id from "Permission" where uri is '/profile/forgot-password');
+insert into "RolePermission" (role_id, permission_id) values (select id from "Role" where name is 'anonymous', select id from "Permission" where uri is '/profile/restore-password');
 insert into "RolePermission" (role_id, permission_id) values (select id from "Role" where name is 'authorized', select id from "Permission" where uri is '/');
 insert into "RolePermission" (role_id, permission_id) values (select id from "Role" where name is 'authorized', select id from "Permission" where uri is '/home');
 insert into "RolePermission" (role_id, permission_id) values (select id from "Role" where name is 'authorized', select id from "Permission" where uri is '/profile/view');

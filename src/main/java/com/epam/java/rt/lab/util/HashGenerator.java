@@ -26,7 +26,7 @@ public class HashGenerator {
 
     private static String saltedPassword(String salt, String password) {
         StringBuilder saltedPassword = new StringBuilder();
-        for (int i = 0; i < salt.length(); i++)
+        for (int i = 0; i < password.length(); i++)
             saltedPassword.append(password.charAt(i)).append(salt.charAt(i));
         return saltedPassword.append(salt.substring(password.length())).toString();
     }

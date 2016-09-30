@@ -68,6 +68,27 @@ public class LoginService extends BaseService {
         }
     }
 
+    public int updateLoginAfterRestore(Login login)
+            throws ServiceException {
+        try {
+            return dao(Login.class.getSimpleName()).update(new DaoParameter()
+                    .setSetValueArray(
+                            new Update.SetValue(Login.Property.SALT, login.getSalt()),
+                            new Update.SetValue(Login.Property.PASSWORD, login.getPassword()),
+                            new Update.SetValue(Login.Property.ATTEMPT_LEFT, login.getAttemptLeft())
+                    )
+                    .setWherePredicate(Where.Predicate.get(
+                            Login.Property.ID,
+                            Where.Predicate.PredicateOperator.EQUAL,
+                            login.getId()
+                    ))
+            );
+        } catch (DaoException e) {
+            e.printStackTrace();
+            throw new ServiceException("exception.service.login.update-login-after-restore.dao", e.getCause());
+        }
+    }
+
     /**
      *
      * @param restore
@@ -135,6 +156,9 @@ public class LoginService extends BaseService {
             );
             if (restoreList == null || restoreList.size() == 0) return null;
             for (Restore restore : restoreList) {
+                System.out.println(restore.getCode());
+                System.out.println(restore.getCookieName());
+                System.out.println(restore.getCookieValue());
                 if (restore.getCode().equals(restoreCode) &&
                         restore.getCookieName().equals(cookieName) &&
                         restore.getCookieValue().equals(cookieValue)) {
@@ -171,7 +195,7 @@ public class LoginService extends BaseService {
 //
 //    public int updatePassword(Login login)
 //            throws DaoException, SQLException, ConnectionException {
-//        logger.debug("updateLogin");
+//        logger.debug("updateLoginAfterRestore");
 //        Dao_ dao = daoFactory.createDao("Login");
 //        return dao.update(login, "id", "password.regex");
 //    }

@@ -15,11 +15,11 @@
                         <fmt:message bundle="${ui}" key="message.register.link"/>${sessionScope.activationEmail}
                     </a>
                 </c:when>
-                <c:when test="${not empty sessionScope.forgotRef}">
-                    <h2><fmt:message bundle="${ui}" key="message.forgot.header"/></h2>
-                    <h4><fmt:message bundle="${ui}" key="message.forgot.info"/></h4>
-                    <a href="${sessionScope.forgotRef}">
-                        <fmt:message bundle="${ui}" key="message.forgot.link"/>${sessionScope.forgotEmail}
+                <c:when test="${not empty sessionScope.restoreRef}">
+                    <h2><fmt:message bundle="${ui}" key="message.restore.header"/></h2>
+                    <h4><fmt:message bundle="${ui}" key="message.restore.info"/></h4>
+                    <a href="${sessionScope.restoreRef}">
+                        <fmt:message bundle="${ui}" key="message.restore.link"/>${sessionScope.restoreEmail}
                     </a>
                 </c:when>
                 <c:when test="${not empty sessionScope.message}">

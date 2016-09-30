@@ -39,6 +39,13 @@ public class TimestampCompare {
         return Days.daysBetween(localDateTime1, localDateTime2).getDays();
     }
 
+    public static Timestamp secondsToTimestamp(Timestamp timestamp, int seconds) {
+        LocalDateTime localDateTime = timestampToJoda(timestamp);
+        if (seconds > 0) return jodaToTimestamp(localDateTime.plusSeconds(seconds));
+        if (seconds < 0) return jodaToTimestamp(localDateTime.minusSeconds(-seconds));
+        return timestamp;
+    }
+
     public static int secondsBetweenTimestamps(Timestamp timestamp1, Timestamp timestamp2) {
         LocalDateTime localDateTime1 = timestampToJoda(timestamp1);
         LocalDateTime localDateTime2 = timestampToJoda(timestamp2);

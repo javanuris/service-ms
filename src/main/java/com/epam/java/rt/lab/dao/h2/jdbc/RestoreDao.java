@@ -1,11 +1,10 @@
 package com.epam.java.rt.lab.dao.h2.jdbc;
 
+import com.epam.java.rt.lab.dao.Dao;
 import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.dao.DaoParameter;
-import com.epam.java.rt.lab.dao.sql.Column;
-import com.epam.java.rt.lab.dao.sql.Insert;
-import com.epam.java.rt.lab.dao.sql.Select;
-import com.epam.java.rt.lab.dao.sql.Sql;
+import com.epam.java.rt.lab.dao.sql.*;
+import com.epam.java.rt.lab.entity.rbac.Login;
 import com.epam.java.rt.lab.entity.rbac.Restore;
 
 import java.sql.Connection;
@@ -62,6 +61,7 @@ public class RestoreDao extends JdbcDao {
     <T> List<T> getEntity(ResultSet resultSet, Sql sql) throws DaoException {
         Select select = (Select) sql;
         String restoreTableName = Sql.getProperty(Restore.class.getName());
+        String loginTableName = Sql.getProperty(Login.class.getName());
         List<Restore> restoreList = new ArrayList<>();
         try {
             while (resultSet.next()) {
@@ -73,7 +73,21 @@ public class RestoreDao extends JdbcDao {
                         if (restore == null) restore = new Restore();
                         setEntityProperty(column.getTableName(), column.getColumnName(), restore, resultSet.getObject(columnIndex));
                     } else {
-                        // another entity
+                        if (loginTableName.equals(column.getTableName())) {
+                            Long loginId = (Long) resultSet.getObject(columnIndex);
+                            if (loginId != null) {
+                                Dao dao = new LoginDao(getConnection());
+                                List<Login> loginList = dao.read(new DaoParameter()
+                                        .setWherePredicate(Where.Predicate.get(
+                                                Login.Property.ID,
+                                                Where.Predicate.PredicateOperator.EQUAL,
+                                                loginId
+                                        ))
+                                );
+                                if (loginList != null && loginList.size() > 0)
+                                    restore.setLogin(loginList.get(0));
+                            }
+                        }
                     }
                 }
                 restoreList.add(restore);

@@ -21,8 +21,9 @@ public final class GlobalProperties {
                 globalProperties.load(GlobalProperties.class.getClassLoader().getResourceAsStream("global.properties"));
             } catch (IOException e) {
                 e.printStackTrace();
+            } finally {
+                propertiesLock.unlock();
             }
-            propertiesLock.unlock();
         }
     }
 
