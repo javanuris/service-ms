@@ -120,12 +120,7 @@ public class PostLoginAction implements Action {
                         NavigationComponent.getNavbarItemArray(user.getRole()));
                 if (form.getItem(2).getValue() != null) {
                     logger.debug("LOGIN USER REMEMBER");
-                    Remember remember = new Remember();
-                    remember.setCookieName(CookieManager.getUserAgentCookieName(req));
-                    remember.setCookieValue(UUID.randomUUID().toString());
-//                    userService.setRemember(remember);
-                    CookieManager.setCookie(resp, remember.getCookieName(), remember.getCookieValue(),
-                            Integer.valueOf(GlobalProperties.getProperty("remember.days.valid")) * 86400, req.getContextPath());
+                    userService.addRemember(req, resp, user);
                 }
                 return true;
             }
@@ -168,8 +163,7 @@ public class PostLoginAction implements Action {
                             TimestampCompare.secondsBetweenTimestamps(
                                     TimestampCompare.getCurrentTimestamp(),
                                     restore.getValid()
-                            ),
-                            req.getContextPath()
+                            )
                     );
                     req.getSession().setAttribute("restoreEmail", form.getItem(0).getValue());
                     req.getSession().setAttribute("restoreRef",

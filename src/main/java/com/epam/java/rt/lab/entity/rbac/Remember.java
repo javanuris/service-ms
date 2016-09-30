@@ -1,6 +1,7 @@
 package com.epam.java.rt.lab.entity.rbac;
 
 import com.epam.java.rt.lab.entity.BaseEntity;
+import com.epam.java.rt.lab.entity.EntityProperty;
 import org.joda.time.DateTime;
 
 import java.sql.Timestamp;
@@ -13,6 +14,19 @@ public class Remember extends BaseEntity {
     private String cookieName;
     private String cookieValue;
     private Timestamp valid;
+
+    public enum Property implements EntityProperty {
+        ID,
+        USER_ID,
+        COOKIE_NAME,
+        COOKIE_VALUE,
+        VALID;
+
+        @Override
+        public Class getEntityClass() {
+            return Remember.class;
+        }
+    }
 
     public Remember() {
     }

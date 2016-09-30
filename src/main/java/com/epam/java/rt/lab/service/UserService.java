@@ -1,5 +1,6 @@
 package com.epam.java.rt.lab.service;
 
+import com.epam.java.rt.lab.dao.Dao;
 import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.dao.DaoParameter;
 import com.epam.java.rt.lab.dao.sql.Where;
@@ -7,10 +8,15 @@ import com.epam.java.rt.lab.entity.rbac.Login;
 import com.epam.java.rt.lab.entity.rbac.Remember;
 import com.epam.java.rt.lab.entity.rbac.Role;
 import com.epam.java.rt.lab.entity.rbac.User;
+import com.epam.java.rt.lab.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * service-ms
@@ -64,6 +70,102 @@ public class UserService extends BaseService {
             return userList != null && userList.size() > 0 ? userList.get(0) : null;
         } catch (DaoException e) {
             throw new ServiceException("exception.service.user.get-user.dao", e.getCause());
+        }
+    }
+
+    /**
+     *
+     * @param user
+     * @return
+     * @throws ServiceException
+     */
+    public void addRemember(HttpServletRequest req, HttpServletResponse resp, User user)
+            throws ServiceException {
+        try {
+            Remember remember = new Remember();
+            remember.setUser(user);
+            remember.setCookieName(CookieManager.getUserAgentCookieName(req));
+            remember.setCookieValue(HashGenerator.hashString(UUID.randomUUID().toString()));
+            remember.setValid(TimestampCompare.daysToTimestamp(
+                    TimestampCompare.getCurrentTimestamp(),
+                    Integer.valueOf(GlobalProperties.getProperty("remember.days.valid"))
+            ));
+            dao(Remember.class.getSimpleName()).create(new DaoParameter().setEntity(remember));
+            CookieManager.setCookie(
+                    resp,
+                    remember.getCookieName(),
+                    remember.getCookieValue(),
+                    TimestampCompare.secondsBetweenTimestamps(
+                            TimestampCompare.getCurrentTimestamp(),
+                            remember.getValid()
+                    )
+            );
+        } catch (DaoException e) {
+            e.printStackTrace();
+            throw new ServiceException("exception.service.login.add-remember.dao", e.getCause());
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            throw new ServiceException("exception.service.user.add-remember.hash", e.getCause());
+        }
+    }
+
+    /**
+     *
+     * @param user
+     * @return
+     * @throws ServiceException
+     */
+    public int removeUserRemember(User user)
+            throws ServiceException {
+        try {
+            return dao(Remember.class.getSimpleName()).delete(new DaoParameter()
+                    .setWherePredicate(Where.Predicate.get(
+                            Remember.Property.USER_ID,
+                            Where.Predicate.PredicateOperator.EQUAL,
+                            user.getId()
+                    ))
+            );
+        } catch (DaoException e) {
+            e.printStackTrace();
+            throw new ServiceException("exception.service.login.remove-restore-list.dao", e.getCause());
+        }
+    }
+
+    /**
+     *
+     * @param cookieName
+     * @param cookieValue
+     * @return
+     * @throws ServiceException
+     */
+    public User getUserRemember(String cookieName, String cookieValue) throws ServiceException {
+        try {
+            Dao dao = dao(Remember.class.getSimpleName());
+            List<Remember> rememberList = dao.read(new DaoParameter()
+                    .setWherePredicate(Where.Predicate.get(
+                            Where.Predicate.get(
+                                    Remember.Property.COOKIE_NAME,
+                                    Where.Predicate.PredicateOperator.EQUAL,
+                                    cookieName
+                            ),
+                            Where.Predicate.PredicateOperator.AND,
+                            Where.Predicate.get(
+                                    Remember.Property.COOKIE_VALUE,
+                                    Where.Predicate.PredicateOperator.EQUAL,
+                                    cookieValue
+                            )
+                    ))
+            );
+            if (rememberList == null || rememberList.size() == 0) return null;
+            User user = rememberList.get(0).getUser();
+            removeUserRemember(user);
+            if (TimestampCompare.secondsBetweenTimestamps(
+                    TimestampCompare.getCurrentTimestamp(), rememberList.get(0).getValid()) < 0)
+                return null;
+            return user;
+        } catch (DaoException e) {
+            e.printStackTrace();
+            throw new ServiceException("exception.service.user.get-user-remember.dao", e.getCause());
         }
     }
 

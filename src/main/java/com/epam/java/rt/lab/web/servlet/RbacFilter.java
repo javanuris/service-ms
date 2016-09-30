@@ -1,11 +1,11 @@
 package com.epam.java.rt.lab.web.servlet;
 
-import com.epam.java.rt.lab.web.component.NavigationComponent;
-import com.epam.java.rt.lab.entity.rbac.Remember;
 import com.epam.java.rt.lab.entity.rbac.User;
 import com.epam.java.rt.lab.service.ServiceException;
 import com.epam.java.rt.lab.service.UserService;
-import com.epam.java.rt.lab.util.*;
+import com.epam.java.rt.lab.util.CookieManager;
+import com.epam.java.rt.lab.util.UrlManager;
+import com.epam.java.rt.lab.web.component.NavigationComponent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,6 +31,7 @@ public class RbacFilter implements Filter {
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)
             throws IOException, ServletException {
+
         logger.debug("RbacFilter");
         try (UserService userService = new UserService();) {
             HttpServletRequest req = (HttpServletRequest) servletRequest;
@@ -41,15 +42,17 @@ public class RbacFilter implements Filter {
                 String rememberCookieName = CookieManager.getUserAgentCookieName(req);
                 String rememberCookieValue = CookieManager.getCookieValue(req, rememberCookieName);
                 if (rememberCookieValue != null) {
-                    Remember remember = userService.getRemember(rememberCookieName, rememberCookieValue);
-                    if (remember != null) {
-                        userId = remember.getUser().getId();
-                        req.getSession().setAttribute("userId", userId);
-                        req.getSession().setAttribute("userName", remember.getUser().getName());
-                        req.getSession().setAttribute("navbarItemArray",
-                                NavigationComponent.getNavbarItemArray(remember.getUser().getRole()));
-                    } else {
+                    user = userService.getUserRemember(rememberCookieName, rememberCookieValue);
+                    if (user == null) {
                         CookieManager.removeCookie(req, (HttpServletResponse) servletResponse, rememberCookieName);
+                    } else {
+                        logger.debug("USER DEFINED: {}", user.getName());
+                        userId = user.getId();
+                        req.getSession().setAttribute("userId", userId);
+                        req.getSession().setAttribute("userName", user.getName());
+                        req.getSession().setAttribute("navbarItemArray",
+                                NavigationComponent.getNavbarItemArray(user.getRole()));
+                        userService.addRemember(req, (HttpServletResponse) servletResponse, user);
                     }
                 }
             }

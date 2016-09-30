@@ -6,6 +6,7 @@ import com.epam.java.rt.lab.dao.sql.Update;
 import com.epam.java.rt.lab.dao.sql.Where;
 import com.epam.java.rt.lab.entity.rbac.Activate;
 import com.epam.java.rt.lab.entity.rbac.Login;
+import com.epam.java.rt.lab.entity.rbac.Remember;
 import com.epam.java.rt.lab.entity.rbac.Restore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,6 +69,12 @@ public class LoginService extends BaseService {
         }
     }
 
+    /**
+     *
+     * @param login
+     * @return
+     * @throws ServiceException
+     */
     public int updateLoginAfterRestore(Login login)
             throws ServiceException {
         try {
@@ -156,9 +163,6 @@ public class LoginService extends BaseService {
             );
             if (restoreList == null || restoreList.size() == 0) return null;
             for (Restore restore : restoreList) {
-                System.out.println(restore.getCode());
-                System.out.println(restore.getCookieName());
-                System.out.println(restore.getCookieValue());
                 if (restore.getCode().equals(restoreCode) &&
                         restore.getCookieName().equals(cookieName) &&
                         restore.getCookieValue().equals(cookieValue)) {

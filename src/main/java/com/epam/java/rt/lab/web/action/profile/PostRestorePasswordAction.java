@@ -42,7 +42,7 @@ public class PostRestorePasswordAction implements Action {
                     login.setPassword(HashGenerator.hashPassword(login.getSalt(), form.getItem(0).getValue()));
                     login.setAttemptLeft(Integer.valueOf(GlobalProperties.getProperty("login.attempt.max")));
                     loginService.updateLoginAfterRestore(login);
-                    resp.sendRedirect(UrlManager.getContextUri(req, "/home"));
+                    resp.sendRedirect(UrlManager.getContextUri(req, "/profile/login"));
                     return;
                 }
             }
