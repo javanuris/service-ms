@@ -1,6 +1,7 @@
 package com.epam.java.rt.lab.dao.sql;
 
 import com.epam.java.rt.lab.dao.DaoException;
+import com.epam.java.rt.lab.entity.BaseEntity;
 import com.epam.java.rt.lab.entity.EntityProperty;
 import com.epam.java.rt.lab.util.GlobalProperties;
 import com.epam.java.rt.lab.util.StringArray;
@@ -68,7 +69,7 @@ public abstract class Sql {
         return new Column(tableName, columnName);
     }
 
-    private static List<Column> getColumnList(String[] tableAndColumnArray)
+    static List<Column> getColumnList(String[] tableAndColumnArray)
             throws DaoException {
         List<Column> columnList = new ArrayList<>();
         for (String tableAndColumn : tableAndColumnArray)
@@ -78,8 +79,16 @@ public abstract class Sql {
 
     // base clauses
 
-    public static Insert insert() {
-        return new Insert();
+    /**
+     *
+     * @param entity
+     * @return
+     * @throws DaoException
+     */
+    public static Insert insert(BaseEntity entity) throws DaoException {
+        if (entity == null)
+            throw new DaoException("exception.dao.sql.insert.null-entity-class");
+        return new Insert(entity);
     }
 
     /**
@@ -117,11 +126,15 @@ public abstract class Sql {
     }
 
     public static Update update(Class entityClass) throws DaoException {
+        if (entityClass == null)
+            throw new DaoException("exception.dao.sql.update.null-entity-class");
         return new Update(entityClass);
     }
 
-    public static Delete delete() {
-        return new Delete();
+    public static Delete delete(Class entityClass) throws DaoException {
+        if (entityClass == null)
+            throw new DaoException("exception.dao.sql.delete.null-entity-class");
+        return new Delete(entityClass);
     }
 
     // resulting methods

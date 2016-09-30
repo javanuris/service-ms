@@ -17,7 +17,7 @@ public class Restore extends BaseEntity {
 
     public enum Property implements EntityProperty {
         ID,
-        LOGIN,
+        LOGIN_ID,
         CODE,
         COOKIE_NAME,
         COOKIE_VALUE,

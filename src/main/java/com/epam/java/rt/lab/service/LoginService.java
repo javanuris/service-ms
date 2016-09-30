@@ -4,7 +4,9 @@ import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.dao.DaoParameter;
 import com.epam.java.rt.lab.dao.sql.Update;
 import com.epam.java.rt.lab.dao.sql.Where;
+import com.epam.java.rt.lab.entity.rbac.Activate;
 import com.epam.java.rt.lab.entity.rbac.Login;
+import com.epam.java.rt.lab.entity.rbac.Restore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,6 +23,11 @@ public class LoginService extends BaseService {
             throws ServiceException {
     }
 
+    /**
+     * @param email
+     * @return
+     * @throws ServiceException
+     */
     public Login getLogin(String email)
             throws ServiceException {
         try {
@@ -38,6 +45,12 @@ public class LoginService extends BaseService {
         }
     }
 
+    /**
+     *
+     * @param login
+     * @return
+     * @throws ServiceException
+     */
     public int updateAttemptLeft(Login login)
             throws ServiceException {
         try {
@@ -54,6 +67,102 @@ public class LoginService extends BaseService {
             throw new ServiceException("exception.service.login.update-attempt-left.dao", e.getCause());
         }
     }
+
+    /**
+     *
+     * @param restore
+     * @return
+     * @throws ServiceException
+     */
+    public int addRestore(Restore restore)
+            throws ServiceException {
+        try {
+            return dao(Restore.class.getSimpleName()).create(new DaoParameter()
+                    .setEntity(restore)
+            );
+        } catch (DaoException e) {
+            e.printStackTrace();
+            throw new ServiceException("exception.service.login.add-restore.dao", e.getCause());
+        }
+    }
+
+    /**
+     *
+     * @param restoreList
+     * @return
+     * @throws ServiceException
+     */
+    public int removeRestoreList(List<Restore> restoreList)
+            throws ServiceException {
+        try {
+            int result = 0;
+            for (Restore restore : restoreList) {
+                result += dao(Restore.class.getSimpleName()).delete(new DaoParameter()
+                        .setWherePredicate(Where.Predicate.get(
+                                Restore.Property.ID,
+                                Where.Predicate.PredicateOperator.EQUAL,
+                                restore.getId()
+                        ))
+                );
+            }
+            return result;
+        } catch (DaoException e) {
+            e.printStackTrace();
+            throw new ServiceException("exception.service.login.remove-restore-list.dao", e.getCause());
+        }
+    }
+
+    /**
+     *
+     * @param restoreEmail
+     * @param restoreCode
+     * @param cookieName
+     * @param cookieValue
+     * @return
+     * @throws ServiceException
+     */
+    public Login getRestoreLogin(String restoreEmail, String restoreCode, String cookieName, String cookieValue)
+            throws ServiceException {
+        try {
+            Login login = getLogin(restoreEmail);
+            if (login == null) return null;
+            List<Restore> restoreList = dao(Restore.class.getSimpleName()).read(new DaoParameter()
+                    .setWherePredicate(Where.Predicate.get(
+                            Restore.Property.LOGIN_ID,
+                            Where.Predicate.PredicateOperator.EQUAL,
+                            login.getId()
+                    ))
+            );
+            if (restoreList == null || restoreList.size() == 0) return null;
+            for (Restore restore : restoreList) {
+                if (restore.getCode().equals(restoreCode) &&
+                        restore.getCookieName().equals(cookieName) &&
+                        restore.getCookieValue().equals(cookieValue)) {
+                    removeRestoreList(restoreList);
+                    return login;
+                }
+            }
+            removeRestoreList(restoreList);
+            return null;
+        } catch (DaoException e) {
+            e.printStackTrace();
+            throw new ServiceException("exception.service.login.get-restore-login.dao", e.getCause());
+        }
+    }
+
+    public int addActivate(Activate activate)
+            throws ServiceException {
+        try {
+            return dao(Activate.class.getSimpleName()).create(new DaoParameter()
+                    .setEntity(activate)
+            );
+        } catch (DaoException e) {
+            e.printStackTrace();
+            throw new ServiceException("exception.service.login.add-activate.dao", e.getCause());
+        }
+    }
+
+
 
 //    public int addLogin(Login login) throws DaoException {
 //        Dao_ dao = daoFactory.createDao("Login");
@@ -127,35 +236,4 @@ public class LoginService extends BaseService {
 //        return login;
 //    }
 //
-//    public void setForgotCode(String email, String code) throws DaoException {
-//        try {
-//            Login login = new Login();
-//            login.setEmail(email);
-//            setRelEntity(login, "Forgot", code);
-//        } catch (DaoException e) {
-//            e.printStackTrace();
-//            throw e;
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
-//
-//    public Login confirmForgotCode(String forgotEmail, String forgotCode) throws DaoException {
-//        if (forgotEmail == null || forgotCode == null) return null;
-//        Login login = new Login();
-//        login.setEmail(forgotEmail);
-//        Map<String, Object> forgotMap = getRelEntity(login, "Forgot");
-//        if (forgotMap == null || !forgotCode.equals(forgotMap.get("code")) ||
-//                TimestampCompare.secondsBetweenTimestamps(TimestampCompare.getCurrentTimestamp(),
-//                        (Timestamp) forgotMap.get("valid")) <= 0) return null;
-//        return getLogin(forgotEmail);
-//    }
-//
-//    public void removeForgotCode(String forgotEmail) throws DaoException {
-//        if (forgotEmail != null) {
-//            Login login = new Login();
-//            login.setEmail(forgotEmail);
-//            removeRelEntity(login, "Forgot");
-//        }
-//    }
 }

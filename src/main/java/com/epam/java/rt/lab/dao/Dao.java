@@ -7,12 +7,12 @@ import java.util.List;
  */
 public interface Dao {
 
-    int create(DaoParameter daoParameter);
+    int create(DaoParameter daoParameter) throws DaoException;
 
     <T> List<T> read(DaoParameter daoParameter) throws DaoException;
 
     int update(DaoParameter daoParameter) throws DaoException;
 
-    int delete(DaoParameter daoParameter);
+    int delete(DaoParameter daoParameter) throws DaoException;
 
 }

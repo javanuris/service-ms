@@ -1,15 +1,10 @@
 package com.epam.java.rt.lab.web.action.profile;
 
-import com.epam.java.rt.lab.entity.rbac.Login;
-import com.epam.java.rt.lab.entity.rbac.Remember;
-import com.epam.java.rt.lab.entity.rbac.User;
+import com.epam.java.rt.lab.entity.rbac.*;
 import com.epam.java.rt.lab.service.LoginService;
 import com.epam.java.rt.lab.service.ServiceException;
 import com.epam.java.rt.lab.service.UserService;
-import com.epam.java.rt.lab.util.CookieManager;
-import com.epam.java.rt.lab.util.GlobalProperties;
-import com.epam.java.rt.lab.util.HashGenerator;
-import com.epam.java.rt.lab.util.UrlManager;
+import com.epam.java.rt.lab.util.*;
 import com.epam.java.rt.lab.util.validator.FormValidator;
 import com.epam.java.rt.lab.web.action.Action;
 import com.epam.java.rt.lab.web.action.ActionException;
@@ -27,6 +22,8 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 import java.util.UUID;
+
+import static com.epam.java.rt.lab.util.HashGenerator.hashPassword;
 
 /**
  * Service Management System
@@ -65,7 +62,16 @@ public class PostLoginAction implements Action {
                         break;
                     case FORGOT:
                         logger.debug("SUBMIT-FORGOT");
-                        if (forgot(req, resp, form, loginService, login)) {
+                        if (restore(req, resp, form, loginService, login)) {
+                            logger.debug("REDIRECT TO {}", "/home");
+                            resp.sendRedirect(UrlManager.getContextUri(req, "/home"));
+                            return;
+                        }
+                        break;
+                    case REGISTER:
+                        logger.debug("SUBMIT-REGISTER");
+                        if (register(req, resp, form, loginService, login)) {
+                            logger.debug("REDIRECT TO {}", "/home");
                             resp.sendRedirect(UrlManager.getContextUri(req, "/home"));
                             return;
                         }
@@ -74,15 +80,9 @@ public class PostLoginAction implements Action {
             }
             req.setAttribute("loginForm", form);
             req.getRequestDispatcher("/WEB-INF/jsp/profile/login.jsp").forward(req, resp);
-//        } catch (ConnectionException | DaoException e) {
-//            e.printStackTrace();
-//            throw new ActionException("exception.action.login.login-service", e.getCause());
         } catch (ServletException | IOException e) {
             e.printStackTrace();
             throw new ActionException("exception.action.login.forward", e.getCause());
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//            throw new ActionException("exception.action.login.update", e.getCause());
         } catch (FormException e) {
             e.printStackTrace();
             throw new ActionException("exception.action.profile.login.form", e.getCause());
@@ -90,29 +90,6 @@ public class PostLoginAction implements Action {
             e.printStackTrace();
             throw new ActionException();
         }
-
-
-//                } else if (req.getParameter(form.getItem(4).getPlaceholder()) != null) {
-//                    logger.debug("SUBMIT-FORGOT");
-
-
-//                } else if (req.getParameter(form.getItem(5).getPlaceholder()) != null) {
-//                    logger.debug("SUBMIT-REGISTER");
-//                    if (loginService.isLoginExists(form.getItem(0).getValue())) {
-//                        logger.debug("EMAIL EXISTS ERROR");
-//                        String[] validationMessageArray = {"profile.login.email.error-exists-register"};
-//                        form.getItem(0).setValidationMessageArray(validationMessageArray);
-//                    } else {
-//                        String activationCode = loginService.createActivationCode
-//                                (form.getItem(0).getValue(), form.getItem(1).getValue());
-//                        req.getSession().setAttribute("activationEmail", form.getItem(0).getValue());
-//                        req.getSession().setAttribute("activationCode", activationCode);
-//                        req.getSession().setAttribute("activationRef",
-//                                UrlManager.getContextRef(req, "/profile/activate", "email, code",
-//                                        form.getItem(0).getValue(), activationCode));
-//                        resp.sendRedirect(UrlManager.getContextUri(req, "/home"));
-//                        return;
-//                    }
     }
 
     private boolean login(HttpServletRequest req, HttpServletResponse resp, Form form, LoginService loginService, Login login)
@@ -124,7 +101,7 @@ public class PostLoginAction implements Action {
             } else if (login.getAttemptLeft() == 0 || login.getStatus() < 0) {
                 logger.debug("LOGIN ZERO ATTEMPT LEFT OR BLOCKED");
                 form.getItem(3).addValidationMessage("form.submit-login.error-blocked");
-            } else if (!HashGenerator.compareHashToSource(login.getPassword(), form.getItem(1).getValue())) {
+            } else if (!hashPassword(login.getSalt(), form.getItem(1).getValue()).equals(login.getPassword())) {
                 logger.debug("LOGIN PASSWORD HASH NOT EQUAL");
                 form.getItem(3).addValidationMessage("form.submit-login.error-denied");
                 login.setAttemptLeft(login.getAttemptLeft() - 1);
@@ -132,7 +109,7 @@ public class PostLoginAction implements Action {
             } else {
                 logger.debug("LOGIN PASSWORD EQUAL");
                 login.setAttemptLeft(Integer.valueOf(GlobalProperties.getProperty("login.attempt.max")));
-//                loginService.updateAttemptLeft(login);
+                loginService.updateAttemptLeft(login);
                 UserService userService = new UserService();
                 User user = userService.getUser(login);
                 if (user == null)
@@ -160,31 +137,88 @@ public class PostLoginAction implements Action {
         }
     }
 
-    private boolean forgot(HttpServletRequest req, HttpServletResponse resp, Form form, LoginService loginService, Login login)
+    private boolean restore(HttpServletRequest req, HttpServletResponse resp, Form form, LoginService loginService, Login login)
             throws ActionException{
         if (login == null) {
             logger.debug("EMAIL NOT EXISTS");
-            form.getItem(0).addValidationMessage("profile.login.email.error-exists-forgot");
+            form.getItem(0).addValidationMessage("profile.login.email.error-exists-restore");
         } else if (login.getAttemptLeft() == 0 && login.getStatus() < 0) {
             logger.debug("LOGIN ZERO ATTEMPT LEFT OR BLOCKED");
-            form.getItem(0).addValidationMessage("profile.login.email.error-block-forgot");
+            form.getItem(0).addValidationMessage("profile.login.email.error-block-restore");
         } else {
-            logger.debug("FORGOT ACCEPTED");
+            logger.debug("RESTORE ACCEPTED");
             try {
-                String forgotCookieName = CookieManager.getUserAgentCookieName(req);
-                String forgotCookieValue = HashGenerator.hashString(UUID.randomUUID().toString());
-//                    loginService.setForgotCode(form.getItem(0).getValue(), forgotCookieValue);
-                CookieManager.setCookie(resp, forgotCookieName, forgotCookieValue,
-                        Integer.valueOf(GlobalProperties.getProperty("forgot.seconds.valid")), req.getContextPath());
-                req.getSession().setAttribute("forgotEmail", form.getItem(0).getValue());
-                req.getSession().setAttribute("forgotCode", forgotCookieValue);
-                req.getSession().setAttribute("forgotRef",
-                        UrlManager.getContextRef(req, "/profile/forgot-password", "email, code",
-                                form.getItem(0).getValue(), forgotCookieValue));
-                return true;
+                Restore restore = new Restore();
+                restore.setLogin(login);
+                restore.setCode(UUID.randomUUID().toString());
+                restore.setCookieName(CookieManager.getUserAgentCookieName(req));
+                restore.setCookieValue(HashGenerator.hashString(restore.getCode()));
+                restore.setValid(TimestampCompare.daysToTimestamp(
+                        TimestampCompare.getCurrentTimestamp(),
+                        Integer.valueOf(GlobalProperties.getProperty("forgot.seconds.valid"))
+                ));
+                if (loginService.addRestore(restore) == 0) {
+                    logger.debug("STORING RESTORE CODE FAILED");
+                    // TODO: need some reaction
+                } else {
+                    CookieManager.setCookie(
+                            resp,
+                            restore.getCookieName(),
+                            restore.getCookieValue(),
+                            TimestampCompare.secondsBetweenTimestamps(
+                                    TimestampCompare.getCurrentTimestamp(),
+                                    restore.getValid()
+                            ),
+                            req.getContextPath()
+                    );
+                    req.getSession().setAttribute("restoreEmail", form.getItem(0).getValue());
+                    req.getSession().setAttribute("restoreCode", restore.getCookieValue());
+                    req.getSession().setAttribute("RestoreRef",
+                            UrlManager.getContextRef(req, "/profile/restore", "email, code",
+                                    form.getItem(0).getValue(), restore.getCookieValue()));
+                    return true;
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        }
+        return false;
+    }
+
+    private boolean register(HttpServletRequest req, HttpServletResponse resp, Form form, LoginService loginService, Login login)
+            throws ActionException {
+        try {
+            if (login != null) {
+                logger.debug("EMAIL ALREADY EXISTS");
+                form.getItem(0).addValidationMessage("profile.login.email.error-exists-register");
+            } else {
+                logger.debug("ACTIVATE ACCEPTED");
+                Activate activate = new Activate();
+                activate.setEmail(form.getItem(0).getValue());
+                activate.setSalt(UUID.randomUUID().toString());
+                activate.setPassword(HashGenerator.hashPassword(activate.getSalt(), form.getItem(1).getValue()));
+                activate.setCode(UUID.randomUUID().toString());
+                activate.setValid(TimestampCompare.daysToTimestamp(
+                        TimestampCompare.getCurrentTimestamp(),
+                        Integer.valueOf(GlobalProperties.getProperty("activation.days.valid"))));
+                if (loginService.addActivate(activate) == 0) {
+                    logger.debug("STORING ACTIVATE CODE FAILED");
+                    // TODO: need some reaction
+                } else {
+                    req.getSession().setAttribute("activationEmail", form.getItem(0).getValue());
+                    req.getSession().setAttribute("activationCode", activate.getCode());
+                    req.getSession().setAttribute("activationRef",
+                            UrlManager.getContextRef(req, "/profile/activate", "email, code",
+                                    form.getItem(0).getValue(), activate.getCode()));
+                    return true;
+                }
+            }
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            throw new ActionException("exception.action.post-login.hash", e.getCause());
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            throw new ActionException("exception.action.post-login.activate", e.getCause());
         }
         return false;
     }

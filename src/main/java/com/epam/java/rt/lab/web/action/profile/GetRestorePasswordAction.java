@@ -11,8 +11,8 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * service-ms
  */
-public class GetForgotPasswordAction implements Action {
-    private static final Logger logger = LoggerFactory.getLogger(GetForgotPasswordAction.class);
+public class GetRestorePasswordAction implements Action {
+    private static final Logger logger = LoggerFactory.getLogger(GetRestorePasswordAction.class);
 
     @Override
     public void execute(HttpServletRequest req, HttpServletResponse resp) throws ActionException {

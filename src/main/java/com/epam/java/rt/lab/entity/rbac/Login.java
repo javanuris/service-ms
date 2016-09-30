@@ -11,6 +11,7 @@ public class Login extends BaseEntity {
     public enum Property implements EntityProperty {
         ID,
         EMAIL,
+        SALT,
         PASSWORD,
         ATTEMPT_LEFT,
         STATUS;
@@ -23,6 +24,7 @@ public class Login extends BaseEntity {
     }
 
     private String email;
+    private String salt;
     private String password;
     private int attemptLeft;
     private int status;
@@ -30,9 +32,10 @@ public class Login extends BaseEntity {
     public Login() {
     }
 
-    public Login(Long id, String email, String password, int attemptLeft, int status) {
+    public Login(Long id, String email, String salt, String password, int attemptLeft, int status) {
         super(id);
         this.email = email;
+        this.salt = salt;
         this.password = password;
         this.attemptLeft = attemptLeft;
         this.status = status;
@@ -44,6 +47,14 @@ public class Login extends BaseEntity {
 
     public void setId(Long id) {
         super.setId(id);
+    }
+
+    public String getSalt() {
+        return salt;
+    }
+
+    public void setSalt(String salt) {
+        this.salt = salt;
     }
 
     public String getEmail() {

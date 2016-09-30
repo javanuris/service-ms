@@ -38,6 +38,8 @@ public class Update extends Sql {
     }
 
     public Update where(Where.Predicate predicate) throws DaoException {
+        if (predicate == null)
+            throw new DaoException("exception.dao.sql.update.empty-predicate");
         this.where = new Where(null, predicate);
         this.where.linkWildValue(getWildValueList());
         return this;
@@ -46,9 +48,11 @@ public class Update extends Sql {
     @Override
     public String create() throws DaoException {
         try {
-            StringBuilder result = this.set.appendClause(new StringBuilder().append(UPDATE).append(table));
-            if (this.where != null) this.where.appendClause(result);
-            return result.toString();
+            return this.where.appendClause(
+                    this.set.appendClause(
+                            new StringBuilder().append(UPDATE).append(table)
+                    )
+            ).toString();
         } catch (Exception e) {
             e.printStackTrace();
             throw new DaoException("exception.dao.sql.update.combine", e.getCause());

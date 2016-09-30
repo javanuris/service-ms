@@ -74,8 +74,18 @@ public abstract class JdbcDao implements Dao {
     }
 
     @Override
-    public int create(DaoParameter daoParameter) {
-        return 0;
+    public int create(DaoParameter daoParameter) throws DaoException {
+        Sql sql = getSqlCreate(daoParameter);
+        try (DaoStatement statement = new DaoStatement(this.connection, sql, Statement.NO_GENERATED_KEYS)) {
+            return statement.executeUpdate();
+        } catch (NoSuchMethodException e) {
+            throw new DaoException("exception.dao.jdbc.create.statement-method", e.getCause());
+        } catch (SQLException e) {
+            throw new DaoException("exception.dao.jdbc.create.sql", e.getCause());
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new DaoException("exception.dao.jdbc.create.close", e.getCause());
+        }
     }
 
     @Override
@@ -113,13 +123,13 @@ public abstract class JdbcDao implements Dao {
         return 0;
     }
 
-    abstract Sql getSqlCreate(DaoParameter daoParameter);
+    abstract Sql getSqlCreate(DaoParameter daoParameter) throws DaoException;
 
     abstract Sql getSqlRead(DaoParameter daoParameter) throws DaoException;
 
     abstract Sql getSqlUpdate(DaoParameter daoParameter) throws DaoException;
 
-    abstract Sql getSqlDelete(DaoParameter daoParameter);
+    abstract Sql getSqlDelete(DaoParameter daoParameter) throws DaoException;
 
     abstract <T> List<T> getEntity(ResultSet resultSet, Sql sql) throws DaoException;
 

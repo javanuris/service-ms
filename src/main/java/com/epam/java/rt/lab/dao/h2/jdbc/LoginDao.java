@@ -24,7 +24,7 @@ public class LoginDao extends JdbcDao {
     }
 
     @Override
-    Sql getSqlCreate(DaoParameter daoParameter) {
+    Sql getSqlCreate(DaoParameter daoParameter) throws DaoException {
         return null;
     }
 

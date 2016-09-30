@@ -9,6 +9,7 @@ import java.sql.Timestamp;
  */
 public class Activate extends BaseEntity {
     private String email;
+    private String salt;
     private String password;
     private String code;
     private Timestamp valid;
@@ -16,9 +17,10 @@ public class Activate extends BaseEntity {
     public Activate() {
     }
 
-    public Activate(Long id, String email, String password, String code, Timestamp valid) {
+    public Activate(Long id, String email, String salt, String password, String code, Timestamp valid) {
         super(id);
         this.email = email;
+        this.salt = salt;
         this.password = password;
         this.code = code;
         this.valid = valid;
@@ -38,6 +40,14 @@ public class Activate extends BaseEntity {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getSalt() {
+        return salt;
+    }
+
+    public void setSalt(String salt) {
+        this.salt = salt;
     }
 
     public String getPassword() {
