@@ -41,7 +41,7 @@ public class NavigationFactory {
         String label = ".label";
         String subNavs = ".navs";
         try {
-            properties.load(NavigationFactory.class.getClassLoader().getResourceAsStream("navigation.properties"));
+            properties.load(NavigationFactory.class.getClassLoader().getResourceAsStream("nav.properties"));
             List<Navigation> navigationList = new ArrayList<>();
             for (String navigationName : StringArray.splitSpaceLessNames(properties.getProperty(navs), comma)) {
                 Navigation navigation = new Navigation(
@@ -71,7 +71,7 @@ public class NavigationFactory {
             }
         } catch (IOException e) {
             e.printStackTrace();
-            throw new NavigationException("exception.component.navigation.properties", e.getCause());
+            throw new NavigationException("exception.component.nav.properties", e.getCause());
         } catch (ServiceException e) {
             e.printStackTrace();
             throw new NavigationException("exception.component.navigation.service", e.getCause());
