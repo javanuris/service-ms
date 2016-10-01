@@ -1,6 +1,9 @@
 package com.epam.java.rt.lab.web.action.profile;
 
-import com.epam.java.rt.lab.entity.rbac.*;
+import com.epam.java.rt.lab.entity.rbac.Activate;
+import com.epam.java.rt.lab.entity.rbac.Login;
+import com.epam.java.rt.lab.entity.rbac.Restore;
+import com.epam.java.rt.lab.entity.rbac.User;
 import com.epam.java.rt.lab.service.LoginService;
 import com.epam.java.rt.lab.service.ServiceException;
 import com.epam.java.rt.lab.service.UserService;
@@ -8,10 +11,11 @@ import com.epam.java.rt.lab.util.*;
 import com.epam.java.rt.lab.util.validator.FormValidator;
 import com.epam.java.rt.lab.web.action.Action;
 import com.epam.java.rt.lab.web.action.ActionException;
-import com.epam.java.rt.lab.web.component.NavigationComponent;
 import com.epam.java.rt.lab.web.component.form.Form;
 import com.epam.java.rt.lab.web.component.form.FormException;
 import com.epam.java.rt.lab.web.component.form.FormFactory;
+import com.epam.java.rt.lab.web.component.navigation.NavigationException;
+import com.epam.java.rt.lab.web.component.navigation.NavigationFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,9 +43,8 @@ public class PostLoginAction implements Action {
 
     @Override
     public void execute(HttpServletRequest req, HttpServletResponse resp) throws ActionException {
-        try (LoginService loginService = new LoginService();
-             UserService userService = new UserService()) {
-            Form form = FormFactory.create("login-profile");
+        try (LoginService loginService = new LoginService()) {
+            Form form = FormFactory.getInstance().create("login-profile");
             Submit submit = req.getParameter(form.getItem(3).getName()) != null ? Submit.LOGIN :
                     req.getParameter(form.getItem(4).getName()) != null ? Submit.FORGOT :
                             req.getParameter(form.getItem(5).getName()) != null ? Submit.REGISTER : null;
@@ -114,10 +117,9 @@ public class PostLoginAction implements Action {
                 User user = userService.getUser(login);
                 if (user == null)
                     throw new ActionException("exception.action.profile.login.user");
-                req.getSession().setAttribute("userId", user.getId());
-                req.getSession().setAttribute("userName", user.getName());
-                req.getSession().setAttribute("navbarItemArray",
-                        NavigationComponent.getNavbarItemArray(user.getRole()));
+                req.getSession().setAttribute("user", user);
+                req.getSession().setAttribute("navigationList",
+                        NavigationFactory.getInstance().create(user.getRole().getName()));
                 if (form.getItem(2).getValue() != null) {
                     logger.debug("LOGIN USER REMEMBER");
                     userService.addRemember(req, resp, user);
@@ -129,6 +131,9 @@ public class PostLoginAction implements Action {
             throw new ActionException("exception.action.post-login.login.hash", e.getCause());
         } catch (ServiceException e) {
             throw new ActionException("exception.action.post-login.service", e.getCause());
+        } catch (NavigationException e) {
+            e.printStackTrace();
+            throw new ActionException("exception.action.post-login.navigation", e.getCause());
         }
     }
 

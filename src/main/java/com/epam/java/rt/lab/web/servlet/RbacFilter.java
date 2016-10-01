@@ -5,7 +5,6 @@ import com.epam.java.rt.lab.service.ServiceException;
 import com.epam.java.rt.lab.service.UserService;
 import com.epam.java.rt.lab.util.CookieManager;
 import com.epam.java.rt.lab.util.UrlManager;
-import com.epam.java.rt.lab.web.component.NavigationComponent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,9 +34,8 @@ public class RbacFilter implements Filter {
         logger.debug("RbacFilter");
         try (UserService userService = new UserService();) {
             HttpServletRequest req = (HttpServletRequest) servletRequest;
-            Long userId = (Long) req.getSession().getAttribute("userId");
-            User user = null;
-            if (userId == null) {
+            User user = (User) req.getSession().getAttribute("user");
+            if (user == null) {
                 logger.debug("TRYING TO GET USER FROM COOKIE");
                 String rememberCookieName = CookieManager.getUserAgentCookieName(req);
                 String rememberCookieValue = CookieManager.getCookieValue(req, rememberCookieName);
@@ -48,16 +46,12 @@ public class RbacFilter implements Filter {
                                 rememberCookieName, UrlManager.getContextUri(req, ""));
                     } else {
                         logger.debug("USER DEFINED: {}", user.getName());
-                        userId = user.getId();
-                        req.getSession().setAttribute("userId", userId);
-                        req.getSession().setAttribute("userName", user.getName());
-                        req.getSession().setAttribute("navbarItemArray",
-                                NavigationComponent.getNavbarItemArray(user.getRole()));
+                        req.getSession().setAttribute("user", user);
                         userService.addRemember(req, (HttpServletResponse) servletResponse, user);
                     }
                 }
             }
-            if (userId == null) {
+            if (user == null) {
                 logger.debug("ANONYMOUS URI = {}", userService.getAnonymous().getRole().getUriList());
                 if (userService.getAnonymous().getRole().getUriList().contains(req.getPathInfo())) {
                     logger.debug("CONTAINS {}", req.getPathInfo());
@@ -71,7 +65,6 @@ public class RbacFilter implements Filter {
                     resp.sendRedirect(UrlManager.getContextUri(req, "/profile/login", parameterMap));
                 }
             } else {
-                if (user == null) user = userService.getUser(userId);
                 if (user.getRole().getUriList().contains(req.getPathInfo())) {
                     disableCacheForAccessSensitive((HttpServletResponse) servletResponse);
                     filterChain.doFilter(servletRequest, servletResponse);

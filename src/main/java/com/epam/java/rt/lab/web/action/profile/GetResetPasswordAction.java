@@ -20,19 +20,19 @@ public class GetResetPasswordAction implements Action {
 
     @Override
     public void execute(HttpServletRequest req, HttpServletResponse resp) throws ActionException {
-        try (LoginService loginService = new LoginService();
-             UserService userService = new UserService()) {
-            Long userId = (Long) req.getSession().getAttribute("userId");
-            User user = userService.getUser(userId);
-                if (user != null) {
-
-                }
-            }
-            resp.sendRedirect();
-        } catch (ServiceException e) {
-            e.printStackTrace();
-            throw new ActionException("exception.action.reset-password.service", e.getCause());
-        }
+//        try (LoginService loginService = new LoginService();
+//             UserService userService = new UserService()) {
+//            Long userId = (Long) req.getSession().getAttribute("userId");
+//            User user = userService.getUser(userId);
+//                if (user != null) {
+//
+//                }
+//            }
+//            resp.sendRedirect();
+//        } catch (ServiceException e) {
+//            e.printStackTrace();
+//            throw new ActionException("exception.action.reset-password.service", e.getCause());
+//        }
 //        try (LoginService loginService = new LoginService()) {
 //            Form form = FormFactory.getInstance().create("profile-reset-password");
 ////            switch (Form.getStatus("profile.reset-password", UrlManager.getContextPathInfo(req), 100)) {
