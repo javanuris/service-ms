@@ -41,7 +41,7 @@ public class NavigationFactory {
         String label = ".label";
         String subNavs = ".navs";
         try {
-            properties.load(NavigationFactory.class.getClassLoader().getResourceAsStream("nav.properties"));
+            properties.load(NavigationFactory.class.getClassLoader().getResourceAsStream("navigation.properties"));
             List<Navigation> navigationList = new ArrayList<>();
             for (String navigationName : StringArray.splitSpaceLessNames(properties.getProperty(navs), comma)) {
                 Navigation navigation = new Navigation(

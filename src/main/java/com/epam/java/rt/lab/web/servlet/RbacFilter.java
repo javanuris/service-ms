@@ -1,12 +1,16 @@
 package com.epam.java.rt.lab.web.servlet;
 
 import com.epam.java.rt.lab.entity.rbac.User;
+import com.epam.java.rt.lab.service.LoginService;
 import com.epam.java.rt.lab.service.ServiceException;
 import com.epam.java.rt.lab.service.UserService;
 import com.epam.java.rt.lab.util.CookieManager;
 import com.epam.java.rt.lab.util.UrlManager;
+import com.epam.java.rt.lab.web.component.navigation.NavigationException;
+import com.epam.java.rt.lab.web.component.navigation.NavigationFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sun.rmi.runtime.Log;
 
 import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
@@ -32,7 +36,8 @@ public class RbacFilter implements Filter {
             throws IOException, ServletException {
 
         logger.debug("RbacFilter");
-        try (UserService userService = new UserService();) {
+        try (UserService userService = new UserService();
+             LoginService loginService = new LoginService()) {
             HttpServletRequest req = (HttpServletRequest) servletRequest;
             User user = (User) req.getSession().getAttribute("user");
             if (user == null) {
@@ -41,12 +46,14 @@ public class RbacFilter implements Filter {
                 String rememberCookieValue = CookieManager.getCookieValue(req, rememberCookieName);
                 if (rememberCookieValue != null) {
                     user = userService.getUserRemember(rememberCookieName, rememberCookieValue);
-                    if (user == null) {
+                    if (user == null || user.getLogin().getAttemptLeft() == 0 || user.getLogin().getStatus() < 0) {
                         CookieManager.removeCookie(req, (HttpServletResponse) servletResponse,
                                 rememberCookieName, UrlManager.getContextUri(req, ""));
                     } else {
                         logger.debug("USER DEFINED: {}", user.getName());
                         req.getSession().setAttribute("user", user);
+                        req.getSession().setAttribute("navigationList",
+                                NavigationFactory.getInstance().create(user.getRole().getName()));
                         userService.addRemember(req, (HttpServletResponse) servletResponse, user);
                     }
                 }
@@ -79,6 +86,9 @@ public class RbacFilter implements Filter {
         } catch (ServiceException e) {
             e.printStackTrace();
             throw new ServletException("exception.filter.rbac.do-filter.user-service", e.getCause());
+        } catch (NavigationException e) {
+            e.printStackTrace();
+            throw new ServletException("exception.filter.rbac.do-filter.navigation", e.getCause());
         }
     }
 
