@@ -17,72 +17,72 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public final class ActionFactory {
 
-    private static final String SIGN_POINT = ".";
-    private static final String GET = "Get";
-    private static final String POST = "Post";
-    private static final String ACTION = "Action";
-
     private static final Logger LOGGER = LoggerFactory.getLogger(ActionFactory.class);
-    private static final Map<String, Action> actionMap = new HashMap<>();
-    private static final Lock mapLock = new ReentrantLock();
 
-    /**
-     * @param method
-     * @param pathInfo
-     * @return
-     * @throws ActionException
-     */
-    public static Action getAction(String method, String pathInfo) throws ActionException {
-        if (ActionFactory.actionMap.size() == 0) init();
-        return ActionFactory.actionMap.get(getActionMapKey(method, pathInfo));
-    }
+    private static class Holder {
 
-    /**
-     *
-     * @throws ActionException
-     */
-    public static void init() throws ActionException {
-        if (ActionFactory.mapLock.tryLock()) {
-            ActionFactory.actionMap.clear();
-            String actionPackagePath = ActionFactory.class.getPackage().getName().concat(SIGN_POINT);
-            try (PermissionService permissionService = new PermissionService()) {
-                List<Permission> permissionList = permissionService.getPermissionList();
-                for (Permission permission : permissionList) {
-                    ActionFactory.addAction(
-                            GET,
-                            permission.getUri(),
-                            actionPackagePath,
-                            permission.getAction()
-                    );
-                    ActionFactory.addAction(
-                            POST,
-                            permission.getUri(),
-                            actionPackagePath,
-                            permission.getAction()
-                    );
-                }
-            } catch (ServiceException e) {
-                throw new ActionException("exception.action.factory.permission", e.getCause());
-            } finally {
-                ActionFactory.mapLock.unlock();
+        private static final ActionFactory INSTANCE;
+
+        static {
+            try {
+                INSTANCE = new ActionFactory();
+            } catch (Exception e) {
+                throw new ExceptionInInitializerError(e);
             }
         }
     }
 
-    private static void addAction(String method, String uri, String actionPackage, String action) throws ActionException {
-        try {
-            int pointIndex = action.lastIndexOf(SIGN_POINT) + 1;
-            if (pointIndex > 0) {
-                action = actionPackage.concat(action.substring(0, pointIndex))
-                        .concat(method).concat(action.substring(pointIndex)).concat(ACTION);
-            } else {
-                action = actionPackage.concat(method).concat(action).concat(ACTION);
+    private Map<String, Action> actionMap = new HashMap<>();
+
+    private ActionFactory() throws ActionException {
+        fillActionMap();
+    }
+
+    private void fillActionMap() throws ActionException {
+        String point = ".";
+        String get = "Get";
+        String post = "Post";
+        String action = "Action";
+        this.actionMap.clear();
+        String actionPackagePath = ActionFactory.class.getPackage().getName().concat(point);
+        try (PermissionService permissionService = new PermissionService()) {
+            List<Permission> permissionList = permissionService.getPermissionList();
+            for (Permission permission : permissionList) {
+                String actionName = permission.getAction();
+                String actionPath = actionPackagePath;
+                int pointIndex = actionName.lastIndexOf(point) + 1;
+                if (pointIndex > 0) {
+                    actionPath = actionPackagePath.concat(actionName.substring(0, pointIndex));
+                    actionName = actionName.substring(pointIndex).concat(action);
+                } else {
+                    actionName = action.concat(action);
+                }
+                addAction(
+                        get,
+                        permission.getUri(),
+                        actionPath,
+                        actionName
+                );
+                addAction(
+                        post,
+                        permission.getUri(),
+                        actionPath,
+                        actionName
+                );
             }
-            Class actionClass = Class.forName(action);
+        } catch (ServiceException e) {
+            throw new ActionException("exception.action.factory.permission", e.getCause());
+        }
+    }
+
+    private void addAction(String method, String uri, String actionPath, String actionName) throws ActionException {
+        try {
+            actionName = actionPath.concat(method).concat(actionName);
+            Class actionClass = Class.forName(actionName);
             Action actionObject = (Action) actionClass.newInstance();
-            ActionFactory.actionMap.put(getActionMapKey(method.toUpperCase(), uri), actionObject);
+            this.actionMap.put(getActionMapKey(method.toUpperCase(), uri), actionObject);
         } catch (IllegalAccessException | ClassNotFoundException e) {
-            LOGGER.debug("exception.action.factory.not-found: {}", action);
+            LOGGER.debug("exception.action.factory.not-found: {}", actionName);
         } catch (InstantiationException e) {
             throw new ActionException("exception.action.factory.action-object", e.getCause());
         }
@@ -90,6 +90,18 @@ public final class ActionFactory {
 
     private static String getActionMapKey(String method, String pathInfo) {
         return method.concat(pathInfo);
+    }
+
+    public static ActionFactory getInstance() throws ActionException {
+        try {
+            return Holder.INSTANCE;
+        } catch (ExceptionInInitializerError e) {
+            throw new ActionException("exception.action.factory.init", e.getCause());
+        }
+    }
+
+    public Action create(String method, String pathInfo) {
+        return this.actionMap.get(getActionMapKey(method, pathInfo));
     }
 
 }

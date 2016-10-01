@@ -13,6 +13,7 @@ import java.sql.Connection;
  * service-ms
  */
 public class JdbcDaoFactory extends AbstractDaoFactory {
+
     private static final Logger logger = LoggerFactory.getLogger(JdbcDaoFactory.class);
 
     public JdbcDaoFactory(Connection connection) {

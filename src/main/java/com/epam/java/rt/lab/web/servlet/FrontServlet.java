@@ -28,9 +28,9 @@ public class FrontServlet extends HttpServlet {
         logger.debug("PARAMETERS: {}", UrlManager.getRequestParameterString(req));
         try {
             if ("/".equals(req.getPathInfo())) {
-                ActionFactory.getAction(req.getMethod(), "/home").execute(req, resp);
+                ActionFactory.getInstance().create(req.getMethod(), "/home").execute(req, resp);
             } else {
-                ActionFactory.getAction(req.getMethod(), req.getPathInfo()).execute(req, resp);
+                ActionFactory.getInstance().create(req.getMethod(), req.getPathInfo()).execute(req, resp);
             }
         } catch (ActionException e) {
             logger.error("ActionException", e);

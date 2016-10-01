@@ -13,44 +13,59 @@ import java.util.*;
  */
 public final class FormFactory {
 
-    private static final String SIGN_POINT = ".";
-    private static final String SIGN_COMMA = ",";
-    private static final String FORMS = "forms";
-    private static final String FORM_ACTION = ".action";
-    private static final String FORM_CONTROLS = ".controls";
-    private static final String CONTROL_LABEL = ".label";
-    private static final String CONTROL_TYPE = ".type";
-    private static final String CONTROL_PLACEHOLDER = ".placeholder";
-    private static final String CONTROL_ACTION = ".action";
-    private static final String CONTROL_SUB_ACTION = ".sub-action";
-    private static final String CONTROL_VALIDATOR = ".validator";
+    private static class Holder {
 
-    private static Map<String, Form> formMap = new HashMap<>();
+        private static final FormFactory INSTANCE;
 
-    private static void loadProperties() throws FormException {
-        Properties formProperties = new Properties();
+        static {
+            try {
+                INSTANCE = new FormFactory();
+            } catch (Exception e) {
+                throw new ExceptionInInitializerError(e);
+            }
+        }
+    }
+
+    private Map<String, Form> formMap = new HashMap<>();
+
+    private FormFactory() throws FormException {
+        fillFormMap();
+    }
+
+    private void fillFormMap() throws FormException {
+        Properties properties = new Properties();
+        String point = ".";
+        String comma = ",";
+        String forms = "forms";
+        String action = ".action";
+        String controls = ".controls";
+        String label = ".label";
+        String type = ".label";
+        String placeholder = ".label";
+        String subAction = ".sub-action";
+        String validator = ".validator";
         try {
-            formProperties.load(FormFactory.class.getClassLoader().getResourceAsStream("form.properties"));
-            FormFactory.formMap.clear();
-            for (String formName : StringArray.splitSpaceLessNames(formProperties.getProperty(FORMS), SIGN_COMMA)) {
-                Form form = new Form(formName, formProperties.getProperty(formName.concat(FORM_ACTION)));
+            properties.load(FormFactory.class.getClassLoader().getResourceAsStream("form.properties"));
+            this.formMap.clear();
+            for (String formName : StringArray.splitSpaceLessNames(properties.getProperty(forms), comma)) {
+                Form form = new Form(formName, properties.getProperty(formName.concat(action)));
                 List<FormControl> formControlList = new ArrayList<>();
-                for (String controlName : StringArray.splitSpaceLessNames(formProperties.getProperty(formName.concat(FORM_CONTROLS)), SIGN_COMMA)) {
-                    String propertyPrefix = formName.concat(SIGN_POINT).concat(controlName);
+                for (String controlName : StringArray.splitSpaceLessNames(properties.getProperty(formName.concat(controls)), comma)) {
+                    String propertyPrefix = formName.concat(point).concat(controlName);
                     formControlList.add(
                             new FormControl(
                                     propertyPrefix,
-                                    formProperties.getProperty(propertyPrefix.concat(CONTROL_LABEL)),
-                                    formProperties.getProperty(propertyPrefix.concat(CONTROL_TYPE)),
-                                    formProperties.getProperty(propertyPrefix.concat(CONTROL_PLACEHOLDER)),
-                                    formProperties.getProperty(propertyPrefix.concat(CONTROL_ACTION)),
-                                    formProperties.getProperty(propertyPrefix.concat(CONTROL_SUB_ACTION)),
-                                    ValidatorFactory.create(formProperties.getProperty(propertyPrefix.concat(CONTROL_VALIDATOR)))
+                                    properties.getProperty(propertyPrefix.concat(label)),
+                                    properties.getProperty(propertyPrefix.concat(type)),
+                                    properties.getProperty(propertyPrefix.concat(placeholder)),
+                                    properties.getProperty(propertyPrefix.concat(action)),
+                                    properties.getProperty(propertyPrefix.concat(subAction)),
+                                    ValidatorFactory.create(properties.getProperty(propertyPrefix.concat(validator)))
                             )
                     );
                 }
                 form.setFormControlList(formControlList);
-                FormFactory.formMap.put(formName, form);
+                this.formMap.put(formName, form);
             }
         } catch (IOException | ValidatorException e) {
             e.printStackTrace();
@@ -58,11 +73,16 @@ public final class FormFactory {
         }
     }
 
-    public static Form create(String formName) throws FormException {
-        if (FormFactory.formMap.size() == 0) FormFactory.loadProperties();
-        Form form = FormFactory.formMap.get(formName);
-        if (form != null) return form.copyDef();
-        throw new FormException("exception.component.form.form-factory.create");
+    public static FormFactory getInstance() throws FormException {
+        try {
+            return Holder.INSTANCE;
+        } catch (ExceptionInInitializerError e) {
+            throw new FormException("exception.component.form.init", e.getCause());
+        }
+    }
+
+    public Form create(String formName) throws FormException {
+        return this.formMap.get(formName);
     }
 
 }
