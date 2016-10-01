@@ -1,7 +1,6 @@
 package com.epam.java.rt.lab.web.component.form;
 
 import com.epam.java.rt.lab.util.StringArray;
-import com.epam.java.rt.lab.util.UrlManager;
 import com.epam.java.rt.lab.util.validator.ValidatorException;
 import com.epam.java.rt.lab.util.validator.ValidatorFactory;
 
@@ -40,8 +39,8 @@ public final class FormFactory {
         String action = ".action";
         String controls = ".controls";
         String label = ".label";
-        String type = ".label";
-        String placeholder = ".label";
+        String type = ".type";
+        String placeholder = ".placeholder";
         String subAction = ".sub-action";
         String validator = ".validator";
         try {
@@ -82,7 +81,7 @@ public final class FormFactory {
     }
 
     public Form create(String formName) throws FormException {
-        return this.formMap.get(formName);
+        return this.formMap.get(formName).copyDef();
     }
 
 }

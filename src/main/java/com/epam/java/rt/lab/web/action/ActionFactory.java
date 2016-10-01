@@ -55,7 +55,7 @@ public final class ActionFactory {
                     actionPath = actionPackagePath.concat(actionName.substring(0, pointIndex));
                     actionName = actionName.substring(pointIndex).concat(action);
                 } else {
-                    actionName = action.concat(action);
+                    actionName = actionName.concat(action);
                 }
                 addAction(
                         get,

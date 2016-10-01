@@ -21,7 +21,7 @@
 </head>
 <body>
     <tags:header>
-        <jsp:attribute name="navbarCurrent">${navbarCurrent}</jsp:attribute>
+        <jsp:attribute name="navigationCurrent">${navbarCurrent}</jsp:attribute>
     </tags:header>
     <div class="container-fluid" style="margin: 70px 0 50px 0;">
         <jsp:doBody/>

@@ -1,5 +1,5 @@
 <%@tag pageEncoding="UTF-8" %>
-<%@attribute name="navbarCurrent" type="java.lang.String" %>
+<%@attribute name="navigationCurrent" type="java.lang.String" %>
 <%@ taglib prefix="tags" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
@@ -14,15 +14,15 @@
             </a>
         </div>
         <div class="collapse navbar-collapse" id="app-navbar-collapse" aria-expanded="false">
-            <c:if test="${sessionScope.navbarItemArray != null}">
+            <c:if test="${sessionScope.navigationList != null}">
                 <ul class="nav navbar-nav">
-                    <c:forEach var="formControl" items="${sessionScope.navbarItemArray}">
+                    <c:forEach var="navigation" items="${sessionScope.navigationList}">
                         <c:choose>
-                            <c:when test="${navbarCurrent.equals(formControl.link)}">
-                                <li class="active"><a href="#"><fmt:message bundle="${ui}" key="${formControl.name}"/></a></li>
+                            <c:when test="${navigationCurrent.equals(navigation.uri)}">
+                                <li class="active"><a href="#"><fmt:message bundle="${ui}" key="${navigation.label}"/></a></li>
                             </c:when>
                             <c:otherwise>
-                                <li><a href="<c:url value="${formControl.link}"/>"><fmt:message bundle="${ui}" key="${formControl.name}"/></a></li>
+                                <li><a href="<c:url value="${navigation.uri}"/>"><fmt:message bundle="${ui}" key="${navigation.label}"/></a></li>
                             </c:otherwise>
                         </c:choose>
                     </c:forEach>
@@ -30,9 +30,9 @@
             </c:if>
             <ul class="nav navbar-nav navbar-right">
                 <c:choose>
-                    <c:when test="${not empty sessionScope.userId}">
+                    <c:when test="${not empty sessionScope.user}">
                         <c:choose>
-                            <c:when test="${navbarCurrent.equals('/profile/view')}">
+                            <c:when test="${navigationCurrent.equals('/profile/view')}">
                                 <c:set var="usernameActive" value="active"/>
                                 <c:set var="usernameHref" value="#"/>
                             </c:when>

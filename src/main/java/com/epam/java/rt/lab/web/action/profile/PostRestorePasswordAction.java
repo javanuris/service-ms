@@ -31,19 +31,23 @@ public class PostRestorePasswordAction implements Action {
     @Override
     public void execute(HttpServletRequest req, HttpServletResponse resp) throws ActionException {
         try (LoginService loginService = new LoginService()) {
-            Form form = FormFactory.create("restore-profile");
+            Form form = FormFactory.getInstance().create("restore-password");
             if (FormValidator.validate(req, form)) {
                 if (!form.getItem(0).getValue().equals(form.getItem(1).getValue())) {
                     form.getItem(1).addValidationMessage("message.profile.repeat-not-equal");
                 } else {
                     Login login = (Login) req.getSession().getAttribute("login");
                     req.removeAttribute("login");
-                    login.setSalt(UUID.randomUUID().toString());
-                    login.setPassword(HashGenerator.hashPassword(login.getSalt(), form.getItem(0).getValue()));
-                    login.setAttemptLeft(Integer.valueOf(GlobalProperties.getProperty("login.attempt.max")));
-                    loginService.updateLoginAfterRestore(login);
-                    resp.sendRedirect(UrlManager.getContextUri(req, "/profile/login"));
-                    return;
+                    if (login == null) {
+                        resp.sendRedirect(UrlManager.getContextUri(req, "/home"));
+                    } else {
+                        login.setSalt(UUID.randomUUID().toString());
+                        login.setPassword(HashGenerator.hashPassword(login.getSalt(), form.getItem(0).getValue()));
+                        login.setAttemptLeft(Integer.valueOf(GlobalProperties.getProperty("login.attempt.max")));
+                        loginService.updateLogin(login);
+                        resp.sendRedirect(UrlManager.getContextUri(req, "/profile/login"));
+                        return;
+                    }
                 }
             }
             req.setAttribute("restoreForm", form);

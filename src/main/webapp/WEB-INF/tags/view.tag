@@ -6,7 +6,7 @@
     <div class="col-xs-12" style="padding: 5px 0;">
         <c:choose>
             <c:when test="${control.type.equals('button')}">
-                <a href="${control.value}" role="${control.type}" class="btn btn-default col-xs-12" id="${control.label}">
+                <a href="${control.action}" role="${control.type}" class="btn btn-default col-xs-12" id="${control.label}">
                     <fmt:message bundle="${ui}" key="${control.label}"/>
                 </a>
             </c:when>

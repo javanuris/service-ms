@@ -1,8 +1,6 @@
 package com.epam.java.rt.lab.web.action.profile;
 
 import com.epam.java.rt.lab.entity.rbac.User;
-import com.epam.java.rt.lab.service.ServiceException;
-import com.epam.java.rt.lab.service.UserService;
 import com.epam.java.rt.lab.util.UrlManager;
 import com.epam.java.rt.lab.web.action.Action;
 import com.epam.java.rt.lab.web.action.ActionException;
@@ -25,9 +23,9 @@ public class GetViewAction implements Action {
 
     @Override
     public void execute(HttpServletRequest req, HttpServletResponse resp) throws ActionException {
-        try (UserService userService = new UserService()) {
+        try {
             logger.debug("/WEB-INF/jsp/profile/view.jsp");
-            User user = userService.getUser((Long) req.getSession().getAttribute("userId"));
+            User user = (User) req.getSession().getAttribute("user");
             View view = ViewFactory.getInstance().create("view-profile");
             view.getControl(0).setValue(user.getFirstName());
             view.getControl(1).setValue(user.getMiddleName());
@@ -40,9 +38,6 @@ public class GetViewAction implements Action {
             view.getControl(6).setAction(UrlManager.getContextUri(req, "/profile/edit"));
             req.setAttribute("viewProfile", view);
             req.getRequestDispatcher("/WEB-INF/jsp/profile/view.jsp").forward(req, resp);
-        } catch (ServiceException e) {
-            e.printStackTrace();
-            throw new ActionException("exception.action.view.service", e.getCause());
         } catch (ViewException e) {
             e.printStackTrace();
             throw new ActionException("exception.action.view.view-factory.get-instance", e.getCause());

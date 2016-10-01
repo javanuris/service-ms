@@ -75,7 +75,7 @@ public class LoginService extends BaseService {
      * @return
      * @throws ServiceException
      */
-    public int updateLoginAfterRestore(Login login)
+    public int updateLogin(Login login)
             throws ServiceException {
         try {
             return dao(Login.class.getSimpleName()).update(new DaoParameter()
@@ -207,7 +207,7 @@ public class LoginService extends BaseService {
 //
 //    public int updatePassword(Login login)
 //            throws DaoException, SQLException, ConnectionException {
-//        logger.debug("updateLoginAfterRestore");
+//        logger.debug("updateLogin");
 //        Dao_ dao = daoFactory.createDao("Login");
 //        return dao.update(login, "id", "password.regex");
 //    }

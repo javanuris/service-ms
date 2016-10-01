@@ -31,7 +31,7 @@ public class NavigationComponent {
         try {
             if (updateMapLock.tryLock(10, TimeUnit.MILLISECONDS)) {
                 Properties navigationProperties = new Properties();
-                navigationProperties.load(NavigationComponent.class.getClassLoader().getResourceAsStream("navigation.properties"));
+                navigationProperties.load(NavigationComponent.class.getClassLoader().getResourceAsStream("nav.properties"));
                 List<NavigationItem> navbarItemList = new ArrayList<>();
                 List<NavigationItem> navItemList = new ArrayList<>();
                 Enumeration enumeration = navigationProperties.propertyNames();

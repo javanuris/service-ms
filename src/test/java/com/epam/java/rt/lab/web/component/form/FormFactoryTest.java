@@ -23,7 +23,7 @@ public class FormFactoryTest {
 
     @Test
     public void create() throws Exception {
-        Form form = FormFactory.create("login-profile");
+        Form form = FormFactory.getInstance().create("login-profile");
         System.out.println(form);
     }
 

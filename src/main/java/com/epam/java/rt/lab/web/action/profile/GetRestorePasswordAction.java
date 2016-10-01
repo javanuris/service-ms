@@ -42,7 +42,7 @@ public class GetRestorePasswordAction implements Action {
                     Login login = loginService.getRestoreLogin(email, code, cookieName, cookieValue);
                     if (login != null) {
                         req.getSession().setAttribute("login", login);
-                        Form form = FormFactory.getInstance().create("restore-profile");
+                        Form form = FormFactory.getInstance().create("restore-password");
                         form.setActionParameterString(UrlManager.getRequestParameterString(req));
                         req.setAttribute("restoreForm", form);
                         req.getRequestDispatcher("/WEB-INF/jsp/profile/restore-password.jsp").forward(req, resp);

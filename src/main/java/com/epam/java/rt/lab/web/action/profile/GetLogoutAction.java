@@ -24,15 +24,12 @@ public class GetLogoutAction implements Action {
     public void execute(HttpServletRequest req, HttpServletResponse resp) throws ActionException {
         try (UserService userService = new UserService()) {
             logger.debug("LOGOUT");
-            Long userId = (Long) req.getSession().getAttribute("userId");
-            req.getSession().removeAttribute("userId");
-            req.getSession().removeAttribute("userName");
-            req.getSession().removeAttribute("navbarItemArray");
+            User user = (User) req.getSession().getAttribute("user");
+            req.getSession().removeAttribute("user");
+            req.getSession().removeAttribute("navigationList");
             req.getSession().invalidate();
-            req.removeAttribute("navbarCurrent");
             CookieManager.removeCookie(req, resp,
                     CookieManager.getUserAgentCookieName(req), UrlManager.getContextUri(req, "/"));
-            User user = userService.getUser(userId);
             userService.removeUserRemember(user);
             logger.debug("REDIRECTING ({})", req.getContextPath());
             resp.sendRedirect(UrlManager.getContextUri(req, "/"));

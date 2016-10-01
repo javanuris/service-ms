@@ -2,7 +2,7 @@
 <%@ taglib prefix="tags" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <tags:template>
-    <jsp:attribute name="title">title.error.server</jsp:attribute>
+    <jsp:attribute name="title">title.server-error</jsp:attribute>
     <jsp:body>
         <div class="col-lg-offset-2 col-lg-8 col-md-offset-1 col-md-10 col-sm-offset-1 col-sm-10 col-xs-offset-0 col-xs-12">
             <div class="panel panel-danger">

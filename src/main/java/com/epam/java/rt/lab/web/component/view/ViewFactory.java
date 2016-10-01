@@ -73,7 +73,7 @@ public class ViewFactory {
     }
 
     public View create(String viewName) {
-        return this.viewMap.get(viewName);
+        return this.viewMap.get(viewName).copyDef();
     }
 
 }
