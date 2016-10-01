@@ -73,6 +73,7 @@ public class RbacFilter implements Filter {
             } else {
                 if (user == null) user = userService.getUser(userId);
                 if (user.getRole().getUriList().contains(req.getPathInfo())) {
+                    disableCacheForAccessSensitive((HttpServletResponse) servletResponse);
                     filterChain.doFilter(servletRequest, servletResponse);
                 } else {
                     if (req.getPathInfo().equals("/profile/login")) {
@@ -86,6 +87,12 @@ public class RbacFilter implements Filter {
             e.printStackTrace();
             throw new ServletException("exception.filter.rbac.do-filter.user-service", e.getCause());
         }
+    }
+
+    private void disableCacheForAccessSensitive (HttpServletResponse resp) {
+        resp.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+        resp.setHeader("Pragma", "no-cache");
+        resp.setDateHeader("Expires", 0);
     }
 
     @Override

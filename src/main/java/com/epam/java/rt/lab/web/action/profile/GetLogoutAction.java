@@ -34,7 +34,6 @@ public class GetLogoutAction implements Action {
                     CookieManager.getUserAgentCookieName(req), UrlManager.getContextUri(req, "/"));
             User user = userService.getUser(userId);
             userService.removeUserRemember(user);
-            resp.setHeader("Cache-FormControl", "no-cache");
             logger.debug("REDIRECTING ({})", req.getContextPath());
             resp.sendRedirect(UrlManager.getContextUri(req, "/"));
         } catch (IOException e) {
