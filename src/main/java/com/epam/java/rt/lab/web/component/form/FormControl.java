@@ -9,6 +9,7 @@ import java.util.List;
  * service-ms
  */
 public class FormControl {
+
     private ControlDef controlDef;
     private ControlVal controlVal;
 
@@ -123,13 +124,13 @@ public class FormControl {
 
     // immutable item definition
     private static class ControlDef {
-        private String name = null;
-        private String label = null;
-        private String type = null;
-        private String placeholder = null;
-        private String action = null;
-        private String subAction = null;
-        private Validator validator = null;
+        private String name;
+        private String label;
+        private String type;
+        private String placeholder;
+        private String action;
+        private String subAction;
+        private Validator validator;
 
         private ControlDef(
                 String name,

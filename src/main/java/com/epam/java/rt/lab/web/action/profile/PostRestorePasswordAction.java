@@ -34,7 +34,7 @@ public class PostRestorePasswordAction implements Action {
             Form form = FormFactory.create("restore-profile");
             if (FormValidator.validate(req, form)) {
                 if (!form.getItem(0).getValue().equals(form.getItem(1).getValue())) {
-                    form.getItem(1).addValidationMessage("profile.reset-password.confirm.error-not-equal");
+                    form.getItem(1).addValidationMessage("message.profile.repeat-not-equal");
                 } else {
                     Login login = (Login) req.getSession().getAttribute("login");
                     req.removeAttribute("login");

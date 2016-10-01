@@ -23,7 +23,8 @@ public class Form implements Iterable<FormControl> {
         // with definitions and newly created fields or objects for mutable values
         Form form = new Form(this.fieldDef.name, this.fieldDef.actionUri);
         List<FormControl> formControlList = new ArrayList<>();
-        for (FormControl formControl : this.formControlList) formControlList.add(new FormControl(formControl.getControlDef()));
+        for (FormControl formControl : this.formControlList)
+            formControlList.add(new FormControl(formControl.getControlDef()));
         form.setFormControlList(formControlList);
         return form;
     }
@@ -102,109 +103,4 @@ public class Form implements Iterable<FormControl> {
         return result.toString();
     }
 
-    //    // form item
-//    public static class FormControl {
-//        private ItemDef itemDef;
-//        private ItemVal itemVal;
-//
-//        public FormControl(String label, String type, String placeholder, ValidatorFactory.Validator validator) {
-//            this.itemDef = new ItemDef(label, type, placeholder, validator);
-//        }
-//
-//        FormControl(ItemDef itemDef) {
-//            this.itemDef = itemDef;
-//        }
-//
-//        ItemDef getControlDef() {
-//            return this.itemDef;
-//        }
-//
-//        public String getLabel() {
-//            return itemDef.label;
-//        }
-//
-//        public String getType() {
-//            return itemDef.type;
-//        }
-//
-//        public String getPlaceholder() {
-//            return itemDef.placeholder;
-//        }
-//
-//        public ValidatorFactory.Validator getValidator() {
-//            return this.itemDef.validator;
-//        }
-//
-//        private ItemVal val() {
-//            if (this.itemVal == null) this.itemVal = new ItemVal();
-//            return this.itemVal;
-//        }
-//
-//        public String[] getAvailableValueArray() {
-//            return val().availableValueArray;
-//        }
-//
-//        public void setAvailableValueArray(String[] availableValueArray) {
-//            val().availableValueArray = availableValueArray;
-//        }
-//
-//        public String getValue() {
-//            return val().value;
-//        }
-//
-//        public void setValue(String value) {
-//            val().value = value;
-//        }
-//
-//        public String getGenericValue() {
-//            return (String) val().genericValue;
-//        }
-//
-//        public <T> void setGenericValue(T genericValue) {
-//            val().genericValue = genericValue;
-//        }
-//
-//        public String[] getValidationMessageArray() {
-//            return val().validationMessageArray;
-//        }
-//
-//        public void setValidationMessageArray(String[] validationMessageArray) {
-//            val().validationMessageArray = validationMessageArray;
-//        }
-//
-//        public boolean getIgnoreValidate() {
-//            return val().ignoreValidate;
-//        }
-//
-//        public void setIgnoreValidate(boolean value) {
-//            val().ignoreValidate = value;
-//        }
-//    }
-//
-//    // immutable item definition
-//    private static class ItemDef {
-//        private String label = null;
-//        private String type = null;
-//        private String placeholder = null;
-//        private ValidatorFactory.Validator validator;
-//
-//        private ItemDef(String label, String type, String placeholder, ValidatorFactory.Validator validator) {
-//            this.label = label;
-//            this.type = type;
-//            this.placeholder = placeholder;
-//            this.validator = validator;
-//        }
-//    }
-//
-//    // mutable item values
-//    private static class ItemVal<T> {
-//        private String[] availableValueArray = null;
-//        private String value = null;
-//        private T genericValue = null;
-//        private String[] validationMessageArray = null;
-//        private boolean ignoreValidate = false;
-//
-//        private ItemVal() {
-//        }
-//    }
 }

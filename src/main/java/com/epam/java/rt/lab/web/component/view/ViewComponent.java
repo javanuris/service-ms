@@ -1,4 +1,4 @@
-package com.epam.java.rt.lab.web.component;
+package com.epam.java.rt.lab.web.component.view;
 
 /**
  * service-ms

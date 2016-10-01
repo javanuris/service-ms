@@ -9,17 +9,17 @@
         <div class="jumbotron" style="text-align: center">
             <c:choose>
                 <c:when test="${not empty sessionScope.activationRef}">
-                    <h2><fmt:message bundle="${ui}" key="message.register.header"/></h2>
-                    <h4><fmt:message bundle="${ui}" key="message.register.info"/></h4>
+                    <h2><fmt:message bundle="${ui}" key="message.info.activation.header"/></h2>
+                    <h4><fmt:message bundle="${ui}" key="message.info.activation.text"/></h4>
                     <a href="${sessionScope.activationRef}">
-                        <fmt:message bundle="${ui}" key="message.register.link"/>${sessionScope.activationEmail}
+                        <fmt:message bundle="${ui}" key="message.info.activation.link"/>${sessionScope.activationEmail}
                     </a>
                 </c:when>
                 <c:when test="${not empty sessionScope.restoreRef}">
-                    <h2><fmt:message bundle="${ui}" key="message.restore.header"/></h2>
-                    <h4><fmt:message bundle="${ui}" key="message.restore.info"/></h4>
+                    <h2><fmt:message bundle="${ui}" key="message.info.restore.header"/></h2>
+                    <h4><fmt:message bundle="${ui}" key="message.info.restore.text"/></h4>
                     <a href="${sessionScope.restoreRef}">
-                        <fmt:message bundle="${ui}" key="message.restore.link"/>${sessionScope.restoreEmail}
+                        <fmt:message bundle="${ui}" key="message.info.restore.link"/>${sessionScope.restoreEmail}
                     </a>
                 </c:when>
                 <c:when test="${not empty sessionScope.message}">
@@ -27,7 +27,7 @@
                 </c:when>
                 <c:otherwise>
                     <h2><fmt:message bundle="${ui}" key="title.home"/></h2>
-                    <h3><fmt:message bundle="${ui}" key="message.footer"/></h3>
+                    <h3><fmt:message bundle="${ui}" key="message.info.java-lab-19"/></h3>
                 </c:otherwise>
             </c:choose>
         </div>

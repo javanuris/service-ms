@@ -97,13 +97,13 @@ public class PostLoginAction implements Action {
         try {
             if (login == null) {
                 logger.debug("LOGIN NOT EXISTS");
-                form.getItem(3).addValidationMessage("form.submit-login.error-denied");
+                form.getItem(3).addValidationMessage("message.profile.email-password-incorrect");
             } else if (login.getAttemptLeft() == 0 || login.getStatus() < 0) {
                 logger.debug("LOGIN ZERO ATTEMPT LEFT OR BLOCKED");
-                form.getItem(3).addValidationMessage("form.submit-login.error-blocked");
+                form.getItem(3).addValidationMessage("message.profile.login-blocked");
             } else if (!hashPassword(login.getSalt(), form.getItem(1).getValue()).equals(login.getPassword())) {
                 logger.debug("LOGIN PASSWORD HASH NOT EQUAL");
-                form.getItem(3).addValidationMessage("form.submit-login.error-denied");
+                form.getItem(3).addValidationMessage("message.profile.email-password-incorrect");
                 login.setAttemptLeft(login.getAttemptLeft() - 1);
                 loginService.updateAttemptLeft(login);
             } else {
@@ -136,10 +136,10 @@ public class PostLoginAction implements Action {
             throws ActionException{
         if (login == null) {
             logger.debug("EMAIL NOT EXISTS");
-            form.getItem(0).addValidationMessage("profile.login.email.error-exists-restore");
+            form.getItem(0).addValidationMessage("message.profile.email-not-exist");
         } else if (login.getAttemptLeft() == 0 || login.getStatus() < 0) {
             logger.debug("LOGIN ZERO ATTEMPT LEFT OR BLOCKED");
-            form.getItem(0).addValidationMessage("profile.login.email.error-block-restore");
+            form.getItem(0).addValidationMessage("message.profile.login-blocked");
         } else {
             logger.debug("RESTORE ACCEPTED");
             try {
