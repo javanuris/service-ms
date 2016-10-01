@@ -38,7 +38,7 @@ public class GetRestorePasswordAction implements Action {
                 String cookieName = CookieManager.getUserAgentCookieName(req);
                 if (cookieName != null) {
                     String cookieValue = CookieManager.getCookieValue(req, cookieName);
-                    CookieManager.removeCookie(req, resp, cookieName);
+                    CookieManager.removeCookie(req, resp, cookieName, UrlManager.getContextUri(req, ""));
                     Login login = loginService.getRestoreLogin(email, code, cookieName, cookieValue);
                     if (login != null) {
                         req.getSession().setAttribute("login", login);

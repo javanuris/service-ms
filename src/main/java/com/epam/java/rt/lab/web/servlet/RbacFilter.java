@@ -44,7 +44,8 @@ public class RbacFilter implements Filter {
                 if (rememberCookieValue != null) {
                     user = userService.getUserRemember(rememberCookieName, rememberCookieValue);
                     if (user == null) {
-                        CookieManager.removeCookie(req, (HttpServletResponse) servletResponse, rememberCookieName);
+                        CookieManager.removeCookie(req, (HttpServletResponse) servletResponse,
+                                rememberCookieName, UrlManager.getContextUri(req, ""));
                     } else {
                         logger.debug("USER DEFINED: {}", user.getName());
                         userId = user.getId();

@@ -98,7 +98,8 @@ public class UserService extends BaseService {
                     TimestampCompare.secondsBetweenTimestamps(
                             TimestampCompare.getCurrentTimestamp(),
                             remember.getValid()
-                    )
+                    ),
+                    UrlManager.getContextUri(req, "/")
             );
         } catch (DaoException e) {
             e.printStackTrace();

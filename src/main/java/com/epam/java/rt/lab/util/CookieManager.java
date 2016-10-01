@@ -19,17 +19,17 @@ public class CookieManager {
         return null;
     }
 
-    public static void setCookie(HttpServletResponse resp, String name, String value, int maxAge) {
+    public static void setCookie(HttpServletResponse resp, String name, String value, int maxAge, String contextPath) {
         if (name != null) {
             Cookie cookie = new Cookie(name, value);
             cookie.setMaxAge(maxAge);
-            cookie.setPath("/");
+            cookie.setPath(contextPath);
             resp.addCookie(cookie);
         }
     }
 
-    public static void removeCookie(HttpServletRequest req, HttpServletResponse resp, String cookieName) {
-        setCookie(resp, cookieName, null, 0);
+    public static void removeCookie(HttpServletRequest req, HttpServletResponse resp, String cookieName, String contextPath) {
+        setCookie(resp, cookieName, null, 0, contextPath);
     }
 
     public static String getUserAgentCookieName(HttpServletRequest req) {

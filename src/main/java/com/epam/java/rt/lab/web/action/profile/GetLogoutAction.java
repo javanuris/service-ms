@@ -30,7 +30,8 @@ public class GetLogoutAction implements Action {
             req.getSession().removeAttribute("navbarItemArray");
             req.getSession().invalidate();
             req.removeAttribute("navbarCurrent");
-            CookieManager.removeCookie(req, resp, CookieManager.getUserAgentCookieName(req));
+            CookieManager.removeCookie(req, resp,
+                    CookieManager.getUserAgentCookieName(req), UrlManager.getContextUri(req, "/"));
             User user = userService.getUser(userId);
             userService.removeUserRemember(user);
             resp.setHeader("Cache-FormControl", "no-cache");

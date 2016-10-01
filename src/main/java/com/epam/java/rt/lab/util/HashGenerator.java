@@ -26,9 +26,13 @@ public class HashGenerator {
 
     private static String saltedPassword(String salt, String password) {
         StringBuilder saltedPassword = new StringBuilder();
-        for (int i = 0; i < password.length(); i++)
-            saltedPassword.append(password.charAt(i)).append(salt.charAt(i));
-        return saltedPassword.append(salt.substring(password.length())).toString();
+        int passwordIndex = 0;
+        for (int i = 0; i < salt.length(); i++) {
+            saltedPassword.append(password.charAt(passwordIndex)).append(salt.charAt(i));
+            passwordIndex = passwordIndex + 1;
+            if (!(passwordIndex < password.length())) passwordIndex = 0;
+        }
+        return saltedPassword.toString();
     }
 
     public static String hashPassword(String salt, String password) throws NoSuchAlgorithmException {

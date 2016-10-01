@@ -137,7 +137,7 @@ public class PostLoginAction implements Action {
         if (login == null) {
             logger.debug("EMAIL NOT EXISTS");
             form.getItem(0).addValidationMessage("profile.login.email.error-exists-restore");
-        } else if (login.getAttemptLeft() == 0 && login.getStatus() < 0) {
+        } else if (login.getAttemptLeft() == 0 || login.getStatus() < 0) {
             logger.debug("LOGIN ZERO ATTEMPT LEFT OR BLOCKED");
             form.getItem(0).addValidationMessage("profile.login.email.error-block-restore");
         } else {
@@ -163,7 +163,8 @@ public class PostLoginAction implements Action {
                             TimestampCompare.secondsBetweenTimestamps(
                                     TimestampCompare.getCurrentTimestamp(),
                                     restore.getValid()
-                            )
+                            ),
+                            UrlManager.getContextUri(req, "")
                     );
                     req.getSession().setAttribute("restoreEmail", form.getItem(0).getValue());
                     req.getSession().setAttribute("restoreRef",
