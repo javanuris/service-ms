@@ -63,6 +63,11 @@ public class UserDao extends JdbcDao {
     }
 
     @Override
+    Sql getSqlCount(DaoParameter daoParameter) throws DaoException {
+        return Sql.count(User.class);
+    }
+
+    @Override
     <T> List<T> getEntity(ResultSet resultSet, Sql sql) throws DaoException {
         Select select = (Select) sql;
         String userTableName = Sql.getProperty(User.class.getName());

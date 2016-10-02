@@ -17,7 +17,7 @@ public class LimitTest {
 
     @Before
     public void setUp() throws Exception {
-        this.limit = new Select.Limit(0, 10);
+        this.limit = new Select.Limit(0L, 10L);
         assertNotNull("Instantiating failed", this.limit);
     }
 

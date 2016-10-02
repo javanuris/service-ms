@@ -3,14 +3,14 @@ package com.epam.java.rt.lab.web.component;
 /**
  * service-ms
  */
-public class PageComponent {
+public class Page {
     private static final Long ITEMS_ON_PAGE = 10L;
     private Long currentPage;
     private Long itemsOnPage;
     private Long countPages;
     private Long countItems;
 
-    public PageComponent(Long currentPage, Long itemsOnPage) {
+    public Page(Long currentPage, Long itemsOnPage) {
         this.currentPage = currentPage;
         this.itemsOnPage = itemsOnPage != null ? itemsOnPage : ITEMS_ON_PAGE;
     }

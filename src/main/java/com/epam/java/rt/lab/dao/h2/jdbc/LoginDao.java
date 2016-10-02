@@ -57,6 +57,11 @@ public class LoginDao extends JdbcDao {
     }
 
     @Override
+    Sql getSqlCount(DaoParameter daoParameter) throws DaoException {
+        return null;
+    }
+
+    @Override
     <T> List<T> getEntity(ResultSet resultSet, Sql sql) throws DaoException {
         Select select = (Select) sql;
         String loginTableName = Sql.getProperty(Login.class.getName());

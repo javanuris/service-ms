@@ -15,4 +15,6 @@ public interface Dao {
 
     int delete(DaoParameter daoParameter) throws DaoException;
 
+    Long count(DaoParameter daoParameter) throws DaoException;
+
 }

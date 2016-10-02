@@ -64,6 +64,11 @@ public class AvatarDao extends JdbcDao {
     }
 
     @Override
+    Sql getSqlCount(DaoParameter daoParameter) throws DaoException {
+        return null;
+    }
+
+    @Override
     <T> List<T> getEntity(ResultSet resultSet, Sql sql) throws DaoException {
         Select select = (Select) sql;
         String avatarTableName = Sql.getProperty(Avatar.class.getName());

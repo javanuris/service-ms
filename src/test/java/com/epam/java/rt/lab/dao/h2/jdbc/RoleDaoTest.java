@@ -74,7 +74,7 @@ public class RoleDaoTest {
                         OrderBy.Criteria.asc(Role.Property.NAME)
                 );
         assertEquals("getSqlRead(ORDER) failed", ROLE_READ_B, ((RoleDao) dao).getSqlRead(this.daoParameter).create());
-        this.daoParameter = new DaoParameter().setLimit(0, 10);
+        this.daoParameter = new DaoParameter().setLimit(0L, 10L);
         assertEquals("getSqlRead(LIMIT) failed", ROLE_READ_C, ((RoleDao) dao).getSqlRead(this.daoParameter).create());
     }
 

@@ -137,6 +137,22 @@ public abstract class Sql {
         return new Delete(entityClass);
     }
 
+    public static Count count(Class entityClass) throws DaoException {
+        if (entityClass == null)
+            throw new DaoException("exception.dao.sql.Count.null-entity-class");
+        return new Count(getColumnList(
+                StringArray.splitSpaceLessNames(
+                        getProperty(
+                                entityClass
+                                        .getName()
+                                        .concat(SIGN_POINT)
+                                        .concat(ALL_COLUMNS)
+                        ),
+                        SIGN_COMMA
+                )
+        ));
+    }
+
     // resulting methods
 
     public abstract String create() throws DaoException;

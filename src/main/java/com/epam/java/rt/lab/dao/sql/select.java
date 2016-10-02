@@ -40,7 +40,7 @@ public class Select extends Sql implements Iterable<Column> {
         return this;
     }
 
-    public Select limit(Integer offset, Integer count) {
+    public Select limit(Long offset, Long count) {
         this.limit = new Limit(offset, count);
         return this;
     }
@@ -87,7 +87,7 @@ public class Select extends Sql implements Iterable<Column> {
     /**
      * The usage is only in Select statement
      */
-    static class From implements Clause {
+    public static class From implements Clause {
 
         private static final String FROM = " FROM ";
 
@@ -109,7 +109,7 @@ public class Select extends Sql implements Iterable<Column> {
     /**
      *
      */
-    static class Join implements Clause {
+    public static class Join implements Clause {
 
         private static final String JOIN = " JOIN ";
 
@@ -176,10 +176,10 @@ public class Select extends Sql implements Iterable<Column> {
 
         private static final String LIMIT = " LIMIT ";
 
-        private Integer offset;
-        private Integer count;
+        private Long offset;
+        private Long count;
 
-        Limit(Integer offset, Integer count) {
+        Limit(Long offset, Long count) {
             this.offset = offset;
             this.count = count;
         }

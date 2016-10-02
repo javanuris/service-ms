@@ -3,12 +3,14 @@ package com.epam.java.rt.lab.service;
 import com.epam.java.rt.lab.dao.Dao;
 import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.dao.DaoParameter;
+import com.epam.java.rt.lab.dao.sql.OrderBy;
 import com.epam.java.rt.lab.dao.sql.Update;
 import com.epam.java.rt.lab.dao.sql.Where;
 import com.epam.java.rt.lab.entity.rbac.*;
 import com.epam.java.rt.lab.util.*;
 import com.epam.java.rt.lab.util.validator.ValidatorException;
 import com.epam.java.rt.lab.util.validator.ValidatorFactory;
+import com.epam.java.rt.lab.web.component.Page;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -114,6 +116,24 @@ public class UserService extends BaseService {
             return userList != null && userList.size() > 0 ? userList.get(0) : null;
         } catch (DaoException e) {
             throw new ServiceException("exception.service.user.get-user.dao", e.getCause());
+        }
+    }
+
+    public List<User> getUserList(Page page) throws ServiceException {
+        try {
+            DaoParameter daoParameter = new DaoParameter();
+            page.setCountItems(dao(User.class.getSimpleName()).count(daoParameter));
+            return dao(User.class.getSimpleName()).read(new DaoParameter()
+                    .setOrderByCriteriaArray(OrderBy.Criteria.asc(
+                            User.Property.FIRST_NAME
+                    ))
+                    .setLimit(
+                            (page.getCurrentPage() - 1) * page.getItemsOnPage(),
+                            page.getItemsOnPage()
+                    )
+            );
+        } catch (DaoException e) {
+            throw new ServiceException("exception.service.user.get-user-list.dao", e.getCause());
         }
     }
 
@@ -326,18 +346,6 @@ public class UserService extends BaseService {
 //        return updateCount;
 //    }
 //
-//    public List<User> getUserList(PageComponent pageComponent) throws DaoException {
-//        Dao_ dao = dao("User");
-//        pageComponent.setCountItems(dao.count(new Parameter_()
-//                .result("id", "firstName", "middleName", "lastName", "role.name", "login.email", "login.attemptLeft", "login.status"))
-//        );
-//        logger.debug("COUNT = {}", pageComponent.getCountItems());
-//        return dao.getAll(new Parameter_()
-//                .result("id", "firstName", "middleName", "lastName", "role.name", "login.email", "login.attemptLeft", "login.status")
-//                .limit((pageComponent.getCurrentPage() - 1) * pageComponent.getItemsOnPage(), pageComponent.getItemsOnPage())
-//                .order(QueryBuilder_.OrderType.ASC, "firstName", "middleName", "lastName")
-//        );
-//    }
 //
 //
 

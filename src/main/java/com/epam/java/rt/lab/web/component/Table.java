@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * service-ms
  */
-public class ListComponent <T> {
+public class Table<T> {
     private List<ListColumn> listColumnList = new ArrayList<>();
     private List<T> entityList;
     private String hrefPrefix;

@@ -73,7 +73,7 @@ public class UserDaoTest {
                         OrderBy.Criteria.asc(User.Property.FIRST_NAME)
                 );
         assertEquals("getSqlRead(ORDER) failed", USER_READ_B, ((UserDao) dao).getSqlRead(this.daoParameter).create());
-        this.daoParameter = new DaoParameter().setLimit(0, 10);
+        this.daoParameter = new DaoParameter().setLimit(0L, 10L);
         assertEquals("getSqlRead(LIMIT) failed", USER_READ_C, ((UserDao) dao).getSqlRead(this.daoParameter).create());
     }
 

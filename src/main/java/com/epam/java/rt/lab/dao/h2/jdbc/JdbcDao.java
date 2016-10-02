@@ -137,6 +137,23 @@ public abstract class JdbcDao implements Dao {
         }
     }
 
+    @Override
+    public Long count(DaoParameter daoParameter) throws DaoException {
+        Sql sql = getSqlCount(daoParameter);
+        try (DaoStatement statement = new DaoStatement(this.connection, sql, Statement.NO_GENERATED_KEYS)) {
+            ResultSet resultSet = statement.executeQuery();
+            if (!resultSet.first()) return null;
+            return resultSet.getLong(1);
+        } catch (NoSuchMethodException e) {
+            throw new DaoException("exception.dao.jdbc.read.statement-method", e.getCause());
+        } catch (SQLException e) {
+            throw new DaoException("exception.dao.jdbc.read.sql", e.getCause());
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new DaoException("exception.dao.jdbc.read.close", e.getCause());
+        }
+    }
+
     abstract Sql getSqlCreate(DaoParameter daoParameter) throws DaoException;
 
     abstract Sql getSqlRead(DaoParameter daoParameter) throws DaoException;
@@ -145,7 +162,10 @@ public abstract class JdbcDao implements Dao {
 
     abstract Sql getSqlDelete(DaoParameter daoParameter) throws DaoException;
 
+    abstract Sql getSqlCount(DaoParameter daoParameter) throws DaoException;
+
     abstract <T> List<T> getEntity(ResultSet resultSet, Sql sql) throws DaoException;
+
 
 //    abstract <T> List<T> getCachedEntity(DaoParameter daoParameter) throws DaoException;
 

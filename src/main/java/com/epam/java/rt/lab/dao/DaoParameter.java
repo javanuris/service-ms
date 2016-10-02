@@ -13,8 +13,8 @@ public class DaoParameter {
 
     private Where.Predicate wherePredicate;
     private OrderBy.Criteria[] orderByCriteriaArray;
-    private Integer limitOffset;
-    private Integer limitCount;
+    private Long limitOffset;
+    private Long limitCount;
     private WildValue[] wildValue;
     private Update.SetValue[] setValueArray;
     private BaseEntity entity;
@@ -41,17 +41,17 @@ public class DaoParameter {
         return this;
     }
 
-    public DaoParameter setLimit(Integer offset, Integer count) {
+    public DaoParameter setLimit(Long offset, Long count) {
         this.limitOffset = offset;
         this.limitCount = count;
         return this;
     }
 
-    public Integer getLimitOffset() {
+    public Long getLimitOffset() {
         return this.limitOffset;
     }
 
-    public Integer getLimitCount() {
+    public Long getLimitCount() {
         return this.limitCount;
     }
 

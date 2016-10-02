@@ -75,7 +75,7 @@ public class PermissionDaoTest {
                         OrderBy.Criteria.asc(Role.Property.NAME)
                 );
         assertEquals("getSqlRead(ORDER) failed", PERMISSION_READ_B, ((PermissionDao) dao).getSqlRead(this.daoParameter).create());
-        this.daoParameter = new DaoParameter().setLimit(0, 10);
+        this.daoParameter = new DaoParameter().setLimit(0L, 10L);
         assertEquals("getSqlRead(LIMIT) failed", PERMISSION_READ_C, ((PermissionDao) dao).getSqlRead(this.daoParameter).create());
     }
 

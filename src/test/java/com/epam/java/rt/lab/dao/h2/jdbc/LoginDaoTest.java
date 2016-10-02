@@ -74,7 +74,7 @@ public class LoginDaoTest {
                         OrderBy.Criteria.asc(Login.Property.EMAIL)
                 );
         assertEquals("getSqlRead(ORDER) failed", LOGIN_READ_B, ((LoginDao) dao).getSqlRead(this.daoParameter).create());
-        this.daoParameter = new DaoParameter().setLimit(0, 10);
+        this.daoParameter = new DaoParameter().setLimit(0L, 10L);
         assertEquals("getSqlRead(LIMIT) failed", LOGIN_READ_C, ((LoginDao) dao).getSqlRead(this.daoParameter).create());
     }
 
