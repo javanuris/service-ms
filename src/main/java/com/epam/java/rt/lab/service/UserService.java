@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.security.NoSuchAlgorithmException;
+import java.sql.Connection;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -61,6 +62,24 @@ public class UserService extends BaseService {
         } catch (DaoException e) {
             e.printStackTrace();
             throw new ServiceException("exception.service.user.update-user.dao", e.getCause());
+        }
+    }
+
+    public Long addUser(Login login) throws ServiceException {
+        try (LoginService loginService = new LoginService();
+             RoleService roleService = new RoleService()) {
+            super.daoFactory.beginTransaction(Connection.TRANSACTION_REPEATABLE_READ);
+            User user = new User();
+            login.setId(loginService.addLogin(login));
+            user.setLogin(login);
+            Role role = roleService.getRoleAuthorized();
+            user.setRole(role);
+            Long userId = dao(User.class.getSimpleName()).create(new DaoParameter().setEntity(user));
+            super.daoFactory.commitTransaction();
+            return userId;
+        } catch (DaoException e) {
+            e.printStackTrace();
+            throw new ServiceException("exception.service.user.add-user.dao", e.getCause());
         }
     }
 

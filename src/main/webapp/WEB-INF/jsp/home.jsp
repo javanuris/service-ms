@@ -9,10 +9,10 @@
         <div class="jumbotron" style="text-align: center">
             <c:choose>
                 <c:when test="${not empty sessionScope.activationRef}">
-                    <h2><fmt:message bundle="${ui}" key="message.info.activation.header"/></h2>
-                    <h4><fmt:message bundle="${ui}" key="message.info.activation.text"/></h4>
+                    <h2><fmt:message bundle="${ui}" key="message.info.activate.header"/></h2>
+                    <h4><fmt:message bundle="${ui}" key="message.info.activate.text"/></h4>
                     <a href="${sessionScope.activationRef}">
-                        <fmt:message bundle="${ui}" key="message.info.activation.link"/>${sessionScope.activationEmail}
+                        <fmt:message bundle="${ui}" key="message.info.activate.link"/>${sessionScope.activationEmail}
                     </a>
                 </c:when>
                 <c:when test="${not empty sessionScope.restoreRef}">

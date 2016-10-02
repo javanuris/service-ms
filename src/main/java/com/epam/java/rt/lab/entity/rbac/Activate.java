@@ -1,6 +1,7 @@
 package com.epam.java.rt.lab.entity.rbac;
 
 import com.epam.java.rt.lab.entity.BaseEntity;
+import com.epam.java.rt.lab.entity.EntityProperty;
 
 import java.sql.Timestamp;
 
@@ -8,6 +9,21 @@ import java.sql.Timestamp;
  * service-ms
  */
 public class Activate extends BaseEntity {
+
+    public enum Property implements EntityProperty {
+        ID,
+        EMAIL,
+        SALT,
+        PASSWORD,
+        CODE,
+        VALID;
+
+        @Override
+        public Class getEntityClass() {
+            return Activate.class;
+        }
+    }
+
     private String email;
     private String salt;
     private String password;

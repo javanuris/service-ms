@@ -38,7 +38,7 @@ public class PostLoginAction implements Action {
 
     private enum Submit {
         LOGIN,
-        FORGOT,
+        RESTORE,
         REGISTER
     }
 
@@ -47,9 +47,9 @@ public class PostLoginAction implements Action {
         try (LoginService loginService = new LoginService()) {
             Form form = FormFactory.getInstance().create("login-profile");
             Submit submit = req.getParameter(form.getItem(3).getName()) != null ? Submit.LOGIN :
-                    req.getParameter(form.getItem(4).getName()) != null ? Submit.FORGOT :
+                    req.getParameter(form.getItem(4).getName()) != null ? Submit.RESTORE :
                             req.getParameter(form.getItem(5).getName()) != null ? Submit.REGISTER : null;
-            if (submit != Submit.LOGIN) form.getItem(1).setIgnoreValidate(true);
+            if (submit == Submit.RESTORE) form.getItem(1).setIgnoreValidate(true);
             if (FormValidator.validate(req, form)) {
                 logger.debug("FORM VALID");
                 Login login = loginService.getLogin(form.getItem(0).getValue());
@@ -64,7 +64,7 @@ public class PostLoginAction implements Action {
                             return;
                         }
                         break;
-                    case FORGOT:
+                    case RESTORE:
                         logger.debug("SUBMIT-FORGOT");
                         if (restore(req, resp, form, loginService, login)) {
                             logger.debug("REDIRECT TO {}", "/home");

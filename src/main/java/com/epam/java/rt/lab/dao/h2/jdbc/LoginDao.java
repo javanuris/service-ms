@@ -2,10 +2,7 @@ package com.epam.java.rt.lab.dao.h2.jdbc;
 
 import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.dao.DaoParameter;
-import com.epam.java.rt.lab.dao.sql.Column;
-import com.epam.java.rt.lab.dao.sql.Select;
-import com.epam.java.rt.lab.dao.sql.Sql;
-import com.epam.java.rt.lab.dao.sql.Update;
+import com.epam.java.rt.lab.dao.sql.*;
 import com.epam.java.rt.lab.entity.rbac.Login;
 
 import java.sql.Connection;
@@ -25,7 +22,16 @@ public class LoginDao extends JdbcDao {
 
     @Override
     Sql getSqlCreate(DaoParameter daoParameter) throws DaoException {
-        return null;
+        Login login = (Login) daoParameter.getEntity();
+        return Sql
+                .insert(login)
+                .values(
+                        new Insert.InsertValue(Login.Property.EMAIL, login.getEmail()),
+                        new Insert.InsertValue(Login.Property.SALT, login.getSalt()),
+                        new Insert.InsertValue(Login.Property.PASSWORD, login.getPassword()),
+                        new Insert.InsertValue(Login.Property.ATTEMPT_LEFT, login.getAttemptLeft()),
+                        new Insert.InsertValue(Login.Property.STATUS, login.getStatus())
+                );
     }
 
     @Override

@@ -8,6 +8,8 @@ import com.epam.java.rt.lab.entity.rbac.Activate;
 import com.epam.java.rt.lab.entity.rbac.Login;
 import com.epam.java.rt.lab.entity.rbac.Remember;
 import com.epam.java.rt.lab.entity.rbac.Restore;
+import com.epam.java.rt.lab.util.GlobalProperties;
+import com.epam.java.rt.lab.util.TimestampCompare;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -92,7 +94,23 @@ public class LoginService extends BaseService {
             );
         } catch (DaoException e) {
             e.printStackTrace();
-            throw new ServiceException("exception.service.login.update-login-after-restore.dao", e.getCause());
+            throw new ServiceException("exception.service.login.update-login.dao", e.getCause());
+        }
+    }
+
+    /**
+     *
+     * @param login
+     * @return
+     * @throws ServiceException
+     */
+    public Long addLogin(Login login)
+            throws ServiceException {
+        try {
+            return dao(Login.class.getSimpleName()).create(new DaoParameter().setEntity(login));
+        } catch (DaoException e) {
+            e.printStackTrace();
+            throw new ServiceException("exception.service.login.add-login.dao", e.getCause());
         }
     }
 
@@ -189,16 +207,83 @@ public class LoginService extends BaseService {
     public Long addActivate(Activate activate)
             throws ServiceException {
         try {
-            return dao(Activate.class.getSimpleName()).create(new DaoParameter()
-                    .setEntity(activate)
+            List<Activate> activateList = dao(Activate.class.getSimpleName()).read(new DaoParameter()
+                    .setWherePredicate(Where.Predicate.get(
+                            Activate.Property.EMAIL,
+                            Where.Predicate.PredicateOperator.EQUAL,
+                            activate.getEmail()
+                    ))
             );
+            if (activateList != null) removeActivateList(activateList);
+            return dao(Activate.class.getSimpleName()).create(new DaoParameter().setEntity(activate));
         } catch (DaoException e) {
             e.printStackTrace();
             throw new ServiceException("exception.service.login.add-activate.dao", e.getCause());
         }
     }
 
+    public int removeActivateList(List<Activate> activateList)
+            throws ServiceException {
+        try {
+            int result = 0;
+            for (Activate activate : activateList) {
+                result += dao(Activate.class.getSimpleName()).delete(new DaoParameter()
+                        .setWherePredicate(Where.Predicate.get(
+                                Activate.Property.ID,
+                                Where.Predicate.PredicateOperator.EQUAL,
+                                activate.getId()
+                        ))
+                );
+            }
+            return result;
+        } catch (DaoException e) {
+            e.printStackTrace();
+            throw new ServiceException("exception.service.login.remove-actiavte-list.dao", e.getCause());
+        }
+    }
 
+    public Login getActivateLogin(String activationEmail, String activationCode) throws ServiceException {
+        if (activationEmail == null || activationCode == null) return null;
+        try {
+            List<Activate> activateList = dao(Activate.class.getSimpleName()).read(new DaoParameter()
+                    .setWherePredicate(Where.Predicate.get(
+                            Activate.Property.EMAIL,
+                            Where.Predicate.PredicateOperator.EQUAL,
+                            activationEmail
+                    ))
+            );
+            if (activateList == null || activateList.size() == 0) return null;
+            Activate activate = activateList.get(0);
+            if (!activationCode.equals(activate.getCode()) || TimestampCompare.secondsBetweenTimestamps
+                    (TimestampCompare.getCurrentTimestamp(), activate.getValid()) < 0) return null;
+            Login login = new Login();
+            login.setEmail(activate.getEmail());
+            login.setSalt(activate.getSalt());
+            login.setPassword(activate.getPassword());
+            login.setAttemptLeft(Integer.valueOf(GlobalProperties.getProperty("login.attempt.max")));
+            login.setStatus(0);
+            return login;
+        } catch (ServiceException | DaoException e) {
+            e.printStackTrace();
+            throw new ServiceException("exception.service.login.get-actvate-login.dao", e.getCause());
+        }
+    }
+
+//    public Login confirmActivationCode(String activationEmail, String activationCode) throws DaoException {
+//        if (activationEmail == null || activationCode == null) return null;
+//        Login login = new Login();
+//        login.setEmail(activationEmail);
+//        Map<String, Object> activationMap = getRelEntity(login, "Activation");
+//        removeRelEntity(login, "Activation");
+//        if (activationMap == null || !activationCode.equals(activationMap.get("code")) ||
+//                TimestampCompare.secondsBetweenTimestamps(TimestampCompare.getCurrentTimestamp(),
+//                (Timestamp) activationMap.get("valid")) <= 0) return null;
+//        login.setPassword((String) activationMap.get("password.regex"));
+//        login.setAttemptLeft(Integer.valueOf(GlobalProperties.getProperty("login.attempt.max")));
+//        login.setStatus(0);
+//        return login;
+//    }
+//
 
 //    public int addLogin(Login login) throws DaoException {
 //        Dao_ dao = daoFactory.createDao("Login");
@@ -255,21 +340,6 @@ public class LoginService extends BaseService {
 //            e.printStackTrace();
 //        }
 //        return null;
-//    }
-//
-//    public Login confirmActivationCode(String activationEmail, String activationCode) throws DaoException {
-//        if (activationEmail == null || activationCode == null) return null;
-//        Login login = new Login();
-//        login.setEmail(activationEmail);
-//        Map<String, Object> activationMap = getRelEntity(login, "Activation");
-//        removeRelEntity(login, "Activation");
-//        if (activationMap == null || !activationCode.equals(activationMap.get("code")) ||
-//                TimestampCompare.secondsBetweenTimestamps(TimestampCompare.getCurrentTimestamp(),
-//                (Timestamp) activationMap.get("valid")) <= 0) return null;
-//        login.setPassword((String) activationMap.get("password.regex"));
-//        login.setAttemptLeft(Integer.valueOf(GlobalProperties.getProperty("login.attempt.max")));
-//        login.setStatus(0);
-//        return login;
 //    }
 //
 }

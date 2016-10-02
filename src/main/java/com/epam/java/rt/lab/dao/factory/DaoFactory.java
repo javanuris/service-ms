@@ -2,7 +2,6 @@ package com.epam.java.rt.lab.dao.factory;
 
 import com.epam.java.rt.lab.dao.Dao;
 import com.epam.java.rt.lab.dao.DaoException;
-import com.epam.java.rt.lab.dao.Dao_;
 
 import java.sql.Connection;
 
