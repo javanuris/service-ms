@@ -99,7 +99,7 @@ public abstract class Sql {
      */
     public static Select select(EntityProperty... entityPropertyArray) throws DaoException {
         if (entityPropertyArray.length == 0)
-            throw new DaoException("exception.dao.sql.select.empty-entity-array");
+            throw new DaoException("exception.dao.sql.Select.empty-entity-array");
         return new Select(getColumnList(entityPropertyArray));
     }
 
@@ -111,7 +111,7 @@ public abstract class Sql {
      */
     public static Select select(Class entityClass) throws DaoException {
         if (entityClass == null)
-            throw new DaoException("exception.dao.sql.select.null-entity-class");
+            throw new DaoException("exception.dao.sql.Select.null-entity-class");
         return new Select(getColumnList(
                 StringArray.splitSpaceLessNames(
                         getProperty(

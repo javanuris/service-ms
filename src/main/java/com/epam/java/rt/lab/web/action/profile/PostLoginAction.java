@@ -38,8 +38,7 @@ public class PostLoginAction implements Action {
 
     private enum Submit {
         LOGIN,
-        RESTORE,
-        REGISTER
+        RESTORE
     }
 
     @Override
@@ -47,8 +46,7 @@ public class PostLoginAction implements Action {
         try (LoginService loginService = new LoginService()) {
             Form form = FormFactory.getInstance().create("login-profile");
             Submit submit = req.getParameter(form.getItem(3).getName()) != null ? Submit.LOGIN :
-                    req.getParameter(form.getItem(4).getName()) != null ? Submit.RESTORE :
-                            req.getParameter(form.getItem(5).getName()) != null ? Submit.REGISTER : null;
+                    req.getParameter(form.getItem(4).getName()) != null ? Submit.RESTORE : null;
             if (submit == Submit.RESTORE) form.getItem(1).setIgnoreValidate(true);
             if (FormValidator.validate(req, form)) {
                 logger.debug("FORM VALID");
@@ -67,14 +65,6 @@ public class PostLoginAction implements Action {
                     case RESTORE:
                         logger.debug("SUBMIT-FORGOT");
                         if (restore(req, resp, form, loginService, login)) {
-                            logger.debug("REDIRECT TO {}", "/home");
-                            resp.sendRedirect(UrlManager.getContextUri(req, "/home"));
-                            return;
-                        }
-                        break;
-                    case REGISTER:
-                        logger.debug("SUBMIT-REGISTER");
-                        if (register(req, resp, form, loginService, login)) {
                             logger.debug("REDIRECT TO {}", "/home");
                             resp.sendRedirect(UrlManager.getContextUri(req, "/home"));
                             return;
@@ -181,43 +171,6 @@ public class PostLoginAction implements Action {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }
-        return false;
-    }
-
-    private boolean register(HttpServletRequest req, HttpServletResponse resp, Form form, LoginService loginService, Login login)
-            throws ActionException {
-        try {
-            if (login != null) {
-                logger.debug("EMAIL ALREADY EXISTS");
-                form.getItem(0).addValidationMessage("profile.login.email.error-exists-register");
-            } else {
-                logger.debug("ACTIVATE ACCEPTED");
-                Activate activate = new Activate();
-                activate.setEmail(form.getItem(0).getValue());
-                activate.setSalt(UUID.randomUUID().toString());
-                activate.setPassword(HashGenerator.hashPassword(activate.getSalt(), form.getItem(1).getValue()));
-                activate.setCode(UUID.randomUUID().toString());
-                activate.setValid(TimestampCompare.daysToTimestamp(
-                        TimestampCompare.getCurrentTimestamp(),
-                        Integer.valueOf(GlobalProperties.getProperty("activation.days.valid"))));
-                if (loginService.addActivate(activate) == 0) {
-                    logger.debug("STORING ACTIVATE CODE FAILED");
-                    // TODO: need some reaction
-                } else {
-                    req.getSession().setAttribute("activationEmail", form.getItem(0).getValue());
-                    req.getSession().setAttribute("activationRef",
-                            UrlManager.getContextRef(req, "/profile/activate", "email, code",
-                                    form.getItem(0).getValue(), activate.getCode()));
-                    return true;
-                }
-            }
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-            throw new ActionException("exception.action.post-login.hash", e.getCause());
-        } catch (ServiceException e) {
-            e.printStackTrace();
-            throw new ActionException("exception.action.post-login.activate", e.getCause());
         }
         return false;
     }

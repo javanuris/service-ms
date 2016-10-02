@@ -238,7 +238,7 @@ public class LoginService extends BaseService {
             return result;
         } catch (DaoException e) {
             e.printStackTrace();
-            throw new ServiceException("exception.service.login.remove-actiavte-list.dao", e.getCause());
+            throw new ServiceException("exception.service.login.remove-activate-list.dao", e.getCause());
         }
     }
 
@@ -268,6 +268,23 @@ public class LoginService extends BaseService {
             throw new ServiceException("exception.service.login.get-actvate-login.dao", e.getCause());
         }
     }
+
+    public int removeActivate(String email)
+            throws ServiceException {
+        try {
+            return dao(Activate.class.getSimpleName()).delete(new DaoParameter()
+                    .setWherePredicate(Where.Predicate.get(
+                            Activate.Property.EMAIL,
+                            Where.Predicate.PredicateOperator.EQUAL,
+                            email
+                    ))
+            );
+        } catch (DaoException e) {
+            e.printStackTrace();
+            throw new ServiceException("exception.service.login.remove-activate.dao", e.getCause());
+        }
+    }
+
 
 //    public Login confirmActivationCode(String activationEmail, String activationCode) throws DaoException {
 //        if (activationEmail == null || activationCode == null) return null;

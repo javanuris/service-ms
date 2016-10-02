@@ -23,7 +23,7 @@ public class Select extends Sql implements Iterable<Column> {
 
     Select(List<Column> columnList) throws DaoException {
         if (columnList == null || columnList.size() == 0)
-            throw new DaoException("exception.dao.sql.select.empty-column-list");
+            throw new DaoException("exception.dao.sql.Select.empty-column-list");
         this.columnList = columnList;
         this.join = new Join();
         this.from = new From(columnList, join);
@@ -61,7 +61,7 @@ public class Select extends Sql implements Iterable<Column> {
 //            System.out.println(result.toString());
             return result.toString();
         } catch (Exception e) {
-            throw new DaoException("exception.dao.sql.select.combine", e.getCause());
+            throw new DaoException("exception.dao.sql.Select.combine", e.getCause());
         }
     }
 
@@ -85,7 +85,7 @@ public class Select extends Sql implements Iterable<Column> {
     }
 
     /**
-     * The usage is only in select statement
+     * The usage is only in Select statement
      */
     static class From implements Clause {
 
@@ -170,7 +170,7 @@ public class Select extends Sql implements Iterable<Column> {
     }
 
     /**
-     * The usage is only in select statement
+     * The usage is only in Select statement
      */
     static class Limit implements Clause {
 
