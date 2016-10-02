@@ -102,7 +102,7 @@ public class LoginService extends BaseService {
      * @return
      * @throws ServiceException
      */
-    public int addRestore(Restore restore)
+    public Long addRestore(Restore restore)
             throws ServiceException {
         try {
             return dao(Restore.class.getSimpleName()).create(new DaoParameter()
@@ -186,7 +186,7 @@ public class LoginService extends BaseService {
         }
     }
 
-    public int addActivate(Activate activate)
+    public Long addActivate(Activate activate)
             throws ServiceException {
         try {
             return dao(Activate.class.getSimpleName()).create(new DaoParameter()

@@ -3,19 +3,19 @@ package com.epam.java.rt.lab.service;
 import com.epam.java.rt.lab.dao.Dao;
 import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.dao.DaoParameter;
+import com.epam.java.rt.lab.dao.sql.Update;
 import com.epam.java.rt.lab.dao.sql.Where;
-import com.epam.java.rt.lab.entity.rbac.Login;
-import com.epam.java.rt.lab.entity.rbac.Remember;
-import com.epam.java.rt.lab.entity.rbac.Role;
-import com.epam.java.rt.lab.entity.rbac.User;
+import com.epam.java.rt.lab.entity.rbac.*;
 import com.epam.java.rt.lab.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.*;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -43,6 +43,28 @@ public class UserService extends BaseService {
         }
     }
 
+    public int updateUser(User user) throws ServiceException {
+        try {
+            return dao(User.class.getSimpleName()).update(new DaoParameter()
+                    .setSetValueArray(
+                            new Update.SetValue(User.Property.FIRST_NAME, user.getFirstName()),
+                            new Update.SetValue(User.Property.MIDDLE_NAME, user.getMiddleName()),
+                            new Update.SetValue(User.Property.LAST_NAME, user.getLastName()),
+                            new Update.SetValue(User.Property.AVATAR_ID, user.getAvatarId())
+                    )
+                    .setWherePredicate(Where.Predicate.get(
+                            User.Property.ID,
+                            Where.Predicate.PredicateOperator.EQUAL,
+                            user.getId()
+                    ))
+            );
+        } catch (DaoException e) {
+            e.printStackTrace();
+            throw new ServiceException("exception.service.user.update-user.dao", e.getCause());
+        }
+    }
+
+    @Deprecated
     public User getUser(Long id) throws ServiceException {
         try {
             List<User> userList = dao(User.class.getSimpleName()).read(new DaoParameter()
@@ -128,7 +150,7 @@ public class UserService extends BaseService {
             );
         } catch (DaoException e) {
             e.printStackTrace();
-            throw new ServiceException("exception.service.login.remove-restore-list.dao", e.getCause());
+            throw new ServiceException("exception.service.user.remove-user-remember.dao", e.getCause());
         }
     }
 
@@ -170,43 +192,79 @@ public class UserService extends BaseService {
         }
     }
 
-    public Remember getRemember(String rememberCookieName, String rememberCookieValue) throws ServiceException {
-//        try {
-//            Dao_ dao = dao("User");
-//            Remember remember = dao.getFirst(new Parameter_()
-//                    .result("id", "firstName", "middleName", "lastName", "role",
-//                            "remember.id", "remember.cookieName", "remember.cookieValue", "remember.valid")
-//                    .filter(Parameter_.Property.set("remember.cookieName", rememberCookieName))
-//            );
-//            if (remember == null) return null;
-//            if (remember.getCookieValue().equals(rememberCookieValue) && TimestampCompare.secondsBetweenTimestamps
-//                    (TimestampCompare.getCurrentTimestamp(), remember.getValid()) > 0) {
-//                remember.setCookieValue(HashGenerator.hashString(UUID.randomUUID().toString()));
-//                return remember;
-//            } else {
-////                dao.remove(remember);
-//
-//                return null;
-//            }
-//        } catch (DaoException e) {
-//            throw new ServiceException("exception.service.user-service.get-remember.dao", e.getCause());
-//        } catch (NoSuchAlgorithmException e) {
-//            throw new ServiceException("exception.service.user-service.get-remember.hash", e.getCause());
-//        }
-        return null;
+    public Avatar getAvatar(Long id) throws ServiceException {
+        try {
+            List<Avatar> avatarList = dao(Avatar.class.getSimpleName()).read(new DaoParameter()
+                    .setWherePredicate(Where.Predicate.get(
+                            Avatar.Property.ID,
+                            Where.Predicate.PredicateOperator.EQUAL,
+                            id
+                    ))
+            );
+            if (avatarList == null || avatarList.size() == 0) return null;
+            return avatarList.get(0);
+        } catch (DaoException e) {
+            e.printStackTrace();
+            throw new ServiceException("exception.service.user.get-avatar.dao", e.getCause());
+        }
     }
 
-    public void setRemember(Remember remember) throws ServiceException {
-//        try {
-//            Dao_ dao = dao("User");
-//            remember.setCookieValue(HashGenerator.hashString(UUID.randomUUID().toString()));
-////            dao.update()
-//
-//        } catch (DaoException e) {
-//            throw new ServiceException("exception.service.user-service.get-remember.dao", e.getCause());
-//        } catch (NoSuchAlgorithmException e) {
-//            throw new ServiceException("exception.service.user-service.get-remember.hash", e.getCause());
-//        }
+    public void setAvatar(User user, String filePath) throws ServiceException {
+        String fileName = filePath.substring(filePath.lastIndexOf("\\") + 1);
+        int avatarInfoIndex = fileName.lastIndexOf(".avatar.");
+        String avatarName = fileName.substring(0, avatarInfoIndex);
+        avatarInfoIndex = avatarInfoIndex + 8;
+        String contentType = fileName.substring(avatarInfoIndex,
+                fileName.indexOf(".", avatarInfoIndex)).replaceAll("_", "/");
+        try (InputStream inputStream = new FileInputStream(new File(filePath))) {
+            Avatar avatar = new Avatar();
+            avatar.setId(user.getAvatarId());
+            avatar.setName(avatarName);
+            avatar.setType(contentType);
+            avatar.setFile((FileInputStream) inputStream);
+            avatar.setModified(TimestampCompare.getCurrentTimestamp());
+            if (avatar.getId() == null) {
+                Long avatarId = dao(Avatar.class.getSimpleName()).create(new DaoParameter()
+                        .setEntity(avatar)
+                );
+                user.setAvatarId(avatarId);
+            } else {
+                dao(Avatar.class.getSimpleName()).update(new DaoParameter()
+                        .setSetValueArray(
+                                new Update.SetValue(Avatar.Property.NAME, avatar.getName()),
+                                new Update.SetValue(Avatar.Property.TYPE, avatar.getType()),
+                                new Update.SetValue(Avatar.Property.FILE, avatar.getFile()),
+                                new Update.SetValue(Avatar.Property.MODIFIED, avatar.getModified())
+                        )
+                        .setWherePredicate(Where.Predicate.get(
+                                Avatar.Property.ID,
+                                Where.Predicate.PredicateOperator.EQUAL,
+                                avatar.getId()
+                        ))
+                );
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new ServiceException("exception.service.user.set-avatar.file", e.getCause());
+        } catch (DaoException e) {
+            e.printStackTrace();
+            throw new ServiceException("exception.service.user.set-avatar.dao", e.getCause());
+        }
+    }
+
+    public int removeAvatar(Long avatarId) throws ServiceException {
+        try {
+            return dao(Avatar.class.getSimpleName()).delete(new DaoParameter()
+                    .setWherePredicate(Where.Predicate.get(
+                            Avatar.Property.ID,
+                            Where.Predicate.PredicateOperator.EQUAL,
+                            avatarId
+                    ))
+            );
+        } catch (DaoException e) {
+            e.printStackTrace();
+            throw new ServiceException("exception.service.user.remove-avatar.dao", e.getCause());
+        }
     }
 
 //    public int addUser(User user) throws DaoException {
@@ -256,22 +314,5 @@ public class UserService extends BaseService {
 //    }
 //
 //
-//    public Map<String, Object> getAvatar(User user) throws DaoException {
-//        return getRelEntity(user, "Avatar");
-//    }
-//
-//    public Map<String, Object> getAvatar(Long avatarId) throws DaoException {
-//        User user = new User();
-//        user.setAvatarId(avatarId);
-//        return getAvatar(user);
-//    }
-//
-//    public void setAvatar(User user, String fileName) throws DaoException {
-//        setRelEntity(user, "Avatar", fileName);
-//    }
-//
-//    public void removeAvatar(User user) throws DaoException {
-//        removeRelEntity(user, "Avatar");
-//    }
 
 }

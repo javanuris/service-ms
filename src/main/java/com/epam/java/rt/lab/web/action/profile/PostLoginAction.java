@@ -33,6 +33,7 @@ import static com.epam.java.rt.lab.util.HashGenerator.hashPassword;
  * Service Management System
  */
 public class PostLoginAction implements Action {
+
     private static final Logger logger = LoggerFactory.getLogger(PostLoginAction.class);
 
     private enum Submit {

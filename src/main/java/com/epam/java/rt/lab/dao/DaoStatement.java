@@ -103,6 +103,10 @@ public class DaoStatement implements AutoCloseable {
         return this.statement.executeQuery();
     }
 
+    public ResultSet getGeneratedKeys() throws SQLException {
+        return this.statement.getGeneratedKeys();
+    }
+
     @Override
     public void close() throws Exception {
         this.statement.close();

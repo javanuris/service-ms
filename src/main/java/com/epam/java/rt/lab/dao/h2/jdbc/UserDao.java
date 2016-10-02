@@ -3,10 +3,8 @@ package com.epam.java.rt.lab.dao.h2.jdbc;
 import com.epam.java.rt.lab.dao.Dao;
 import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.dao.DaoParameter;
-import com.epam.java.rt.lab.dao.sql.Column;
-import com.epam.java.rt.lab.dao.sql.Select;
-import com.epam.java.rt.lab.dao.sql.Sql;
-import com.epam.java.rt.lab.dao.sql.Where;
+import com.epam.java.rt.lab.dao.sql.*;
+import com.epam.java.rt.lab.entity.EntityProperty;
 import com.epam.java.rt.lab.entity.rbac.Login;
 import com.epam.java.rt.lab.entity.rbac.Permission;
 import com.epam.java.rt.lab.entity.rbac.Role;
@@ -28,8 +26,18 @@ public class UserDao extends JdbcDao {
     }
 
     @Override
-    Sql getSqlCreate(DaoParameter daoParameter) {
-        return null;
+    Sql getSqlCreate(DaoParameter daoParameter) throws DaoException {
+        User user = (User) daoParameter.getEntity();
+        return Sql
+                .insert(user)
+                .values(
+                        new Insert.InsertValue(User.Property.FIRST_NAME, user.getFirstName()),
+                        new Insert.InsertValue(User.Property.MIDDLE_NAME, user.getMiddleName()),
+                        new Insert.InsertValue(User.Property.LAST_NAME, user.getLastName()),
+                        new Insert.InsertValue(User.Property.LOGIN_ID, user.getLogin().getId()),
+                        new Insert.InsertValue(User.Property.ROLE_ID, user.getRole().getId()),
+                        new Insert.InsertValue(User.Property.AVATAR_ID, user.getAvatarId())
+                );
     }
 
     @Override
@@ -42,8 +50,11 @@ public class UserDao extends JdbcDao {
     }
 
     @Override
-    Sql getSqlUpdate(DaoParameter daoParameter) {
-        return null;
+    Sql getSqlUpdate(DaoParameter daoParameter) throws DaoException {
+        return Sql
+                .update(User.class)
+                .set(daoParameter.getSetValueArray())
+                .where(daoParameter.getWherePredicate());
     }
 
     @Override

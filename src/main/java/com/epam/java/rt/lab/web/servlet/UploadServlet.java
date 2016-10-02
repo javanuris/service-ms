@@ -39,7 +39,7 @@ public class UploadServlet extends HttpServlet {
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        if (req.getSession().getAttribute("userId") != null) {
+        if (req.getSession().getAttribute("user") != null) {
             if (req.getMethod().equals("POST")) {
                 logger.debug("UPLOAD FILE");
                 if (UploadServlet.contentTypeListMap.size() == 0) initContentTypeListMap();

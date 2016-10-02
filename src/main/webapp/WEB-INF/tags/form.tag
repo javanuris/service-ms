@@ -48,13 +48,13 @@
                 <div class="form-group${not empty control.validationMessageList ? ' has-error' : ''}">
                     <label for="${control.name}"><fmt:message bundle="${ui}" key="${control.label}"/></label>
                     <label class="btn btn-default btn-file">
-                        <input id="${control.label}" onchange="uploadToServer(this)" type="file" name="${control.placeholder}"/>
+                        <input id="${control.name}" onchange="uploadToServer(this)" type="file" name="${control.action}"/>
                         <div style="width: 100%; text-align: center;">
-                            <img id="${control.label}-image" src="${control.value}" alt="<fmt:message bundle="${ui}" key="message.avatar-empty"/>"
+                            <img id="${control.name}-image" src="${control.value}" alt="<fmt:message bundle="${ui}" key="message.avatar-empty"/>"
                                  class="img-thumbnail" style="max-width: 100%; min-width: 100%; height: auto; align-content: center;">
                         </div>
-                        <div id="${control.label}-label"><fmt:message bundle="${ui}" key="message.browse-file"/></div>
-                        <input id="${control.label}-hidden" name="${control.label}" hidden/>
+                        <div id="${control.name}-label"><fmt:message bundle="${ui}" key="message.browse-file"/></div>
+                        <input id="${control.name}-hidden" name="${control.name}" hidden/>
                     </label>
                     <tags:validation validationMessageList="${control.validationMessageList}"/>
                 </div>

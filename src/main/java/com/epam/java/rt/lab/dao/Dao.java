@@ -7,7 +7,7 @@ import java.util.List;
  */
 public interface Dao {
 
-    int create(DaoParameter daoParameter) throws DaoException;
+    Long create(DaoParameter daoParameter) throws DaoException;
 
     <T> List<T> read(DaoParameter daoParameter) throws DaoException;
 

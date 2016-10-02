@@ -5,9 +5,6 @@ import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.dao.DaoParameter;
 import com.epam.java.rt.lab.dao.DaoStatement;
 import com.epam.java.rt.lab.dao.sql.Sql;
-import com.epam.java.rt.lab.dao.sql.Where;
-import com.epam.java.rt.lab.entity.BaseEntity;
-import com.epam.java.rt.lab.entity.rbac.Login;
 import com.epam.java.rt.lab.util.StringArray;
 
 import java.io.*;
@@ -77,10 +74,13 @@ public abstract class JdbcDao implements Dao {
     }
 
     @Override
-    public int create(DaoParameter daoParameter) throws DaoException {
+    public Long create(DaoParameter daoParameter) throws DaoException {
         Sql sql = getSqlCreate(daoParameter);
-        try (DaoStatement statement = new DaoStatement(this.connection, sql, Statement.NO_GENERATED_KEYS)) {
-            return statement.executeUpdate();
+        try (DaoStatement statement = new DaoStatement(this.connection, sql, Statement.RETURN_GENERATED_KEYS)) {
+            if (statement.executeUpdate() == 0) return null;
+            ResultSet resultSet = statement.getGeneratedKeys();
+            if (!resultSet.first()) return null;
+            return (Long) resultSet.getObject(1);
         } catch (NoSuchMethodException e) {
             throw new DaoException("exception.dao.jdbc.create.statement-method", e.getCause());
         } catch (SQLException e) {
@@ -124,6 +124,7 @@ public abstract class JdbcDao implements Dao {
     @Override
     public int delete(DaoParameter daoParameter) throws DaoException {
         Sql sql = getSqlDelete(daoParameter);
+        System.out.println("\n\n\n" + sql);
         try (DaoStatement statement = new DaoStatement(this.connection, sql, Statement.NO_GENERATED_KEYS)) {
             return statement.executeUpdate();
         } catch (NoSuchMethodException e) {
