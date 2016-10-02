@@ -3,6 +3,7 @@ package com.epam.java.rt.lab.web.servlet;
 import com.epam.java.rt.lab.entity.rbac.Avatar;
 import com.epam.java.rt.lab.service.ServiceException;
 import com.epam.java.rt.lab.service.UserService;
+import com.epam.java.rt.lab.util.TimestampCompare;
 import com.epam.java.rt.lab.util.validator.Validator;
 import com.epam.java.rt.lab.util.validator.ValidatorException;
 import com.epam.java.rt.lab.util.validator.ValidatorFactory;
@@ -16,6 +17,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 
@@ -32,37 +34,54 @@ public class DownloadServlet extends HttpServlet {
             if (req.getMethod().equals("GET")) {
                 logger.debug("DOWNLOAD REQUESTED: {}", req.getPathInfo());
                 InputStream inputStream = null;
+                Timestamp lastModified = null;
+                Timestamp ifModifiedSince = null;
+                String contentType = null;
                 switch (req.getPathInfo()) {
                     case "/avatar":
                         String avatarId = req.getParameter("id");
                         String avatarPath = req.getParameter("path");
+                        String ifModifiedSinceHeader = req.getHeader("If-Modified-Since");
+                        if (ifModifiedSinceHeader != null)
+                            ifModifiedSince = TimestampCompare.of(ifModifiedSinceHeader);
                         if (avatarId != null) {
                             logger.debug("AVATAR BY ID: {}", avatarId);
-                            try {
-                                if (ValidatorFactory.create("digits").validate(avatarId) == null) {
-                                    try (UserService userService = new UserService()) {
-                                        Avatar avatar = userService.getAvatar(Long.valueOf(avatarId));
-                                        resp.setContentType(avatar.getType());
-                                        inputStream = avatar.getFile();
-                                    } catch (ServiceException e) {
-                                        e.printStackTrace();
-                                        throw new ServletException(e);
+                            try (UserService userService = new UserService()) {
+                                Avatar avatar = userService.getAvatar(avatarId);
+                                if (avatar != null) {
+                                    lastModified = avatar.getModified();
+                                    contentType = avatar.getType();
+                                    if (ifModifiedSince != null && TimestampCompare.secondsBetweenTimestamps
+                                            (ifModifiedSince, lastModified) >= -1) {
+                                        resp.setStatus(304);
+                                        return;
                                     }
+                                    inputStream = avatar.getFile();
                                 }
-                            } catch (ValidatorException e) {
+                            } catch (ServiceException e) {
                                 e.printStackTrace();
+                                throw new ServletException(e);
                             }
                         } else if (avatarPath != null) {
                             logger.debug("AVATAR BY PATH: {}", avatarPath);
-                            resp.setContentType(avatarPath.substring(avatarPath.lastIndexOf(".") + 1).replaceAll("_", "/"));
-                            inputStream = new FileInputStream(new File(avatarPath));
+                            File file = new File(avatarPath);
+                            lastModified = TimestampCompare.of(file.lastModified());
+                            contentType = avatarPath.substring(avatarPath.lastIndexOf(".") + 1).replaceAll("_", "/");
+                            if (TimestampCompare.secondsBetweenTimestamps(ifModifiedSince, lastModified) >= -1) {
+                                resp.setStatus(304);
+                                return;
+                            }
+                            inputStream = new FileInputStream(file);
                         }
                 }
                 if (inputStream != null) {
                     logger.debug("READY TO DOWNLOAD");
+                    if (lastModified != null)
+                        resp.setHeader("Last-Modified", lastModified.toString());
+                    if (contentType != null)
+                        resp.setContentType(contentType);
                     IOUtils.copy(inputStream, resp.getOutputStream());
                     inputStream.close();
-                    resp.getOutputStream().close();
                     logger.debug("DOWNLOAD COMPLETE");
                 }
             }

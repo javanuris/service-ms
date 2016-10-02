@@ -7,6 +7,8 @@ import com.epam.java.rt.lab.dao.sql.Update;
 import com.epam.java.rt.lab.dao.sql.Where;
 import com.epam.java.rt.lab.entity.rbac.*;
 import com.epam.java.rt.lab.util.*;
+import com.epam.java.rt.lab.util.validator.ValidatorException;
+import com.epam.java.rt.lab.util.validator.ValidatorFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,6 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -211,8 +214,9 @@ public class UserService extends BaseService {
         }
     }
 
-    public Avatar getAvatar(Long id) throws ServiceException {
+    public Avatar getAvatar(String id) throws ServiceException {
         try {
+            if (ValidatorFactory.create("digits").validate(id) != null) return null;
             List<Avatar> avatarList = dao(Avatar.class.getSimpleName()).read(new DaoParameter()
                     .setWherePredicate(Where.Predicate.get(
                             Avatar.Property.ID,
@@ -225,6 +229,9 @@ public class UserService extends BaseService {
         } catch (DaoException e) {
             e.printStackTrace();
             throw new ServiceException("exception.service.user.get-avatar.dao", e.getCause());
+        } catch (ValidatorException e) {
+            e.printStackTrace();
+            return null;
         }
     }
 

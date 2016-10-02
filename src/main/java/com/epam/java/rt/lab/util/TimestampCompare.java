@@ -6,6 +6,8 @@ import org.joda.time.LocalDateTime;
 import org.joda.time.Seconds;
 
 import java.sql.Timestamp;
+import java.text.Format;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
@@ -52,4 +54,17 @@ public class TimestampCompare {
         return Seconds.secondsBetween(localDateTime1, localDateTime2).getSeconds();
     }
 
+    public static Timestamp of(String stringTimestamp) {
+        try {
+            return Timestamp.valueOf(stringTimestamp);
+        } catch (ClassCastException e) {
+            //
+            return null;
+        }
+    }
+
+    public static Timestamp of(Long longTimestamp) {
+        Format dateFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+        return Timestamp.valueOf(dateFormat.format(new Date(longTimestamp)));
+    }
 }
