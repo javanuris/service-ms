@@ -52,7 +52,7 @@ public class DownloadServlet extends HttpServlet {
                                     lastModified = avatar.getModified();
                                     contentType = avatar.getType();
                                     if (ifModifiedSince != null && TimestampCompare.secondsBetweenTimestamps
-                                            (ifModifiedSince, lastModified) >= -1) {
+                                            (ifModifiedSince, lastModified) < 1) {
                                         resp.setStatus(304);
                                         return;
                                     }
@@ -65,9 +65,10 @@ public class DownloadServlet extends HttpServlet {
                         } else if (avatarPath != null) {
                             logger.debug("AVATAR BY PATH: {}", avatarPath);
                             File file = new File(avatarPath);
-                            lastModified = TimestampCompare.of(file.lastModified());
+                            lastModified = new Timestamp(file.lastModified());
                             contentType = avatarPath.substring(avatarPath.lastIndexOf(".") + 1).replaceAll("_", "/");
-                            if (TimestampCompare.secondsBetweenTimestamps(ifModifiedSince, lastModified) >= -1) {
+                            if (ifModifiedSince != null && TimestampCompare.secondsBetweenTimestamps
+                                    (ifModifiedSince, lastModified) < 1) {
                                 resp.setStatus(304);
                                 return;
                             }

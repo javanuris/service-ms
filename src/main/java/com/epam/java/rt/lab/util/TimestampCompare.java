@@ -63,8 +63,4 @@ public class TimestampCompare {
         }
     }
 
-    public static Timestamp of(Long longTimestamp) {
-        Format dateFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
-        return Timestamp.valueOf(dateFormat.format(new Date(longTimestamp)));
-    }
 }
