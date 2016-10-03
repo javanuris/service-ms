@@ -5,7 +5,7 @@
     <jsp:attribute name="title">title.rbac.user.list</jsp:attribute>
     <jsp:attribute name="navbarCurrent">/rbac/user/list</jsp:attribute>
     <jsp:body>
-        <tags:nav navCurrent="/rbac/user/list"/>
+        <tags:nav nav="${requestScope.nav}" navCurrent="/rbac/user/list"/>
         ${requestScope.userList.addColumn(1, 'control.table.header.id.label', 'id')}
         ${requestScope.userList.addColumn(3, 'control.table.header.user.label', 'name')}
         ${requestScope.userList.addColumn(3, 'control.table.header.role.label', 'role.name')}

@@ -36,6 +36,7 @@ public class NavigationFactory {
     private void fillNavigationMap() throws NavigationException {
         Properties properties = new Properties();
         String comma = ",";
+        String point = ".";
         String navs = "navs";
         String uri = ".uri";
         String label = ".label";
@@ -48,12 +49,13 @@ public class NavigationFactory {
                         properties.getProperty(navigationName.concat(uri)),
                         properties.getProperty(navigationName.concat(label))
                 );
-                String subNavsProperty = properties.getProperty((navigationName).concat(subNavs));
+                String subNavsProperty = properties.getProperty(navigationName.concat(subNavs));
                 if (subNavsProperty != null) {
+                    String subNamPrefix = navigationName.concat(point);
                     for (String subNavigationName : StringArray.splitSpaceLessNames(subNavsProperty, comma)) {
                         navigation.addNavigation(new Navigation(
-                                properties.getProperty(navigationName.concat(uri)),
-                                properties.getProperty(navigationName.concat(label))
+                                properties.getProperty(subNamPrefix.concat(subNavigationName).concat(uri)),
+                                properties.getProperty(subNamPrefix.concat(subNavigationName).concat(label))
                         ));
                     }
                 }
