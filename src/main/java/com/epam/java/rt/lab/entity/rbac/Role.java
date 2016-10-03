@@ -11,6 +11,9 @@ import java.util.List;
  * service-ms
  */
 public class Role extends BaseEntity {
+
+    private final static String COMMA_DELIMITER = ", ";
+
     private String name;
     private List<String> uriList = new ArrayList<>();
 
@@ -49,4 +52,9 @@ public class Role extends BaseEntity {
     public void setUriList(List<String> uriList) {
         this.uriList = uriList;
     }
+
+    public String getUris() throws Exception {
+        return StringArray.combine(uriList, COMMA_DELIMITER);
+    }
+
 }

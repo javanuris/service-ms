@@ -41,8 +41,11 @@ public class RoleDao extends JdbcDao {
     }
 
     @Override
-    Sql getSqlUpdate(DaoParameter daoParameter) {
-        return null;
+    Sql getSqlUpdate(DaoParameter daoParameter) throws DaoException {
+        return Sql
+                .update(Role.class)
+                .set(daoParameter.getSetValueArray())
+                .where(daoParameter.getWherePredicate());
     }
 
     @Override
@@ -52,7 +55,7 @@ public class RoleDao extends JdbcDao {
 
     @Override
     Sql getSqlCount(DaoParameter daoParameter) throws DaoException {
-        return null;
+        return Sql.count(Role.class);
     }
 
     @Override

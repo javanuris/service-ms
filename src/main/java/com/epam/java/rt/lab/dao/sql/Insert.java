@@ -6,6 +6,7 @@ import com.epam.java.rt.lab.entity.EntityProperty;
 import com.epam.java.rt.lab.util.StringArray;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * service-ms
@@ -26,6 +27,12 @@ public class Insert extends Sql {
             throw new DaoException("exception.dao.sql.insert.empty-entity");
         this.entity = entity;
         this.table = getProperty(entity.getClass().getName());
+    }
+
+    Insert(Class propertyClass) throws DaoException {
+        if (propertyClass == null)
+            throw new DaoException("exception.dao.sql.insert.empty-entity");
+        this.table = getProperty(propertyClass.getName());
     }
 
     public Insert values(InsertValue... insertValueArray) throws DaoException {

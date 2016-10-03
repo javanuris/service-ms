@@ -9,6 +9,7 @@ import com.epam.java.rt.lab.util.StringArray;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -62,6 +63,8 @@ public abstract class Sql {
 
     static Column getColumn(EntityProperty entityProperty) throws DaoException {
         String entityClassName = entityProperty.getEntityClass().getName();
+        System.out.println(entityClassName);
+        System.out.println(entityClassName.concat(SIGN_POINT).concat(entityProperty.toString()));
         String tableName = getProperty(entityClassName);
         String columnName = getProperty(entityClassName.concat(SIGN_POINT).concat(entityProperty.toString()));
         if (tableName == null || columnName == null)
@@ -89,6 +92,18 @@ public abstract class Sql {
         if (entity == null)
             throw new DaoException("exception.dao.sql.insert.null-entity-class");
         return new Insert(entity);
+    }
+
+    /**
+     *
+     * @param
+     * @return
+     * @throws DaoException
+     */
+    public static Insert insert(Class propertyClass) throws DaoException {
+        if (propertyClass == null)
+            throw new DaoException("exception.dao.sql.insert.null-entity-class");
+        return new Insert(propertyClass);
     }
 
     /**

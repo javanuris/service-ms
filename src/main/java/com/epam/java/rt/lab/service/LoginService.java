@@ -84,7 +84,8 @@ public class LoginService extends BaseService {
                     .setSetValueArray(
                             new Update.SetValue(Login.Property.SALT, login.getSalt()),
                             new Update.SetValue(Login.Property.PASSWORD, login.getPassword()),
-                            new Update.SetValue(Login.Property.ATTEMPT_LEFT, login.getAttemptLeft())
+                            new Update.SetValue(Login.Property.ATTEMPT_LEFT, login.getAttemptLeft()),
+                            new Update.SetValue(Login.Property.STATUS, login.getAttemptLeft())
                     )
                     .setWherePredicate(Where.Predicate.get(
                             Login.Property.ID,

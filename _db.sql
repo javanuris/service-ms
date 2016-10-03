@@ -34,6 +34,8 @@ insert into "Permission" (uri, action) values ('/rbac/user/list', 'rbac.user.Lis
 insert into "Permission" (uri, action) values ('/rbac/user/view', 'rbac.user.View');
 insert into "Permission" (uri, action) values ('/rbac/user/edit', 'rbac.user.Edit');
 insert into "Permission" (uri, action) values ('/rbac/role/list', 'rbac.role.List');
+insert into "Permission" (uri, action) values ('/rbac/role/view', 'rbac.role.View');
+insert into "Permission" (uri, action) values ('/rbac/role/edit', 'rbac.role.Edit');
 insert into "Permission" (uri, action) values ('/rbac/permission/list', 'rbac.permission.List');
 insert into "Permission" (uri, action) values ('/application/list', 'application.List');
 insert into "Permission" (uri, action) values ('/execution/list', 'execution.List');
@@ -67,6 +69,8 @@ insert into "RolePermission" (role_id, permission_id) values (select id from "Ro
 insert into "RolePermission" (role_id, permission_id) values (select id from "Role" where name is 'admin', select id from "Permission" where uri is '/rbac/user/view');
 insert into "RolePermission" (role_id, permission_id) values (select id from "Role" where name is 'admin', select id from "Permission" where uri is '/rbac/user/edit');
 insert into "RolePermission" (role_id, permission_id) values (select id from "Role" where name is 'admin', select id from "Permission" where uri is '/rbac/role/list');
+insert into "RolePermission" (role_id, permission_id) values (select id from "Role" where name is 'admin', select id from "Permission" where uri is '/rbac/role/view');
+insert into "RolePermission" (role_id, permission_id) values (select id from "Role" where name is 'admin', select id from "Permission" where uri is '/rbac/role/edit');
 insert into "RolePermission" (role_id, permission_id) values (select id from "Role" where name is 'admin', select id from "Permission" where uri is '/rbac/permission/list');
 insert into "RolePermission" (role_id, permission_id) values (select id from "Role" where name is 'admin', select id from "Permission" where uri is '/application/list');
 insert into "RolePermission" (role_id, permission_id) values (select id from "Role" where name is 'admin', select id from "Permission" where uri is '/execution/list');

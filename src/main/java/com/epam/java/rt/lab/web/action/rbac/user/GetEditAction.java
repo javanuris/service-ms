@@ -43,7 +43,12 @@ public class GetEditAction implements Action {
                 parameterMap.remove("id");
                 resp.sendRedirect(UrlManager.getContextUri(req, "/rbac/user/list", parameterMap));
             } else {
-                User user = userService.getUser(Long.valueOf(id));
+                User user = (User) req.getSession().getAttribute("user");
+                if (user.getId() == Long.valueOf(id)) {
+                    resp.sendRedirect(UrlManager.getContextUri(req, "/profile/edit", parameterMap));
+                    return;
+                }
+                user = userService.getUser(Long.valueOf(id));
                 Form form = FormFactory.getInstance().create("edit-user-profile");
                 form.setActionParameterString(UrlManager.getRequestParameterString(parameterMap));
                 form.getItem(0).setValue(user.getFirstName());
@@ -59,7 +64,13 @@ public class GetEditAction implements Action {
                     valueList.add(new FormControl.SelectValue(role.getId().toString(), role.getName()));
                 form.getItem(4).setAvailableValueList(valueList);
                 form.getItem(4).setValue(user.getRole().getId().toString());
-                form.getItem(6).setActionParameters("?".concat(UrlManager.getRequestParameterString(parameterMap)));
+                form.getItem(5).setValue(String.valueOf(user.getLogin().getAttemptLeft()));
+                valueList = new ArrayList<>();
+                valueList.add(new FormControl.SelectValue("0", "0"));
+                valueList.add(new FormControl.SelectValue("-1", "-1"));
+                form.getItem(6).setAvailableValueList(valueList);
+                form.getItem(6).setValue(String.valueOf(user.getLogin().getStatus()));
+                form.getItem(8).setActionParameters("?".concat(UrlManager.getRequestParameterString(parameterMap)));
                 req.setAttribute("editForm", form);
                 req.getRequestDispatcher("/WEB-INF/jsp/rbac/user/edit.jsp").forward(req, resp);
             }

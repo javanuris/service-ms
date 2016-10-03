@@ -124,7 +124,6 @@ public abstract class JdbcDao implements Dao {
     @Override
     public int delete(DaoParameter daoParameter) throws DaoException {
         Sql sql = getSqlDelete(daoParameter);
-        System.out.println("\n\n\n" + sql);
         try (DaoStatement statement = new DaoStatement(this.connection, sql, Statement.NO_GENERATED_KEYS)) {
             return statement.executeUpdate();
         } catch (NoSuchMethodException e) {

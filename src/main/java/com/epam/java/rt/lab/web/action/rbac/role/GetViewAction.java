@@ -1,6 +1,8 @@
-package com.epam.java.rt.lab.web.action.rbac.user;
+package com.epam.java.rt.lab.web.action.rbac.role;
 
+import com.epam.java.rt.lab.entity.rbac.Role;
 import com.epam.java.rt.lab.entity.rbac.User;
+import com.epam.java.rt.lab.service.RoleService;
 import com.epam.java.rt.lab.service.ServiceException;
 import com.epam.java.rt.lab.service.UserService;
 import com.epam.java.rt.lab.util.UrlManager;
@@ -19,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Service Management System
@@ -28,35 +31,28 @@ public class GetViewAction implements Action {
 
     @Override
     public void execute(HttpServletRequest req, HttpServletResponse resp) throws ActionException {
-        try (UserService userService = new UserService()) {
-            logger.debug("/WEB-INF/jsp/rbac/user/view.jsp");
+        try (RoleService roleService = new RoleService()) {
+            logger.debug("/WEB-INF/jsp/rbac/role/view.jsp");
             Map<String, String> parameterMap = UrlManager.getRequestParameterMap(req.getQueryString());
             String id = parameterMap.remove("id");
             if (ValidatorFactory.create("digits").validate(id) != null) {
-                resp.sendRedirect(UrlManager.getContextUri(req, "/rbac/user/list", parameterMap));
+                resp.sendRedirect(UrlManager.getContextUri(req, "/rbac/role/list", parameterMap));
             } else {
                 User user = (User) req.getSession().getAttribute("user");
-                if (user.getId() == Long.valueOf(id)) {
-                    resp.sendRedirect(UrlManager.getContextUri(req, "/profile/view", parameterMap));
+                if (user.getRole().getId().equals(Long.valueOf(id))) {
+                    req.getSession().setAttribute("message", "message.role-owner");
+                    resp.sendRedirect(UrlManager.getContextUri(req, "/home", parameterMap));
                     return;
                 }
-                user = userService.getUser(Long.valueOf(id));
-                View view = ViewFactory.getInstance().create("view-user-profile");
-                view.getControl(0).setValue(user.getFirstName());
-                view.getControl(1).setValue(user.getMiddleName());
-                view.getControl(2).setValue(user.getLastName());
-                view.getControl(3).setValue(
-                        UrlManager.getContextRef(req, "/file/download/avatar", "id", user.getAvatarId())
-                );
-                view.getControl(4).setValue(user.getLogin().getEmail());
-                view.getControl(5).setValue(user.getRole().getName());
-                view.getControl(6).setValue(String.valueOf(user.getLogin().getAttemptLeft()));
-                view.getControl(7).setValue(String.valueOf(user.getLogin().getStatus()));
-                view.getControl(8).setAction(UrlManager.getContextUri(req, "/rbac/user/edit",
+                Role role = roleService.getRole(Long.valueOf(id));
+                View view = ViewFactory.getInstance().create("view-role");
+                view.getControl(0).setValue(role.getName());
+                view.getControl(1).setValue(role.getUris());
+                view.getControl(2).setAction(UrlManager.getContextUri(req, "/rbac/role/edit",
                         UrlManager.getRequestParameterString(parameterMap), "id=".concat(id)));
-                view.getControl(9).setAction(UrlManager.getContextUri(req, "/rbac/user/list", parameterMap));
-                req.setAttribute("viewProfile", view);
-                req.getRequestDispatcher("/WEB-INF/jsp/rbac/user/view.jsp").forward(req, resp);
+                view.getControl(3).setAction(UrlManager.getContextUri(req, "/rbac/role/list", parameterMap));
+                req.setAttribute("viewRole", view);
+                req.getRequestDispatcher("/WEB-INF/jsp/rbac/role/view.jsp").forward(req, resp);
             }
         } catch (ServiceException e) {
             e.printStackTrace();
@@ -70,6 +66,9 @@ public class GetViewAction implements Action {
         } catch (ServletException | IOException e) {
             e.printStackTrace();
             throw new ActionException("exception.action.view.request", e.getCause());
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new ActionException("exception.action.view.uris", e.getCause());
         }
     }
 

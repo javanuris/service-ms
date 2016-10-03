@@ -34,6 +34,7 @@ public class FrontServlet extends HttpServlet {
             }
         } catch (ActionException e) {
             logger.error("ActionException", e);
+            e.printStackTrace();
             throw new ServletException(e.getMessage());
         }
     }

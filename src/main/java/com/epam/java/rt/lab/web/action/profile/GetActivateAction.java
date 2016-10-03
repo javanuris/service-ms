@@ -44,7 +44,7 @@ public class GetActivateAction implements Action {
                         resp.sendRedirect(UrlManager.getContextUri(req, "/profile/login"));
                         return;
                     } else {
-                        req.getSession().setAttribute("message", "message.activation.error-confirm");
+                        req.getSession().setAttribute("message", "message.activation-error");
                     }
                 }
             }
