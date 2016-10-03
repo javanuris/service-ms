@@ -57,13 +57,15 @@ public class PostEditAction implements Action {
                                 Long avatarId = user.getAvatarId();
                                 user.setAvatarId(null);
                                 userService.updateUser(user);
-                                userService.removeAvatar(user.getAvatarId());
+                                userService.removeAvatar(avatarId);
                             } else {
                                 String[] pair = form.getItem(3).getValue().split("\\?");
                                 if (pair.length == 2) {
                                     pair = pair[1].split("=");
-                                    if (pair.length == 2)
-                                        userService.setAvatar(user, pair[1]);
+                                    if (pair.length == 2) {
+                                        if ("path".equals(pair[0]))
+                                            userService.setAvatar(user, pair[1]);
+                                    }
                                 }
                                 userService.updateUser(user);
                             }

@@ -11,7 +11,7 @@ public class Page {
     private Long countItems;
 
     public Page(Long currentPage, Long itemsOnPage) {
-        this.currentPage = currentPage;
+        this.currentPage = currentPage != null ? currentPage : 1L;
         this.itemsOnPage = itemsOnPage != null ? itemsOnPage : ITEMS_ON_PAGE;
     }
 

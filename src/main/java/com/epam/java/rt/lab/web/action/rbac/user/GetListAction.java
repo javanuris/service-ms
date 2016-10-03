@@ -29,9 +29,9 @@ public class GetListAction implements Action {
             String pageIndex = req.getParameter("page");
             String itemCount = req.getParameter("items");
             Page page = new Page(
-                    pageIndex == null || ValidatorFactory.create("digits").validate(pageIndex) == null ?
-                            1L : Long.valueOf(pageIndex),
-                    itemCount == null || ValidatorFactory.create("digits").validate(itemCount) == null ?
+                    ValidatorFactory.create("digits").validate(pageIndex) != null ?
+                            null : Long.valueOf(pageIndex),
+                    ValidatorFactory.create("digits").validate(itemCount) != null ?
                             null : Long.valueOf(itemCount)
             );
             Table table = new Table();

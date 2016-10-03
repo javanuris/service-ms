@@ -56,7 +56,8 @@ public class UserService extends BaseService {
                             new Update.SetValue(User.Property.FIRST_NAME, user.getFirstName()),
                             new Update.SetValue(User.Property.MIDDLE_NAME, user.getMiddleName()),
                             new Update.SetValue(User.Property.LAST_NAME, user.getLastName()),
-                            new Update.SetValue(User.Property.AVATAR_ID, user.getAvatarId())
+                            new Update.SetValue(User.Property.AVATAR_ID, user.getAvatarId()),
+                            new Update.SetValue(User.Property.ROLE_ID, user.getRole().getId())
                     )
                     .setWherePredicate(Where.Predicate.get(
                             User.Property.ID,
@@ -88,7 +89,6 @@ public class UserService extends BaseService {
         }
     }
 
-    @Deprecated
     public User getUser(Long id) throws ServiceException {
         try {
             List<User> userList = dao(User.class.getSimpleName()).read(new DaoParameter()

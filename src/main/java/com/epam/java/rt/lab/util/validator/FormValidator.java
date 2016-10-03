@@ -33,6 +33,21 @@ public class FormValidator {
                         formControl.setValidationMessageList(new ArrayList<>());
                     formControl.getValidationMessageList().addAll(Arrays.asList(msgArray));
                 }
+                if ("select".equals(formControl.getType())) {
+                    if (formControl.getAvailableValueList() == null) {
+                        boolean contains = false;
+                        for (FormControl.SelectValue selectValue : formControl.getAvailableValueList()) {
+                            if (selectValue.getValue().equals(formControl.getValue())) {
+                                contains = true;
+                                break;
+                            }
+                        }
+                        if (!contains) {
+                            result = false;
+                            formControl.addValidationMessage("message.validation.select");
+                        }
+                    }
+                }
             }
         }
         return result;

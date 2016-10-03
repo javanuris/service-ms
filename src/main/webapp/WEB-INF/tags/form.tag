@@ -16,7 +16,7 @@
                             </button>
                         </c:when>
                         <c:when test="${control.type.equals('button')}">
-                            <a href="${control.action}" role="${control.type}" class="btn btn-default col-xs-12" name="${control.name}">
+                            <a href="${control.action}${control.actionParameters}" role="${control.type}" class="btn btn-default col-xs-12" name="${control.name}">
                                 <fmt:message bundle="${ui}" key="${control.label}"/>
                             </a>
                         </c:when>
@@ -33,13 +33,31 @@
                     </div>
                 </div>
             </c:when>
+            <c:when test="${control.type.equals('select')}">
+                <div class="form-group${not empty control.validationMessageList ? ' has-error' : ''}">
+                    <label for="${control.label}"><fmt:message bundle="${ui}" key="${control.label}"/></label>
+                    <select class="form-control" name="${control.name}">
+                        <c:forEach var="option" items="${control.availableValueList}">
+                            <c:choose>
+                                <c:when test="${option.value.equals(control.value)}">
+                                    <option value="${option.value}" selected>${option.label}</option>
+                                </c:when>
+                                <c:otherwise>
+                                    <option value="${option.value}">${option.label}</option>
+                                </c:otherwise>
+                            </c:choose>
+                        </c:forEach>
+                    </select>
+                    <tags:validation validationMessageList="${control.validationMessageList}"/>
+                </div>
+            </c:when>
             <c:when test="${control.type.equals('file')}">
                 <div class="form-group${not empty control.validationMessageList ? ' has-error' : ''}">
                     <label for="${control.label}"><fmt:message bundle="${ui}" key="${control.label}"/></label>
                     <label class="btn btn-default btn-file">
                         <input id="${control.label}" onchange="uploadToServer(this)" type="file" name="${control.placeholder}"/>
                         <div id="${control.label}-label"><fmt:message bundle="${ui}" key="message.browse-file"/></div>
-                        <input id="${control.label}-hidden" name="${control.label}" hidden/>
+                        <input id="${control.label}-hidden" name="${control.label}" value="${control.value}" hidden/>
                     </label>
                     <tags:validation validationMessageList="${control.validationMessageList}"/>
                 </div>
@@ -54,7 +72,7 @@
                                  class="img-thumbnail" style="max-width: 100%; min-width: 100%; height: auto; align-content: center;">
                         </div>
                         <div id="${control.name}-label"><fmt:message bundle="${ui}" key="message.browse-file"/></div>
-                        <input id="${control.name}-hidden" name="${control.name}" hidden/>
+                        <input id="${control.name}-hidden" name="${control.name}" value="${control.value}" hidden/>
                     </label>
                     <tags:validation validationMessageList="${control.validationMessageList}"/>
                 </div>

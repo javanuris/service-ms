@@ -32,6 +32,7 @@ insert into "Permission" (uri, action) values ('/profile/edit', 'profile.Edit');
 insert into "Permission" (uri, action) values ('/profile/logout', 'profile.Logout');
 insert into "Permission" (uri, action) values ('/rbac/user/list', 'rbac.user.List');
 insert into "Permission" (uri, action) values ('/rbac/user/view', 'rbac.user.View');
+insert into "Permission" (uri, action) values ('/rbac/user/edit', 'rbac.user.Edit');
 insert into "Permission" (uri, action) values ('/rbac/role/list', 'rbac.role.List');
 insert into "Permission" (uri, action) values ('/rbac/permission/list', 'rbac.permission.List');
 insert into "Permission" (uri, action) values ('/application/list', 'application.List');
@@ -64,6 +65,7 @@ insert into "RolePermission" (role_id, permission_id) values (select id from "Ro
 insert into "RolePermission" (role_id, permission_id) values (select id from "Role" where name is 'admin', select id from "Permission" where uri is '/profile/logout');
 insert into "RolePermission" (role_id, permission_id) values (select id from "Role" where name is 'admin', select id from "Permission" where uri is '/rbac/user/list');
 insert into "RolePermission" (role_id, permission_id) values (select id from "Role" where name is 'admin', select id from "Permission" where uri is '/rbac/user/view');
+insert into "RolePermission" (role_id, permission_id) values (select id from "Role" where name is 'admin', select id from "Permission" where uri is '/rbac/user/edit');
 insert into "RolePermission" (role_id, permission_id) values (select id from "Role" where name is 'admin', select id from "Permission" where uri is '/rbac/role/list');
 insert into "RolePermission" (role_id, permission_id) values (select id from "Role" where name is 'admin', select id from "Permission" where uri is '/rbac/permission/list');
 insert into "RolePermission" (role_id, permission_id) values (select id from "Role" where name is 'admin', select id from "Permission" where uri is '/application/list');

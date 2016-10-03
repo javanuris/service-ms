@@ -75,11 +75,11 @@ public class FormControl {
         return this.controlVal;
     }
 
-    public List<String> getAvailableValueList() {
+    public List<SelectValue> getAvailableValueList() {
         return val().availableValueList;
     }
 
-    public void setAvailableValueList(List<String> availableValueList) {
+    public void setAvailableValueList(List<SelectValue> availableValueList) {
         val().availableValueList = availableValueList;
     }
 
@@ -121,9 +121,17 @@ public class FormControl {
         val().ignoreValidate = value;
     }
 
+    public String getActionParameters() {
+        return val().actionParameters;
+    }
+
+    public void setActionParameters(String actionParameters) {
+        val().actionParameters = actionParameters;
+    }
 
     // immutable item definition
     private static class ControlDef {
+
         private String name;
         private String label;
         private String type;
@@ -153,13 +161,34 @@ public class FormControl {
 
     // mutable item values
     private static class ControlVal<T> {
-        private List<String> availableValueList = null;
+
+        private List<SelectValue> availableValueList = null;
         private String value = null;
         private T genericValue = null;
         private List<String> validationMessageList = null;
         private boolean ignoreValidate = false;
+        private String actionParameters;
 
         private ControlVal() {
+        }
+    }
+
+    public static class SelectValue {
+
+        private String value;
+        private String label;
+
+        public SelectValue(String value, String label) {
+            this.value = value;
+            this.label = label;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        public String getLabel() {
+            return label;
         }
     }
 
@@ -171,6 +200,7 @@ public class FormControl {
                 .append(", TYPE: ").append(getType())
                 .append(", PLACEHOLDER: ").append(getPlaceholder())
                 .append(", ACTION: ").append(getAction())
+                .append(", ACTION-PARAMETERS: ").append(getActionParameters())
                 .append(", SUB-ACTION: ").append(getSubAction())
                 .append(", VALIDATOR: ").append(getValidator())
                 .append(", AVAILABLE-VALUE-LIST: ").append(getAvailableValueList())
