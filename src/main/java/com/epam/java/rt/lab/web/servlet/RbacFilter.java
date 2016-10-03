@@ -6,6 +6,9 @@ import com.epam.java.rt.lab.service.ServiceException;
 import com.epam.java.rt.lab.service.UserService;
 import com.epam.java.rt.lab.util.CookieManager;
 import com.epam.java.rt.lab.util.UrlManager;
+import com.epam.java.rt.lab.web.Rbac.RoleException;
+import com.epam.java.rt.lab.web.Rbac.RoleFactory;
+import com.epam.java.rt.lab.web.component.form.FormException;
 import com.epam.java.rt.lab.web.component.navigation.NavigationException;
 import com.epam.java.rt.lab.web.component.navigation.NavigationFactory;
 import org.slf4j.Logger;
@@ -36,8 +39,7 @@ public class RbacFilter implements Filter {
             throws IOException, ServletException {
 
         logger.debug("RbacFilter");
-        try (UserService userService = new UserService();
-             LoginService loginService = new LoginService()) {
+        try (UserService userService = new UserService()) {
             HttpServletRequest req = (HttpServletRequest) servletRequest;
             User user = (User) req.getSession().getAttribute("user");
             if (user == null) {
@@ -60,7 +62,7 @@ public class RbacFilter implements Filter {
             }
             if (user == null) {
                 logger.debug("ANONYMOUS URI = {}", userService.getAnonymous().getRole().getUriList());
-                if (userService.getAnonymous().getRole().getUriList().contains(req.getPathInfo())) {
+                if (RoleFactory.getInstance().createAnonymous().verifyPermission(req.getPathInfo())) {
                     logger.debug("CONTAINS {}", req.getPathInfo());
                     filterChain.doFilter(servletRequest, servletResponse);
                     logger.debug("REDIRECT (SHOULD BE NULL) {}", req.getSession().getAttribute("redirect"));
@@ -72,7 +74,7 @@ public class RbacFilter implements Filter {
                     resp.sendRedirect(UrlManager.getContextUri(req, "/profile/login", parameterMap));
                 }
             } else {
-                if (user.getRole().getUriList().contains(req.getPathInfo())) {
+                if (RoleFactory.getInstance().create(user.getRole().getName()).verifyPermission(req.getPathInfo())) { // TODO: refactor to role
                     disableCacheForAccessSensitive((HttpServletResponse) servletResponse);
                     filterChain.doFilter(servletRequest, servletResponse);
                 } else {
@@ -89,6 +91,11 @@ public class RbacFilter implements Filter {
         } catch (NavigationException e) {
             e.printStackTrace();
             throw new ServletException("exception.filter.rbac.do-filter.navigation", e.getCause());
+        } catch (RoleException e) {
+            e.printStackTrace();
+            throw new ServletException("exception.filter.rbac.do-filter.role-factory", e.getCause());
+        } catch (FormException e) {
+            e.printStackTrace();
         }
     }
 

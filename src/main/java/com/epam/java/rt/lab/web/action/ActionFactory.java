@@ -1,16 +1,14 @@
 package com.epam.java.rt.lab.web.action;
 
-import com.epam.java.rt.lab.entity.rbac.Permission;
-import com.epam.java.rt.lab.service.PermissionService;
-import com.epam.java.rt.lab.service.ServiceException;
+import com.epam.java.rt.lab.web.Rbac.Permission;
+import com.epam.java.rt.lab.web.Rbac.RoleFactory;
+import com.epam.java.rt.lab.web.component.form.FormException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Service Management System
@@ -42,20 +40,17 @@ public final class ActionFactory {
         String point = ".";
         String get = "Get";
         String post = "Post";
-        String action = "Action";
+//        String action = "Action";
         this.actionMap.clear();
         String actionPackagePath = ActionFactory.class.getPackage().getName().concat(point);
-        try (PermissionService permissionService = new PermissionService()) {
-            List<Permission> permissionList = permissionService.getPermissionList();
-            for (Permission permission : permissionList) {
-                String actionName = permission.getAction();
+        try {
+            for (Permission permission : RoleFactory.getInstance().getPermissionList()) {
+                String actionName = permission.getActionName();
                 String actionPath = actionPackagePath;
                 int pointIndex = actionName.lastIndexOf(point) + 1;
                 if (pointIndex > 0) {
                     actionPath = actionPackagePath.concat(actionName.substring(0, pointIndex));
-                    actionName = actionName.substring(pointIndex).concat(action);
-                } else {
-                    actionName = actionName.concat(action);
+                    actionName = actionName.substring(pointIndex);
                 }
                 addAction(
                         get,
@@ -70,8 +65,9 @@ public final class ActionFactory {
                         actionName
                 );
             }
-        } catch (ServiceException e) {
-            throw new ActionException("exception.action.factory.permission", e.getCause());
+        } catch (FormException e) {
+            e.printStackTrace();
+            throw new ActionException("exception.action.factory.role-factory", e.getCause());
         }
     }
 
