@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * service-ms
+ * category-ms
  */
 @WebServlet(urlPatterns = "/file/download/*")
 public class DownloadServlet extends HttpServlet {

@@ -1,7 +1,7 @@
 package com.epam.java.rt.lab.web.access;
 
 /**
- * service-ms
+ * category-ms
  */
 public class Permission {
 

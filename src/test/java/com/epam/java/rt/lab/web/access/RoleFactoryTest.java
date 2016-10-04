@@ -5,7 +5,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 /**
- * service-ms
+ * category-ms
  */
 public class RoleFactoryTest {
 

@@ -5,7 +5,7 @@ import java.math.BigInteger;
 import java.util.Comparator;
 
 /**
- * service-ms
+ * category-ms
  */
 public class NumberCompare implements Comparator<Number> {
 // copyAndPaste from http://stackoverflow.com/a/12884075

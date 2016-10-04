@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.util.*;
 
 /**
- * service-ms
+ * category-ms
  */
 public final class RoleFactory {
 

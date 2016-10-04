@@ -17,7 +17,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.*;
 
 /**
- * service-ms
+ * category-ms
  */
 @MultipartConfig(maxFileSize = 10485760)
 @WebServlet(urlPatterns = "/file/upload/*")

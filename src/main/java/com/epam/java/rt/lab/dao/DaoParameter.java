@@ -10,7 +10,7 @@ import com.epam.java.rt.lab.entity.EntityProperty;
 import java.util.Map;
 
 /**
- *  used to exchange parameters between service layer and dao layer, and through dao methods
+ *  used to exchange parameters between category layer and dao layer, and through dao methods
  */
 public class DaoParameter {
 

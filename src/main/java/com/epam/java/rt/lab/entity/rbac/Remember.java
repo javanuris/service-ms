@@ -7,7 +7,7 @@ import org.joda.time.DateTime;
 import java.sql.Timestamp;
 
 /**
- * service-ms
+ * category-ms
  */
 public class Remember extends BaseEntity {
     private User user;

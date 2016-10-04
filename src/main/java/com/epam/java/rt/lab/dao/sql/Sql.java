@@ -15,7 +15,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * service-ms
+ * category-ms
  */
 public abstract class Sql {
 
@@ -63,8 +63,8 @@ public abstract class Sql {
 
     static Column getColumn(EntityProperty entityProperty) throws DaoException {
         String entityClassName = entityProperty.getEntityClass().getName();
-        System.out.println(entityClassName);
-        System.out.println(entityClassName.concat(SIGN_POINT).concat(entityProperty.toString()));
+//        System.out.println(entityClassName);
+//        System.out.println(entityClassName.concat(SIGN_POINT).concat(entityProperty.toString()));
         String tableName = getProperty(entityClassName);
         String columnName = getProperty(entityClassName.concat(SIGN_POINT).concat(entityProperty.toString()));
         if (tableName == null || columnName == null)

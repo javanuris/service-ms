@@ -9,7 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * service-ms
+ * category-ms
  */
 public class OrderBy implements Clause {
 

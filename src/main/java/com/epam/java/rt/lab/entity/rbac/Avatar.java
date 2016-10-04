@@ -8,7 +8,7 @@ import java.io.InputStream;
 import java.sql.Timestamp;
 
 /**
- * service-ms
+ * category-ms
  */
 public class Avatar extends BaseEntity {
 

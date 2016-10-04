@@ -3,9 +3,7 @@ package com.epam.java.rt.lab.web.action.profile;
 import com.epam.java.rt.lab.entity.rbac.Activate;
 import com.epam.java.rt.lab.entity.rbac.Login;
 import com.epam.java.rt.lab.service.LoginService;
-import com.epam.java.rt.lab.service.RoleService;
 import com.epam.java.rt.lab.service.ServiceException;
-import com.epam.java.rt.lab.service.UserService;
 import com.epam.java.rt.lab.util.GlobalProperties;
 import com.epam.java.rt.lab.util.HashGenerator;
 import com.epam.java.rt.lab.util.TimestampCompare;
@@ -24,7 +22,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
-import java.util.Map;
 import java.util.UUID;
 
 /**

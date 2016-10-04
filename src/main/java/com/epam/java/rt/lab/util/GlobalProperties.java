@@ -6,7 +6,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * service-ms
+ * category-ms
  */
 public final class GlobalProperties {
 

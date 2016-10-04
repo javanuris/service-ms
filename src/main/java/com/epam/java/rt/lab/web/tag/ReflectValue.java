@@ -8,7 +8,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
- * service-ms
+ * category-ms
  */
 public class ReflectValue extends SimpleTagSupport {
 

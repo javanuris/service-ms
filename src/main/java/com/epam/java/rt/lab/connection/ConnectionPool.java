@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * service-ms
+ * category-ms
  */
 public class ConnectionPool implements DataSource {
     private static final Logger logger = LoggerFactory.getLogger(ConnectionPool.class);

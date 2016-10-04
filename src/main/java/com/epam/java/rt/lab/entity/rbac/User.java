@@ -5,7 +5,7 @@ import com.epam.java.rt.lab.entity.BaseEntity;
 import com.epam.java.rt.lab.web.access.Role;
 
 /**
- * service-ms
+ * category-ms
  */
 public class User extends BaseEntity {
     private String firstName;

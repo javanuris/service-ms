@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * service-ms
+ * category-ms
  */
 public class Where implements Clause {
 

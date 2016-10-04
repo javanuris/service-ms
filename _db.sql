@@ -12,7 +12,7 @@ create table if not exists "Avatar" (id identity primary key, name varchar(255),
 create table if not exists "User" (id identity primary key, first_name varchar(255), middle_name varchar(255), last_name varchar(255), login_id bigint references "Login" (id), role_name varchar(255), avatar_id bigint references "Avatar" (id));
 create table if not exists "Remember" (id identity primary key, user_id bigint references "User" (id), cookie_name varchar(255), cookie_value varchar(255), valid datetime);
 create table if not exists "Activate" (id identity primary key, email varchar(255) unique, salt varchar(128) not null, password varchar(255), code varchar(255), valid datetime);
-create table if not exists "Category" (id identity primary key, created timestamp, category_id bigint references "Category" (id), name varchar(255) not null);
+create table if not exists "Category" (id identity primary key, created timestamp, parent_id bigint references "Category" (id), name varchar(255) not null);
 create table if not exists "Application" (id identity primary key, created timestamp, user_id bigint references "User" (id), category_id bigint references "Category" (id), message varchar(255) not null);
 create table if not exists "Processing" (id identity primary key, application_id bigint references "Application" (id), user_id bigint references "User" (id), created timestamp);
 create table if not exists "Attachment" (id identity primary key, name varchar(255), type varchar(255), file blob, created datetime);
@@ -37,7 +37,7 @@ insert into "User" (first_name, middle_name, last_name, login_id, role_name) val
 insert into "User" (first_name, middle_name, last_name, login_id, role_name) values ('Gregory', 'Z.', 'Shvartz', select id from "Login" where email is 'test@test.com', 'admin');
 insert into "User" (first_name, middle_name, last_name, login_id, role_name) values ('Bill', 'L.', 'Black', select id from "Login" where email is 'test@test.com', 'admin');
 insert into "User" (first_name, middle_name, last_name, login_id, role_name) values ('Latisha', 'P.', 'Morrisson', select id from "Login" where email is 'test@test.com', 'admin');
-insert into "Category" (created, category_id, name) values ('2016-10-11 17:36:17.528', null, 'Heating');
+insert into "Category" (created, parent_id, name) values ('2016-10-11 17:36:17.528', null, 'Heating');
 
 
 //Select data

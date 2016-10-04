@@ -19,7 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
- * service-ms
+ * category-ms
  */
 public class PostEditAction implements Action {
 
@@ -58,7 +58,7 @@ public class PostEditAction implements Action {
                             return;
                         } catch (ServiceException e) {
                             e.printStackTrace();
-                            throw new ActionException("exception.action.profile.edit.service", e.getCause());
+                            throw new ActionException("exception.action.profile.edit.category", e.getCause());
                         }
                     }
                     break;
@@ -106,7 +106,7 @@ public class PostEditAction implements Action {
 //            req.getRequestDispatcher("/WEB-INF/jsp/profile/edit.jsp").forward(req, resp);
 //        } catch (ConnectionException | DaoException e) {
 //            e.printStackTrace();
-//            throw new ActionException("exception.action.edit.user-service", e.getCause());
+//            throw new ActionException("exception.action.edit.user-category", e.getCause());
 //        } catch (ServletException | IOException e) {
 //            e.printStackTrace();
 //            throw new ActionException("exception.action.edit.forward", e.getCause());

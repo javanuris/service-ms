@@ -41,7 +41,7 @@ public class GetViewAction implements Action {
 //            }
 //        } catch (ServiceException e) {
 //            e.printStackTrace();
-//            throw new ActionException("exception.action.access.user.view.user-service.get-user", e.getCause());
+//            throw new ActionException("exception.action.access.user.view.user-category.get-user", e.getCause());
 //        } catch (ValidatorException e) {
 //            e.printStackTrace();
 //            throw new ActionException("exception.action.access.user.view.validator.id", e.getCause());

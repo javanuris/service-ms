@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * service-ms
+ * category-ms
  */
 public class DaoStatement implements AutoCloseable {
 

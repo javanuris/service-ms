@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * service-ms
+ * category-ms
  */
 public class ApplicationDao extends JdbcDao {
 

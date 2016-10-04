@@ -29,7 +29,7 @@
         </c:when>
         <c:otherwise>
             <li class="list-group-item col-xs-12" style="text-align: center;" disabled="">
-                <em><fmt:message bundle="${ui}" key="list.empty.label"/></em>
+                <em><fmt:message bundle="${ui}" key="message.info.empty"/></em>
             </li>
         </c:otherwise>
     </c:choose>

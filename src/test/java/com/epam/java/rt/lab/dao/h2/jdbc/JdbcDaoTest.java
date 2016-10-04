@@ -17,7 +17,7 @@ import java.util.List;
 import static org.junit.Assert.*;
 
 /**
- * service-ms
+ * category-ms
  */
 public class JdbcDaoTest {
 

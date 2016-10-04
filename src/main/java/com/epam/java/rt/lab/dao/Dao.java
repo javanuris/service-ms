@@ -3,7 +3,7 @@ package com.epam.java.rt.lab.dao;
 import java.util.List;
 
 /**
- * service-ms
+ * category-ms
  */
 public interface Dao {
 

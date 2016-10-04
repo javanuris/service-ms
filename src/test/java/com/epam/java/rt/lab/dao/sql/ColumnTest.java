@@ -6,7 +6,7 @@ import org.junit.runners.MethodSorters;
 import static org.junit.Assert.*;
 
 /**
- * service-ms
+ * category-ms
  */
 //@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class ColumnTest {

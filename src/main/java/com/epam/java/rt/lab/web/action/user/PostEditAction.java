@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * service-ms
+ * category-ms
  */
 public class PostEditAction implements Action {
     private static final Logger logger = LoggerFactory.getLogger(GetLoginAction.class);
@@ -54,6 +54,7 @@ public class PostEditAction implements Action {
                 }
                 user = userService.getUser(Long.valueOf(id));
                 Form form = FormFactory.getInstance().create("edit-user-profile");
+                form.setActionParameterString(UrlManager.getRequestParameterString(parameterMap));
                 List<FormControl.SelectValue> valueList = new ArrayList<>();
                 for (Map.Entry<String, Role> entry : RoleFactory.getInstance().getRoleMap().entrySet())
                     valueList.add(new FormControl.SelectValue(
@@ -80,7 +81,7 @@ public class PostEditAction implements Action {
             }
         } catch (ServiceException e) {
             e.printStackTrace();
-            throw new ActionException("exception.action.user.edit.user-service.get-user", e.getCause());
+            throw new ActionException("exception.action.user.edit.user-category.get-user", e.getCause());
         } catch (ValidatorException e) {
             e.printStackTrace();
             throw new ActionException("exception.action.user.edit.validator.id", e.getCause());

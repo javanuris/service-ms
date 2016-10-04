@@ -15,7 +15,7 @@ import java.sql.SQLException;
 import java.util.Properties;
 
 /**
- * service-ms
+ * category-ms
  */
 public abstract class AbstractDaoFactory implements DaoFactory {
 

@@ -5,7 +5,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
 
 /**
- * service-ms
+ * category-ms
  */
 public class HashGenerator {
 

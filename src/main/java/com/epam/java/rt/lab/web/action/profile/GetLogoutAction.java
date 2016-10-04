@@ -36,7 +36,7 @@ public class GetLogoutAction implements Action {
         } catch (IOException e) {
             throw new ActionException("exception.action.logout.redirect", e.getCause());
         } catch (ServiceException e) {
-            throw new ActionException("exception.action.logout.service", e.getCause());
+            throw new ActionException("exception.action.logout.category", e.getCause());
         }
     }
 

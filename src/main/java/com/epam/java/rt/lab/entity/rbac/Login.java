@@ -4,7 +4,7 @@ import com.epam.java.rt.lab.entity.EntityProperty;
 import com.epam.java.rt.lab.entity.BaseEntity;
 
 /**
- * service-ms
+ * category-ms
  */
 public class Login extends BaseEntity {
 

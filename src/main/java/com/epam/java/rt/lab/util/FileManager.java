@@ -7,7 +7,7 @@ import java.io.File;
 import java.io.FilenameFilter;
 
 /**
- * service-ms
+ * category-ms
  */
 public class FileManager {
     private static final Logger logger = LoggerFactory.getLogger(FileManager.class);

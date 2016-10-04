@@ -23,7 +23,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
 
 /**
- * service-ms
+ * category-ms
  */
 public class PostRestorePasswordAction implements Action {
     private static final Logger logger = LoggerFactory.getLogger(PostRestorePasswordAction.class);
@@ -58,7 +58,7 @@ public class PostRestorePasswordAction implements Action {
             throw new ActionException("exception.action.profile.restore-password.jsp", e.getCause());
         } catch (ServiceException e) {
             e.printStackTrace();
-            throw new ActionException("exception.action.restore-password.service", e.getCause());
+            throw new ActionException("exception.action.restore-password.category", e.getCause());
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
             throw new ActionException("exception.action.restore-password.hash", e.getCause());

@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.util.*;
 
 /**
- * service-ms
+ * category-ms
  */
 public class NavigationFactory {
 

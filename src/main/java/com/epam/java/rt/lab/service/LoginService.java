@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 
 /**
- * service-ms
+ * category-ms
  */
 public class LoginService extends BaseService {
 
@@ -172,7 +172,6 @@ public class LoginService extends BaseService {
             throws ServiceException {
         try {
             Login login = getLogin(restoreEmail);
-            System.out.println("\n\n\n LOGIN.EMAIL = " + login.getEmail());
             if (login == null) return null;
             List<Restore> restoreList = dao(Restore.class.getSimpleName()).read(new DaoParameter()
                     .setWherePredicate(Where.Predicate.get(
@@ -181,15 +180,8 @@ public class LoginService extends BaseService {
                             login.getId()
                     ))
             );
-            System.out.println("\n\n\n RESTORE.LIST = " + restoreList.size());
             if (restoreList == null || restoreList.size() == 0) return null;
             for (Restore restore : restoreList) {
-                System.out.println("\n\n\n CODE = " + restore.getCode());
-                System.out.println(" CODE = " + restoreCode);
-                System.out.println("\n\n\n NAME = " + restore.getCookieName());
-                System.out.println(" NAME = " + cookieName);
-                System.out.println("\n\n\n VALUE = " + restore.getCookieValue());
-                System.out.println(" VALUE = " + cookieValue);
                 if (restore.getCode().equals(restoreCode) &&
                         restore.getCookieName().equals(cookieName) &&
                         restore.getCookieValue().equals(cookieValue)) {

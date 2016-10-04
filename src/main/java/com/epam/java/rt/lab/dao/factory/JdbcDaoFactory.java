@@ -10,7 +10,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
 
 /**
- * service-ms
+ * category-ms
  */
 public class JdbcDaoFactory extends AbstractDaoFactory {
 

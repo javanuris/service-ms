@@ -4,7 +4,7 @@ import java.io.PrintStream;
 import java.io.PrintWriter;
 
 /**
- * service-ms
+ * category-ms
  */
 public class ViewException extends Exception {
     public ViewException() {

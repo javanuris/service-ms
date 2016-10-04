@@ -23,7 +23,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
 
 /**
- * service-ms
+ * category-ms
  */
 public class PostResetPasswordAction implements Action {
     private static final Logger logger = LoggerFactory.getLogger(GetLoginAction.class);

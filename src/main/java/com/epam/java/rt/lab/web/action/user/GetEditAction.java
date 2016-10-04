@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * service-ms
+ * category-ms
  */
 public class GetEditAction implements Action {
     private static final Logger logger = LoggerFactory.getLogger(GetLoginAction.class);
@@ -36,7 +36,7 @@ public class GetEditAction implements Action {
     @Override
     public void execute(HttpServletRequest req, HttpServletResponse resp) throws ActionException {
         try (UserService userService = new UserService()) {
-            logger.debug("/WEB-INF/jsp/user/view.jsp");
+            logger.debug("/WEB-INF/jsp/user/edit.jsp");
             Map<String, String> parameterMap = UrlManager.getRequestParameterMap(req.getQueryString());
             String id = parameterMap.get("id");
             if (ValidatorFactory.create("digits").validate(id) != null) {
@@ -76,7 +76,7 @@ public class GetEditAction implements Action {
             }
         } catch (ServiceException e) {
             e.printStackTrace();
-            throw new ActionException("exception.action.user.edit.user-service.get-user", e.getCause());
+            throw new ActionException("exception.action.user.edit.user-category.get-user", e.getCause());
         } catch (ValidatorException e) {
             e.printStackTrace();
             throw new ActionException("exception.action.user.edit.validator.id", e.getCause());

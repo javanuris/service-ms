@@ -1,7 +1,7 @@
 package com.epam.java.rt.lab.web.component.view;
 
 /**
- * service-ms
+ * category-ms
  */
 public class ViewControl {
 

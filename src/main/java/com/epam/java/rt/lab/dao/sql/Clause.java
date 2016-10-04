@@ -3,7 +3,7 @@ package com.epam.java.rt.lab.dao.sql;
 import com.epam.java.rt.lab.dao.DaoException;
 
 /**
- * service-ms
+ * category-ms
  */
 public interface Clause {
 

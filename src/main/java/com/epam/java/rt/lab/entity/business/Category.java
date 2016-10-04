@@ -6,7 +6,7 @@ import com.epam.java.rt.lab.entity.EntityProperty;
 import java.sql.Timestamp;
 
 /**
- * service-ms
+ * category-ms
  */
 public class Category extends BaseEntity {
 
@@ -16,7 +16,7 @@ public class Category extends BaseEntity {
 
     public enum Property implements EntityProperty {
         ID,
-        CATEGORY_ID,
+        PARENT_ID,
         CREATED,
         NAME;
 

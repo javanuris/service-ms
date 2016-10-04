@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * service-ms
+ * category-ms
  */
 public class UserService extends BaseService {
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);

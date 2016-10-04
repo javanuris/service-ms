@@ -1,10 +1,5 @@
 package com.epam.java.rt.lab.web.action.profile;
 
-import com.epam.java.rt.lab.entity.rbac.Login;
-import com.epam.java.rt.lab.service.LoginService;
-import com.epam.java.rt.lab.service.RoleService;
-import com.epam.java.rt.lab.service.ServiceException;
-import com.epam.java.rt.lab.service.UserService;
 import com.epam.java.rt.lab.util.UrlManager;
 import com.epam.java.rt.lab.web.action.Action;
 import com.epam.java.rt.lab.web.action.ActionException;
@@ -61,7 +56,7 @@ public class GetRegisterAction implements Action {
 //            resp.sendRedirect(UrlManager.getContextUri(req, "/home"));
 //        } catch (ServiceException e) {
 //            e.printStackTrace();
-//            throw new ActionException("exception.action.activate.service", e.getCause());
+//            throw new ActionException("exception.action.activate.category", e.getCause());
 //        } catch (IOException e) {
 //            e.printStackTrace();
 //            throw new ActionException("exception.action.activate.request", e.getCause());

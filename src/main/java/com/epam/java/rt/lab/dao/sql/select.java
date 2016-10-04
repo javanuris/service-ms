@@ -8,7 +8,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * service-ms
+ * category-ms
  */
 public class Select extends Sql implements Iterable<Column> {
 

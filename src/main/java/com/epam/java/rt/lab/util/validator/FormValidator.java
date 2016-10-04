@@ -11,7 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * service-ms
+ * category-ms
  */
 public class FormValidator {
 
@@ -54,13 +54,11 @@ public class FormValidator {
                     if (formControl.getAvailableValueList() != null) {
                         List<String> uriList = new ArrayList<>();
                         String[] valueList = req.getParameterValues(formControl.getName());
-                        System.out.println(">>> " + valueList.length);
                         formControl.setGenericValue(valueList);
                         for (FormControl.SelectValue selectValue : formControl.getAvailableValueList())
                             for (String value : valueList)
                                 if (selectValue.getValue().equals(formControl.getValue()))
                                     uriList.add(value);
-                        System.out.println(">>> " + uriList.size());
                         if (uriList.size() != valueList.length) {
                             result = false;
                             formControl.addValidationMessage("message.validation.select");

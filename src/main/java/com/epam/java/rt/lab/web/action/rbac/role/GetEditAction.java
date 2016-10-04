@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * service-ms
+ * category-ms
  */
 public class GetEditAction implements Action {
     private static final Logger logger = LoggerFactory.getLogger(GetLoginAction.class);
@@ -47,7 +47,7 @@ public class GetEditAction implements Action {
 //            }
 //        } catch (ServiceException e) {
 //            e.printStackTrace();
-//            throw new ActionException("exception.action.access.role.edit.user-service.get-user", e.getCause());
+//            throw new ActionException("exception.action.access.role.edit.user-category.get-user", e.getCause());
 //        } catch (ValidatorException e) {
 //            e.printStackTrace();
 //            throw new ActionException("exception.action.access.role.edit.validator.id", e.getCause());

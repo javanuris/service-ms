@@ -40,7 +40,7 @@ public class GetActivateAction implements Action {
 //            resp.sendRedirect(UrlManager.getContextUri(req, "/home"));
 //        } catch (ServiceException e) {
 //            e.printStackTrace();
-//            throw new ActionException("exception.action.activate.service", e.getCause());
+//            throw new ActionException("exception.action.activate.category", e.getCause());
 //        } catch (IOException e) {
 //            e.printStackTrace();
 //            throw new ActionException("exception.action.activate.request", e.getCause());

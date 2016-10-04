@@ -5,7 +5,7 @@ import com.epam.java.rt.lab.util.NumberCompare;
 import java.sql.Timestamp;
 
 /**
- * service-ms
+ * category-ms
  */
 public class Validator<T extends Number> {
     private ValidatorType type;

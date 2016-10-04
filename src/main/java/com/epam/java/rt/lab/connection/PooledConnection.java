@@ -9,7 +9,7 @@ import java.util.Properties;
 import java.util.concurrent.Executor;
 
 /**
- * service-ms
+ * category-ms
  */
 public class PooledConnection implements Connection {
     private static final Logger logger = LoggerFactory.getLogger(PooledConnection.class);

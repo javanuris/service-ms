@@ -1,11 +1,9 @@
-package com.epam.java.rt.lab.web.action.application;
+package com.epam.java.rt.lab.web.action.category;
 
-import com.epam.java.rt.lab.service.ApplicationService;
+import com.epam.java.rt.lab.entity.business.Category;
+import com.epam.java.rt.lab.service.CategoryService;
 import com.epam.java.rt.lab.service.ServiceException;
-import com.epam.java.rt.lab.service.UserService;
 import com.epam.java.rt.lab.util.UrlManager;
-import com.epam.java.rt.lab.util.validator.ValidatorException;
-import com.epam.java.rt.lab.util.validator.ValidatorFactory;
 import com.epam.java.rt.lab.web.action.Action;
 import com.epam.java.rt.lab.web.action.ActionException;
 import com.epam.java.rt.lab.web.component.Page;
@@ -23,34 +21,34 @@ import java.util.List;
 /**
  * Service Management System
  */
-public class ListAction implements Action {
-    private static final Logger logger = LoggerFactory.getLogger(ListAction.class);
+public class GetListAction implements Action {
+    private static final Logger logger = LoggerFactory.getLogger(GetListAction.class);
 
     @Override
     public void execute(HttpServletRequest req, HttpServletResponse resp) throws ActionException {
-        try (ApplicationService applicationService = new ApplicationService()) {
+        try (CategoryService categoryService = new CategoryService()) {
             Page page = new Page(req);
             Table table = new Table();
-            table.setEntityList(applicationService.getApplicationList(page));
-            table.setHrefPrefix(UrlManager.getContextUri(req, "/application/view",
+            table.setEntityList(categoryService.getCategoryList(page));
+            table.setHrefPrefix(UrlManager.getContextUri(req, "/category/view",
                     "page=".concat(String.valueOf(page.getCurrentPage())),
                     "items=".concat(String.valueOf(page.getItemsOnPage())),
                     "id="));
-            req.setAttribute("applicationList", table);
-            req.setAttribute("applicationListPage", page);
+            req.setAttribute("categoryList", table);
+            req.setAttribute("categoryListPage", page);
             List<Navigation> navigationList = (List<Navigation>) req.getSession().getAttribute("navigationList");
             if (navigationList != null) {
                 for (Navigation navigation : navigationList)
-                    if ("/application/list".equals(navigation.getUri()))
+                    if ("/category/list".equals(navigation.getUri()))
                         req.setAttribute("nav", navigation);
             }
-            req.getRequestDispatcher("/WEB-INF/jsp/application/list.jsp").forward(req, resp);
+            req.getRequestDispatcher("/WEB-INF/jsp/category/list.jsp").forward(req, resp);
         } catch (ServiceException e) {
             e.printStackTrace();
-            throw new ActionException("exception.action.application.list.service", e.getCause());
+            throw new ActionException("exception.action.service.list.category", e.getCause());
         } catch (ServletException | IOException e) {
             e.printStackTrace();
-            throw new ActionException("exception.action.application.list.request", e.getCause());
+            throw new ActionException("exception.action.service.list.request", e.getCause());
         }
     }
 

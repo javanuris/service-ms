@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * service-ms
+ * category-ms
  */
 public class CategoryDao extends JdbcDao {
 
@@ -30,7 +30,7 @@ public class CategoryDao extends JdbcDao {
                 .insert(service)
                 .values(
                         new Insert.InsertValue(Category.Property.CREATED, service.getCreated()),
-                        new Insert.InsertValue(Category.Property.CATEGORY_ID, service.getParent().getId()),
+                        new Insert.InsertValue(Category.Property.PARENT_ID, service.getParent().getId()),
                         new Insert.InsertValue(Category.Property.NAME, service.getName())
                 );
     }
@@ -75,8 +75,14 @@ public class CategoryDao extends JdbcDao {
                     columnIndex++;
                     if (categoryTableName.equals(column.getTableName())) {
                         if (category == null) category = new Category();
-                        if (column.getColumnName().equals("category_id")) { // TODO: variable instead literal
-                            // not filling in dao
+                        if (column.getColumnName().equals("parent_id")) { // TODO: variable instead literal
+                            // fill only id
+                            Long parentId = (Long) resultSet.getObject(columnIndex);
+                            if (parentId != null) {
+                                Category parent = new Category();
+                                parent.setId(parentId);
+                                category.setParent(parent);
+                            }
                         } else {
                             setEntityProperty(column.getTableName(), column.getColumnName(), category, resultSet.getObject(columnIndex));
                         }

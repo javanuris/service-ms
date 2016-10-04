@@ -6,7 +6,7 @@ import com.epam.java.rt.lab.dao.DaoException;
 import java.sql.Connection;
 
 /**
- * service-ms
+ * category-ms
  */
 public interface DaoFactory {
 

@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.Properties;
 
 /**
- * service-ms
+ * category-ms
  */
 public final class ValidatorFactory {
 

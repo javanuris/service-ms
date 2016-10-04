@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * service-ms
+ * category-ms
  */
 public class GetRestorePasswordAction implements Action {
 
@@ -57,7 +57,7 @@ public class GetRestorePasswordAction implements Action {
             throw new ActionException("exception.action.profile.restore-password.jsp", e.getCause());
         } catch (ServiceException e) {
             e.printStackTrace();
-            throw new ActionException("exception.action.restore-password.service", e.getCause());
+            throw new ActionException("exception.action.restore-password.category", e.getCause());
         }
     }
 }

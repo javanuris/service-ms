@@ -19,7 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
- * service-ms
+ * category-ms
  */
 public class GetResetPasswordAction implements Action {
     private static final Logger logger = LoggerFactory.getLogger(GetLoginAction.class);

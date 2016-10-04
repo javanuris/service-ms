@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * service-ms
+ * category-ms
  */
 public class Table<T> {
     private List<ListColumn> listColumnList = new ArrayList<>();

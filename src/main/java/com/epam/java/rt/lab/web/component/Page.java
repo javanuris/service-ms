@@ -6,7 +6,7 @@ import com.epam.java.rt.lab.util.validator.ValidatorFactory;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * service-ms
+ * category-ms
  */
 public class Page {
     private static final Long ITEMS_ON_PAGE = 10L;

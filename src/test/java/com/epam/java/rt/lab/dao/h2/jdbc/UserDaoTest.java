@@ -22,7 +22,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 /**
- * service-ms
+ * category-ms
  */
 public class UserDaoTest {
 

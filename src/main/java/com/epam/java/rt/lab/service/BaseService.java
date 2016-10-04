@@ -6,7 +6,7 @@ import com.epam.java.rt.lab.dao.factory.AbstractDaoFactory;
 import com.epam.java.rt.lab.dao.factory.DaoFactory;
 
 /**
- * service-ms
+ * category-ms
  */
 abstract class BaseService implements AutoCloseable{
     DaoFactory daoFactory;

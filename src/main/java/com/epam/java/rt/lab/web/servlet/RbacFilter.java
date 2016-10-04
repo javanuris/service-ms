@@ -84,7 +84,7 @@ public class RbacFilter implements Filter {
             }
         } catch (ServiceException e) {
             e.printStackTrace();
-            throw new ServletException("exception.filter.access.do-filter.user-service", e.getCause());
+            throw new ServletException("exception.filter.access.do-filter.user-category", e.getCause());
         } catch (NavigationException e) {
             e.printStackTrace();
             throw new ServletException("exception.filter.access.do-filter.navigation", e.getCause());

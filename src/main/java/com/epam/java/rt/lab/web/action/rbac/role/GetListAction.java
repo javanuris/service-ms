@@ -42,7 +42,7 @@ public class GetListAction implements Action {
 //            req.getRequestDispatcher("/WEB-INF/jsp/access/role/list.jsp").forward(req, resp);
 //        } catch (ServiceException e) {
 //            e.printStackTrace();
-//            throw new ActionException("exception.action.access.role.list.service", e.getCause());
+//            throw new ActionException("exception.action.access.role.list.category", e.getCause());
 //        } catch (ValidatorException e) {
 //            e.printStackTrace();
 //            throw new ActionException("exception.action.access.role.list.validator", e.getCause());

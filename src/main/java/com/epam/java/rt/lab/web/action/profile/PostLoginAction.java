@@ -121,7 +121,7 @@ public class PostLoginAction implements Action {
         } catch (NoSuchAlgorithmException e) {
             throw new ActionException("exception.action.post-login.login.hash", e.getCause());
         } catch (ServiceException e) {
-            throw new ActionException("exception.action.post-login.service", e.getCause());
+            throw new ActionException("exception.action.post-login.category", e.getCause());
         } catch (NavigationException e) {
             e.printStackTrace();
             throw new ActionException("exception.action.post-login.navigation", e.getCause());

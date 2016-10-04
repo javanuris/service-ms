@@ -1,7 +1,7 @@
 package com.epam.java.rt.lab.entity;
 
 /**
- * service-ms
+ * category-ms
  */
 public abstract class BaseEntity {
     private Long id;

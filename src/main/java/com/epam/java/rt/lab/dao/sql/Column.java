@@ -7,7 +7,7 @@ import static com.epam.java.rt.lab.dao.sql.Sql.SIGN_POINT;
 import static com.epam.java.rt.lab.dao.sql.Sql.SIGN_POINT_REGEX;
 
 /**
- * service-ms
+ * category-ms
  */
 public class Column implements Clause {
 

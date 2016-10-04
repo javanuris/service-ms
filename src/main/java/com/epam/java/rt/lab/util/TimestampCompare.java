@@ -11,7 +11,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
- * service-ms
+ * category-ms
  */
 public class TimestampCompare {
 

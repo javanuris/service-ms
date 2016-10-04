@@ -7,7 +7,7 @@ import com.epam.java.rt.lab.entity.rbac.User;
 import java.sql.Timestamp;
 
 /**
- * service-ms
+ * category-ms
  */
 public class Application extends BaseEntity {
     private User user;

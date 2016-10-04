@@ -11,7 +11,7 @@ import java.util.List;
 import static org.junit.Assert.*;
 
 /**
- * service-ms
+ * category-ms
  */
 public class SelectTest {
 
@@ -43,7 +43,7 @@ public class SelectTest {
                 )
         );
         // no result to assert
-        System.out.println(select.create());
+//        System.out.println(select.create());
     }
 
     @Test

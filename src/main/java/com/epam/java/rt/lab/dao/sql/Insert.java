@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * service-ms
+ * category-ms
  */
 public class Insert extends Sql {
 
@@ -63,7 +63,7 @@ public class Insert extends Sql {
             values.append(insertValue.value.makeWildcard());
         }
         result.append(values).append(AFTER_VALUES);
-        System.out.println(result);
+//        System.out.println(result);
         return result.toString();
     }
 

@@ -5,7 +5,7 @@ import com.epam.java.rt.lab.dao.DaoException;
 import java.util.List;
 
 /**
- * service-ms
+ * category-ms
  */
 public class WildValue<T> {
 
