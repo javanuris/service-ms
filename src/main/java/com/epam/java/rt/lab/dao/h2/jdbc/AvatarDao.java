@@ -1,16 +1,13 @@
 package com.epam.java.rt.lab.dao.h2.jdbc;
 
-import com.epam.java.rt.lab.dao.Dao;
 import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.dao.DaoParameter;
-import com.epam.java.rt.lab.dao.sql.*;
+import com.epam.java.rt.lab.dao.sql.Column;
+import com.epam.java.rt.lab.dao.sql.Insert;
+import com.epam.java.rt.lab.dao.sql.Select;
+import com.epam.java.rt.lab.dao.sql.Sql;
 import com.epam.java.rt.lab.entity.rbac.Avatar;
-import com.epam.java.rt.lab.entity.rbac.Login;
-import com.epam.java.rt.lab.entity.rbac.Role;
-import com.epam.java.rt.lab.entity.rbac.User;
 
-import java.io.FileInputStream;
-import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;

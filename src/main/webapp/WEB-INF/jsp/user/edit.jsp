@@ -2,7 +2,7 @@
 <%@ taglib prefix="tags" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <tags:template>
-    <jsp:attribute name="title">title.rbac.role.edit</jsp:attribute>
-    <jsp:attribute name="navbarCurrent">/rbac/user/list</jsp:attribute>
-    <jsp:body><tags:profile-form form="${requestScope.editRole}"/></jsp:body>
+    <jsp:attribute name="title">title.user.edit</jsp:attribute>
+    <jsp:attribute name="navbarCurrent">/user/list</jsp:attribute>
+    <jsp:body><tags:profile-form form="${requestScope.editForm}"/></jsp:body>
 </tags:template>

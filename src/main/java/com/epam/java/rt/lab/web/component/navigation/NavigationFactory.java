@@ -1,9 +1,10 @@
 package com.epam.java.rt.lab.web.component.navigation;
 
-import com.epam.java.rt.lab.entity.rbac.Role;
-import com.epam.java.rt.lab.service.RoleService;
 import com.epam.java.rt.lab.service.ServiceException;
 import com.epam.java.rt.lab.util.StringArray;
+import com.epam.java.rt.lab.web.Rbac.Role;
+import com.epam.java.rt.lab.web.Rbac.RoleException;
+import com.epam.java.rt.lab.web.Rbac.RoleFactory;
 
 import java.io.IOException;
 import java.util.*;
@@ -62,21 +63,20 @@ public class NavigationFactory {
                 navigationList.add(navigation);
 
             }
-            RoleService roleService = new RoleService();
-            for (Role role : roleService.getRoleList()) {
+            for (Map.Entry<String, Role> entry : RoleFactory.getInstance().getRoleMap().entrySet()) {
                 List<Navigation> roleNavigationList = new ArrayList<>();
                 for (Navigation navigation : navigationList) {
-                    if (role.getUriList().contains(navigation.getUri()))
+                    if (entry.getValue().verifyPermission(navigation.getUri()))
                         roleNavigationList.add(navigation);
                 }
-                this.roleNavigationMap.put(role.getName(), roleNavigationList);
+                this.roleNavigationMap.put(entry.getValue().getName(), roleNavigationList);
             }
         } catch (IOException e) {
             e.printStackTrace();
             throw new NavigationException("exception.component.nav.properties", e.getCause());
-        } catch (ServiceException e) {
+        } catch (RoleException e) {
             e.printStackTrace();
-            throw new NavigationException("exception.component.navigation.service", e.getCause());
+            throw new NavigationException("exception.component.navigation.role-factory", e.getCause());
         }
     }
 

@@ -43,6 +43,7 @@ public final class FormFactory {
         String placeholder = ".placeholder";
         String subAction = ".sub-action";
         String validator = ".validator";
+        String dictionary = ".dictionary";
         try {
             properties.load(FormFactory.class.getClassLoader().getResourceAsStream("form.properties"));
             this.formMap.clear();
@@ -59,7 +60,8 @@ public final class FormFactory {
                                     properties.getProperty(propertyPrefix.concat(placeholder)),
                                     properties.getProperty(propertyPrefix.concat(action)),
                                     properties.getProperty(propertyPrefix.concat(subAction)),
-                                    ValidatorFactory.create(properties.getProperty(propertyPrefix.concat(validator)))
+                                    ValidatorFactory.create(properties.getProperty(propertyPrefix.concat(validator))),
+                                    properties.getProperty(propertyPrefix.concat(dictionary))
                             )
                     );
                 }

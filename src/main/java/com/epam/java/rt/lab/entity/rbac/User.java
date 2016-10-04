@@ -2,6 +2,7 @@ package com.epam.java.rt.lab.entity.rbac;
 
 import com.epam.java.rt.lab.entity.EntityProperty;
 import com.epam.java.rt.lab.entity.BaseEntity;
+import com.epam.java.rt.lab.web.Rbac.Role;
 
 /**
  * service-ms
@@ -20,7 +21,7 @@ public class User extends BaseEntity {
         MIDDLE_NAME,
         LAST_NAME,
         LOGIN_ID,
-        ROLE_ID,
+        ROLE_NAME,
         AVATAR_ID;
 
         @Override

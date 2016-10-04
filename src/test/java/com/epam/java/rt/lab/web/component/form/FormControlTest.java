@@ -32,7 +32,7 @@ public class FormControlTest {
 
     @Before
     public void setUp() throws Exception {
-        this.formControl = new FormControl(NAME, LABEL, TYPE, PLACEHOLDER, ACTION, SUB_ACTION, null);
+        this.formControl = new FormControl(NAME, LABEL, TYPE, PLACEHOLDER, ACTION, SUB_ACTION, null, null);
     }
 
     @After

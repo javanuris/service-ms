@@ -1,4 +1,4 @@
-package com.epam.java.rt.lab.web.action.rbac.user;
+package com.epam.java.rt.lab.web.action.user;
 
 import com.epam.java.rt.lab.service.ServiceException;
 import com.epam.java.rt.lab.service.UserService;
@@ -38,7 +38,7 @@ public class GetListAction implements Action {
             );
             Table table = new Table();
             table.setEntityList(userService.getUserList(page));
-            table.setHrefPrefix(UrlManager.getContextUri(req, "/rbac/user/view",
+            table.setHrefPrefix(UrlManager.getContextUri(req, "/user/view",
                     "page=".concat(String.valueOf(page.getCurrentPage())),
                     "items=".concat(String.valueOf(page.getItemsOnPage())),
                     "id="));
@@ -47,10 +47,10 @@ public class GetListAction implements Action {
             List<Navigation> navigationList = (List<Navigation>) req.getSession().getAttribute("navigationList");
             if (navigationList != null) {
                 for (Navigation navigation : navigationList)
-                    if ("/rbac/user/list".equals(navigation.getUri()))
+                    if ("/user/list".equals(navigation.getUri()))
                         req.setAttribute("nav", navigation);
             }
-            req.getRequestDispatcher("/WEB-INF/jsp/rbac/user/list.jsp").forward(req, resp);
+            req.getRequestDispatcher("/WEB-INF/jsp/user/list.jsp").forward(req, resp);
         } catch (ServiceException e) {
             e.printStackTrace();
             throw new ActionException("exception.action.rbac.user.list.service", e.getCause());

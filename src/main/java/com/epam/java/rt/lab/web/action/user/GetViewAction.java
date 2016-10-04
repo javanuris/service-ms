@@ -1,4 +1,4 @@
-package com.epam.java.rt.lab.web.action.rbac.user;
+package com.epam.java.rt.lab.web.action.user;
 
 import com.epam.java.rt.lab.entity.rbac.User;
 import com.epam.java.rt.lab.service.ServiceException;
@@ -29,11 +29,11 @@ public class GetViewAction implements Action {
     @Override
     public void execute(HttpServletRequest req, HttpServletResponse resp) throws ActionException {
         try (UserService userService = new UserService()) {
-            logger.debug("/WEB-INF/jsp/rbac/user/view.jsp");
+            logger.debug("/WEB-INF/jsp/user/view.jsp");
             Map<String, String> parameterMap = UrlManager.getRequestParameterMap(req.getQueryString());
             String id = parameterMap.remove("id");
             if (ValidatorFactory.create("digits").validate(id) != null) {
-                resp.sendRedirect(UrlManager.getContextUri(req, "/rbac/user/list", parameterMap));
+                resp.sendRedirect(UrlManager.getContextUri(req, "/user/list", parameterMap));
             } else {
                 User user = (User) req.getSession().getAttribute("user");
                 if (user.getId() == Long.valueOf(id)) {
@@ -52,24 +52,24 @@ public class GetViewAction implements Action {
                 view.getControl(5).setValue(user.getRole().getName());
                 view.getControl(6).setValue(String.valueOf(user.getLogin().getAttemptLeft()));
                 view.getControl(7).setValue(String.valueOf(user.getLogin().getStatus()));
-                view.getControl(8).setAction(UrlManager.getContextUri(req, "/rbac/user/edit",
+                view.getControl(8).setAction(UrlManager.getContextUri(req, "/user/edit",
                         UrlManager.getRequestParameterString(parameterMap), "id=".concat(id)));
-                view.getControl(9).setAction(UrlManager.getContextUri(req, "/rbac/user/list", parameterMap));
+                view.getControl(9).setAction(UrlManager.getContextUri(req, "/user/list", parameterMap));
                 req.setAttribute("viewProfile", view);
-                req.getRequestDispatcher("/WEB-INF/jsp/rbac/user/view.jsp").forward(req, resp);
+                req.getRequestDispatcher("/WEB-INF/jsp/user/view.jsp").forward(req, resp);
             }
         } catch (ServiceException e) {
             e.printStackTrace();
-            throw new ActionException("exception.action.rbac.user.view.user-service.get-user", e.getCause());
+            throw new ActionException("exception.action.user.view.user-service.get-user", e.getCause());
         } catch (ValidatorException e) {
             e.printStackTrace();
-            throw new ActionException("exception.action.rbac.user.view.validator.id", e.getCause());
+            throw new ActionException("exception.action.user.view.validator.id", e.getCause());
         } catch (ViewException e) {
             e.printStackTrace();
-            throw new ActionException("exception.action.view.view-factory.get-instance", e.getCause());
+            throw new ActionException("exception.action.user.view.view-factory.get-instance", e.getCause());
         } catch (ServletException | IOException e) {
             e.printStackTrace();
-            throw new ActionException("exception.action.view.request", e.getCause());
+            throw new ActionException("exception.action.user.view.request", e.getCause());
         }
     }
 

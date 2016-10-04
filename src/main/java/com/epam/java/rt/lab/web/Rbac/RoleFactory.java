@@ -16,6 +16,7 @@ import java.util.*;
 public final class RoleFactory {
 
     private static final String ANONYMOUS = "anonymous";
+    private static final String AUTHORIZED = "authorized";
 
     private static class Holder {
 
@@ -63,11 +64,11 @@ public final class RoleFactory {
         }
     }
 
-    public static RoleFactory getInstance() throws FormException {
+    public static RoleFactory getInstance() throws RoleException {
         try {
             return Holder.INSTANCE;
         } catch (ExceptionInInitializerError e) {
-            throw new FormException("exception.web.rbac.role-factory.init", e.getCause());
+            throw new RoleException("exception.web.rbac.role-factory.init", e.getCause());
         }
     }
 
@@ -79,8 +80,16 @@ public final class RoleFactory {
         return this.roleMap.get(ANONYMOUS);
     }
 
+    public Role createAuthorized() throws RoleException {
+        return this.roleMap.get(AUTHORIZED);
+    }
+
     public List<Permission> getPermissionList() {
         return this.permissionList;
+    }
+
+    public Map<String, Role> getRoleMap() {
+        return this.roleMap;
     }
 
 }

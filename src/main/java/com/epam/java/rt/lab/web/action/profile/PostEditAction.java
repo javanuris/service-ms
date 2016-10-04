@@ -53,22 +53,7 @@ public class PostEditAction implements Action {
                             user.setFirstName(form.getItem(0).getValue());
                             user.setMiddleName(form.getItem(1).getValue());
                             user.setLastName(form.getItem(2).getValue());
-                            if (form.getItem(3).getValue().length() == 0) {
-                                Long avatarId = user.getAvatarId();
-                                user.setAvatarId(null);
-                                userService.updateUser(user);
-                                userService.removeAvatar(avatarId);
-                            } else {
-                                String[] pair = form.getItem(3).getValue().split("\\?");
-                                if (pair.length == 2) {
-                                    pair = pair[1].split("=");
-                                    if (pair.length == 2) {
-                                        if ("path".equals(pair[0]))
-                                            userService.setAvatar(user, pair[1]);
-                                    }
-                                }
-                                userService.updateUser(user);
-                            }
+                            userService.updateUser(user,form.getItem(3).getValue());
                             resp.sendRedirect(UrlManager.getContextUri(req, "/profile/view"));
                             return;
                         } catch (ServiceException e) {

@@ -6,22 +6,28 @@ import com.epam.java.rt.lab.dao.DaoParameter;
 import com.epam.java.rt.lab.dao.sql.OrderBy;
 import com.epam.java.rt.lab.dao.sql.Update;
 import com.epam.java.rt.lab.dao.sql.Where;
-import com.epam.java.rt.lab.entity.rbac.*;
+import com.epam.java.rt.lab.entity.rbac.Avatar;
+import com.epam.java.rt.lab.entity.rbac.Login;
+import com.epam.java.rt.lab.entity.rbac.Remember;
+import com.epam.java.rt.lab.entity.rbac.User;
 import com.epam.java.rt.lab.util.*;
 import com.epam.java.rt.lab.util.validator.ValidatorException;
 import com.epam.java.rt.lab.util.validator.ValidatorFactory;
+import com.epam.java.rt.lab.web.Rbac.RoleException;
+import com.epam.java.rt.lab.web.Rbac.RoleFactory;
 import com.epam.java.rt.lab.web.component.Page;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
-import java.sql.Timestamp;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -57,7 +63,7 @@ public class UserService extends BaseService {
                             new Update.SetValue(User.Property.MIDDLE_NAME, user.getMiddleName()),
                             new Update.SetValue(User.Property.LAST_NAME, user.getLastName()),
                             new Update.SetValue(User.Property.AVATAR_ID, user.getAvatarId()),
-                            new Update.SetValue(User.Property.ROLE_ID, user.getRole().getId())
+                            new Update.SetValue(User.Property.ROLE_NAME, user.getRole().getName())
                     )
                     .setWherePredicate(Where.Predicate.get(
                             User.Property.ID,
@@ -71,21 +77,48 @@ public class UserService extends BaseService {
         }
     }
 
+    public int updateUser(User user, String avatarPath) throws ServiceException {
+        int result = 0;
+        String[] pair = avatarPath.split("\\?");
+        if (pair.length == 2) pair = pair[1].split("=");
+        if ("id".equals(pair[0])) {
+            // avatar not changed
+            result = updateUser(user);
+        } else if ("path".equals(pair[0])) {
+            // avatar recently uploaded
+            setAvatar(user, pair[1]);
+            result = updateUser(user);
+        } else {
+            if (user.getAvatarId() != null) {
+                // avatar removed
+                Long avatarId = user.getAvatarId();
+                user.setAvatarId(null);
+                result = updateUser(user);
+                removeAvatar(avatarId);
+            } else {
+                // avatar not changed
+                result = updateUser(user);
+            }
+        }
+        return result;
+    }
+
     public Long addUser(Login login) throws ServiceException {
-        try (LoginService loginService = new LoginService();
-             RoleService roleService = new RoleService()) {
+        try (LoginService loginService = new LoginService()) {
             super.daoFactory.beginTransaction(Connection.TRANSACTION_REPEATABLE_READ);
             User user = new User();
             login.setId(loginService.addLogin(login));
             user.setLogin(login);
-            Role role = roleService.getRoleAuthorized();
-            user.setRole(role);
+            user.setRole(RoleFactory.getInstance().createAuthorized());
             Long userId = dao(User.class.getSimpleName()).create(new DaoParameter().setEntity(user));
             super.daoFactory.commitTransaction();
             return userId;
         } catch (DaoException e) {
             e.printStackTrace();
             throw new ServiceException("exception.service.user.add-user.dao", e.getCause());
+        } catch (RoleException e) {
+            e.printStackTrace();
+            throw new ServiceException("exception.service.user.add-user.role-factory", e.getCause());
         }
     }
 
@@ -115,6 +148,7 @@ public class UserService extends BaseService {
             );
             return userList != null && userList.size() > 0 ? userList.get(0) : null;
         } catch (DaoException e) {
+            e.printStackTrace();
             throw new ServiceException("exception.service.user.get-user.dao", e.getCause());
         }
     }

@@ -61,7 +61,7 @@ public class RbacFilter implements Filter {
                 }
             }
             if (user == null) {
-                logger.debug("ANONYMOUS URI = {}", userService.getAnonymous().getRole().getUriList());
+                logger.debug("ANONYMOUS ROLE NAME = {}", userService.getAnonymous().getRole().getName());
                 if (RoleFactory.getInstance().createAnonymous().verifyPermission(req.getPathInfo())) {
                     logger.debug("CONTAINS {}", req.getPathInfo());
                     filterChain.doFilter(servletRequest, servletResponse);
@@ -74,7 +74,7 @@ public class RbacFilter implements Filter {
                     resp.sendRedirect(UrlManager.getContextUri(req, "/profile/login", parameterMap));
                 }
             } else {
-                if (RoleFactory.getInstance().create(user.getRole().getName()).verifyPermission(req.getPathInfo())) { // TODO: refactor to role
+                if (user.getRole().verifyPermission(req.getPathInfo())) {
                     disableCacheForAccessSensitive((HttpServletResponse) servletResponse);
                     filterChain.doFilter(servletRequest, servletResponse);
                 } else {
@@ -94,8 +94,6 @@ public class RbacFilter implements Filter {
         } catch (RoleException e) {
             e.printStackTrace();
             throw new ServletException("exception.filter.rbac.do-filter.role-factory", e.getCause());
-        } catch (FormException e) {
-            e.printStackTrace();
         }
     }
 

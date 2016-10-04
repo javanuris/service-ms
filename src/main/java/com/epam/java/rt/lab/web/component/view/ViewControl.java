@@ -8,8 +8,8 @@ public class ViewControl {
     private ControlDef controlDef;
     private ControlVal controlVal;
 
-    public ViewControl(String name, String label, String type) {
-        this.controlDef = new ControlDef(name, label, type);
+    public ViewControl(String name, String label, String type, String dictionary) {
+        this.controlDef = new ControlDef(name, label, type, dictionary);
     }
 
     ViewControl(ControlDef controlDef) {
@@ -30,6 +30,10 @@ public class ViewControl {
 
     public String getType() {
         return controlDef.type;
+    }
+
+    public String getDictionary() {
+        return controlDef.dictionary;
     }
 
     private ControlVal val() {
@@ -58,11 +62,13 @@ public class ViewControl {
         private String name;
         private String label;
         private String type;
+        private String dictionary;
 
-        private ControlDef(String name, String label, String type) {
+        private ControlDef(String name, String label, String type, String dictionary) {
             this.name = name;
             this.label = label;
             this.type = type;
+            this.dictionary = dictionary;
         }
 
     }

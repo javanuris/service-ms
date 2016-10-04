@@ -20,7 +20,8 @@ public class FormControl {
             String placeholder,
             String action,
             String subAction,
-            Validator validator
+            Validator validator,
+            String dictionary
     ) {
 
         this.controlDef = new ControlDef(
@@ -30,7 +31,8 @@ public class FormControl {
                 placeholder,
                 action,
                 subAction,
-                validator
+                validator,
+                dictionary
         );
     }
 
@@ -68,6 +70,10 @@ public class FormControl {
 
     public Validator getValidator() {
         return this.controlDef.validator;
+    }
+
+    public String getDictionary() {
+        return this.controlDef.dictionary;
     }
 
     private ControlVal val() {
@@ -139,6 +145,7 @@ public class FormControl {
         private String action;
         private String subAction;
         private Validator validator;
+        private String dictionary;
 
         private ControlDef(
                 String name,
@@ -147,7 +154,8 @@ public class FormControl {
                 String placeholder,
                 String action,
                 String subAction,
-                Validator validator
+                Validator validator,
+                String dictionary
         ) {
             this.name = name;
             this.label = label;
@@ -156,6 +164,7 @@ public class FormControl {
             this.action = action;
             this.subAction = subAction;
             this.validator = validator;
+            this.dictionary = dictionary;
         }
     }
 
@@ -190,6 +199,7 @@ public class FormControl {
         public String getLabel() {
             return label;
         }
+
     }
 
     @Override
@@ -203,6 +213,7 @@ public class FormControl {
                 .append(", ACTION-PARAMETERS: ").append(getActionParameters())
                 .append(", SUB-ACTION: ").append(getSubAction())
                 .append(", VALIDATOR: ").append(getValidator())
+                .append(", DICTIONARY: ").append(getDictionary())
                 .append(", AVAILABLE-VALUE-LIST: ").append(getAvailableValueList())
                 .append(", VALUE: ").append(getValue())
                 .append(", GENERIC-VALUE: ").append(getGenericValue() == null ? "" : String.valueOf(getGenericValue()))

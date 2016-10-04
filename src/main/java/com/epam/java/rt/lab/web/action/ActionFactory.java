@@ -1,6 +1,7 @@
 package com.epam.java.rt.lab.web.action;
 
 import com.epam.java.rt.lab.web.Rbac.Permission;
+import com.epam.java.rt.lab.web.Rbac.RoleException;
 import com.epam.java.rt.lab.web.Rbac.RoleFactory;
 import com.epam.java.rt.lab.web.component.form.FormException;
 import org.slf4j.Logger;
@@ -65,7 +66,7 @@ public final class ActionFactory {
                         actionName
                 );
             }
-        } catch (FormException e) {
+        } catch (RoleException e) {
             e.printStackTrace();
             throw new ActionException("exception.action.factory.role-factory", e.getCause());
         }

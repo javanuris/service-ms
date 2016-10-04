@@ -4,11 +4,10 @@ import com.epam.java.rt.lab.dao.Dao;
 import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.dao.DaoParameter;
 import com.epam.java.rt.lab.dao.sql.*;
-import com.epam.java.rt.lab.entity.EntityProperty;
 import com.epam.java.rt.lab.entity.rbac.Login;
-import com.epam.java.rt.lab.entity.rbac.Permission;
-import com.epam.java.rt.lab.entity.rbac.Role;
 import com.epam.java.rt.lab.entity.rbac.User;
+import com.epam.java.rt.lab.web.Rbac.RoleException;
+import com.epam.java.rt.lab.web.Rbac.RoleFactory;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -35,7 +34,7 @@ public class UserDao extends JdbcDao {
                         new Insert.InsertValue(User.Property.MIDDLE_NAME, user.getMiddleName()),
                         new Insert.InsertValue(User.Property.LAST_NAME, user.getLastName()),
                         new Insert.InsertValue(User.Property.LOGIN_ID, user.getLogin().getId()),
-                        new Insert.InsertValue(User.Property.ROLE_ID, user.getRole().getId()),
+                        new Insert.InsertValue(User.Property.ROLE_NAME, user.getRole().getName()),
                         new Insert.InsertValue(User.Property.AVATAR_ID, user.getAvatarId())
                 );
     }
@@ -72,7 +71,6 @@ public class UserDao extends JdbcDao {
         Select select = (Select) sql;
         String userTableName = Sql.getProperty(User.class.getName());
         String loginTableName = Sql.getProperty(Login.class.getName());
-        String roleTableName = Sql.getProperty(Role.class.getName());
         List<User> userList = new ArrayList<>();
         try {
             while (resultSet.next()) {
@@ -82,7 +80,12 @@ public class UserDao extends JdbcDao {
                     columnIndex++;
                     if (userTableName.equals(column.getTableName())) {
                         if (user == null) user = new User();
-                        setEntityProperty(column.getTableName(), column.getColumnName(), user, resultSet.getObject(columnIndex));
+                        if (column.getColumnName().equals("role_name")) {
+                            user.setRole(RoleFactory.getInstance()
+                                    .create(resultSet.getString(columnIndex)));
+                        } else {
+                            setEntityProperty(column.getTableName(), column.getColumnName(), user, resultSet.getObject(columnIndex));
+                        }
                     } else {
                         if (loginTableName.equals(column.getTableName())) {
                             Long loginId = (Long) resultSet.getObject(columnIndex);
@@ -98,20 +101,6 @@ public class UserDao extends JdbcDao {
                                 if (loginList != null && loginList.size() > 0)
                                     user.setLogin(loginList.get(0));
                             }
-                        } else if (roleTableName.equals(column.getTableName())) {
-                            Long roleId = (Long) resultSet.getObject(columnIndex);
-                            if (roleId != null) {
-                                Dao dao = new RoleDao(getConnection());
-                                List<Role> roleList = dao.read(new DaoParameter()
-                                        .setWherePredicate(Where.Predicate.get(
-                                                Role.Property.ID,
-                                                Where.Predicate.PredicateOperator.EQUAL,
-                                                roleId
-                                        ))
-                                );
-                                if (roleList != null && roleList.size() > 0)
-                                    user.setRole(roleList.get(0));
-                            }
                         }
                     }
                 }
@@ -120,6 +109,9 @@ public class UserDao extends JdbcDao {
             return (List<T>) userList;
         } catch (SQLException e) {
             throw new DaoException("exception.dao.jdbc.user.get-entity", e.getCause());
+        } catch (RoleException e) {
+            e.printStackTrace();
+            throw new DaoException("exception.dao.jdbc.user.role-factory", e.getCause());
         }
     }
 
