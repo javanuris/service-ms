@@ -59,4 +59,28 @@ public class ApplicationService extends BaseService {
         }
     }
 
+    public Application getApplication(Long id) throws ServiceException {
+        try {
+            List<Application> applicationList = dao(Application.class.getSimpleName()).read(new DaoParameter()
+                    .setWherePredicate(Where.Predicate.get(
+                            Application.Property.ID,
+                            Where.Predicate.PredicateOperator.EQUAL,
+                            id
+                    ))
+            );
+            return applicationList != null && applicationList.size() > 0 ? applicationList.get(0) : null;
+        } catch (DaoException e) {
+            throw new ServiceException("exception.service.application.get-application.dao", e.getCause());
+        }
+    }
+
+    public Long addApplication(Application application) throws ServiceException {
+        try {
+            return dao(Application.class.getSimpleName()).create(new DaoParameter().setEntity(application));
+        } catch (DaoException e) {
+            e.printStackTrace();
+            throw new ServiceException("exception.service.application.add-application.dao", e.getCause());
+        }
+    }
+
 }

@@ -35,6 +35,8 @@ public class GetListAction implements Action {
                     "id="));
             req.setAttribute("applicationList", table);
             req.setAttribute("applicationListPage", page);
+            req.setAttribute("addApplicationRef", UrlManager.getContextUri(req, "/application/add",
+                    UrlManager.getRequestParameterString(req)));
             List<Navigation> navigationList = (List<Navigation>) req.getSession().getAttribute("navigationList");
             if (navigationList != null) {
                 for (Navigation navigation : navigationList)

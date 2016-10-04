@@ -9,9 +9,8 @@
             <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
             <fmt:message bundle="${ui}" key="control.add-category.label"/>
         </a>
-        ${requestScope.categoryList.addColumn(1, 'control.table.header.id.label', 'id')}
         ${requestScope.categoryList.addColumn(3, 'control.table.header.created.label', 'created')}
-        ${requestScope.categoryList.addColumn(8, 'control.table.header.name.label', 'name')}
+        ${requestScope.categoryList.addColumn(9, 'control.table.header.name.label', 'name')}
         <tags:table table="${requestScope.categoryList}" page="${requestScope.categoryListPage}" uriWithQuestionMark="${pageContext.request.contextPath}/category/list?"/>
     </jsp:body>
 </tags:template>

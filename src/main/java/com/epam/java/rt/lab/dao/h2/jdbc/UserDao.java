@@ -88,19 +88,8 @@ public class UserDao extends JdbcDao {
                         }
                     } else {
                         if (loginTableName.equals(column.getTableName())) {
-                            Long loginId = (Long) resultSet.getObject(columnIndex);
-                            if (loginId != null) {
-                                Dao dao = new LoginDao(getConnection());
-                                List<Login> loginList = dao.read(new DaoParameter()
-                                        .setWherePredicate(Where.Predicate.get(
-                                                Login.Property.ID,
-                                                Where.Predicate.PredicateOperator.EQUAL,
-                                                loginId
-                                        ))
-                                );
-                                if (loginList != null && loginList.size() > 0)
-                                    user.setLogin(loginList.get(0));
-                            }
+                            user.setLogin((new LoginDao(getConnection())
+                                    .getLogin((Long) resultSet.getObject(columnIndex))));
                         }
                     }
                 }
@@ -113,6 +102,19 @@ public class UserDao extends JdbcDao {
             e.printStackTrace();
             throw new DaoException("exception.dao.jdbc.user.role-factory", e.getCause());
         }
+    }
+
+    User getUser(Long id) throws DaoException {
+        if (id == null) return null;
+        List<User> userList = read(new DaoParameter()
+                .setWherePredicate(Where.Predicate.get(
+                        User.Property.ID,
+                        Where.Predicate.PredicateOperator.EQUAL,
+                        id
+                ))
+        );
+        if (userList == null || userList.size() == 0) return null;
+        return userList.get(0);
     }
 
 }

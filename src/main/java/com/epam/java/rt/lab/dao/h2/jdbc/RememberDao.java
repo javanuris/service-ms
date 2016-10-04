@@ -78,19 +78,8 @@ public class RememberDao extends JdbcDao {
                         setEntityProperty(column.getTableName(), column.getColumnName(), remember, resultSet.getObject(columnIndex));
                     } else {
                         if (userTableName.equals(column.getTableName())) {
-                            Long userId = (Long) resultSet.getObject(columnIndex);
-                            if (userId != null) {
-                                Dao dao = new UserDao(getConnection());
-                                List<User> userList = dao.read(new DaoParameter()
-                                        .setWherePredicate(Where.Predicate.get(
-                                                User.Property.ID,
-                                                Where.Predicate.PredicateOperator.EQUAL,
-                                                userId
-                                        ))
-                                );
-                                if (userList != null && userList.size() > 0)
-                                    remember.setUser(userList.get(0));
-                            }
+                            remember.setUser(new UserDao(getConnection())
+                                    .getUser((Long) resultSet.getObject(columnIndex)));
                         }
                     }
                 }
@@ -101,6 +90,5 @@ public class RememberDao extends JdbcDao {
             throw new DaoException("exception.dao.jdbc.remember.get-entity", e.getCause());
         }
     }
-
 
 }

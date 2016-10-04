@@ -87,5 +87,17 @@ public class LoginDao extends JdbcDao {
         }
     }
 
+    Login getLogin(Long id) throws DaoException {
+        if (id == null) return null;
+        List<Login> loginList = read(new DaoParameter()
+                .setWherePredicate(Where.Predicate.get(
+                        Login.Property.ID,
+                        Where.Predicate.PredicateOperator.EQUAL,
+                        id
+                ))
+        );
+        if (loginList == null || loginList.size() == 0) return null;
+        return loginList.get(0);
+    }
 
 }

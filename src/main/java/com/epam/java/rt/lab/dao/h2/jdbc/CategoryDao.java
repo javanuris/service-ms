@@ -2,10 +2,7 @@ package com.epam.java.rt.lab.dao.h2.jdbc;
 
 import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.dao.DaoParameter;
-import com.epam.java.rt.lab.dao.sql.Column;
-import com.epam.java.rt.lab.dao.sql.Insert;
-import com.epam.java.rt.lab.dao.sql.Select;
-import com.epam.java.rt.lab.dao.sql.Sql;
+import com.epam.java.rt.lab.dao.sql.*;
 import com.epam.java.rt.lab.entity.business.Category;
 
 import java.sql.Connection;
@@ -98,6 +95,19 @@ public class CategoryDao extends JdbcDao {
             e.printStackTrace();
             throw new DaoException("exception.dao.jdbc.category.get-entity", e.getCause());
         }
+    }
+
+    Category getCategory(Long id) throws DaoException {
+        if (id == null) return null;
+        List<Category> categoryList = read(new DaoParameter()
+                .setWherePredicate(Where.Predicate.get(
+                        Category.Property.ID,
+                        Where.Predicate.PredicateOperator.EQUAL,
+                        id
+                ))
+        );
+        if (categoryList == null || categoryList.size() == 0) return null;
+        return categoryList.get(0);
     }
 
 }

@@ -79,19 +79,8 @@ public class RestoreDao extends JdbcDao {
                         setEntityProperty(column.getTableName(), column.getColumnName(), restore, resultSet.getObject(columnIndex));
                     } else {
                         if (loginTableName.equals(column.getTableName())) {
-                            Long loginId = (Long) resultSet.getObject(columnIndex);
-                            if (loginId != null) {
-                                Dao dao = new LoginDao(getConnection());
-                                List<Login> loginList = dao.read(new DaoParameter()
-                                        .setWherePredicate(Where.Predicate.get(
-                                                Login.Property.ID,
-                                                Where.Predicate.PredicateOperator.EQUAL,
-                                                loginId
-                                        ))
-                                );
-                                if (loginList != null && loginList.size() > 0)
-                                    restore.setLogin(loginList.get(0));
-                            }
+                            restore.setLogin((new LoginDao(getConnection())
+                                    .getLogin((Long) resultSet.getObject(columnIndex))));
                         }
                     }
                 }

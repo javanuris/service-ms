@@ -5,6 +5,7 @@ import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.dao.DaoParameter;
 import com.epam.java.rt.lab.dao.sql.*;
 import com.epam.java.rt.lab.entity.business.Application;
+import com.epam.java.rt.lab.entity.business.Category;
 import com.epam.java.rt.lab.entity.rbac.Login;
 import com.epam.java.rt.lab.entity.rbac.User;
 import com.epam.java.rt.lab.web.access.RoleException;
@@ -68,49 +69,34 @@ public class ApplicationDao extends JdbcDao {
     @Override
     <T> List<T> getEntity(ResultSet resultSet, Sql sql) throws DaoException {
         Select select = (Select) sql;
+        String applicationTableName = Sql.getProperty(Application.class.getName());
         String userTableName = Sql.getProperty(User.class.getName());
-        String loginTableName = Sql.getProperty(Login.class.getName());
-        List<User> userList = new ArrayList<>();
+        String categoryTableName = Sql.getProperty(Category.class.getName());
+        List<Application> applicationList = new ArrayList<>();
         try {
             while (resultSet.next()) {
                 int columnIndex = 0;
-                User user = null;
+                Application application = null;
                 for (Column column : select) {
                     columnIndex++;
-                    if (userTableName.equals(column.getTableName())) {
-                        if (user == null) user = new User();
-                        if (column.getColumnName().equals("role_name")) {
-                            user.setRole(RoleFactory.getInstance()
-                                    .create(resultSet.getString(columnIndex)));
-                        } else {
-                            setEntityProperty(column.getTableName(), column.getColumnName(), user, resultSet.getObject(columnIndex));
-                        }
+                    if (applicationTableName.equals(column.getTableName())) {
+                        if (application == null) application = new Application();
+                        setEntityProperty(column.getTableName(), column.getColumnName(), application, resultSet.getObject(columnIndex));
                     } else {
-                        if (loginTableName.equals(column.getTableName())) {
-                            Long loginId = (Long) resultSet.getObject(columnIndex);
-                            if (loginId != null) {
-                                Dao dao = new LoginDao(getConnection());
-                                List<Login> loginList = dao.read(new DaoParameter()
-                                        .setWherePredicate(Where.Predicate.get(
-                                                Login.Property.ID,
-                                                Where.Predicate.PredicateOperator.EQUAL,
-                                                loginId
-                                        ))
-                                );
-                                if (loginList != null && loginList.size() > 0)
-                                    user.setLogin(loginList.get(0));
-                            }
+                        if (userTableName.equals(column.getTableName())) {
+                            application.setUser((new UserDao(getConnection())
+                                    .getUser((Long) resultSet.getObject(columnIndex))));
+                        } else if (categoryTableName.equals(column.getTableName())) {
+                            application.setCategory((new CategoryDao(getConnection())
+                                    .getCategory((Long) resultSet.getObject(columnIndex))));
                         }
                     }
                 }
-                userList.add(user);
+                applicationList.add(application);
             }
-            return (List<T>) userList;
+            return (List<T>) applicationList;
         } catch (SQLException e) {
-            throw new DaoException("exception.dao.jdbc.user.get-entity", e.getCause());
-        } catch (RoleException e) {
-            e.printStackTrace();
-            throw new DaoException("exception.dao.jdbc.user.role-factory", e.getCause());
+            throw new DaoException("exception.dao.jdbc.application.get-entity", e.getCause());
         }
     }
 
