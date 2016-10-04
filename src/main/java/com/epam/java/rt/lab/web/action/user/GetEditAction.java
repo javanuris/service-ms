@@ -6,9 +6,9 @@ import com.epam.java.rt.lab.service.UserService;
 import com.epam.java.rt.lab.util.UrlManager;
 import com.epam.java.rt.lab.util.validator.ValidatorException;
 import com.epam.java.rt.lab.util.validator.ValidatorFactory;
-import com.epam.java.rt.lab.web.Rbac.Role;
-import com.epam.java.rt.lab.web.Rbac.RoleException;
-import com.epam.java.rt.lab.web.Rbac.RoleFactory;
+import com.epam.java.rt.lab.web.access.Role;
+import com.epam.java.rt.lab.web.access.RoleException;
+import com.epam.java.rt.lab.web.access.RoleFactory;
 import com.epam.java.rt.lab.web.action.Action;
 import com.epam.java.rt.lab.web.action.ActionException;
 import com.epam.java.rt.lab.web.action.profile.GetLoginAction;
@@ -81,11 +81,11 @@ public class GetEditAction implements Action {
             e.printStackTrace();
             throw new ActionException("exception.action.user.edit.validator.id", e.getCause());
         } catch (FormException e) {
-            throw new ActionException("exception.action.rbac.user.edit.form", e.getCause());
+            throw new ActionException("exception.action.access.user.edit.form", e.getCause());
         } catch (ServletException | IOException e) {
-            throw new ActionException("exception.action.rbac.user.edit.jsp", e.getCause());
+            throw new ActionException("exception.action.access.user.edit.jsp", e.getCause());
         } catch (RoleException e) {
-            throw new ActionException("exception.action.rbac.user.edit.role-factory", e.getCause());
+            throw new ActionException("exception.action.access.user.edit.role-factory", e.getCause());
         }
     }
 }

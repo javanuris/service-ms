@@ -1,19 +1,16 @@
 package com.epam.java.rt.lab.web.servlet;
 
 import com.epam.java.rt.lab.entity.rbac.User;
-import com.epam.java.rt.lab.service.LoginService;
 import com.epam.java.rt.lab.service.ServiceException;
 import com.epam.java.rt.lab.service.UserService;
 import com.epam.java.rt.lab.util.CookieManager;
 import com.epam.java.rt.lab.util.UrlManager;
-import com.epam.java.rt.lab.web.Rbac.RoleException;
-import com.epam.java.rt.lab.web.Rbac.RoleFactory;
-import com.epam.java.rt.lab.web.component.form.FormException;
+import com.epam.java.rt.lab.web.access.RoleException;
+import com.epam.java.rt.lab.web.access.RoleFactory;
 import com.epam.java.rt.lab.web.component.navigation.NavigationException;
 import com.epam.java.rt.lab.web.component.navigation.NavigationFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sun.rmi.runtime.Log;
 
 import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
@@ -87,13 +84,13 @@ public class RbacFilter implements Filter {
             }
         } catch (ServiceException e) {
             e.printStackTrace();
-            throw new ServletException("exception.filter.rbac.do-filter.user-service", e.getCause());
+            throw new ServletException("exception.filter.access.do-filter.user-service", e.getCause());
         } catch (NavigationException e) {
             e.printStackTrace();
-            throw new ServletException("exception.filter.rbac.do-filter.navigation", e.getCause());
+            throw new ServletException("exception.filter.access.do-filter.navigation", e.getCause());
         } catch (RoleException e) {
             e.printStackTrace();
-            throw new ServletException("exception.filter.rbac.do-filter.role-factory", e.getCause());
+            throw new ServletException("exception.filter.access.do-filter.role-factory", e.getCause());
         }
     }
 

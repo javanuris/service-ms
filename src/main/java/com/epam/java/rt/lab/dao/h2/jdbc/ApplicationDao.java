@@ -4,6 +4,7 @@ import com.epam.java.rt.lab.dao.Dao;
 import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.dao.DaoParameter;
 import com.epam.java.rt.lab.dao.sql.*;
+import com.epam.java.rt.lab.entity.business.Application;
 import com.epam.java.rt.lab.entity.rbac.Login;
 import com.epam.java.rt.lab.entity.rbac.User;
 import com.epam.java.rt.lab.web.access.RoleException;
@@ -18,31 +19,29 @@ import java.util.List;
 /**
  * service-ms
  */
-public class UserDao extends JdbcDao {
+public class ApplicationDao extends JdbcDao {
 
-    public UserDao(Connection connection) throws DaoException {
+    public ApplicationDao(Connection connection) throws DaoException {
         super(connection);
     }
 
     @Override
     Sql getSqlCreate(DaoParameter daoParameter) throws DaoException {
-        User user = (User) daoParameter.getEntity();
+        Application application = (Application) daoParameter.getEntity();
         return Sql
-                .insert(user)
+                .insert(application)
                 .values(
-                        new Insert.InsertValue(User.Property.FIRST_NAME, user.getFirstName()),
-                        new Insert.InsertValue(User.Property.MIDDLE_NAME, user.getMiddleName()),
-                        new Insert.InsertValue(User.Property.LAST_NAME, user.getLastName()),
-                        new Insert.InsertValue(User.Property.LOGIN_ID, user.getLogin().getId()),
-                        new Insert.InsertValue(User.Property.ROLE_NAME, user.getRole().getName()),
-                        new Insert.InsertValue(User.Property.AVATAR_ID, user.getAvatarId())
+                        new Insert.InsertValue(Application.Property.CREATED, application.getCreated()),
+                        new Insert.InsertValue(Application.Property.USER_ID, application.getUser().getId()),
+                        new Insert.InsertValue(Application.Property.CATEGORY_ID, application.getCategory().getId()),
+                        new Insert.InsertValue(Application.Property.MESSAGE, application.getMessage())
                 );
     }
 
     @Override
     Sql getSqlRead(DaoParameter daoParameter) throws DaoException {
         return Sql
-                .select(User.class)
+                .select(Application.class)
                 .where(daoParameter.getWherePredicate())
                 .orderBy(daoParameter.getOrderByCriteriaArray())
                 .limit(daoParameter.getLimitOffset(), daoParameter.getLimitCount());
@@ -51,7 +50,7 @@ public class UserDao extends JdbcDao {
     @Override
     Sql getSqlUpdate(DaoParameter daoParameter) throws DaoException {
         return Sql
-                .update(User.class)
+                .update(Application.class)
                 .set(daoParameter.getSetValueArray())
                 .where(daoParameter.getWherePredicate());
     }
@@ -63,7 +62,7 @@ public class UserDao extends JdbcDao {
 
     @Override
     Sql getSqlCount(DaoParameter daoParameter) throws DaoException {
-        return Sql.count(User.class);
+        return Sql.count(Application.class);
     }
 
     @Override

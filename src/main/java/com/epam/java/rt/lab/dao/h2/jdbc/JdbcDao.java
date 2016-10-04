@@ -254,8 +254,10 @@ public abstract class JdbcDao implements Dao {
                 }
                 this.method = entityClass.getMethod(split[1], this.type);
             } catch (ClassNotFoundException e) {
+                e.printStackTrace();
                 throw new DaoException("exception.dao.jdbc.entity-method.class-not-found", e.getCause());
             } catch (NoSuchMethodException e) {
+                e.printStackTrace();
                 throw new DaoException("exception.dao.jdbc.entity-method.method-not-found", e.getCause());
             }
         }

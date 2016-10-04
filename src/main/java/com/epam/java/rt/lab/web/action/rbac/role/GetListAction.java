@@ -27,7 +27,7 @@ public class GetListAction implements Action {
 //            );
 //            Table table = new Table();
 //            table.setEntityList(roleService.getRoleList(page));
-//            table.setHrefPrefix(UrlManager.getContextUri(req, "/rbac/role/view",
+//            table.setHrefPrefix(UrlManager.getContextUri(req, "/access/role/view",
 //                    "page=".concat(String.valueOf(page.getCurrentPage())),
 //                    "items=".concat(String.valueOf(page.getItemsOnPage())),
 //                    "id="));
@@ -36,19 +36,19 @@ public class GetListAction implements Action {
 //            List<Navigation> navigationList = (List<Navigation>) req.getSession().getAttribute("navigationList");
 //            if (navigationList != null) {
 //                for (Navigation navigation : navigationList)
-//                    if ("/rbac/user/list".equals(navigation.getUri()))
+//                    if ("/access/user/list".equals(navigation.getUri()))
 //                        req.setAttribute("nav", navigation);
 //            }
-//            req.getRequestDispatcher("/WEB-INF/jsp/rbac/role/list.jsp").forward(req, resp);
+//            req.getRequestDispatcher("/WEB-INF/jsp/access/role/list.jsp").forward(req, resp);
 //        } catch (ServiceException e) {
 //            e.printStackTrace();
-//            throw new ActionException("exception.action.rbac.role.list.service", e.getCause());
+//            throw new ActionException("exception.action.access.role.list.service", e.getCause());
 //        } catch (ValidatorException e) {
 //            e.printStackTrace();
-//            throw new ActionException("exception.action.rbac.role.list.validator", e.getCause());
+//            throw new ActionException("exception.action.access.role.list.validator", e.getCause());
 //        } catch (ServletException | IOException e) {
 //            e.printStackTrace();
-//            throw new ActionException("exception.action.rbac.role.list.request", e.getCause());
+//            throw new ActionException("exception.action.access.role.list.request", e.getCause());
 //        }
     }
 

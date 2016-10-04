@@ -1,4 +1,4 @@
-package com.epam.java.rt.lab.web.action.execution;
+package com.epam.java.rt.lab.web.action.processing;
 
 import com.epam.java.rt.lab.web.action.Action;
 import com.epam.java.rt.lab.web.action.ActionException;
@@ -19,8 +19,8 @@ public class ListAction implements Action {
     @Override
     public void execute(HttpServletRequest req, HttpServletResponse resp) throws ActionException {
         try {
-            logger.debug("/WEB-INF/jsp/execution/list.jsp");
-            req.getRequestDispatcher("/WEB-INF/jsp/execution/list.jsp").forward(req, resp);
+            logger.debug("/WEB-INF/jsp/processing/list.jsp");
+            req.getRequestDispatcher("/WEB-INF/jsp/processing/list.jsp").forward(req, resp);
         } catch (ServletException | IOException e) {
             throw new ActionException(e.getMessage());
         }

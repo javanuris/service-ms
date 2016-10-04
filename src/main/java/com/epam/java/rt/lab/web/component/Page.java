@@ -1,5 +1,10 @@
 package com.epam.java.rt.lab.web.component;
 
+import com.epam.java.rt.lab.util.validator.ValidatorException;
+import com.epam.java.rt.lab.util.validator.ValidatorFactory;
+
+import javax.servlet.http.HttpServletRequest;
+
 /**
  * service-ms
  */
@@ -13,6 +18,20 @@ public class Page {
     public Page(Long currentPage, Long itemsOnPage) {
         this.currentPage = currentPage != null ? currentPage : 1L;
         this.itemsOnPage = itemsOnPage != null ? itemsOnPage : ITEMS_ON_PAGE;
+    }
+
+    public Page(HttpServletRequest req) {
+        try {
+            String currentPage = req.getParameter("page");
+            this.currentPage = ValidatorFactory.create("digits").validate(currentPage) != null ?
+                    1L : Long.valueOf(currentPage);
+            String itemsOnPage = req.getParameter("items");
+            this.itemsOnPage = ValidatorFactory.create("digits").validate(itemsOnPage) != null ?
+                    ITEMS_ON_PAGE : Long.valueOf(itemsOnPage);
+        } catch (ValidatorException e) {
+            this.currentPage = 1L;
+            this.itemsOnPage = ITEMS_ON_PAGE;
+        }
     }
 
     public Long getCurrentPage() {

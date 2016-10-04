@@ -1,14 +1,12 @@
 package com.epam.java.rt.lab.web.action;
 
-import com.epam.java.rt.lab.web.Rbac.Permission;
-import com.epam.java.rt.lab.web.Rbac.RoleException;
-import com.epam.java.rt.lab.web.Rbac.RoleFactory;
-import com.epam.java.rt.lab.web.component.form.FormException;
+import com.epam.java.rt.lab.web.access.Permission;
+import com.epam.java.rt.lab.web.access.RoleException;
+import com.epam.java.rt.lab.web.access.RoleFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**

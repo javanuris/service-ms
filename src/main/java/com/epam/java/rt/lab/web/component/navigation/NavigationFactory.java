@@ -1,10 +1,9 @@
 package com.epam.java.rt.lab.web.component.navigation;
 
-import com.epam.java.rt.lab.service.ServiceException;
 import com.epam.java.rt.lab.util.StringArray;
-import com.epam.java.rt.lab.web.Rbac.Role;
-import com.epam.java.rt.lab.web.Rbac.RoleException;
-import com.epam.java.rt.lab.web.Rbac.RoleFactory;
+import com.epam.java.rt.lab.web.access.Role;
+import com.epam.java.rt.lab.web.access.RoleException;
+import com.epam.java.rt.lab.web.access.RoleFactory;
 
 import java.io.IOException;
 import java.util.*;
