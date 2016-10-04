@@ -41,19 +41,26 @@ public class ApplicationService extends BaseService {
             throws ServiceException {
     }
 
-    public List<Application> getApplicationList(Page page) throws ServiceException {
+    public List<Application> getApplicationList(Page page, User user) throws ServiceException {
         try {
             DaoParameter daoParameter = new DaoParameter();
             page.setCountItems(dao(Application.class.getSimpleName()).count(daoParameter));
-            return dao(Application.class.getSimpleName()).read(new DaoParameter()
-                    .setOrderByCriteriaArray(OrderBy.Criteria.asc(
+            daoParameter = new DaoParameter()
+                    .setOrderByCriteriaArray(OrderBy.Criteria.desc(
                             Application.Property.CREATED
                     ))
                     .setLimit(
                             (page.getCurrentPage() - 1) * page.getItemsOnPage(),
                             page.getItemsOnPage()
-                    )
-            );
+                    );
+            if (user != null) {
+                daoParameter.setWherePredicate(Where.Predicate.get(
+                        User.Property.ID,
+                        Where.Predicate.PredicateOperator.EQUAL,
+                        user.getId()
+                ));
+            }
+            return dao(Application.class.getSimpleName()).read(daoParameter);
         } catch (DaoException e) {
             throw new ServiceException("exception.service.application.get-application-list.dao", e.getCause());
         }

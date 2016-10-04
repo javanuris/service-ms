@@ -1,5 +1,6 @@
 package com.epam.java.rt.lab.web.action.application;
 
+import com.epam.java.rt.lab.entity.rbac.User;
 import com.epam.java.rt.lab.service.ApplicationService;
 import com.epam.java.rt.lab.service.ServiceException;
 import com.epam.java.rt.lab.util.UrlManager;
@@ -28,7 +29,9 @@ public class GetListAction implements Action {
         try (ApplicationService applicationService = new ApplicationService()) {
             Page page = new Page(req);
             Table table = new Table();
-            table.setEntityList(applicationService.getApplicationList(page));
+            User user = (User) req.getSession().getAttribute("user");
+            if (!"authorized".equals(user.getRole().getName())) user = null;
+            table.setEntityList(applicationService.getApplicationList(page, user));
             table.setHrefPrefix(UrlManager.getContextUri(req, "/application/view",
                     "page=".concat(String.valueOf(page.getCurrentPage())),
                     "items=".concat(String.valueOf(page.getItemsOnPage())),
