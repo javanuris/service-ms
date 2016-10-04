@@ -25,13 +25,14 @@ public class CategoryDao extends JdbcDao {
 
     @Override
     Sql getSqlCreate(DaoParameter daoParameter) throws DaoException {
-        Category service = (Category) daoParameter.getEntity();
+        Category category = (Category) daoParameter.getEntity();
         return Sql
-                .insert(service)
+                .insert(category)
                 .values(
-                        new Insert.InsertValue(Category.Property.CREATED, service.getCreated()),
-                        new Insert.InsertValue(Category.Property.PARENT_ID, service.getParent().getId()),
-                        new Insert.InsertValue(Category.Property.NAME, service.getName())
+                        new Insert.InsertValue(Category.Property.CREATED, category.getCreated()),
+                        new Insert.InsertValue(Category.Property.PARENT_ID,
+                                 category.getParent() == null ? null : category.getParent().getId()),
+                        new Insert.InsertValue(Category.Property.NAME, category.getName())
                 );
     }
 

@@ -4,5 +4,5 @@
 <tags:template>
     <jsp:attribute name="title">title.category.edit</jsp:attribute>
     <jsp:attribute name="navbarCurrent">/category/list</jsp:attribute>
-    <jsp:body><tags:profile-form form="${requestScope.editCategory}"/></jsp:body>
+    <jsp:body><tags:form-panel form="${requestScope.editCategory}"/></jsp:body>
 </tags:template>

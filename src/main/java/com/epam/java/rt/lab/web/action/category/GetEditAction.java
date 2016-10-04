@@ -33,7 +33,7 @@ import java.util.Map;
  * category-ms
  */
 public class GetEditAction implements Action {
-    private static final Logger logger = LoggerFactory.getLogger(GetLoginAction.class);
+    private static final Logger logger = LoggerFactory.getLogger(GetEditAction.class);
 
     @Override
     public void execute(HttpServletRequest req, HttpServletResponse resp) throws ActionException {

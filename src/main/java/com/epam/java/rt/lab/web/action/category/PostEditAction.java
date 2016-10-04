@@ -35,7 +35,7 @@ import java.util.Map;
  * category-ms
  */
 public class PostEditAction implements Action {
-    private static final Logger logger = LoggerFactory.getLogger(GetLoginAction.class);
+    private static final Logger logger = LoggerFactory.getLogger(PostEditAction.class);
 
     @Override
     public void execute(HttpServletRequest req, HttpServletResponse resp) throws ActionException {

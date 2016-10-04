@@ -4,5 +4,5 @@
 <tags:template>
     <jsp:attribute name="title">title.user.edit</jsp:attribute>
     <jsp:attribute name="navbarCurrent">/user/list</jsp:attribute>
-    <jsp:body><tags:profile-form form="${requestScope.editForm}"/></jsp:body>
+    <jsp:body><tags:form-panel form="${requestScope.editForm}"/></jsp:body>
 </tags:template>

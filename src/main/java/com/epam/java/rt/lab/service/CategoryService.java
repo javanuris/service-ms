@@ -88,5 +88,14 @@ public class CategoryService extends BaseService {
         }
     }
 
+    public Long addCategory(Category category) throws ServiceException {
+        try {
+            return dao(Category.class.getSimpleName()).create(new DaoParameter().setEntity(category));
+        } catch (DaoException e) {
+            e.printStackTrace();
+            throw new ServiceException("exception.service.category.update-category.dao", e.getCause());
+        }
+    }
+
 
 }

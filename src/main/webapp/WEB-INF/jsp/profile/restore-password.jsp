@@ -4,5 +4,5 @@
 <tags:template>
     <jsp:attribute name="title">title.profile.restore-password</jsp:attribute>
     <jsp:attribute name="navbarCurrent">/profile/restore-password</jsp:attribute>
-    <jsp:body><tags:profile-form form="${requestScope.restoreForm}"/></jsp:body>
+    <jsp:body><tags:form-panel form="${requestScope.restoreForm}"/></jsp:body>
 </tags:template>
