@@ -3,7 +3,7 @@ drop table "Login"; drop table "Restore";
 drop table "User"; drop table "Avatar"; drop table "Remember";
 drop table "Activate";
 drop table "Category"; drop table "Application"; drop table "Processing";
-drop table "Attachment"; drop table "Comment";
+drop table "Photo"; drop table "Comment";
 
 //create tables
 create table if not exists "Login" (id identity primary key, email varchar(255) unique not null, salt varchar(255) not null, password varchar(255) not null, attempt_left int not null, status int not null);
@@ -15,8 +15,8 @@ create table if not exists "Activate" (id identity primary key, email varchar(25
 create table if not exists "Category" (id identity primary key, created timestamp, parent_id bigint references "Category" (id), name varchar(255) not null);
 create table if not exists "Application" (id identity primary key, created timestamp, user_id bigint references "User" (id), category_id bigint references "Category" (id), message varchar(255) not null);
 create table if not exists "Processing" (id identity primary key, application_id bigint references "Application" (id), user_id bigint references "User" (id), created timestamp);
-create table if not exists "Attachment" (id identity primary key, name varchar(255), type varchar(255), file blob, created datetime);
-create table if not exists "Comment" (id identity primary key, user_id bigint references "User" (id), created timestamp, application_id bigint references "Application" (id), attachment_id bigint references "Attachment" (id), message varchar(255));
+create table if not exists "Photo" (id identity primary key, name varchar(255), type varchar(255), file blob, modified datetime);
+create table if not exists "Comment" (id identity primary key, user_id bigint references "User" (id), created timestamp, application_id bigint references "Application" (id), photo_id bigint references "Photo" (id), message varchar(255));
 
 //init data
 insert into "Login" (email, salt, password, attempt_left, status) values ('test@test.com', 'salt', 'test', 5, 0);
@@ -38,6 +38,9 @@ insert into "User" (first_name, middle_name, last_name, login_id, role_name) val
 insert into "User" (first_name, middle_name, last_name, login_id, role_name) values ('Bill', 'L.', 'Black', select id from "Login" where email is 'test@test.com', 'admin');
 insert into "User" (first_name, middle_name, last_name, login_id, role_name) values ('Latisha', 'P.', 'Morrisson', select id from "Login" where email is 'test@test.com', 'admin');
 insert into "Category" (created, parent_id, name) values ('2016-10-11 17:36:17.528', null, 'Heating');
+insert into "Application" (created, user_id, category_id, message) values ('2016-10-11 17:36:17.528', '2', '1', 'Some problem with heating, too cold in bathroom');
+insert into "Comment" (created, user_id, application_id, message) values ('2016-10-11 17:36:17.528', '2', '1', 'And hot water not hot');
+insert into "Comment" (created, user_id, application_id, message) values ('2016-10-11 17:36:17.528', '4', '1', 'And hot water not hot');
 
 
 //Select data

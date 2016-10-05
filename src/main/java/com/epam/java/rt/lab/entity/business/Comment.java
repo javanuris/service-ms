@@ -9,36 +9,31 @@ import java.sql.Timestamp;
 /**
  * category-ms
  */
-public class Application extends BaseEntity {
+public class Comment extends BaseEntity {
 
     private User user;
     private Timestamp created;
-    private Category category;
+    private Long applicationId;
+    private Long photoId;
     private String message;
 
     public enum Property implements EntityProperty {
         ID,
         USER_ID,
         CREATED,
-        CATEGORY_ID,
+        APPLICATION_ID,
+        PHOTO_ID,
         MESSAGE;
 
         @Override
         public Class getEntityClass() {
-            return Application.class;
+            return Comment.class;
         }
     }
 
-    public Application() {
+    public Comment() {
     }
 
-    public Application(Long id, User user, Timestamp created, Category category, String message) {
-        super(id);
-        this.user = user;
-        this.created = created;
-        this.category = category;
-        this.message = message;
-    }
 
     public Long getId() {
         return super.getId();
@@ -64,12 +59,20 @@ public class Application extends BaseEntity {
         this.created = created;
     }
 
-    public Category getCategory() {
-        return category;
+    public Long getApplicationId() {
+        return applicationId;
     }
 
-    public void setCategory(Category category) {
-        this.category = category;
+    public void setApplicationId(Long applicationId) {
+        this.applicationId = applicationId;
+    }
+
+    public Long getPhotoId() {
+        return photoId;
+    }
+
+    public void setPhotoId(Long photoId) {
+        this.photoId = photoId;
     }
 
     public String getMessage() {

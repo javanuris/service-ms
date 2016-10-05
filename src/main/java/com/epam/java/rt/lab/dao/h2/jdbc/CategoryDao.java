@@ -27,8 +27,7 @@ public class CategoryDao extends JdbcDao {
                 .insert(category)
                 .values(
                         new Insert.InsertValue(Category.Property.CREATED, category.getCreated()),
-                        new Insert.InsertValue(Category.Property.PARENT_ID,
-                                 category.getParent() == null ? null : category.getParent().getId()),
+                        new Insert.InsertValue(Category.Property.PARENT_ID, category.getParentId()),
                         new Insert.InsertValue(Category.Property.NAME, category.getName())
                 );
     }
@@ -62,7 +61,7 @@ public class CategoryDao extends JdbcDao {
 
     @Override
     <T> List<T> getEntity(ResultSet resultSet, Sql sql) throws DaoException {
-        Select select = (Select) sql;
+        Select_ select = (Select_) sql;
         String categoryTableName = Sql.getProperty(Category.class.getName());
         List<Category> categoryList = new ArrayList<>();
         try {
@@ -73,17 +72,7 @@ public class CategoryDao extends JdbcDao {
                     columnIndex++;
                     if (categoryTableName.equals(column.getTableName())) {
                         if (category == null) category = new Category();
-                        if (column.getColumnName().equals("parent_id")) { // TODO: variable instead literal
-                            // fill only id
-                            Long parentId = (Long) resultSet.getObject(columnIndex);
-                            if (parentId != null) {
-                                Category parent = new Category();
-                                parent.setId(parentId);
-                                category.setParent(parent);
-                            }
-                        } else {
-                            setEntityProperty(column.getTableName(), column.getColumnName(), category, resultSet.getObject(columnIndex));
-                        }
+                        setEntityProperty(column.getTableName(), column.getColumnName(), category, resultSet.getObject(columnIndex));
                     } else {
                         // another entity
                     }

@@ -10,7 +10,7 @@ import java.sql.Timestamp;
  */
 public class Category extends BaseEntity {
 
-    private Category parent;
+    private Long parentId;
     private Timestamp created;
     private String name;
 
@@ -29,9 +29,9 @@ public class Category extends BaseEntity {
     public Category() {
     }
 
-    public Category(Long id, Category parent, Timestamp created, String name) {
+    public Category(Long id, Long parentId, Timestamp created, String name) {
         super(id);
-        this.parent = parent;
+        this.parentId = parentId;
         this.created = created;
         this.name = name;
     }
@@ -45,12 +45,12 @@ public class Category extends BaseEntity {
         super.setId(id);
     }
 
-    public Category getParent() {
-        return parent;
+    public Long getParentId() {
+        return parentId;
     }
 
-    public void setParent(Category parent) {
-        this.parent = parent;
+    public void setParentId(Long parentId) {
+        this.parentId = parentId;
     }
 
     public Timestamp getCreated() {

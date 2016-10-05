@@ -41,7 +41,7 @@ public class WhereTest {
                 )
         );
         predicateList.get(1).wildValueArray[0].link(this.wildValueList);
-        Select.Join join = new Select.Join();
+        Select_.Join join = new Select_.Join();
         join.setFrom(FROM_TABLE);
         this.where = new Where(
                 join,

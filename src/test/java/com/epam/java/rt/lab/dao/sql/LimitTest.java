@@ -13,11 +13,11 @@ public class LimitTest {
 
     private static final String LIMIT = " LIMIT 0, 10";
 
-    private Select.Limit limit;
+    private Select_.Limit limit;
 
     @Before
     public void setUp() throws Exception {
-        this.limit = new Select.Limit(0L, 10L);
+        this.limit = new Select_.Limit(0L, 10L);
         assertNotNull("Instantiating failed", this.limit);
     }
 

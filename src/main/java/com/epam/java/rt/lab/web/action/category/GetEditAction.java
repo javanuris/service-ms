@@ -54,8 +54,7 @@ public class GetEditAction implements Action {
                     if (!parent.getId().equals(category.getId()))
                         valueList.add(new FormControl.SelectValue(parent.getId().toString(), parent.getName()));
                 form.getItem(0).setAvailableValueList(valueList);
-                if (category.getParent() != null)
-                    form.getItem(0).setValue(category.getParent().getId().toString());
+                form.getItem(0).setValue(String.valueOf(category.getParentId()));
                 form.getItem(1).setValue(category.getName());
                 form.getItem(3).setActionParameters("?".concat(UrlManager.getRequestParameterString(parameterMap)));
                 req.setAttribute("editCategory", form);

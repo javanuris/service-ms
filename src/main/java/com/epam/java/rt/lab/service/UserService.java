@@ -346,41 +346,4 @@ public class UserService extends BaseService {
             throw new ServiceException("exception.service.user.remove-avatar.dao", e.getCause());
         }
     }
-
-//    public int addUser(User user) throws DaoException {
-//        Dao_ dao = daoFactory.createDao("User");
-//        return dao.create(user);
-//    }
-//
-//    private <T> Map<String, Object> getRelEntity(T entity, String relEntityName) throws DaoException {
-//        Dao_ dao = daoFactory.createDao("User");
-//        Map<String, Object> relEntityMap = (Map<String, Object>) dao.getRelEntity(entity, relEntityName);
-//        return relEntityMap;
-//    }
-//
-//    private <T> void setRelEntity(T entity, String relEntityName, Object relEntity) throws DaoException {
-//        if (relEntity != null) {
-//            Dao_ dao = daoFactory.createDao("User");
-//            dao.setRelEntity(entity, relEntityName, relEntity);
-//        }
-//    }
-//
-//    private <T> void removeRelEntity(T entity, String relEntityName) throws DaoException {
-//        Dao_ dao = daoFactory.createDao("User");
-//        dao.removeRelEntity(entity, relEntityName);
-//    }
-//
-//    public void removeRemember(Long userId) throws DaoException {
-//        removeRelEntity(userId, "Remember");
-//    }
-//
-//    public int updateUser(User user) throws DaoException {
-//        Dao_ dao = daoFactory.createDao("User");
-//        int updateCount = dao.update(user, "id", "firstName, middleName, lastName, avatarId");
-//        return updateCount;
-//    }
-//
-//
-//
-
 }

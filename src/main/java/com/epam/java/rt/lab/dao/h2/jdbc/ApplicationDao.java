@@ -1,15 +1,11 @@
 package com.epam.java.rt.lab.dao.h2.jdbc;
 
-import com.epam.java.rt.lab.dao.Dao;
 import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.dao.DaoParameter;
 import com.epam.java.rt.lab.dao.sql.*;
 import com.epam.java.rt.lab.entity.business.Application;
 import com.epam.java.rt.lab.entity.business.Category;
-import com.epam.java.rt.lab.entity.rbac.Login;
 import com.epam.java.rt.lab.entity.rbac.User;
-import com.epam.java.rt.lab.web.access.RoleException;
-import com.epam.java.rt.lab.web.access.RoleFactory;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -68,7 +64,7 @@ public class ApplicationDao extends JdbcDao {
 
     @Override
     <T> List<T> getEntity(ResultSet resultSet, Sql sql) throws DaoException {
-        Select select = (Select) sql;
+        Select_ select = (Select_) sql;
         String applicationTableName = Sql.getProperty(Application.class.getName());
         String userTableName = Sql.getProperty(User.class.getName());
         String categoryTableName = Sql.getProperty(Category.class.getName());
@@ -98,6 +94,19 @@ public class ApplicationDao extends JdbcDao {
         } catch (SQLException e) {
             throw new DaoException("exception.dao.jdbc.application.get-entity", e.getCause());
         }
+    }
+
+    Application getApplication(Long id) throws DaoException {
+        if (id == null) return null;
+        List<Application> applicationList = read(new DaoParameter()
+                .setWherePredicate(Where.Predicate.get(
+                        Application.Property.ID,
+                        Where.Predicate.PredicateOperator.EQUAL,
+                        id
+                ))
+        );
+        if (applicationList == null || applicationList.size() == 0) return null;
+        return applicationList.get(0);
     }
 
 }

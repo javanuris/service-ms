@@ -27,7 +27,7 @@ public class UploadServlet extends HttpServlet {
 
     private static void initContentTypeListMap() throws IOException {
         Properties properties = new Properties();
-        properties.load(UploadServlet.class.getClassLoader().getResourceAsStream("content-types.properties"));
+        properties.load(UploadServlet.class.getClassLoader().getResourceAsStream("content-type.properties"));
         Enumeration names = properties.propertyNames();
         while (names.hasMoreElements()) {
             String key = (String) names.nextElement();
@@ -51,6 +51,13 @@ public class UploadServlet extends HttpServlet {
                         logger.debug("contentType = {} (valid: {})", filePart.getContentType(), contentTypeListMap.get("avatar").toArray());
                         if (UploadServlet.contentTypeListMap.get("avatar").contains(filePart.getContentType())) {
                             prefix = ".avatar.".concat(filePart.getContentType().replaceAll("/", "_")).concat(".");
+                            postfix = ".".concat(req.getSession().getId());
+                        }
+                        break;
+                    case "/photo":
+                        logger.debug("contentType = {} (valid: {})", filePart.getContentType(), contentTypeListMap.get("photo").toArray());
+                        if (UploadServlet.contentTypeListMap.get("photo").contains(filePart.getContentType())) {
+                            prefix = ".photo.".concat(filePart.getContentType().replaceAll("/", "_")).concat(".");
                             postfix = ".".concat(req.getSession().getId());
                         }
                         break;

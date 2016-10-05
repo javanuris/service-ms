@@ -84,6 +84,7 @@ public abstract class JdbcDao implements Dao {
         } catch (NoSuchMethodException e) {
             throw new DaoException("exception.dao.jdbc.create.statement-method", e.getCause());
         } catch (SQLException e) {
+            e.printStackTrace();
             throw new DaoException("exception.dao.jdbc.create.sql", e.getCause());
         } catch (Exception e) {
             e.printStackTrace();

@@ -1,6 +1,5 @@
 package com.epam.java.rt.lab.dao.h2.jdbc;
 
-import com.epam.java.rt.lab.dao.Dao;
 import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.dao.DaoParameter;
 import com.epam.java.rt.lab.dao.sql.*;
@@ -68,7 +67,7 @@ public class UserDao extends JdbcDao {
 
     @Override
     <T> List<T> getEntity(ResultSet resultSet, Sql sql) throws DaoException {
-        Select select = (Select) sql;
+        Select_ select = (Select_) sql;
         String userTableName = Sql.getProperty(User.class.getName());
         String loginTableName = Sql.getProperty(Login.class.getName());
         List<User> userList = new ArrayList<>();

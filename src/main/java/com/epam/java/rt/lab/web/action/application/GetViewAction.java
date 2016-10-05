@@ -2,14 +2,17 @@ package com.epam.java.rt.lab.web.action.application;
 
 import com.epam.java.rt.lab.entity.business.Application;
 import com.epam.java.rt.lab.entity.business.Category;
+import com.epam.java.rt.lab.entity.business.Comment;
 import com.epam.java.rt.lab.service.ApplicationService;
 import com.epam.java.rt.lab.service.CategoryService;
+import com.epam.java.rt.lab.service.CommentService;
 import com.epam.java.rt.lab.service.ServiceException;
 import com.epam.java.rt.lab.util.UrlManager;
 import com.epam.java.rt.lab.util.validator.ValidatorException;
 import com.epam.java.rt.lab.util.validator.ValidatorFactory;
 import com.epam.java.rt.lab.web.action.Action;
 import com.epam.java.rt.lab.web.action.ActionException;
+import com.epam.java.rt.lab.web.component.Page;
 import com.epam.java.rt.lab.web.component.view.View;
 import com.epam.java.rt.lab.web.component.view.ViewException;
 import com.epam.java.rt.lab.web.component.view.ViewFactory;
@@ -20,6 +23,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -30,7 +34,8 @@ public class GetViewAction implements Action {
 
     @Override
     public void execute(HttpServletRequest req, HttpServletResponse resp) throws ActionException {
-        try (ApplicationService applicationService = new ApplicationService()) {
+        try (ApplicationService applicationService = new ApplicationService();
+             CommentService commentService = new CommentService()) {
             logger.debug("/WEB-INF/jsp/application/view.jsp");
             Map<String, String> parameterMap = UrlManager.getRequestParameterMap(req.getQueryString());
             String id = parameterMap.remove("id");
@@ -43,13 +48,18 @@ public class GetViewAction implements Action {
                 view.getControl(1).setValue(application.getCategory().getName());
                 view.getControl(2).setValue(application.getMessage());
                 view.getControl(3).setValue(application.getUser().getName());
-                view.getControl(4).setAction(UrlManager.getContextUri(req, "/application/comment",
-                        UrlManager.getRequestParameterString(parameterMap), "id=".concat(id)));
-                view.getControl(5).setAction(UrlManager.getContextUri(req, "/application/list", parameterMap));
+                view.getControl(4).setAction(UrlManager.getContextUri(req, "/application/list", parameterMap));
                 req.setAttribute("viewApplication", view);
-
-                //comments here
-
+                req.setAttribute("commentRef", UrlManager.getContextUri(req, "/application/comment",
+                        UrlManager.getRequestParameterString(parameterMap), "id=".concat(id)));
+                req.setAttribute("commentPhotoRef", UrlManager.getContextUri(req, "/file/download/photo?id="));
+                req.setAttribute("userAvatarRef", UrlManager.getContextUri(req, "/file/download/avatar?id="));
+                Page page = new Page(null, null);
+                req.setAttribute("commentList", commentService.getCommentList(page, Long.valueOf(id)));
+                if (page.getCountItems() > 10) {
+                    parameterMap.put("rel", "application");
+                    req.setAttribute("allCommentRef", UrlManager.getContextUri(req, "/comment", parameterMap));
+                }
                 req.getRequestDispatcher("/WEB-INF/jsp/application/view.jsp").forward(req, resp);
             }
         } catch (ServiceException e) {

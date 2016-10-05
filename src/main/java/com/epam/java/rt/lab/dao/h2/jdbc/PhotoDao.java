@@ -6,7 +6,7 @@ import com.epam.java.rt.lab.dao.sql.Column;
 import com.epam.java.rt.lab.dao.sql.Insert;
 import com.epam.java.rt.lab.dao.sql.Select_;
 import com.epam.java.rt.lab.dao.sql.Sql;
-import com.epam.java.rt.lab.entity.rbac.Activate;
+import com.epam.java.rt.lab.entity.business.Photo;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -17,30 +17,29 @@ import java.util.List;
 /**
  * category-ms
  */
-public class ActivateDao extends JdbcDao {
+public class PhotoDao extends JdbcDao {
 
-    public ActivateDao(Connection connection) throws DaoException {
+    public PhotoDao(Connection connection) throws DaoException {
         super(connection);
     }
 
     @Override
     Sql getSqlCreate(DaoParameter daoParameter) throws DaoException {
-        Activate activate = (Activate) daoParameter.getEntity();
+        Photo photo = (Photo) daoParameter.getEntity();
         return Sql
-                .insert(activate)
+                .insert(photo)
                 .values(
-                        new Insert.InsertValue(Activate.Property.EMAIL, activate.getEmail()),
-                        new Insert.InsertValue(Activate.Property.SALT, activate.getSalt()),
-                        new Insert.InsertValue(Activate.Property.PASSWORD, activate.getPassword()),
-                        new Insert.InsertValue(Activate.Property.CODE, activate.getCode()),
-                        new Insert.InsertValue(Activate.Property.VALID, activate.getValid())
+                        new Insert.InsertValue(Photo.Property.NAME, photo.getName()),
+                        new Insert.InsertValue(Photo.Property.TYPE, photo.getType()),
+                        new Insert.InsertValue(Photo.Property.FILE, photo.getFile()),
+                        new Insert.InsertValue(Photo.Property.MODIFIED, photo.getModified())
                 );
     }
 
     @Override
     Sql getSqlRead(DaoParameter daoParameter) throws DaoException {
         return Sql
-                .select(Activate.class)
+                .select(Photo.class)
                 .where(daoParameter.getWherePredicate())
                 .orderBy(daoParameter.getOrderByCriteriaArray())
                 .limit(daoParameter.getLimitOffset(), daoParameter.getLimitCount());
@@ -49,7 +48,7 @@ public class ActivateDao extends JdbcDao {
     @Override
     Sql getSqlUpdate(DaoParameter daoParameter) throws DaoException {
         return Sql
-                .update(Activate.class)
+                .update(Photo.class)
                 .set(daoParameter.getSetValueArray())
                 .where(daoParameter.getWherePredicate());
     }
@@ -57,7 +56,7 @@ public class ActivateDao extends JdbcDao {
     @Override
     Sql getSqlDelete(DaoParameter daoParameter) throws DaoException {
         return Sql
-                .delete(Activate.class)
+                .delete(Photo.class)
                 .where(daoParameter.getWherePredicate());
     }
 
@@ -69,26 +68,30 @@ public class ActivateDao extends JdbcDao {
     @Override
     <T> List<T> getEntity(ResultSet resultSet, Sql sql) throws DaoException {
         Select_ select = (Select_) sql;
-        String activateTableName = Sql.getProperty(Activate.class.getName());
-        List<Activate> activateList = new ArrayList<>();
+        String photoTableName = Sql.getProperty(Photo.class.getName());
+        List<Photo> photoList = new ArrayList<>();
         try {
             while (resultSet.next()) {
                 int columnIndex = 0;
-                Activate activate = null;
+                Photo photo = null;
                 for (Column column : select) {
                     columnIndex++;
-                    if (activateTableName.equals(column.getTableName())) {
-                        if (activate == null) activate = new Activate();
-                        setEntityProperty(column.getTableName(), column.getColumnName(), activate, resultSet.getObject(columnIndex));
+                    if (photoTableName.equals(column.getTableName())) {
+                        if (photo == null) photo = new Photo();
+                        if (column.getColumnName().equals("file")) {
+                            photo.setFile(resultSet.getBinaryStream(columnIndex));
+                        } else {
+                            setEntityProperty(column.getTableName(), column.getColumnName(), photo, resultSet.getObject(columnIndex));
+                        }
                     } else {
                         // another entity
                     }
                 }
-                activateList.add(activate);
+                photoList.add(photo);
             }
-            return (List<T>) activateList;
+            return (List<T>) photoList;
         } catch (SQLException e) {
-            throw new DaoException("exception.dao.jdbc.activate.get-entity", e.getCause());
+            throw new DaoException("exception.dao.jdbc.photo.get-entity", e.getCause());
         }
     }
 

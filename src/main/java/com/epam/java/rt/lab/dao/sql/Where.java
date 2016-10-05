@@ -13,10 +13,10 @@ public class Where implements Clause {
 
     private static final String WHERE = " WHERE ";
 
-    private Select.Join join;
+    private Select_.Join join;
     private Predicate predicate;
 
-    Where(Select.Join join, Predicate predicate) throws DaoException {
+    Where(Select_.Join join, Predicate predicate) throws DaoException {
         this.join = join;
         Predicate joinPredicate = null;
         if (join == null && predicate == null) return;

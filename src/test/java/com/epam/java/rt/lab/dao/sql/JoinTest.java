@@ -16,11 +16,11 @@ public class JoinTest {
     private static final String JOIN_PREDICATE = "\"Login\".id = \"Restore\".login_id";
     private static final String JOIN = " JOIN \"Restore\"";
 
-    private Select.Join join;
+    private Select_.Join join;
 
     @Before
     public void setUp() throws Exception {
-        this.join = new Select.Join();
+        this.join = new Select_.Join();
         assertNotNull("Instantiating failed", this.join);
     }
 

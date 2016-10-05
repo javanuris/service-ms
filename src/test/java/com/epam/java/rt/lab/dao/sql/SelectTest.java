@@ -15,7 +15,7 @@ import static org.junit.Assert.*;
  */
 public class SelectTest {
 
-    private Select select;
+    private Select_ select;
 
     @Before
     public void setUp() throws Exception {
@@ -24,7 +24,7 @@ public class SelectTest {
         columnList.add(Column.of("\"Restore\".code"));
         columnList.add(Column.of("\"Login\".id"));
         columnList.add(Column.of("\"Login\".email"));
-        this.select = new Select(columnList);
+        this.select = new Select_(columnList);
         assertNotNull("Instantiating failed", this.select);
     }
 

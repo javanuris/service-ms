@@ -57,11 +57,7 @@ public class PostEditAction implements Action {
                         valueList.add(new FormControl.SelectValue(parent.getId().toString(), parent.getName()));
                 form.getItem(0).setAvailableValueList(valueList);
                 if (FormValidator.validate(req, form)) {
-                    if (form.getItem(0).getValue().length() > 0) {
-                        Category parent = new Category();
-                        parent.setId(Long.valueOf(form.getItem(0).getValue()));
-                        category.setParent(parent);
-                    }
+                    category.setParentId(Long.valueOf(form.getItem(0).getValue()));
                     category.setName(form.getItem(1).getValue());
                     categoryService.updateCategory(category);
                     resp.sendRedirect(UrlManager.getContextUri(req, "/category/view", parameterMap));

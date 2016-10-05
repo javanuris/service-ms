@@ -72,8 +72,7 @@ public class CategoryService extends BaseService {
         try {
             return dao(Category.class.getSimpleName()).update(new DaoParameter()
                     .setSetValueArray(
-                            new Update.SetValue(Category.Property.PARENT_ID,
-                                    category.getParent() == null ? null : category.getParent().getId()),
+                            new Update.SetValue(Category.Property.PARENT_ID, category.getParentId()),
                             new Update.SetValue(Category.Property.NAME, category.getName())
                     )
                     .setWherePredicate(Where.Predicate.get(

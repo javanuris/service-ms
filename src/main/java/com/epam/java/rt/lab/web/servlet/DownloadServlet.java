@@ -1,6 +1,8 @@
 package com.epam.java.rt.lab.web.servlet;
 
+import com.epam.java.rt.lab.entity.business.Photo;
 import com.epam.java.rt.lab.entity.rbac.Avatar;
+import com.epam.java.rt.lab.service.CommentService;
 import com.epam.java.rt.lab.service.ServiceException;
 import com.epam.java.rt.lab.service.UserService;
 import com.epam.java.rt.lab.util.TimestampCompare;
@@ -37,17 +39,17 @@ public class DownloadServlet extends HttpServlet {
                 Timestamp lastModified = null;
                 Timestamp ifModifiedSince = null;
                 String contentType = null;
+                String fileId = req.getParameter("id");
+                String filePath = req.getParameter("path");
+                String ifModifiedSinceHeader = req.getHeader("If-Modified-Since");
                 switch (req.getPathInfo()) {
                     case "/avatar":
-                        String avatarId = req.getParameter("id");
-                        String avatarPath = req.getParameter("path");
-                        String ifModifiedSinceHeader = req.getHeader("If-Modified-Since");
                         if (ifModifiedSinceHeader != null)
                             ifModifiedSince = TimestampCompare.of(ifModifiedSinceHeader);
-                        if (avatarId != null) {
-                            logger.debug("AVATAR BY ID: {}", avatarId);
+                        if (fileId != null) {
+                            logger.debug("AVATAR BY ID: {}", fileId);
                             try (UserService userService = new UserService()) {
-                                Avatar avatar = userService.getAvatar(avatarId);
+                                Avatar avatar = userService.getAvatar(fileId);
                                 if (avatar != null) {
                                     lastModified = avatar.getModified();
                                     contentType = avatar.getType();
@@ -62,11 +64,44 @@ public class DownloadServlet extends HttpServlet {
                                 e.printStackTrace();
                                 throw new ServletException(e);
                             }
-                        } else if (avatarPath != null) {
-                            logger.debug("AVATAR BY PATH: {}", avatarPath);
-                            File file = new File(avatarPath);
+                        } else if (filePath != null) {
+                            logger.debug("AVATAR BY PATH: {}", filePath);
+                            File file = new File(filePath);
                             lastModified = new Timestamp(file.lastModified());
-                            contentType = avatarPath.substring(avatarPath.lastIndexOf(".") + 1).replaceAll("_", "/");
+                            contentType = filePath.substring(filePath.lastIndexOf(".") + 1).replaceAll("_", "/");
+                            if (ifModifiedSince != null && TimestampCompare.secondsBetweenTimestamps
+                                    (ifModifiedSince, lastModified) < 1) {
+                                resp.setStatus(304);
+                                return;
+                            }
+                            inputStream = new FileInputStream(file);
+                        }
+                    case "/photo":
+                        if (ifModifiedSinceHeader != null)
+                            ifModifiedSince = TimestampCompare.of(ifModifiedSinceHeader);
+                        if (fileId != null) {
+                            logger.debug("PHOTO BY ID: {}", fileId);
+                            try (CommentService commentService = new CommentService()) {
+                                Photo photo = commentService.getPhoto(fileId);
+                                if (photo != null) {
+                                    lastModified = photo.getModified();
+                                    contentType = photo.getType();
+                                    if (ifModifiedSince != null && TimestampCompare.secondsBetweenTimestamps
+                                            (ifModifiedSince, lastModified) < 1) {
+                                        resp.setStatus(304);
+                                        return;
+                                    }
+                                    inputStream = photo.getFile();
+                                }
+                            } catch (ServiceException e) {
+                                e.printStackTrace();
+                                throw new ServletException(e);
+                            }
+                        } else if (filePath != null) {
+                            logger.debug("PHOTO BY PATH: {}", filePath);
+                            File file = new File(filePath);
+                            lastModified = new Timestamp(file.lastModified());
+                            contentType = filePath.substring(filePath.lastIndexOf(".") + 1).replaceAll("_", "/");
                             if (ifModifiedSince != null && TimestampCompare.secondsBetweenTimestamps
                                     (ifModifiedSince, lastModified) < 1) {
                                 resp.setStatus(304);
@@ -89,8 +124,5 @@ public class DownloadServlet extends HttpServlet {
         }
     }
 
-    private void avatar(String avatarId, String avatarPath) {
-        //
-    }
 
 }

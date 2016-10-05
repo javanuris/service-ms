@@ -1,9 +1,7 @@
 package com.epam.java.rt.lab.dao.sql;
 
 import com.epam.java.rt.lab.dao.DaoException;
-import com.epam.java.rt.lab.util.StringArray;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -13,15 +11,15 @@ public class Count extends Sql {
 
     private static final String SELECT_COUNT = "SELECT COUNT(*) as count ";
 
-    private Select.From from;
-    private Select.Join join;
+    private Select_.From from;
+    private Select_.Join join;
     private Where where;
 
     Count(List<Column> columnList) throws DaoException {
         if (columnList == null || columnList.size() == 0)
             throw new DaoException("exception.dao.sql.Select.empty-column-list");
-        this.join = new Select.Join();
-        this.from = new Select.From(columnList, join);
+        this.join = new Select_.Join();
+        this.from = new Select_.From(columnList, join);
     }
 
     public Count where(Where.Predicate predicate) throws DaoException {

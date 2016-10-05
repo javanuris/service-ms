@@ -47,11 +47,7 @@ public class PostAddAction implements Action {
             form.getItem(3).setActionParameters("?".concat(UrlManager.getRequestParameterString(parameterMap)));
             if (FormValidator.validate(req, form)) {
                 Category category = new Category();
-                if (form.getItem(0).getValue().length() > 0) {
-                    Category parent = new Category();
-                    parent.setId(Long.valueOf(form.getItem(0).getValue()));
-                    category.setParent(parent);
-                }
+                category.setParentId(Long.valueOf(form.getItem(0).getValue()));
                 category.setName(form.getItem(1).getValue());
                 category.setCreated(TimestampCompare.getCurrentTimestamp());
                 parameterMap.put("id", String.valueOf(categoryService.addCategory(category)));

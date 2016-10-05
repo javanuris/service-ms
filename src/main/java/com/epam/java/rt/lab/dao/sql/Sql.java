@@ -3,13 +3,11 @@ package com.epam.java.rt.lab.dao.sql;
 import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.entity.BaseEntity;
 import com.epam.java.rt.lab.entity.EntityProperty;
-import com.epam.java.rt.lab.util.GlobalProperties;
 import com.epam.java.rt.lab.util.StringArray;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -112,10 +110,10 @@ public abstract class Sql {
      * @return
      * @throws DaoException
      */
-    public static Select select(EntityProperty... entityPropertyArray) throws DaoException {
+    public static Select_ select(EntityProperty... entityPropertyArray) throws DaoException {
         if (entityPropertyArray.length == 0)
             throw new DaoException("exception.dao.sql.Select.empty-entity-array");
-        return new Select(getColumnList(entityPropertyArray));
+        return new Select_(getColumnList(entityPropertyArray));
     }
 
     /**
@@ -124,10 +122,10 @@ public abstract class Sql {
      * @return
      * @throws DaoException
      */
-    public static Select select(Class entityClass) throws DaoException {
+    public static Select_ select(Class entityClass) throws DaoException {
         if (entityClass == null)
             throw new DaoException("exception.dao.sql.Select.null-entity-class");
-        return new Select(getColumnList(
+        return new Select_(getColumnList(
                 StringArray.splitSpaceLessNames(
                         getProperty(
                                 entityClass

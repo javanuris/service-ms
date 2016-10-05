@@ -38,11 +38,9 @@ public class GetViewAction implements Action {
                 resp.sendRedirect(UrlManager.getContextUri(req, "/category/list", parameterMap));
             } else {
                 Category category = categoryService.getCategory(Long.valueOf(id));
-                if (category.getParent() != null)
-                    category.setParent(categoryService.getCategory(category.getParent().getId()));
                 View view = ViewFactory.getInstance().create("view-category");
-                if (category.getParent() != null)
-                    view.getControl(0).setValue(category.getParent().getName());
+                if (category.getParentId() != null)
+                    view.getControl(0).setValue(categoryService.getCategory(category.getParentId()).getName());
                 view.getControl(1).setValue(category.getName());
                 view.getControl(2).setAction(UrlManager.getContextUri(req, "/category/edit",
                         UrlManager.getRequestParameterString(parameterMap), "id=".concat(id)));

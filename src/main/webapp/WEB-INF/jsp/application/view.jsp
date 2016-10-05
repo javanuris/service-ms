@@ -11,5 +11,6 @@
                 </div>
             </div>
         </div>
+        <tags:comment addCommentRef="${requestScope.commentRef}" commentList="${requestScope.commentList}" allCommentRef="${requestScope.allCommentRef}"/>
     </jsp:body>
 </tags:template>
