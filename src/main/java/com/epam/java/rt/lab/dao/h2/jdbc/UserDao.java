@@ -67,7 +67,7 @@ public class UserDao extends JdbcDao {
 
     @Override
     <T> List<T> getEntity(ResultSet resultSet, Sql sql) throws DaoException {
-        Select_ select = (Select_) sql;
+        Select select = (Select) sql;
         String userTableName = Sql.getProperty(User.class.getName());
         String loginTableName = Sql.getProperty(Login.class.getName());
         List<User> userList = new ArrayList<>();

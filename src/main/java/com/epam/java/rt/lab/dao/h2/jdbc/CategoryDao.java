@@ -61,7 +61,7 @@ public class CategoryDao extends JdbcDao {
 
     @Override
     <T> List<T> getEntity(ResultSet resultSet, Sql sql) throws DaoException {
-        Select_ select = (Select_) sql;
+        Select select = (Select) sql;
         String categoryTableName = Sql.getProperty(Category.class.getName());
         List<Category> categoryList = new ArrayList<>();
         try {

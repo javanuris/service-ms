@@ -63,7 +63,7 @@ public class RestoreDao extends JdbcDao {
 
     @Override
     <T> List<T> getEntity(ResultSet resultSet, Sql sql) throws DaoException {
-        Select_ select = (Select_) sql;
+        Select select = (Select) sql;
         String restoreTableName = Sql.getProperty(Restore.class.getName());
         String loginTableName = Sql.getProperty(Login.class.getName());
         List<Restore> restoreList = new ArrayList<>();

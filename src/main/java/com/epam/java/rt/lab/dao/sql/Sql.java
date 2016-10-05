@@ -110,10 +110,10 @@ public abstract class Sql {
      * @return
      * @throws DaoException
      */
-    public static Select_ select(EntityProperty... entityPropertyArray) throws DaoException {
+    public static Select select(EntityProperty... entityPropertyArray) throws DaoException {
         if (entityPropertyArray.length == 0)
             throw new DaoException("exception.dao.sql.Select.empty-entity-array");
-        return new Select_(getColumnList(entityPropertyArray));
+        return new Select(getColumnList(entityPropertyArray));
     }
 
     /**
@@ -122,10 +122,10 @@ public abstract class Sql {
      * @return
      * @throws DaoException
      */
-    public static Select_ select(Class entityClass) throws DaoException {
+    public static Select select(Class entityClass) throws DaoException {
         if (entityClass == null)
             throw new DaoException("exception.dao.sql.Select.null-entity-class");
-        return new Select_(getColumnList(
+        return new Select(getColumnList(
                 StringArray.splitSpaceLessNames(
                         getProperty(
                                 entityClass

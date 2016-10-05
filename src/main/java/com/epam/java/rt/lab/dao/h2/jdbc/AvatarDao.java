@@ -4,7 +4,7 @@ import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.dao.DaoParameter;
 import com.epam.java.rt.lab.dao.sql.Column;
 import com.epam.java.rt.lab.dao.sql.Insert;
-import com.epam.java.rt.lab.dao.sql.Select_;
+import com.epam.java.rt.lab.dao.sql.Select;
 import com.epam.java.rt.lab.dao.sql.Sql;
 import com.epam.java.rt.lab.entity.rbac.Avatar;
 
@@ -67,7 +67,7 @@ public class AvatarDao extends JdbcDao {
 
     @Override
     <T> List<T> getEntity(ResultSet resultSet, Sql sql) throws DaoException {
-        Select_ select = (Select_) sql;
+        Select select = (Select) sql;
         String avatarTableName = Sql.getProperty(Avatar.class.getName());
         List<Avatar> avatarList = new ArrayList<>();
         try {

@@ -64,7 +64,7 @@ public class CommentDao extends JdbcDao {
 
     @Override
     <T> List<T> getEntity(ResultSet resultSet, Sql sql) throws DaoException {
-        Select_ select = (Select_) sql;
+        Select select = (Select) sql;
         String commentTableName = Sql.getProperty(Comment.class.getName());
         String userTableName = Sql.getProperty(User.class.getName());
         List<Comment> commentList = new ArrayList<>();

@@ -62,7 +62,7 @@ public class RememberDao extends JdbcDao {
 
     @Override
     <T> List<T> getEntity(ResultSet resultSet, Sql sql) throws DaoException {
-        Select_ select = (Select_) sql;
+        Select select = (Select) sql;
         String rememberTableName = Sql.getProperty(Remember.class.getName());
         String userTableName = Sql.getProperty(User.class.getName());
         List<Remember> rememberList = new ArrayList<>();

@@ -16,8 +16,8 @@ public class FromTest {
 
     private static final String FROM = " FROM \"Login\"";
 
-    private Select_.From from;
-    private Select_.Join join;
+    private Select.From from;
+    private Select.Join join;
 
     @Before
     public void setUp() throws Exception {
@@ -26,8 +26,8 @@ public class FromTest {
         columnList.add(Column.of("\"Login\".email"));
         columnList.add(Column.of("\"Restore\".id"));
         columnList.add(Column.of("\"Restore\".code"));
-        this.join = new Select_.Join();
-        this.from = new Select_.From(columnList, this.join);
+        this.join = new Select.Join();
+        this.from = new Select.From(columnList, this.join);
         assertNotNull("Instantiating failed", this.from);
     }
 

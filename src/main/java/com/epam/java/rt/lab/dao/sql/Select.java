@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * category-ms
  */
-public class Select_ extends Sql implements Iterable<Column> {
+public class Select extends Sql implements Iterable<Column> {
 
     private static final String SELECT = "SELECT ";
 
@@ -21,7 +21,7 @@ public class Select_ extends Sql implements Iterable<Column> {
     private OrderBy orderBy;
     private Limit limit;
 
-    Select_(List<Column> columnList) throws DaoException {
+    Select(List<Column> columnList) throws DaoException {
         if (columnList == null || columnList.size() == 0)
             throw new DaoException("exception.dao.sql.Select.empty-column-list");
         this.columnList = columnList;
@@ -29,18 +29,18 @@ public class Select_ extends Sql implements Iterable<Column> {
         this.from = new From(columnList, join);
     }
 
-    public Select_ where(Where.Predicate predicate) throws DaoException {
+    public Select where(Where.Predicate predicate) throws DaoException {
         this.where = new Where(join, predicate);
         this.where.linkWildValue(getWildValueList());
         return this;
     }
 
-    public Select_ orderBy(OrderBy.Criteria[] criteriaArray) {
+    public Select orderBy(OrderBy.Criteria[] criteriaArray) {
         this.orderBy = new OrderBy(criteriaArray);
         return this;
     }
 
-    public Select_ limit(Long offset, Long count) {
+    public Select limit(Long offset, Long count) {
         this.limit = new Limit(offset, count);
         return this;
     }
