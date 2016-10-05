@@ -11,6 +11,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 import java.io.*;
+import java.nio.CharBuffer;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
@@ -64,12 +66,15 @@ public class UploadServlet extends HttpServlet {
                 }
                 if (prefix != null) {
                     InputStream inputStream = filePart.getInputStream();
+//                    String fileName = new String(filePart.getSubmittedFileName().getBytes(), "UTF-8");
                     String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
+                    logger.debug("FILENAME: {}", fileName);
                     File outputFile = File.createTempFile(fileName.concat(prefix), postfix);
                     Files.copy(inputStream, outputFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
                     inputStream.close();
-                    logger.debug("UPLOAD COMPLETE");
-                    resp.getWriter().print("filePath=".concat(outputFile.getAbsolutePath()));
+                    String outputFileName = new String(outputFile.getAbsolutePath().getBytes("UTF-8"), "ISO-8859-1");
+                    logger.debug("UPLOAD COMPLETE: {}", outputFileName);
+                    resp.getWriter().print("filePath=".concat(outputFileName));
                     return;
                 }
             }

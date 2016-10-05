@@ -30,7 +30,8 @@ public class ApplicationDao extends JdbcDao {
                 .values(
                         new Insert.InsertValue(Application.Property.CREATED, application.getCreated()),
                         new Insert.InsertValue(Application.Property.USER_ID, application.getUser().getId()),
-                        new Insert.InsertValue(Application.Property.CATEGORY_ID, application.getCategory().getId()),
+                        new Insert.InsertValue(Application.Property.CATEGORY_ID,
+                                application.getCategory() == null ? null : application.getCategory().getId()),
                         new Insert.InsertValue(Application.Property.MESSAGE, application.getMessage())
                 );
     }

@@ -6,6 +6,7 @@ import com.epam.java.rt.lab.service.CommentService;
 import com.epam.java.rt.lab.service.ServiceException;
 import com.epam.java.rt.lab.service.UserService;
 import com.epam.java.rt.lab.util.TimestampCompare;
+import com.epam.java.rt.lab.util.UrlManager;
 import com.epam.java.rt.lab.util.validator.Validator;
 import com.epam.java.rt.lab.util.validator.ValidatorException;
 import com.epam.java.rt.lab.util.validator.ValidatorFactory;
@@ -19,6 +20,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.net.URLDecoder;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
@@ -64,7 +66,7 @@ public class DownloadServlet extends HttpServlet {
                                 e.printStackTrace();
                                 throw new ServletException(e);
                             }
-                        } else if (filePath != null) {
+                        } else {
                             logger.debug("AVATAR BY PATH: {}", filePath);
                             File file = new File(filePath);
                             lastModified = new Timestamp(file.lastModified());
@@ -97,7 +99,7 @@ public class DownloadServlet extends HttpServlet {
                                 e.printStackTrace();
                                 throw new ServletException(e);
                             }
-                        } else if (filePath != null) {
+                        } else {
                             logger.debug("PHOTO BY PATH: {}", filePath);
                             File file = new File(filePath);
                             lastModified = new Timestamp(file.lastModified());
