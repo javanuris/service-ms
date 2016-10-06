@@ -19,8 +19,8 @@ public class Table<T> {
         this.entityList = entityList;
     }
 
-    public void addColumn(int width, String header, String fieldName) {
-        this.listColumnList.add(new ListColumn(width, header, fieldName));
+    public void addColumn(int width, String header, String fieldName, String localePrefix) {
+        this.listColumnList.add(new ListColumn(width, header, fieldName, localePrefix));
     }
 
     public List<ListColumn> getListColumnList() {
@@ -39,11 +39,13 @@ public class Table<T> {
         private int width;
         private String header;
         private String fieldName;
+        private String localePrefix;
 
-        public ListColumn(int width, String header, String fieldName) {
+        public ListColumn(int width, String header, String fieldName, String localePrefix) {
             this.width = width;
             this.header = header;
             this.fieldName = fieldName;
+            this.localePrefix = localePrefix;
         }
 
         public int getWidth() {
@@ -56,6 +58,10 @@ public class Table<T> {
 
         public String getFieldName() {
             return fieldName;
+        }
+
+        public String getLocalePrefix() {
+            return localePrefix;
         }
     }
 

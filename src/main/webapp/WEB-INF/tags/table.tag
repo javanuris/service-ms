@@ -6,6 +6,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="val" uri="/WEB-INF/reflect_value.tld" %>
+<%@ taglib prefix="dat" uri="/WEB-INF/date_value.tld" %>
 <div class="list-group">
     <li class="list-group-item col-xs-12" style="border-top: hidden; border-left: hidden; border-right: hidden;">
         <c:forEach var="listColumn" items="${table.listColumnList}">
@@ -20,7 +21,16 @@
                 <a href="${table.hrefPrefix.concat(control.id)}" class="list-group-item col-xs-12" style="border-left: hidden; border-right: hidden;">
                     <c:forEach var="listColumn" items="${table.listColumnList}">
                         <div class="col-xs-${listColumn.width}">
-                            <val:reflectValue entityMethod="${listColumn.fieldName}" entityObject="${control}"/>
+                            <c:set var="value"><val:reflectValue entityMethod="${listColumn.fieldName}" entityObject="${control}"/></c:set>
+                            <c:choose>
+                                <c:when test="${listColumn.localePrefix == 'date'}">
+                                    <dat:dateValue locale="${language}" stringValue="${value}"/>
+                                </c:when>
+                                <c:when test="${listColumn.localePrefix.length() > 0}">
+                                    <fmt:message bundle="${ui}" key="${listColumn.localePrefix.concat('.').concat(value)}"/>
+                                </c:when>
+                                <c:otherwise>${value}</c:otherwise>
+                            </c:choose>
                         </div>
                     </c:forEach>
                 </a>

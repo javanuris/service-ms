@@ -1,7 +1,9 @@
 package com.epam.java.rt.lab.web.action.application;
 
+import com.epam.java.rt.lab.entity.business.Application;
 import com.epam.java.rt.lab.entity.business.Comment;
 import com.epam.java.rt.lab.entity.rbac.User;
+import com.epam.java.rt.lab.service.ApplicationService;
 import com.epam.java.rt.lab.service.CommentService;
 import com.epam.java.rt.lab.service.ServiceException;
 import com.epam.java.rt.lab.util.TimestampCompare;
@@ -38,7 +40,8 @@ public class PostCommentAction implements Action {
 
     @Override
     public void execute(HttpServletRequest req, HttpServletResponse resp) throws ActionException {
-        try (CommentService commentService = new CommentService()) {
+        try (CommentService commentService = new CommentService();
+             ApplicationService applicationService = new ApplicationService()) {
             logger.debug("/WEB-INF/jsp/category/edit.jsp");
             Map<String, String> parameterMap = UrlManager.getRequestParameterMap(req.getQueryString());
             String id = parameterMap.get("id");
@@ -46,29 +49,29 @@ public class PostCommentAction implements Action {
                 parameterMap.remove("id");
                 resp.sendRedirect(UrlManager.getContextUri(req, "/application/view", parameterMap));
             } else {
-                Form form = FormFactory.getInstance().create("comment-application");
-                form.setActionParameterString(UrlManager.getRequestParameterString(parameterMap));
-                if (FormValidator.validate(req, form)) {
-                    logger.debug("FORM VALID");
-                    User user = (User) req.getSession().getAttribute("user");
-                    Comment comment = new Comment();
-                    comment.setCreated(TimestampCompare.getCurrentTimestamp());
-                    comment.setUser(user);
-                    comment.setApplicationId(Long.valueOf(id));
-                    String avatarPath = form.getItem(0).getValue();
-                    if (avatarPath != null) {
-                        String[] pair = avatarPath.split("\\?");
-                        if (pair.length == 2) pair = pair[1].split("=");
-                        if ("path".equals(pair[0]))
-                            comment.setPhotoId(commentService.addPhoto(pair[1]));
+                User user = (User) req.getSession().getAttribute("user");
+                Application application = applicationService.getApplication(Long.valueOf(id));
+                if (application == null || (!application.getUser().getId().equals(user.getId()) &&
+                        ("authorized".equals(user.getRole().getName())))) {
+                    resp.sendRedirect(UrlManager.getContextUri(req, "/application/list", parameterMap));
+                } else {
+                    Form form = FormFactory.getInstance().create("comment-application");
+                    form.setActionParameterString(UrlManager.getRequestParameterString(parameterMap));
+                    if (FormValidator.validate(req, form)) {
+                        logger.debug("FORM VALID");
+                        Comment comment = new Comment();
+                        comment.setCreated(TimestampCompare.getCurrentTimestamp());
+                        comment.setUser(user);
+                        comment.setApplicationId(Long.valueOf(id));
+                        commentService.setCommentPhoto(comment, form.getItem(0).getValue());
+                        comment.setMessage(form.getItem(1).getValue());
+                        commentService.addComment(comment);
+                        resp.sendRedirect(UrlManager.getContextUri(req, "/application/view", parameterMap));
+                        return;
                     }
-                    comment.setMessage(form.getItem(1).getValue());
-                    commentService.addComment(comment);
-                    resp.sendRedirect(UrlManager.getContextUri(req, "/application/view", parameterMap));
-                    return;
+                    req.setAttribute("commentApplication", form);
+                    req.getRequestDispatcher("/WEB-INF/jsp/application/comment.jsp").forward(req, resp);
                 }
-                req.setAttribute("commentApplication", form);
-                req.getRequestDispatcher("/WEB-INF/jsp/application/comment.jsp").forward(req, resp);
             }
         } catch (FormException e) {
             throw new ActionException("exception.action.application.comment.form", e.getCause());

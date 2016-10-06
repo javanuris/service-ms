@@ -1,0 +1,22 @@
+<taglib>
+    <tlib-version>1.0</tlib-version>
+    <jsp-version>2.0</jsp-version>
+    <short-name>dateValue</short-name>
+    <tag>
+        <name>dateValue</name>
+        <tag-class>com.epam.java.rt.lab.web.tag.DateValue</tag-class>
+        <body-content>empty</body-content>
+        <attribute>
+            <name>locale</name>
+            <type>java.util.Locale</type>
+            <rtexprvalue>true</rtexprvalue>
+            <required>true</required>
+        </attribute>
+        <attribute>
+            <name>stringValue</name>
+            <type>java.lang.String</type>
+            <rtexprvalue>true</rtexprvalue>
+            <required>true</required>
+        </attribute>
+    </tag>
+</taglib>

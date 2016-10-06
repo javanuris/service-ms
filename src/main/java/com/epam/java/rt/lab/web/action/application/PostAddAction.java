@@ -2,9 +2,11 @@ package com.epam.java.rt.lab.web.action.application;
 
 import com.epam.java.rt.lab.entity.business.Application;
 import com.epam.java.rt.lab.entity.business.Category;
+import com.epam.java.rt.lab.entity.business.Comment;
 import com.epam.java.rt.lab.entity.rbac.User;
 import com.epam.java.rt.lab.service.ApplicationService;
 import com.epam.java.rt.lab.service.CategoryService;
+import com.epam.java.rt.lab.service.CommentService;
 import com.epam.java.rt.lab.service.ServiceException;
 import com.epam.java.rt.lab.util.TimestampCompare;
 import com.epam.java.rt.lab.util.UrlManager;
@@ -35,7 +37,8 @@ public class PostAddAction implements Action {
     @Override
     public void execute(HttpServletRequest req, HttpServletResponse resp) throws ActionException {
         try (ApplicationService applicationService = new ApplicationService();
-             CategoryService categoryService = new CategoryService()) {
+             CategoryService categoryService = new CategoryService();
+             CommentService commentService = new CommentService()) {
             logger.debug("/WEB-INF/jsp/application/add.jsp");
             Map<String, String> parameterMap = UrlManager.getRequestParameterMap(req.getQueryString());
             Form form = FormFactory.getInstance().create("add-application");
@@ -45,20 +48,31 @@ public class PostAddAction implements Action {
             for (Category category : categoryService.getCategoryList())
                 valueList.add(new FormControl.SelectValue(category.getId().toString(), category.getName()));
             form.getItem(0).setAvailableValueList(valueList);
-            form.getItem(3).setActionParameters("?".concat(UrlManager.getRequestParameterString(parameterMap)));
+            form.getItem(5).setActionParameters("?".concat(UrlManager.getRequestParameterString(parameterMap)));
             if (FormValidator.validate(req, form)) {
                 Application application = new Application();
-                if (form.getItem(0).getValue().length() > 0) {
+                if (form.getItem(0).getValue().length() == 0) {
+                    form.getItem(0).addValidationMessage("message.validation.category-error");
+                } else {
+                    User user = (User) req.getSession().getAttribute("user");
                     Category category = new Category();
                     category.setId(Long.valueOf(form.getItem(0).getValue()));
                     application.setCategory(category);
+                    application.setCreated(TimestampCompare.getCurrentTimestamp());
+                    application.setUser((User) req.getSession().getAttribute("user"));
+                    application.setMessage(form.getItem(1).getValue());
+                    Long applicationId = applicationService.addApplication(application);
+                    Comment comment = new Comment();
+                    comment.setCreated(TimestampCompare.getCurrentTimestamp());
+                    comment.setUser(user);
+                    comment.setApplicationId(Long.valueOf(applicationId));
+                    commentService.setCommentPhoto(comment, form.getItem(2).getValue());
+                    comment.setMessage(form.getItem(3).getValue());
+                    commentService.addComment(comment);
+                    parameterMap.put("id", String.valueOf(applicationId));
+                    resp.sendRedirect(UrlManager.getContextUri(req, "/application/view", parameterMap));
+                    return;
                 }
-                application.setCreated(TimestampCompare.getCurrentTimestamp());
-                application.setUser((User) req.getSession().getAttribute("user"));
-                application.setMessage(form.getItem(1).getValue());
-                parameterMap.put("id", String.valueOf(applicationService.addApplication(application)));
-                resp.sendRedirect(UrlManager.getContextUri(req, "/application/view", parameterMap));
-                return;
             }
             req.setAttribute("addApplication", form);
             req.getRequestDispatcher("/WEB-INF/jsp/application/add.jsp").forward(req, resp);

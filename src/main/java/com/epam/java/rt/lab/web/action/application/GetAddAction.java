@@ -39,7 +39,8 @@ public class GetAddAction implements Action {
             for (Category parent : categoryService.getCategoryList())
                 valueList.add(new FormControl.SelectValue(parent.getId().toString(), parent.getName()));
             form.getItem(0).setAvailableValueList(valueList);
-            form.getItem(3).setActionParameters("?".concat(UrlManager.getRequestParameterString(parameterMap)));
+            form.getItem(2).setValue(UrlManager.getContextUri(req, "/file/download/photo?"));
+            form.getItem(5).setActionParameters("?".concat(UrlManager.getRequestParameterString(parameterMap)));
             req.setAttribute("addApplication", form);
             req.getRequestDispatcher("/WEB-INF/jsp/application/add.jsp").forward(req, resp);
         } catch (ServiceException e) {

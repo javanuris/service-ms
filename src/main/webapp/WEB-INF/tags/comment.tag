@@ -5,6 +5,7 @@
 <%@ taglib prefix="tags" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="dat" uri="/WEB-INF/date_value.tld" %>
 <div class="col-lg-offset-4 col-lg-4 col-md-offset-3 col-md-6 col-sm-offset-2 col-sm-8 col-xs-offset-1 col-xs-10">
     <div class="panel panel-default">
         <div class="panel-body">
@@ -26,7 +27,7 @@
                     <div class="col-xs-12" style="padding: 5px; margin-top: 5px; background-color: whitesmoke; border-radius: 5px;">
                         <div class="row" style="display: flex; justify-content: center;">
                             <div class="col-xs-5" style="text-align: left; align-self: center;">
-                                <small>${comment.created}</small>
+                                <small><dat:dateValue locale="${language}" stringValue="${comment.created}"/></small>
                             </div>
                             <c:choose>
                                 <c:when test="${not empty comment.user.avatarId}">

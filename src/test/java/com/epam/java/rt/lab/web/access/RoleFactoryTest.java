@@ -16,9 +16,9 @@ public class RoleFactoryTest {
 
     @Test
     public void create() throws Exception {
-        assertNotNull("create() failed", RoleFactory.getInstance().create("anonymous"));
-        assertEquals("create().getName() failed", "anonymous",
-                RoleFactory.getInstance().create("anonymous").getName());
+        assertNotNull("create() failed", RoleFactory.getInstance().create("dictionary.role.anonymous"));
+        assertEquals("create().getName() failed", "dictionary.role.anonymous",
+                RoleFactory.getInstance().create("dictionary.role.anonymous").getName());
     }
 
     @Test

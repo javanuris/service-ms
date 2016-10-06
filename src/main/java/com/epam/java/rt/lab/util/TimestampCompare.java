@@ -63,4 +63,8 @@ public class TimestampCompare {
         }
     }
 
+    public static Date from(String stringTimestamp) {
+        return new Date(of(stringTimestamp).getTime());
+    }
+
 }

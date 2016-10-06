@@ -32,8 +32,8 @@ public class ViewControl {
         return controlDef.type;
     }
 
-    public String getDictionary() {
-        return controlDef.dictionary;
+    public String getLocalePrefix() {
+        return controlDef.localePrefix;
     }
 
     private ControlVal val() {
@@ -62,13 +62,13 @@ public class ViewControl {
         private String name;
         private String label;
         private String type;
-        private String dictionary;
+        private String localePrefix;
 
-        private ControlDef(String name, String label, String type, String dictionary) {
+        private ControlDef(String name, String label, String type, String localePrefix) {
             this.name = name;
             this.label = label;
             this.type = type;
-            this.dictionary = dictionary;
+            this.localePrefix = localePrefix;
         }
 
     }

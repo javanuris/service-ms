@@ -131,6 +131,15 @@ public class CommentService extends BaseService {
         }
     }
 
+    public void setCommentPhoto(Comment comment, String photoPath) throws ServiceException {
+        if (photoPath != null) {
+            String[] pair = photoPath.split("\\?");
+            if (pair.length == 2) pair = pair[1].split("=");
+            if ("path".equals(pair[0]))
+                comment.setPhotoId(addPhoto(pair[1]));
+        }
+    }
+
     public Long addPhoto(String filePath) throws ServiceException {
         String fileName = filePath.substring(filePath.lastIndexOf("\\") + 1);
         int photoInfoIndex = fileName.lastIndexOf(".photo.");

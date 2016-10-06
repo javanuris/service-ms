@@ -39,7 +39,7 @@ public class ViewFactory {
         String controls = ".controls";
         String label = ".label";
         String type = ".type";
-        String dictionary = ".dictionary";
+        String locale = ".locale";
         try {
             properties.load(ViewFactory.class.getClassLoader().getResourceAsStream("view.properties"));
             this.viewMap.clear();
@@ -53,7 +53,7 @@ public class ViewFactory {
                                     propertyPrefix,
                                     properties.getProperty(propertyPrefix.concat(label)),
                                     properties.getProperty(propertyPrefix.concat(type)),
-                                    properties.getProperty(propertyPrefix.concat(dictionary))
+                                    properties.getProperty(propertyPrefix.concat(locale))
                             )
                     );
                 }
