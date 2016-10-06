@@ -16,18 +16,18 @@ public class Page {
     private Long countItems;
 
     public Page(Long currentPage, Long itemsOnPage) {
-        this.currentPage = currentPage != null ? currentPage : 1L;
-        this.itemsOnPage = itemsOnPage != null ? itemsOnPage : ITEMS_ON_PAGE;
+        this.currentPage = (currentPage != null && currentPage > 0) ? currentPage : 1L;
+        this.itemsOnPage = (itemsOnPage != null && itemsOnPage > 0) ? itemsOnPage : ITEMS_ON_PAGE;
     }
 
     public Page(HttpServletRequest req) {
         try {
             String currentPage = req.getParameter("page");
             this.currentPage = ValidatorFactory.create("digits").validate(currentPage) != null ?
-                    1L : Long.valueOf(currentPage);
+                    1L : Long.valueOf(currentPage) > 0 ? Long.valueOf(currentPage) : 1L;
             String itemsOnPage = req.getParameter("items");
             this.itemsOnPage = ValidatorFactory.create("digits").validate(itemsOnPage) != null ?
-                    ITEMS_ON_PAGE : Long.valueOf(itemsOnPage);
+                    ITEMS_ON_PAGE : Long.valueOf(itemsOnPage) > 0 ? Long.valueOf(itemsOnPage) : ITEMS_ON_PAGE;
         } catch (ValidatorException e) {
             this.currentPage = 1L;
             this.itemsOnPage = ITEMS_ON_PAGE;

@@ -49,30 +49,34 @@ public class GetEditAction implements Action {
                     return;
                 }
                 user = userService.getUser(Long.valueOf(id));
-                Form form = FormFactory.getInstance().create("edit-user-profile");
-                form.setActionParameterString(UrlManager.getRequestParameterString(parameterMap));
-                form.getItem(0).setValue(user.getFirstName());
-                form.getItem(1).setValue(user.getMiddleName());
-                form.getItem(2).setValue(user.getLastName());
-                if (user.getAvatarId() == null) {
-                    form.getItem(3).setValue(UrlManager.getContextUri(req, "/file/download/avatar?"));
+                if (user == null) {
+                    resp.sendRedirect(UrlManager.getContextUri(req, "/user/list", parameterMap));
                 } else {
-                    form.getItem(3).setValue(UrlManager.getContextRef(req, "/file/download/avatar", "id", user.getAvatarId()));
+                    Form form = FormFactory.getInstance().create("edit-user-profile");
+                    form.setActionParameterString(UrlManager.getRequestParameterString(parameterMap));
+                    form.getItem(0).setValue(user.getFirstName());
+                    form.getItem(1).setValue(user.getMiddleName());
+                    form.getItem(2).setValue(user.getLastName());
+                    if (user.getAvatarId() == null) {
+                        form.getItem(3).setValue(UrlManager.getContextUri(req, "/file/download/avatar?"));
+                    } else {
+                        form.getItem(3).setValue(UrlManager.getContextRef(req, "/file/download/avatar", "id", user.getAvatarId()));
+                    }
+                    List<FormControl.SelectValue> valueList = new ArrayList<>();
+                    for (Map.Entry<String, Role> entry : RoleFactory.getInstance().getRoleMap().entrySet())
+                        valueList.add(new FormControl.SelectValue(entry.getValue().getName(), entry.getValue().getName()));
+                    form.getItem(4).setAvailableValueList(valueList);
+                    form.getItem(4).setValue(user.getRole().getName());
+                    form.getItem(5).setValue(String.valueOf(user.getLogin().getAttemptLeft()));
+                    valueList = new ArrayList<>();
+                    valueList.add(new FormControl.SelectValue("0", "0"));
+                    valueList.add(new FormControl.SelectValue("-1", "-1"));
+                    form.getItem(6).setAvailableValueList(valueList);
+                    form.getItem(6).setValue(String.valueOf(user.getLogin().getStatus()));
+                    form.getItem(8).setActionParameters("?".concat(UrlManager.getRequestParameterString(parameterMap)));
+                    req.setAttribute("editForm", form);
+                    req.getRequestDispatcher("/WEB-INF/jsp/user/edit.jsp").forward(req, resp);
                 }
-                List<FormControl.SelectValue> valueList = new ArrayList<>();
-                for (Map.Entry<String, Role> entry : RoleFactory.getInstance().getRoleMap().entrySet())
-                    valueList.add(new FormControl.SelectValue(entry.getValue().getName(), entry.getValue().getName()));
-                form.getItem(4).setAvailableValueList(valueList);
-                form.getItem(4).setValue(user.getRole().getName());
-                form.getItem(5).setValue(String.valueOf(user.getLogin().getAttemptLeft()));
-                valueList = new ArrayList<>();
-                valueList.add(new FormControl.SelectValue("0", "0"));
-                valueList.add(new FormControl.SelectValue("-1", "-1"));
-                form.getItem(6).setAvailableValueList(valueList);
-                form.getItem(6).setValue(String.valueOf(user.getLogin().getStatus()));
-                form.getItem(8).setActionParameters("?".concat(UrlManager.getRequestParameterString(parameterMap)));
-                req.setAttribute("editForm", form);
-                req.getRequestDispatcher("/WEB-INF/jsp/user/edit.jsp").forward(req, resp);
             }
         } catch (ServiceException e) {
             e.printStackTrace();

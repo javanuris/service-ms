@@ -33,7 +33,7 @@ public class DateValue extends SimpleTagSupport {
     public void doTag() throws JspException, IOException {
         DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.MEDIUM, locale);
         Date dateValue = TimestampCompare.from(stringValue);
-        DateFormat timeFormat = new SimpleDateFormat("HH:MM");
+        DateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
         JspWriter out = getJspContext().getOut();
         out.print("<small>".concat(dateFormat.format(dateValue)).concat("</small> ").concat(timeFormat.format(dateValue)));
     }

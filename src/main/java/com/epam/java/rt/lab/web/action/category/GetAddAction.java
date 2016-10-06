@@ -35,7 +35,7 @@ public class GetAddAction implements Action {
         try (CategoryService categoryService = new CategoryService()) {
             logger.debug("/WEB-INF/jsp/category/edit.jsp");
             Map<String, String> parameterMap = UrlManager.getRequestParameterMap(req.getQueryString());
-            Form form = FormFactory.getInstance().create("edit-category");
+            Form form = FormFactory.getInstance().create("add-category");
             form.setActionParameterString(UrlManager.getRequestParameterString(parameterMap));
             List<FormControl.SelectValue> valueList = new ArrayList<>();
             valueList.add(new FormControl.SelectValue("", "-"));

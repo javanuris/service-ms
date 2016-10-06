@@ -38,15 +38,19 @@ public class GetViewAction implements Action {
                 resp.sendRedirect(UrlManager.getContextUri(req, "/category/list", parameterMap));
             } else {
                 Category category = categoryService.getCategory(Long.valueOf(id));
-                View view = ViewFactory.getInstance().create("view-category");
-                if (category.getParentId() != null)
-                    view.getControl(0).setValue(categoryService.getCategory(category.getParentId()).getName());
-                view.getControl(1).setValue(category.getName());
-                view.getControl(2).setAction(UrlManager.getContextUri(req, "/category/edit",
-                        UrlManager.getRequestParameterString(parameterMap), "id=".concat(id)));
-                view.getControl(3).setAction(UrlManager.getContextUri(req, "/category/list", parameterMap));
-                req.setAttribute("viewCategory", view);
-                req.getRequestDispatcher("/WEB-INF/jsp/category/view.jsp").forward(req, resp);
+                if (category == null) {
+                    resp.sendRedirect(UrlManager.getContextUri(req, "/category/list", parameterMap));
+                } else {
+                    View view = ViewFactory.getInstance().create("view-category");
+                    if (category.getParentId() != null)
+                        view.getControl(0).setValue(categoryService.getCategory(category.getParentId()).getName());
+                    view.getControl(1).setValue(category.getName());
+                    view.getControl(2).setAction(UrlManager.getContextUri(req, "/category/edit",
+                            UrlManager.getRequestParameterString(parameterMap), "id=".concat(id)));
+                    view.getControl(3).setAction(UrlManager.getContextUri(req, "/category/list", parameterMap));
+                    req.setAttribute("viewCategory", view);
+                    req.getRequestDispatcher("/WEB-INF/jsp/category/view.jsp").forward(req, resp);
+                }
             }
         } catch (ServiceException e) {
             e.printStackTrace();
