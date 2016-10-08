@@ -13,7 +13,12 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * category-ms
+ * {@code Sql} class defines abstract base sql statement
+ * contains static fabric methods to create needed types
+ * of sql statements
+ *
+ * @see Properties
+ * @see WildValue
  */
 public abstract class Sql {
 
@@ -26,15 +31,23 @@ public abstract class Sql {
     public static final String ALL_COLUMNS = "*";
     public static final String JOIN_AMPERSAND = "&";
 
+    /** {@code Properties} object which contains sql properties */
     private static Properties sqlProperties = new Properties();
+    /** {@code Lock} object used to implement thread safe initialization */
     private static Lock propertiesLock = new ReentrantLock();
-
+    /** {@code List} of {@code WildValue} objects */
     private List<WildValue> wildValueList;
 
+    /**
+     * Initiates new {@code Sql} object
+     */
     Sql() {
         this.wildValueList = new ArrayList<>();
     }
 
+    /**
+     * Static method to initialize sql properties
+     */
     private static void init() {
         if (propertiesLock.tryLock()) {
             try {
@@ -47,11 +60,30 @@ public abstract class Sql {
         }
     }
 
+    /**
+     * Returns {@code String} representation of
+     * sql property value
+     *
+     * @param key   {@code String} representation of property key
+     * @return      {@code String} representation of property value
+     */
     public static String getProperty(String key) {
         if (sqlProperties.size() == 0) init();
         return sqlProperties.getProperty(key);
     }
 
+    /**
+     * Returns {@code List} of {@code Column} objects from
+     * {@code Array} of {@code EntityProperty} objects
+     *
+     * @param entityPropertyArray       {@code Array} of {@code EntityProperty}
+     *                                  objects
+     * @return                          {@code List} of {@code Column} objects
+     * @throws DaoException
+     *
+     * @see Column
+     * @see EntityProperty
+     */
     private static List<Column> getColumnList(EntityProperty[] entityPropertyArray) throws DaoException {
         List<Column> columnList = new ArrayList<>();
         for (EntityProperty entityProperty : entityPropertyArray)
@@ -59,6 +91,16 @@ public abstract class Sql {
         return columnList;
     }
 
+    /**
+     * Returns {@code Column} object from {@code EntityProperty} object
+     *
+     * @param entityProperty        {@code EntityProperty} object
+     * @return                      {@code Column} object
+     * @throws DaoException
+     *
+     * @see Column
+     * @see EntityProperty
+     */
     static Column getColumn(EntityProperty entityProperty) throws DaoException {
         String entityClassName = entityProperty.getEntityClass().getName();
 //        System.out.println(entityClassName);
@@ -70,6 +112,17 @@ public abstract class Sql {
         return new Column(tableName, columnName);
     }
 
+    /**
+     * Returns {@code List} of {@code Column} objects from
+     * {@code Array} of {@code String} representation of
+     * column's full names (including table name)
+     *
+     * @param tableAndColumnArray   {@code Array} of {@code String} objects
+     * @return                      {@code List} of {@code Column} objects
+     * @throws DaoException
+     *
+     * @see Column
+     */
     static List<Column> getColumnList(String[] tableAndColumnArray)
             throws DaoException {
         List<Column> columnList = new ArrayList<>();
@@ -78,13 +131,15 @@ public abstract class Sql {
         return columnList;
     }
 
-    // base clauses
-
     /**
+     * Fabric method to create {@code Insert} object with defined
+     * {@code BaseEntity} object
      *
-     * @param entity
-     * @return
+     * @param entity        {@code BaseEntity} object
+     * @return              {@code Insert} object
      * @throws DaoException
+     *
+     * @see BaseEntity
      */
     public static Insert insert(BaseEntity entity) throws DaoException {
         if (entity == null)
@@ -93,10 +148,14 @@ public abstract class Sql {
     }
 
     /**
+     * Fabric method to create {@code Insert} object with defined
+     * {@code Class} of entity
      *
-     * @param
-     * @return
+     * @param propertyClass {@code Class} of entity
+     * @return              {@code Insert} object
      * @throws DaoException
+     *
+     * @see Insert
      */
     public static Insert insert(Class propertyClass) throws DaoException {
         if (propertyClass == null)
@@ -105,10 +164,15 @@ public abstract class Sql {
     }
 
     /**
+     * Fabric method to create {@code Select} object with defined
+     * {@code Array} of {@code EntityProperty} objects
      *
-     * @param entityPropertyArray
-     * @return
+     * @param entityPropertyArray   {@code Array} of {@code EntityProperty} objects
+     * @return                      {@code Select} object
      * @throws DaoException
+     *
+     * @see Select
+     * @see EntityProperty
      */
     public static Select select(EntityProperty... entityPropertyArray) throws DaoException {
         if (entityPropertyArray.length == 0)
@@ -117,10 +181,14 @@ public abstract class Sql {
     }
 
     /**
+     * Fabric method to create {@code Select} object with defined
+     * {@code Class} of entity
      *
-     * @param entityClass
-     * @return
+     * @param entityClass           {@code Class} of entity
+     * @return                      {@code Select} object
      * @throws DaoException
+     *
+     * @see Select
      */
     public static Select select(Class entityClass) throws DaoException {
         if (entityClass == null)
@@ -138,12 +206,32 @@ public abstract class Sql {
         ));
     }
 
+    /**
+     * Fabric method to create {@code Update} object with defined
+     * {@code Class} of entity
+     *
+     * @param entityClass           {@code Class} of entity
+     * @return                      {@code Update} object
+     * @throws DaoException
+     *
+     * @see Update
+     */
     public static Update update(Class entityClass) throws DaoException {
         if (entityClass == null)
             throw new DaoException("exception.dao.sql.update.null-entity-class");
         return new Update(entityClass);
     }
 
+    /**
+     * Fabric method to create {@code Delete} object with defined
+     * {@code Class} of entity
+     *
+     * @param entityClass           {@code Class} of entity
+     * @return                      {@code Delete} object
+     * @throws DaoException
+     *
+     * @see Delete
+     */
     public static Delete delete(Class entityClass) throws DaoException {
         if (entityClass == null)
             throw new DaoException("exception.dao.sql.delete.null-entity-class");
@@ -166,10 +254,24 @@ public abstract class Sql {
         ));
     }
 
-    // resulting methods
-
+    /**
+     * Abstract method which should be implemented in inherited classes.
+     * Base method to return sql statement.
+     *
+     * @return                  {@code String} representation of sql statement
+     * @throws DaoException
+     */
     public abstract String create() throws DaoException;
 
+    /**
+     * Returns {@code List} of {@code WildValue} objects to replace values
+     * in sql statements by wildcards and fill this {@code List} to set
+     * prepared statement
+     *
+     * @return      {@code List} of {@code WildValue} objects
+     *
+     * @see WildValue
+     */
     public List<WildValue> getWildValueList() {
         return wildValueList;
     }

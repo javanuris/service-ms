@@ -10,17 +10,29 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * category-ms
+ * {@code Update} class defines sql statement
+ * which calls UPDATE sql expression
  */
 public class Update extends Sql {
 
     private static final String UPDATE = "UPDATE ";
 
+    /** {@code Class} of entity */
     private Class entityClass;
+    /** {@code String} representation of table name */
     private String table;
+    /** {@code Set} object of set clause */
     private Set set;
+    /** {@code Where} object of where clause */
     private Where where;
 
+    /**
+     * Initiates new {@code Update} object with defined
+     * {@code Class} of entity
+     *
+     * @param entityClass       {@code Class} of entity
+     * @throws DaoException
+     */
     Update(Class entityClass) throws DaoException {
         if (entityClass == null)
             throw new DaoException("exception.dao.sql.update.empty-class");
@@ -28,6 +40,16 @@ public class Update extends Sql {
         this.table = getProperty(entityClass.getName());
     }
 
+    /**
+     * Returns {@code Update} object, on which this method called
+     * with setting its set clause
+     *
+     * @param setValueArray     {@code Array} of {@code SetValue} objects
+     * @return                  {@code Update} object
+     * @throws DaoException
+     *
+     * @see SetValue
+     */
     public Update set(SetValue[] setValueArray) throws DaoException {
         for (SetValue setValue : setValueArray)
             if (!entityClass.equals(setValue.entityProperty.getEntityClass()))
@@ -37,6 +59,16 @@ public class Update extends Sql {
         return this;
     }
 
+    /**
+     * Returns {@code Update} object, on which this method called
+     * with setting its where clause
+     *
+     * @param predicate         {@code Predicate} object
+     * @return                  {@code Update} object
+     * @throws DaoException
+     *
+     * @see com.epam.java.rt.lab.dao.sql.Where.Predicate
+     */
     public Update where(Where.Predicate predicate) throws DaoException {
         if (predicate == null)
             throw new DaoException("exception.dao.sql.update.empty-predicate");
@@ -60,18 +92,38 @@ public class Update extends Sql {
     }
 
     /**
-     * The usage is only in update statement
+     * {@code Set} class defines set clause of sql statement
+     *
+     * @see SetValue
+     * @see WildValue
      */
     static class Set implements Clause {
 
         private static final String SET = " SET ";
 
+        /** {@code Array} of {@code SetValue} objects */
         private SetValue[] setValueArray;
 
+        /**
+         * Initiates new {@code Set} object from
+         * {@code Array} of {@code SetValue} objects
+         *
+         * @param setValueArray     {@code Array} of {@code SetValue} objects
+         *
+         * @see SetValue
+         */
         Set(SetValue[] setValueArray) {
             this.setValueArray = setValueArray;
         }
 
+        /**
+         * Links {@code List} of {@code WildValue} objects to get single
+         * {@code List} which will be set on prepared statement
+         *
+         * @param wildValueList     {@code List} of {@code WildValue} objects
+         *
+         * @see WildValue
+         */
         private void linkWildValue(List<WildValue> wildValueList) {
             if (this.setValueArray != null) {
                 for (SetValue setValue : this.setValueArray)
@@ -92,13 +144,29 @@ public class Update extends Sql {
 
     }
 
+    /**
+     * {@code SetValue} class defines set value in set clause of sql statement
+     */
     public static class SetValue implements Clause {
 
         private static final String EQUAL = " = ";
 
+        /** {@code EntityProperty} object */
         private EntityProperty entityProperty;
+        /** {@code WildValue} object */
         private WildValue wildValue;
 
+        /**
+         * Initiates new {@code SetValue} object with defined
+         * {@code EntityProperty} object and generic value
+         *
+         * @param entityProperty        {@code EntityProperty} object
+         * @param value                 generic value
+         * @param <T>
+         * @throws DaoException
+         *
+         * @see EntityProperty
+         */
         public <T> SetValue(EntityProperty entityProperty, T value) throws DaoException {
             if (entityProperty == null)
                 throw new DaoException("exception.dao.update.empty-entity-property");

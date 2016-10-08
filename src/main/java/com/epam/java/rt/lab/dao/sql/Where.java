@@ -7,15 +7,27 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * category-ms
+ * {@code Where} class defines where clause of sql statement
  */
 public class Where implements Clause {
 
     private static final String WHERE = " WHERE ";
 
+    /** {@code Join} object */
     private Select.Join join;
+    /** {@code Predicate} object */
     private Predicate predicate;
 
+    /**
+     * Initiates new {@code Where} object with defined
+     * {@code Join} object and {@code Predicate} object
+     *
+     * @param join          {@code Join} object
+     * @param predicate     {@code Predicate} object
+     * @throws DaoException
+     *
+     * @see com.epam.java.rt.lab.dao.sql.Select.Join
+     */
     Where(Select.Join join, Predicate predicate) throws DaoException {
         this.join = join;
         Predicate joinPredicate = null;
@@ -35,6 +47,11 @@ public class Where implements Clause {
         }
     }
 
+    /**
+     * Adds {@code Join} table to join clause from {@code Predicate}
+     *
+     * @param predicate     {@code Predicate} object
+     */
     private void addJoinFromPredicate(Predicate predicate) {
         if (predicate.predicate != null) addJoinFromPredicate(predicate.predicate);
         if (predicate.comparePredicate != null) addJoinFromPredicate(predicate.comparePredicate);
@@ -44,10 +61,22 @@ public class Where implements Clause {
             this.join.addJoin(predicate.compareColumn.getTableName());
     }
 
+    /**
+     * Links to base single {@code List} of {@code WildValue} objects
+     *
+     * @param wildValueList     {@code List} of {@code WildValue} objects
+     */
     void linkWildValue(List<WildValue> wildValueList) {
         if (this.predicate != null) linkWildValue(wildValueList, this.predicate);
     }
 
+    /**
+     * Recursive method which links to base single {@code List} of
+     * {@code WildValue} objects from {@code Predicate} object
+     *
+     * @param wildValueList     {@code List} of {@code WildValue} objects
+     * @param predicate         {@code Predicate} object
+     */
     private void linkWildValue(List<WildValue> wildValueList, Predicate predicate) {
         if (predicate.predicate != null) linkWildValue(wildValueList, predicate.predicate);
         if (predicate.comparePredicate != null) linkWildValue(wildValueList, predicate.comparePredicate);
@@ -61,6 +90,9 @@ public class Where implements Clause {
                 this.predicate.appendClause(result.append(WHERE));
     }
 
+    /**
+     * {@code Predicate} class defines where predicate
+     */
     public static class Predicate implements Clause {
 
         private static final String EQUAL = " = ";
@@ -79,6 +111,9 @@ public class Where implements Clause {
         private static final String PAR_OPEN = "(";
         private static final String PAR_CLOSE = ")";
 
+        /**
+         * {@code Predicate} operator enumeration
+         */
         public enum PredicateOperator {
             EQUAL,
             NOT_EQUAL,

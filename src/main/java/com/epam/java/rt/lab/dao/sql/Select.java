@@ -197,17 +197,30 @@ public class Select extends Sql implements Iterable<Column> {
         /**
          * Set {@code From} object
          *
-         * @param from
+         * @param from  {@code From} object
          */
         public void setFrom(String from) {
             this.from = from;
         }
 
+        /**
+         * Adds join table name to join clause
+         *
+         * @param join  {@code String} representation of join table name
+         */
         void addJoin(String join) {
             if (!from.equals(join) && !this.joinList.contains(join))
                 this.joinList.add(join);
         }
 
+        /**
+         * Returns {@code Predicate} object for where clause
+         *
+         * @return      {@code Predicate} object
+         * @throws DaoException
+         *
+         * @see com.epam.java.rt.lab.dao.sql.Where.Predicate
+         */
         Where.Predicate getPredicate() throws DaoException {
             List<Where.Predicate> predicateList = new ArrayList<>();
             getPredicate(predicateList, this.from, 0);
@@ -216,6 +229,19 @@ public class Select extends Sql implements Iterable<Column> {
             return Where.Predicate.get(predicateList);
         }
 
+        /**
+         * Fills {@code List} of {@code Predicate} objects for where clause
+         * from table name, which should be selected or joined.
+         *
+         * @param predicateList     {@code List} of {@code Predicate} objects
+         * @param tableName         {@code String} representation of table name
+         * @param startIndex        {@code int} starting index in {@code List} of
+         *                          {@code Predicate} objects, to which should be
+         *                          found referenced columns
+         * @throws DaoException
+         *
+         * @see com.epam.java.rt.lab.dao.sql.Where.Predicate
+         */
         private void getPredicate(List<Where.Predicate> predicateList, String tableName, int startIndex) throws DaoException {
             for (int i = startIndex; i < this.joinList.size(); i++) {
                 String joinTableName = this.joinList.get(i);
@@ -245,15 +271,26 @@ public class Select extends Sql implements Iterable<Column> {
     }
 
     /**
-     * The usage is only in Select statement
+     * {@code Limit} class defines limit clause
+     * for sql statement
      */
     static class Limit implements Clause {
 
         private static final String LIMIT = " LIMIT ";
 
+        /** {@code Long} representation of limit offset value */
         private Long offset;
+        /** {@code Long} representation of limit count value */
         private Long count;
 
+        /**
+         * Initiates new {@code Limit} object with defined
+         * {@code Long} limit offset value and
+         * {@code Long} limit count value
+         *
+         * @param offset        {@code Long} limit offset value
+         * @param count         {@code Long} limit count value
+         */
         Limit(Long offset, Long count) {
             this.offset = offset;
             this.count = count;
