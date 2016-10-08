@@ -9,7 +9,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * category-ms
+ * {@code Insert} class defines sql statement,
+ * which calls INSERT sql expression
  */
 public class Insert extends Sql {
 
@@ -18,10 +19,20 @@ public class Insert extends Sql {
     private static final String BEFORE_VALUES = ") VALUES (";
     private static final String AFTER_VALUES = ")";
 
+    /** {@code BaseEntity} object, which should be inserted to database */
     private BaseEntity entity;
+    /** {@code String} representation pf table name */
     private String table;
+    /** {@code Array} of {@code InsertValue} objects */
     private InsertValue[] insertValueArray;
 
+    /**
+     * Initiates new {@code Insert} object with defined
+     * {@code BaseEntity} object
+     *
+     * @param entity        {@code BaseEntity} object
+     * @throws DaoException
+     */
     Insert(BaseEntity entity) throws DaoException {
         if (entity == null)
             throw new DaoException("exception.dao.sql.insert.empty-entity");
@@ -29,12 +40,29 @@ public class Insert extends Sql {
         this.table = getProperty(entity.getClass().getName());
     }
 
+    /**
+     * Initiates new {@code Insert} object with defined
+     * {@code Class} of entity to define table name
+     *
+     * @param propertyClass {@code Class} of entity
+     * @throws DaoException
+     */
     Insert(Class propertyClass) throws DaoException {
         if (propertyClass == null)
             throw new DaoException("exception.dao.sql.insert.empty-entity");
         this.table = getProperty(propertyClass.getName());
     }
 
+    /**
+     * Returns {@code Insert} object, on which this method called
+     * with setting its values clause
+     *
+     * @param insertValueArray  {@code Array} of {@code InsertValue} objects
+     * @return                  {@code Insert} object, on which this method called
+     * @throws DaoException
+     *
+     * @see InsertValue
+     */
     public Insert values(InsertValue... insertValueArray) throws DaoException {
         for (InsertValue insertValue : insertValueArray) {
             if (!entity.getClass().equals(insertValue.entityProperty.getEntityClass()))
@@ -68,18 +96,37 @@ public class Insert extends Sql {
     }
 
     /**
+     * {@code InsertValue} class defines inserting values
+     * through {@code EntityProperty} object and
+     * {@code WildValue} object
      *
+     * @see EntityProperty
+     * @see WildValue
      */
     public static class InsertValue {
 
+        /** {@code EntityProperty} object */
         private EntityProperty entityProperty;
+        /** {@code WildValue} object */
         private WildValue value;
 
+        /**
+         * Initiates new {@code InsertValue} object with defined
+         * {@code EntityProperty} object and generic value, from which
+         * created new {@code WildValue} object
+         *
+         * @param entityProperty    {@code EntityProperty} object
+         * @param value             generic value
+         * @param <T>
+         * @throws DaoException
+         *
+         * @see EntityProperty
+         * @see WildValue
+         */
         public <T> InsertValue(EntityProperty entityProperty, T value) throws DaoException {
             this.entityProperty = entityProperty;
             this.value = new WildValue(value);
         }
-
 
     }
 }

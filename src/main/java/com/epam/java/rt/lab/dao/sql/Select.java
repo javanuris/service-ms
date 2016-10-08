@@ -8,19 +8,39 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * category-ms
+ * {@code Select} class defines sql statement,
+ * which calls SELECT sql expression
+ *
+ * @see Column
+ * @see OrderBy
+ * @see Limit
+ * @see com.epam.java.rt.lab.dao.sql.OrderBy.Criteria
+ * @see com.epam.java.rt.lab.dao.sql.Where.Predicate
  */
 public class Select extends Sql implements Iterable<Column> {
 
     private static final String SELECT = "SELECT ";
 
+    /** {@code List} of {@code Column} objects */
     private List<Column> columnList;
+    /** {@code From} object */
     private From from;
+    /** {@code Join} object */
     private Join join;
+    /** {@code Where} object */
     private Where where;
+    /** {@code OrderBy} object */
     private OrderBy orderBy;
+    /** {@code Limit} object */
     private Limit limit;
 
+    /**
+     * Initiates new {@code Select} object with defined
+     * {@code List} of {@code Column} objects
+     *
+     * @param columnList        {@code List} of {@code Column} objects
+     * @throws DaoException
+     */
     Select(List<Column> columnList) throws DaoException {
         if (columnList == null || columnList.size() == 0)
             throw new DaoException("exception.dao.sql.Select.empty-column-list");
@@ -29,17 +49,44 @@ public class Select extends Sql implements Iterable<Column> {
         this.from = new From(columnList, join);
     }
 
+    /**
+     * Returns {@code Select} object, on which this method called
+     * with setting its where clause
+     *
+     * @param predicate     {@code Predicate} object
+     * @return              {@code Select} object, on which this method called
+     * @throws DaoException
+     *
+     * @see com.epam.java.rt.lab.dao.sql.Where.Predicate
+     */
     public Select where(Where.Predicate predicate) throws DaoException {
         this.where = new Where(join, predicate);
         this.where.linkWildValue(getWildValueList());
         return this;
     }
 
+    /**
+     * Returns {@code Select} object, on which this method called
+     * with defined its order by clause
+     *
+     * @param criteriaArray {@code Array} of {@code Criteria} objects
+     * @return              {@code Select} object, on which this method called
+     *
+     * @see com.epam.java.rt.lab.dao.sql.OrderBy.Criteria
+     */
     public Select orderBy(OrderBy.Criteria[] criteriaArray) {
         this.orderBy = new OrderBy(criteriaArray);
         return this;
     }
 
+    /**
+     * Returns {@code Select} object, on which this method called
+     * with defined its limit clause
+     *
+     * @param offset    {@code Long} limit offset value
+     * @param count     {@code Long} limit count value
+     * @return          {@code Select} object, on which this method called
+     */
     public Select limit(Long offset, Long count) {
         this.limit = new Limit(offset, count);
         return this;
@@ -85,14 +132,25 @@ public class Select extends Sql implements Iterable<Column> {
     }
 
     /**
-     * The usage is only in Select statement
+     * {@code From} class defines from clause of sql statement
+     *
+     * @see Column
      */
     public static class From implements Clause {
 
         private static final String FROM = " FROM ";
 
+        /** {@code From} object */
         private String from;
 
+        /**
+         * Initiates new {@code From} object with defined
+         * {@code From} object
+         *
+         * @param columnList    {@code List} of {@Column} objects
+         * @param join          {@code Join} object to pre initiate join clause
+         *                      according to selected columns
+         */
         From(List<Column> columnList, Join join) {
             this.from = columnList.get(0).getTableName();
             join.setFrom(this.from);
@@ -107,23 +165,40 @@ public class Select extends Sql implements Iterable<Column> {
     }
 
     /**
+     * {@cdoe Join} class defines join clause of sql statement
      *
+     * @see com.epam.java.rt.lab.dao.sql.Where.Predicate
      */
     public static class Join implements Clause {
 
         private static final String JOIN = " JOIN ";
 
+        /** {@code String} representation of base table name */
         private String from;
+        /** {@code List} of {@code Stirng} objects which defines join table names */
         private List<String> joinList;
 
+        /**
+         * Initiates new {@code Join} object
+         */
         Join() {
             this.joinList = new ArrayList<>();
         }
 
+        /**
+         * Returns {@code From} object
+         *
+         * @return  {@code From} object
+         */
         public String getFrom() {
             return from;
         }
 
+        /**
+         * Set {@code From} object
+         *
+         * @param from
+         */
         public void setFrom(String from) {
             this.from = from;
         }

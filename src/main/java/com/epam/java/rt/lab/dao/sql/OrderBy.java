@@ -9,14 +9,21 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * category-ms
+ * {@code OrderBy} class defines sql statement clause
  */
 public class OrderBy implements Clause {
 
     private static final String ORDER_BY = " ORDER BY ";
 
+    /** {@code Array} of {@code Criteria} objects */
     private Criteria[] criteriaArray;
 
+    /**
+     * Initiates new {@code OrderBy} object with defined
+     * {@code Array} of {@code Criteria} objects
+     *
+     * @param criteriaArray     {@code Array} of {@code Criteria} objects
+     */
     OrderBy(Criteria[] criteriaArray) {
         this.criteriaArray = criteriaArray;
     }
@@ -32,25 +39,59 @@ public class OrderBy implements Clause {
 
     }
 
+    /**
+     * {@code Criteria} class defines ordering criteria
+     *
+     * @see Column
+     * @see EntityProperty
+     */
     public static class Criteria implements Clause {
 
         private static final String ASC = " ASC";
         private static final String DESC = " DESC";
 
+        /** {@code Column} object */
         private Column column;
+        /** {@code boolean} value indicating ordering type */
         private boolean descending;
 
+        /**
+         * Initiates new {@code Criteria} object with defined
+         * {@code Column} object and {@code boolean} value indicating
+         * ordering type
+         *
+         * @param column        {@code Column} object
+         * @param descending    {@code boolean} value indication ordering type
+         */
         Criteria(Column column, boolean descending) {
             this.column = column;
             this.descending = descending;
         }
 
-        // get
-
+        /**
+         * Returns new {@code Criteria} object with ascending ordering type
+         * for column defined by {@code EntityProperty} object
+         *
+         * @param entityProperty    {@code EntityProperty} object
+         * @return                  {@code Criteria} object, on which this method called
+         * @throws DaoException
+         *
+         * @see EntityProperty
+         */
         public static Criteria asc(EntityProperty entityProperty) throws DaoException {
             return new Criteria(Sql.getColumn(entityProperty), false);
         }
 
+        /**
+         * Returns new {@code Criteria} object with descending ordering type
+         * for column defined by {@code EntityProperty} object
+         *
+         * @param entityProperty    {@code EntityProperty} object
+         * @return                  {@code Criteria} object, on which this method called
+         * @throws DaoException
+         *
+         * @see EntityProperty
+         */
         public static Criteria desc(EntityProperty entityProperty) throws DaoException {
             return new Criteria(Sql.getColumn(entityProperty), true);
         }
