@@ -23,7 +23,7 @@
                         <div class="col-xs-${listColumn.width}">
                             <c:set var="value"><val:reflectValue entityMethod="${listColumn.fieldName}" entityObject="${control}"/></c:set>
                             <c:choose>
-                                <c:when test="${listColumn.localePrefix == 'date'}">
+                                <c:when test="${'date'.equals(listColumn.localePrefix)}">
                                     <dat:dateValue locale="${language}" stringValue="${value}"/>
                                 </c:when>
                                 <c:when test="${listColumn.localePrefix.length() > 0}">

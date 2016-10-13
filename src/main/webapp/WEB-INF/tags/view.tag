@@ -21,7 +21,7 @@
                 <div class="col-xs-4" style="color: darkgray; text-align: right;"><fmt:message bundle="${ui}" key="${control.label}"/>:</div>
                 <div class="col-xs-8" style="font-size: medium;">
                     <c:choose>
-                        <c:when test="${control.localePrefix == 'date'}">
+                        <c:when test="${'date'.equals(control.localePrefix)}">
                             <dat:dateValue locale="${language}" stringValue="${control.value}"/>
                         </c:when>
                         <c:when test="${control.localePrefix.length() > 0}">

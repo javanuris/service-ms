@@ -84,48 +84,6 @@ public class PostCommentAction implements Action {
             e.printStackTrace();
             throw new ActionException("exception.action.application.comment.validator", e.getCause());
         }
-
-
-//            } else if ("POST".equals(req.getMethod())) {
-//                logger.debug("POST");
-//                if (ValidatorFactory.validate(req, form)) {
-//                    logger.debug("FORM VALID");
-//                    user.setFirstName(form.getItem(0).getValue());
-//                    user.setMiddleName(form.getItem(1).getValue());
-//                    user.setLastName(form.getItem(2).getValue());
-//                    if (form.getItem(3).getValue().length() == 0) {
-//                        userService.removeAvatar(user);
-//                    } else {
-//                        logger.debug("{} = {}", form.getItem(3).getLabel(), form.getItem(3).getValue());
-//                        String[] pair = form.getItem(3).getValue().split("\\?");
-//                        logger.debug("pair = {}", pair);
-//                        if (pair.length == 2) {
-//                            pair = pair[1].split("=");
-//                            logger.debug("pair = {}", pair);
-//                            if (pair.length == 2) userService.setAvatar(user, pair[1]);
-//                        }
-//                    }
-//                    if (userService.updateUser(user) != 1) {
-//                        logger.debug("UPDATE ERROR");
-//                        String[] validationMessageArray = {"profile.edit.submit.error-edit"};
-//                        form.getItem(4).setValidationMessageArray(validationMessageArray);
-//                    } else {
-//                        logger.debug("UPDATE SUCCESS");
-//                        req.getSession().setAttribute("userName", user.getName());
-//                        resp.sendRedirect(UrlManager.getContextUri(req, "/profile/view"));
-//                        return;
-//                    }
-//                }
-//            }
-//            req.getRequestDispatcher("/WEB-INF/jsp/profile/edit.jsp").forward(req, resp);
-//        } catch (ConnectionException | DaoException e) {
-//            e.printStackTrace();
-//            throw new ActionException("exception.action.edit.user-category", e.getCause());
-//        } catch (ServletException | IOException e) {
-//            e.printStackTrace();
-//            throw new ActionException("exception.action.edit.forward", e.getCause());
-//        } catch (ComponentException e) {
-//            e.printStackTrace();
-//        }
     }
+
 }

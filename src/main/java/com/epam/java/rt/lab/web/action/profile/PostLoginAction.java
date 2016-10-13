@@ -46,7 +46,7 @@ public class PostLoginAction implements Action {
             Form form = FormFactory.getInstance().create("login-profile");
             Submit submit = req.getParameter(form.getItem(3).getName()) != null ? Submit.LOGIN :
                     req.getParameter(form.getItem(4).getName()) != null ? Submit.RESTORE : null;
-            if (submit == Submit.RESTORE) form.getItem(1).setIgnoreValidate(true);
+            if (Submit.RESTORE.equals(submit)) form.getItem(1).setIgnoreValidate(true);
             if (FormValidator.validate(req, form)) {
                 logger.debug("FORM VALID");
                 Login login = loginService.getLogin(form.getItem(0).getValue());

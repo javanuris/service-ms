@@ -178,9 +178,9 @@ public class Where implements Clause {
 
         public static <T> Predicate get(EntityProperty entityProperty, PredicateOperator operator, T... valArray)
                 throws DaoException {
-            if (operator == PredicateOperator.IS_NULL || operator == PredicateOperator.IS_NOT_NULL ||
-                    operator == PredicateOperator.AND || operator == PredicateOperator.OR ||
-                    (operator == PredicateOperator.BETWEEN && valArray.length != 2) ||
+            if (PredicateOperator.IS_NULL.equals(operator) || PredicateOperator.IS_NOT_NULL.equals(operator) ||
+                    PredicateOperator.AND.equals(operator) || PredicateOperator.OR.equals(operator) ||
+                    (PredicateOperator.BETWEEN.equals(operator) && valArray.length != 2) ||
                     valArray.length == 0)
                 throw new DaoException("exception.dao.sql.where.value");
             List<WildValue> wildValueList = new ArrayList<>();
@@ -222,7 +222,7 @@ public class Where implements Clause {
         // combines
 
         private String getWildcard() throws DaoException {
-            if (this.operator == PredicateOperator.IN) {
+            if (PredicateOperator.IN.equals(this.operator)) {
                 boolean first = true;
                 String result = "";
                 for (int i = 0; i < this.wildValueArray.length; i++) {
