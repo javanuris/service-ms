@@ -1,4 +1,4 @@
-package com.epam.java.rt.lab.service;
+package com.epam.java.rt.lab.util.file;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -6,36 +6,39 @@ import org.slf4j.LoggerFactory;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 
-public class ServiceException extends Exception {
+/**
+ * service-ms
+ */
+public class UploadException extends Exception {
+    
+    private static final String UNNAMED_UPLOAD_EXCEPTION = "exception.util.file.upload.unnamed";
+    private static final Logger LOGGER = LoggerFactory.getLogger(UploadException.class);
 
-    private static final String UNNAMED_SERVICE_EXCEPTION = "exception.service.unnamed";
-    private static final Logger LOGGER = LoggerFactory.getLogger(ServiceException.class);
-
-    public ServiceException() {
+    public UploadException() {
         super();
-        LOGGER.error(UNNAMED_SERVICE_EXCEPTION);
+        LOGGER.error(UNNAMED_UPLOAD_EXCEPTION);
     }
 
-    public ServiceException(String message) {
+    public UploadException(String message) {
         super(message);
         LOGGER.error(message);
     }
 
-    public ServiceException(String message, Throwable cause) {
+    public UploadException(String message, Throwable cause) {
         super(message, cause);
         LOGGER.error(message, cause);
     }
 
-    public ServiceException(Throwable cause) {
+    public UploadException(Throwable cause) {
         super(cause);
-        LOGGER.error(UNNAMED_SERVICE_EXCEPTION, cause);
+        LOGGER.error(UNNAMED_UPLOAD_EXCEPTION, cause);
     }
 
-    protected ServiceException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+    protected UploadException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
-        LOGGER.error(UNNAMED_SERVICE_EXCEPTION, cause);
+        LOGGER.error(UNNAMED_UPLOAD_EXCEPTION, cause);
     }
-
+    
     @Override
     public String getMessage() {
         return super.getMessage();

@@ -16,11 +16,8 @@ import java.util.List;
  * category-ms
  */
 public class CategoryService extends BaseService {
-    private static final Logger logger = LoggerFactory.getLogger(CategoryService.class);
 
-    public CategoryService()
-            throws ServiceException {
-    }
+    private static final Logger logger = LoggerFactory.getLogger(CategoryService.class);
 
     public List<Category> getCategoryList(Page page) throws ServiceException {
         try {

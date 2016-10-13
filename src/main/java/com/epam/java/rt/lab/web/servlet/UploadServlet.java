@@ -1,7 +1,7 @@
 package com.epam.java.rt.lab.web.servlet;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.epam.java.rt.lab.util.file.UploadException;
+import com.epam.java.rt.lab.util.file.UploadManager;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
@@ -9,14 +9,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.Part;
-import java.io.*;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.util.*;
+import java.io.IOException;
 
 /**
  * category-ms
@@ -24,62 +17,23 @@ import java.util.*;
 @MultipartConfig(maxFileSize = 10485760)
 @WebServlet(urlPatterns = "/file/upload/*")
 public class UploadServlet extends HttpServlet {
-    private static final Logger logger = LoggerFactory.getLogger(UploadServlet.class);
-    private static Map<String, List<String>> contentTypeListMap = new HashMap<>();
-
-    private static void initContentTypeListMap() throws IOException {
-        Properties properties = new Properties();
-        properties.load(UploadServlet.class.getClassLoader().getResourceAsStream("content-type.properties"));
-        Enumeration names = properties.propertyNames();
-        while (names.hasMoreElements()) {
-            String key = (String) names.nextElement();
-            List<String> types = new ArrayList<>();
-            for (String type : properties.getProperty(key).replaceAll(" ", "").split(",")) types.add(type);
-            contentTypeListMap.put(key, types);
-        }
-    }
 
     @Override
-    protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException {
         if (req.getSession().getAttribute("user") != null) {
             if (req.getMethod().equals("POST")) {
-                logger.debug("UPLOAD FILE");
-                if (UploadServlet.contentTypeListMap.size() == 0) initContentTypeListMap();
-                Part filePart = req.getPart("file");
-                String prefix = null;
-                String postfix = null;
-                switch (req.getPathInfo()) {
-                    case "/avatar":
-                        logger.debug("contentType = {} (valid: {})", filePart.getContentType(), contentTypeListMap.get("avatar").toArray());
-                        if (UploadServlet.contentTypeListMap.get("avatar").contains(filePart.getContentType())) {
-                            prefix = ".avatar.".concat(filePart.getContentType().replaceAll("/", "_")).concat(".");
-                            postfix = ".".concat(req.getSession().getId());
-                        }
-                        break;
-                    case "/photo":
-                        logger.debug("contentType = {} (valid: {})", filePart.getContentType(), contentTypeListMap.get("photo").toArray());
-                        if (UploadServlet.contentTypeListMap.get("photo").contains(filePart.getContentType())) {
-                            prefix = ".photo.".concat(filePart.getContentType().replaceAll("/", "_")).concat(".");
-                            postfix = ".".concat(req.getSession().getId());
-                        }
-                        break;
-                }
-                if (prefix != null) {
-                    InputStream inputStream = filePart.getInputStream();
-//                    String fileName = new String(filePart.getSubmittedFileName().getBytes(), "UTF-8");
-                    String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
-                    logger.debug("FILENAME: {}", fileName);
-                    File outputFile = File.createTempFile(fileName.concat(prefix), postfix);
-                    Files.copy(inputStream, outputFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                    inputStream.close();
-                    String outputFileName = new String(outputFile.getAbsolutePath().getBytes("UTF-8"), "ISO-8859-1");
-                    logger.debug("UPLOAD COMPLETE: {}", outputFileName);
-                    resp.getWriter().print("filePath=".concat(outputFileName));
-                    return;
+                try {
+                    String absolutePath = UploadManager.
+                            uploadFileAndGetAbsolutePath(req.getSession().getId(),
+                                    req.getPathInfo().substring(1), req.getPart("file"));
+                    if (absolutePath != null) resp.getWriter().print(absolutePath);
+                } catch (UploadException e) {
+                    throw new ServletException("exception.web.servlet.upload.upload-file", e.getCause());
+                } catch (ServletException | IOException e) {
+                    throw new ServletException("exception.web.servlet.upload.get-part", e.getCause());
                 }
             }
         }
-        resp.getWriter().print("");
     }
 
 }

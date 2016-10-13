@@ -1,4 +1,4 @@
-package com.epam.java.rt.lab.service;
+package com.epam.java.rt.lab.web.servlet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -6,34 +6,34 @@ import org.slf4j.LoggerFactory;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 
-public class ServiceException extends Exception {
+public class ServletException extends Exception {
 
-    private static final String UNNAMED_SERVICE_EXCEPTION = "exception.service.unnamed";
-    private static final Logger LOGGER = LoggerFactory.getLogger(ServiceException.class);
+    private static final String UNNAMED_SERVLET_EXCEPTION = "exception.web.servlet.unnamed";
+    private static final Logger LOGGER = LoggerFactory.getLogger(ServletException.class);
 
-    public ServiceException() {
+    public ServletException() {
         super();
-        LOGGER.error(UNNAMED_SERVICE_EXCEPTION);
+        LOGGER.error(UNNAMED_SERVLET_EXCEPTION);
     }
 
-    public ServiceException(String message) {
+    public ServletException(String message) {
         super(message);
         LOGGER.error(message);
     }
 
-    public ServiceException(String message, Throwable cause) {
+    public ServletException(String message, Throwable cause) {
         super(message, cause);
         LOGGER.error(message, cause);
     }
 
-    public ServiceException(Throwable cause) {
+    public ServletException(Throwable cause) {
         super(cause);
-        LOGGER.error(UNNAMED_SERVICE_EXCEPTION, cause);
+        LOGGER.error(UNNAMED_SERVLET_EXCEPTION, cause);
     }
 
-    protected ServiceException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+    protected ServletException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
-        LOGGER.error(UNNAMED_SERVICE_EXCEPTION, cause);
+        LOGGER.error(UNNAMED_SERVLET_EXCEPTION, cause);
     }
 
     @Override

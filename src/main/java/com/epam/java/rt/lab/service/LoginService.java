@@ -22,10 +22,6 @@ public class LoginService extends BaseService {
 
     private static final Logger logger = LoggerFactory.getLogger(LoginService.class);
 
-    public LoginService()
-            throws ServiceException {
-    }
-
     /**
      * @param email
      * @return

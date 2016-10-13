@@ -25,11 +25,8 @@ import java.util.List;
  * category-ms
  */
 public class CommentService extends BaseService {
-    private static final Logger logger = LoggerFactory.getLogger(CommentService.class);
 
-    public CommentService()
-            throws ServiceException {
-    }
+    private static final Logger logger = LoggerFactory.getLogger(CommentService.class);
 
     public List<Comment> getCommentList(Page page, Long applicationId) throws ServiceException {
         try {

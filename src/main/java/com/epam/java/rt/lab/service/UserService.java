@@ -34,11 +34,8 @@ import java.util.UUID;
  * category-ms
  */
 public class UserService extends BaseService {
-    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 
-    public UserService()
-            throws ServiceException {
-    }
+    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 
     public User getUser(Login login) throws ServiceException {
         try {

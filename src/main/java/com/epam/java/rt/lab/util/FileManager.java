@@ -6,10 +6,8 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.FilenameFilter;
 
-/**
- * category-ms
- */
 public class FileManager {
+
     private static final Logger logger = LoggerFactory.getLogger(FileManager.class);
 
     private FileManager() {
