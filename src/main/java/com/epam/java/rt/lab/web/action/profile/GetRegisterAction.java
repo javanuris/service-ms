@@ -32,35 +32,6 @@ public class GetRegisterAction implements Action {
         } catch (ServletException | IOException e) {
             throw new ActionException("exception.action.profile.register.jsp", e.getCause());
         }
-
-//        try (LoginService loginService = new LoginService();
-//             RoleService roleService = new RoleService();
-//             UserService userService = new UserService()) {
-//            if ("GET".equals(req.getMethod())) {
-//                logger.debug("GET");
-//                String activationEmail = req.getParameter("email");
-//                String activationCode = req.getParameter("code");
-//                req.getSession().removeAttribute("activationEmail");
-//                req.getSession().removeAttribute("activationRef");
-//                if (activationEmail != null && activationCode != null) {
-//                    Login login = loginService.getActivateLogin(activationEmail, activationCode);
-//                    if (login != null) {
-//                        userService.addUser(login);
-//                        resp.sendRedirect(UrlManager.getContextUri(req, "/profile/login"));
-//                        return;
-//                    } else {
-//                        req.getSession().setAttribute("message", "message.activation.error-confirm");
-//                    }
-//                }
-//            }
-//            resp.sendRedirect(UrlManager.getContextUri(req, "/home"));
-//        } catch (ServiceException e) {
-//            e.printStackTrace();
-//            throw new ActionException("exception.action.activate.category", e.getCause());
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//            throw new ActionException("exception.action.activate.request", e.getCause());
-//        }
     }
 
 }

@@ -167,9 +167,6 @@ public abstract class JdbcDao implements Dao {
 
     abstract <T> List<T> getEntity(ResultSet resultSet, Sql sql) throws DaoException;
 
-
-//    abstract <T> List<T> getCachedEntity(DaoParameter daoParameter) throws DaoException;
-
     /**
      *
      */

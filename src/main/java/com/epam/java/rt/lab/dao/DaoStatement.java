@@ -56,8 +56,6 @@ public class DaoStatement implements AutoCloseable {
                     DaoStatement.statementMethodMap.put(Double.class, PreparedStatement.class.getMethod("setDouble", int.class, double.class));
                     DaoStatement.statementMethodMap.put(float.class, PreparedStatement.class.getMethod("setFloat", int.class, float.class));
                     DaoStatement.statementMethodMap.put(Float.class, PreparedStatement.class.getMethod("setFloat", int.class, float.class));
-//                    statementMethodMap.put(Time.class, PreparedStatement.class.getMethod("setTime", int.class, Time.class));
-//                    statementMethodMap.put(Date.class, PreparedStatement.class.getMethod("setDate", int.class, Date.class));
                     DaoStatement.statementMethodMap.put(Timestamp.class, PreparedStatement.class.getMethod("setTimestamp", int.class, Timestamp.class));
                     DaoStatement.statementMethodMap.put(String.class, PreparedStatement.class.getMethod("setString", int.class, String.class));
                     DaoStatement.statementMethodMap.put(Blob.class, PreparedStatement.class.getMethod("setBlob", int.class, Blob.class));

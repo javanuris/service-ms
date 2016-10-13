@@ -39,7 +39,6 @@ public final class ActionFactory {
         String point = ".";
         String get = "Get";
         String post = "Post";
-//        String action = "Action";
         this.actionMap.clear();
         String actionPackagePath = ActionFactory.class.getPackage().getName().concat(point);
         try {

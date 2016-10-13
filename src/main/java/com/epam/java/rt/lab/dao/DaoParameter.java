@@ -21,9 +21,8 @@ public class DaoParameter {
     private WildValue[] wildValue;
     private Update.SetValue[] setValueArray;
     private BaseEntity entity;
-    private Map<EntityProperty, Object> valueMap; // not cool
+    private Map<EntityProperty, Object> valueMap;
     private EntityProperty[] propertyArray;
-//    private boolean makeCache;
 
     public DaoParameter() {
     }
@@ -95,14 +94,5 @@ public class DaoParameter {
         this.propertyArray = propertyArray;
         return this;
     }
-
-    //    public boolean isMakeCache() {
-//        return makeCache;
-//    }
-//
-//    public DaoParameter setMakeCache(boolean makeCache) {
-//        this.makeCache = makeCache;
-//        return this;
-//    }
 
 }
