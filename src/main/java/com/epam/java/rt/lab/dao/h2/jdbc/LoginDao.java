@@ -83,7 +83,7 @@ public class LoginDao extends JdbcDao {
             }
             return (List<T>) loginList;
         } catch (SQLException e) {
-            throw new DaoException("exception.dao.jdbc.login.get-entity", e.getCause());
+            throw new DaoException("exception.dao.jdbc.login.valueOf-entity", e.getCause());
         }
     }
 

@@ -21,7 +21,7 @@ public class Select extends Sql implements Iterable<Column> {
 
     private static final String SELECT = "SELECT ";
 
-    /** {@code List} of {@code Column} objects */
+    /** {@code List} valueOf {@code Column} objects */
     private List<Column> columnList;
     /** {@code From} object */
     private From from;
@@ -36,9 +36,9 @@ public class Select extends Sql implements Iterable<Column> {
 
     /**
      * Initiates new {@code Select} object with defined
-     * {@code List} of {@code Column} objects
+     * {@code List} valueOf {@code Column} objects
      *
-     * @param columnList        {@code List} of {@code Column} objects
+     * @param columnList        {@code List} valueOf {@code Column} objects
      * @throws DaoException
      */
     Select(List<Column> columnList) throws DaoException {
@@ -69,7 +69,7 @@ public class Select extends Sql implements Iterable<Column> {
      * Returns {@code Select} object, on which this method called
      * with defined its order by clause
      *
-     * @param criteriaArray {@code Array} of {@code Criteria} objects
+     * @param criteriaArray {@code Array} valueOf {@code Criteria} objects
      * @return              {@code Select} object, on which this method called
      *
      * @see com.epam.java.rt.lab.dao.sql.OrderBy.Criteria
@@ -132,7 +132,7 @@ public class Select extends Sql implements Iterable<Column> {
     }
 
     /**
-     * {@code From} class defines from clause of sql statement
+     * {@code From} class defines from clause valueOf sql statement
      *
      * @see Column
      */
@@ -147,7 +147,7 @@ public class Select extends Sql implements Iterable<Column> {
          * Initiates new {@code From} object with defined
          * {@code From} object
          *
-         * @param columnList    {@code List} of {@Column} objects
+         * @param columnList    {@code List} valueOf {@Column} objects
          * @param join          {@code Join} object to pre initiate join clause
          *                      according to selected columns
          */
@@ -165,7 +165,7 @@ public class Select extends Sql implements Iterable<Column> {
     }
 
     /**
-     * {@cdoe Join} class defines join clause of sql statement
+     * {@cdoe Join} class defines join clause valueOf sql statement
      *
      * @see com.epam.java.rt.lab.dao.sql.Where.Predicate
      */
@@ -173,9 +173,9 @@ public class Select extends Sql implements Iterable<Column> {
 
         private static final String JOIN = " JOIN ";
 
-        /** {@code String} representation of base table name */
+        /** {@code String} representation valueOf base table name */
         private String from;
-        /** {@code List} of {@code Stirng} objects which defines join table names */
+        /** {@code List} valueOf {@code Stirng} objects which defines join table names */
         private List<String> joinList;
 
         /**
@@ -206,7 +206,7 @@ public class Select extends Sql implements Iterable<Column> {
         /**
          * Adds join table name to join clause
          *
-         * @param join  {@code String} representation of join table name
+         * @param join  {@code String} representation valueOf join table name
          */
         void addJoin(String join) {
             if (!from.equals(join) && !this.joinList.contains(join))
@@ -230,12 +230,12 @@ public class Select extends Sql implements Iterable<Column> {
         }
 
         /**
-         * Fills {@code List} of {@code Predicate} objects for where clause
+         * Fills {@code List} valueOf {@code Predicate} objects for where clause
          * from table name, which should be selected or joined.
          *
-         * @param predicateList     {@code List} of {@code Predicate} objects
-         * @param tableName         {@code String} representation of table name
-         * @param startIndex        {@code int} starting index in {@code List} of
+         * @param predicateList     {@code List} valueOf {@code Predicate} objects
+         * @param tableName         {@code String} representation valueOf table name
+         * @param startIndex        {@code int} starting index in {@code List} valueOf
          *                          {@code Predicate} objects, to which should be
          *                          found referenced columns
          * @throws DaoException
@@ -278,9 +278,9 @@ public class Select extends Sql implements Iterable<Column> {
 
         private static final String LIMIT = " LIMIT ";
 
-        /** {@code Long} representation of limit offset value */
+        /** {@code Long} representation valueOf limit offset value */
         private Long offset;
-        /** {@code Long} representation of limit count value */
+        /** {@code Long} representation valueOf limit count value */
         private Long count;
 
         /**

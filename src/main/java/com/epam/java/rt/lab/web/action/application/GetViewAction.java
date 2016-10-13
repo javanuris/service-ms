@@ -71,13 +71,13 @@ public class GetViewAction implements Action {
             }
         } catch (ServiceException e) {
             e.printStackTrace();
-            throw new ActionException("exception.action.category.view.user-category.get-user", e.getCause());
+            throw new ActionException("exception.action.category.view.user-category.valueOf-user", e.getCause());
         } catch (ValidatorException e) {
             e.printStackTrace();
             throw new ActionException("exception.action.category.view.validator.id", e.getCause());
         } catch (ViewException e) {
             e.printStackTrace();
-            throw new ActionException("exception.action.category.view.view-factory.get-instance", e.getCause());
+            throw new ActionException("exception.action.category.view.view-factory.valueOf-instance", e.getCause());
         } catch (ServletException | IOException e) {
             e.printStackTrace();
             throw new ActionException("exception.action.category.view.request", e.getCause());

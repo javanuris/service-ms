@@ -143,8 +143,8 @@ public class PostLoginAction implements Action {
                 restore.setCode(UUID.randomUUID().toString());
                 restore.setCookieName(CookieManager.getUserAgentCookieName(req));
                 restore.setCookieValue(HashGenerator.hashString(restore.getCode()));
-                restore.setValid(TimestampCompare.secondsToTimestamp(
-                        TimestampCompare.getCurrentTimestamp(),
+                restore.setValid(TimestampManager.secondsToTimestamp(
+                        TimestampManager.getCurrentTimestamp(),
                         Integer.valueOf(PropertyManager.getProperty("restore.seconds.valid"))
                 ));
                 if (loginService.addRestore(restore) == 0) {
@@ -155,8 +155,8 @@ public class PostLoginAction implements Action {
                             resp,
                             restore.getCookieName(),
                             restore.getCookieValue(),
-                            TimestampCompare.secondsBetweenTimestamps(
-                                    TimestampCompare.getCurrentTimestamp(),
+                            TimestampManager.secondsBetweenTimestamps(
+                                    TimestampManager.getCurrentTimestamp(),
                                     restore.getValid()
                             ),
                             UrlManager.getContextUri(req, "")

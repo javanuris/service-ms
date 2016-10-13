@@ -6,7 +6,7 @@ import com.epam.java.rt.lab.service.LoginService;
 import com.epam.java.rt.lab.service.ServiceException;
 import com.epam.java.rt.lab.util.PropertyManager;
 import com.epam.java.rt.lab.util.HashGenerator;
-import com.epam.java.rt.lab.util.TimestampCompare;
+import com.epam.java.rt.lab.util.TimestampManager;
 import com.epam.java.rt.lab.util.UrlManager;
 import com.epam.java.rt.lab.util.validator.FormValidator;
 import com.epam.java.rt.lab.web.action.Action;
@@ -51,8 +51,8 @@ public class PostRegisterAction implements Action {
                         activate.setSalt(UUID.randomUUID().toString());
                         activate.setPassword(HashGenerator.hashPassword(activate.getSalt(), form.getItem(1).getValue()));
                         activate.setCode(UUID.randomUUID().toString());
-                        activate.setValid(TimestampCompare.daysToTimestamp(
-                                TimestampCompare.getCurrentTimestamp(),
+                        activate.setValid(TimestampManager.daysToTimestamp(
+                                TimestampManager.getCurrentTimestamp(),
                                 Integer.valueOf(PropertyManager.getProperty("activation.days.valid"))));
                         if (loginService.addActivate(activate) == 0) {
                             logger.debug("STORING ACTIVATE CODE FAILED");

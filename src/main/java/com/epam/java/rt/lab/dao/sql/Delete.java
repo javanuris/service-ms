@@ -14,14 +14,14 @@ public class Delete extends Sql {
 
     /** Entity {@code Class} */
     private Class entityClass;
-    /** {@code String} representation of table name */
+    /** {@code String} representation valueOf table name */
     private String table;
     /** {@code Where} object, which defines where clause */
     private Where where;
 
     /**
      * Initiates new @{code Delete} object with defined
-     * {@code Class} of entity
+     * {@code Class} valueOf entity
      *
      * @param entityClass       entity {@code Class}
      * @throws DaoException

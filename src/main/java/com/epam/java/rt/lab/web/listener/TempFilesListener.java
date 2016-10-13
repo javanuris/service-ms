@@ -1,6 +1,7 @@
 package com.epam.java.rt.lab.web.listener;
 
-import com.epam.java.rt.lab.util.FileManager;
+import com.epam.java.rt.lab.util.PropertyManager;
+import com.epam.java.rt.lab.util.file.FileManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,7 +16,6 @@ import java.io.IOException;
  */
 @WebListener
 public class TempFilesListener implements HttpSessionListener {
-    private static final Logger logger = LoggerFactory.getLogger(TempFilesListener.class);
 
     @Override
     public void sessionCreated(HttpSessionEvent httpSessionEvent) {
@@ -24,9 +24,9 @@ public class TempFilesListener implements HttpSessionListener {
 
     @Override
     public void sessionDestroyed(HttpSessionEvent httpSessionEvent) {
-        logger.debug("SessionDestroyed: {}", httpSessionEvent.getSession().getId());
         try {
-            String extension = ".".concat(httpSessionEvent.getSession().getId());
+            String extension = PropertyManager.COMMA
+                               + httpSessionEvent.getSession().getId();
             File temporaryFile = File.createTempFile("", extension);
             String folderPath = temporaryFile.getParentFile().getParent();
             FileManager.deleteFilesWithExtension(folderPath, extension);

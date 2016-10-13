@@ -6,7 +6,7 @@ import com.epam.java.rt.lab.entity.rbac.User;
 import com.epam.java.rt.lab.service.ApplicationService;
 import com.epam.java.rt.lab.service.CommentService;
 import com.epam.java.rt.lab.service.ServiceException;
-import com.epam.java.rt.lab.util.TimestampCompare;
+import com.epam.java.rt.lab.util.TimestampManager;
 import com.epam.java.rt.lab.util.UrlManager;
 import com.epam.java.rt.lab.util.validator.FormValidator;
 import com.epam.java.rt.lab.util.validator.ValidatorException;
@@ -60,7 +60,7 @@ public class PostCommentAction implements Action {
                     if (FormValidator.validate(req, form)) {
                         logger.debug("FORM VALID");
                         Comment comment = new Comment();
-                        comment.setCreated(TimestampCompare.getCurrentTimestamp());
+                        comment.setCreated(TimestampManager.getCurrentTimestamp());
                         comment.setUser(user);
                         comment.setApplicationId(Long.valueOf(id));
                         commentService.setCommentPhoto(comment, form.getItem(0).getValue());

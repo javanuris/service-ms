@@ -15,14 +15,14 @@ public class OrderBy implements Clause {
 
     private static final String ORDER_BY = " ORDER BY ";
 
-    /** {@code Array} of {@code Criteria} objects */
+    /** {@code Array} valueOf {@code Criteria} objects */
     private Criteria[] criteriaArray;
 
     /**
      * Initiates new {@code OrderBy} object with defined
-     * {@code Array} of {@code Criteria} objects
+     * {@code Array} valueOf {@code Criteria} objects
      *
-     * @param criteriaArray     {@code Array} of {@code Criteria} objects
+     * @param criteriaArray     {@code Array} valueOf {@code Criteria} objects
      */
     OrderBy(Criteria[] criteriaArray) {
         this.criteriaArray = criteriaArray;

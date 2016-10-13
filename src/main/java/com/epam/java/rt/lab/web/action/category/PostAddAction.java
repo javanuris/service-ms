@@ -3,14 +3,11 @@ package com.epam.java.rt.lab.web.action.category;
 import com.epam.java.rt.lab.entity.business.Category;
 import com.epam.java.rt.lab.service.CategoryService;
 import com.epam.java.rt.lab.service.ServiceException;
-import com.epam.java.rt.lab.util.TimestampCompare;
+import com.epam.java.rt.lab.util.TimestampManager;
 import com.epam.java.rt.lab.util.UrlManager;
 import com.epam.java.rt.lab.util.validator.FormValidator;
-import com.epam.java.rt.lab.util.validator.ValidatorException;
-import com.epam.java.rt.lab.util.validator.ValidatorFactory;
 import com.epam.java.rt.lab.web.action.Action;
 import com.epam.java.rt.lab.web.action.ActionException;
-import com.epam.java.rt.lab.web.action.profile.GetLoginAction;
 import com.epam.java.rt.lab.web.component.form.Form;
 import com.epam.java.rt.lab.web.component.form.FormControl;
 import com.epam.java.rt.lab.web.component.form.FormException;
@@ -50,7 +47,7 @@ public class PostAddAction implements Action {
                 if (form.getItem(0).getValue().length() > 0)
                     category.setParentId(Long.valueOf(form.getItem(0).getValue()));
                 category.setName(form.getItem(1).getValue());
-                category.setCreated(TimestampCompare.getCurrentTimestamp());
+                category.setCreated(TimestampManager.getCurrentTimestamp());
                 parameterMap.put("id", String.valueOf(categoryService.addCategory(category)));
                 resp.sendRedirect(UrlManager.getContextUri(req, "/category/view", parameterMap));
                 return;
@@ -59,7 +56,7 @@ public class PostAddAction implements Action {
             req.getRequestDispatcher("/WEB-INF/jsp/category/edit.jsp").forward(req, resp);
         } catch (ServiceException e) {
             e.printStackTrace();
-            throw new ActionException("exception.action.category.edit.user-category.get-user", e.getCause());
+            throw new ActionException("exception.action.category.edit.user-category.valueOf-user", e.getCause());
         } catch (FormException e) {
             throw new ActionException("exception.action.category.user.edit.form", e.getCause());
         } catch (ServletException | IOException e) {

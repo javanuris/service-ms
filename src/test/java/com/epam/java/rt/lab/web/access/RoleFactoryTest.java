@@ -24,7 +24,7 @@ public class RoleFactoryTest {
     @Test
     public void getPermissionList() throws Exception {
         assertNotNull("getPermissionList() failed", RoleFactory.getInstance().getPermissionList());
-        assertTrue("getPermissionList().get(0) failed",
+        assertTrue("getPermissionList().valueOf(0) failed",
                 RoleFactory.getInstance().getPermissionList().get(0).getUri().equals("/"));
     }
 

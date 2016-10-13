@@ -48,7 +48,7 @@ public class UserService extends BaseService {
             );
             return userList != null && userList.size() > 0 ? userList.get(0) : null;
         } catch (DaoException e) {
-            throw new ServiceException("exception.service.user.get-user.dao", e.getCause());
+            throw new ServiceException("exception.service.user.valueOf-user.dao", e.getCause());
         }
     }
 
@@ -130,7 +130,7 @@ public class UserService extends BaseService {
             );
             return userList != null && userList.size() > 0 ? userList.get(0) : null;
         } catch (DaoException e) {
-            throw new ServiceException("exception.service.user.get-user.dao", e.getCause());
+            throw new ServiceException("exception.service.user.valueOf-user.dao", e.getCause());
         }
     }
 
@@ -146,7 +146,7 @@ public class UserService extends BaseService {
             return userList != null && userList.size() > 0 ? userList.get(0) : null;
         } catch (DaoException e) {
             e.printStackTrace();
-            throw new ServiceException("exception.service.user.get-user.dao", e.getCause());
+            throw new ServiceException("exception.service.user.valueOf-user.dao", e.getCause());
         }
     }
 
@@ -164,7 +164,7 @@ public class UserService extends BaseService {
                     )
             );
         } catch (DaoException e) {
-            throw new ServiceException("exception.service.user.get-user-list.dao", e.getCause());
+            throw new ServiceException("exception.service.user.valueOf-user-list.dao", e.getCause());
         }
     }
 
@@ -181,8 +181,8 @@ public class UserService extends BaseService {
             remember.setUser(user);
             remember.setCookieName(CookieManager.getUserAgentCookieName(req));
             remember.setCookieValue(HashGenerator.hashString(UUID.randomUUID().toString()));
-            remember.setValid(TimestampCompare.daysToTimestamp(
-                    TimestampCompare.getCurrentTimestamp(),
+            remember.setValid(TimestampManager.daysToTimestamp(
+                    TimestampManager.getCurrentTimestamp(),
                     Integer.valueOf(PropertyManager.getProperty("remember.days.valid"))
             ));
             dao(Remember.class.getSimpleName()).create(new DaoParameter().setEntity(remember));
@@ -190,8 +190,8 @@ public class UserService extends BaseService {
                     resp,
                     remember.getCookieName(),
                     remember.getCookieValue(),
-                    TimestampCompare.secondsBetweenTimestamps(
-                            TimestampCompare.getCurrentTimestamp(),
+                    TimestampManager.secondsBetweenTimestamps(
+                            TimestampManager.getCurrentTimestamp(),
                             remember.getValid()
                     ),
                     UrlManager.getContextUri(req, "/")
@@ -255,13 +255,13 @@ public class UserService extends BaseService {
             if (rememberList == null || rememberList.size() == 0) return null;
             User user = rememberList.get(0).getUser();
             removeUserRemember(user);
-            if (TimestampCompare.secondsBetweenTimestamps(
-                    TimestampCompare.getCurrentTimestamp(), rememberList.get(0).getValid()) < 0)
+            if (TimestampManager.secondsBetweenTimestamps(
+                    TimestampManager.getCurrentTimestamp(), rememberList.get(0).getValid()) < 0)
                 return null;
             return user;
         } catch (DaoException e) {
             e.printStackTrace();
-            throw new ServiceException("exception.service.user.get-user-remember.dao", e.getCause());
+            throw new ServiceException("exception.service.user.valueOf-user-remember.dao", e.getCause());
         }
     }
 
@@ -279,7 +279,7 @@ public class UserService extends BaseService {
             return avatarList.get(0);
         } catch (DaoException e) {
             e.printStackTrace();
-            throw new ServiceException("exception.service.user.get-avatar.dao", e.getCause());
+            throw new ServiceException("exception.service.user.valueOf-avatar.dao", e.getCause());
         } catch (ValidatorException e) {
             e.printStackTrace();
             return null;
@@ -299,7 +299,7 @@ public class UserService extends BaseService {
             avatar.setName(avatarName);
             avatar.setType(contentType);
             avatar.setFile((FileInputStream) inputStream);
-            avatar.setModified(TimestampCompare.getCurrentTimestamp());
+            avatar.setModified(TimestampManager.getCurrentTimestamp());
             if (avatar.getId() == null) {
                 Long avatarId = dao(Avatar.class.getSimpleName()).create(new DaoParameter()
                         .setEntity(avatar)

@@ -1,13 +1,11 @@
 package com.epam.java.rt.lab.web.tag;
 
-import com.epam.java.rt.lab.util.TimestampCompare;
+import com.epam.java.rt.lab.util.TimestampManager;
 
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.tagext.SimpleTagSupport;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -32,7 +30,7 @@ public class DateValue extends SimpleTagSupport {
     @Override
     public void doTag() throws JspException, IOException {
         DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.MEDIUM, locale);
-        Date dateValue = TimestampCompare.from(stringValue);
+        Date dateValue = TimestampManager.from(stringValue);
         DateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
         JspWriter out = getJspContext().getOut();
         out.print("<small>".concat(dateFormat.format(dateValue)).concat("</small> ").concat(timeFormat.format(dateValue)));

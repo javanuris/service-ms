@@ -23,7 +23,7 @@ public class Insert extends Sql {
     private BaseEntity entity;
     /** {@code String} representation pf table name */
     private String table;
-    /** {@code Array} of {@code InsertValue} objects */
+    /** {@code Array} valueOf {@code InsertValue} objects */
     private InsertValue[] insertValueArray;
 
     /**
@@ -42,9 +42,9 @@ public class Insert extends Sql {
 
     /**
      * Initiates new {@code Insert} object with defined
-     * {@code Class} of entity to define table name
+     * {@code Class} valueOf entity to define table name
      *
-     * @param propertyClass {@code Class} of entity
+     * @param propertyClass {@code Class} valueOf entity
      * @throws DaoException
      */
     Insert(Class propertyClass) throws DaoException {
@@ -57,7 +57,7 @@ public class Insert extends Sql {
      * Returns {@code Insert} object, on which this method called
      * with setting its values clause
      *
-     * @param insertValueArray  {@code Array} of {@code InsertValue} objects
+     * @param insertValueArray  {@code Array} valueOf {@code InsertValue} objects
      * @return                  {@code Insert} object, on which this method called
      * @throws DaoException
      *

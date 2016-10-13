@@ -2,6 +2,7 @@ package com.epam.java.rt.lab.entity.business;
 
 import com.epam.java.rt.lab.entity.BaseEntity;
 import com.epam.java.rt.lab.entity.EntityProperty;
+import com.epam.java.rt.lab.entity.File;
 
 import java.io.InputStream;
 import java.sql.Timestamp;
@@ -9,7 +10,7 @@ import java.sql.Timestamp;
 /**
  * category-ms
  */
-public class Photo extends BaseEntity {
+public class Photo extends BaseEntity implements File {
 
     public enum Property implements EntityProperty {
         ID,

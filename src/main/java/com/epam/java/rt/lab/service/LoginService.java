@@ -8,7 +8,7 @@ import com.epam.java.rt.lab.entity.rbac.Activate;
 import com.epam.java.rt.lab.entity.rbac.Login;
 import com.epam.java.rt.lab.entity.rbac.Restore;
 import com.epam.java.rt.lab.util.PropertyManager;
-import com.epam.java.rt.lab.util.TimestampCompare;
+import com.epam.java.rt.lab.util.TimestampManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +39,7 @@ public class LoginService extends BaseService {
             return loginList != null && loginList.size() > 0 ? loginList.get(0) : null;
         } catch (DaoException e) {
             e.printStackTrace();
-            throw new ServiceException("exception.service.login.get-login.dao", e.getCause());
+            throw new ServiceException("exception.service.login.valueOf-login.dao", e.getCause());
         }
     }
 
@@ -188,7 +188,7 @@ public class LoginService extends BaseService {
             return null;
         } catch (DaoException e) {
             e.printStackTrace();
-            throw new ServiceException("exception.service.login.get-restore-login.dao", e.getCause());
+            throw new ServiceException("exception.service.login.valueOf-restore-login.dao", e.getCause());
         }
     }
 
@@ -242,8 +242,8 @@ public class LoginService extends BaseService {
             );
             if (activateList == null || activateList.size() == 0) return null;
             Activate activate = activateList.get(0);
-            if (!activationCode.equals(activate.getCode()) || TimestampCompare.secondsBetweenTimestamps
-                    (TimestampCompare.getCurrentTimestamp(), activate.getValid()) < 0) return null;
+            if (!activationCode.equals(activate.getCode()) || TimestampManager.secondsBetweenTimestamps
+                    (TimestampManager.getCurrentTimestamp(), activate.getValid()) < 0) return null;
             Login login = new Login();
             login.setEmail(activate.getEmail());
             login.setSalt(activate.getSalt());
@@ -253,7 +253,7 @@ public class LoginService extends BaseService {
             return login;
         } catch (ServiceException | DaoException e) {
             e.printStackTrace();
-            throw new ServiceException("exception.service.login.get-actvate-login.dao", e.getCause());
+            throw new ServiceException("exception.service.login.valueOf-actvate-login.dao", e.getCause());
         }
     }
 
@@ -280,10 +280,10 @@ public class LoginService extends BaseService {
 //        login.setEmail(activationEmail);
 //        Map<String, Object> activationMap = getRelEntity(login, "Activation");
 //        removeRelEntity(login, "Activation");
-//        if (activationMap == null || !activationCode.equals(activationMap.get("code")) ||
+//        if (activationMap == null || !activationCode.equals(activationMap.valueOf("code")) ||
 //                TimestampCompare.secondsBetweenTimestamps(TimestampCompare.getCurrentTimestamp(),
-//                (Timestamp) activationMap.get("valid")) <= 0) return null;
-//        login.setPassword((String) activationMap.get("password.regex"));
+//                (Timestamp) activationMap.valueOf("valid")) <= 0) return null;
+//        login.setPassword((String) activationMap.valueOf("password.regex"));
 //        login.setAttemptLeft(Integer.valueOf(GlobalProperties.getProperty("login.attempt.max")));
 //        login.setStatus(0);
 //        return login;

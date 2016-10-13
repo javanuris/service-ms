@@ -86,7 +86,7 @@ public class RememberDao extends JdbcDao {
             }
             return (List<T>) rememberList;
         } catch (SQLException e) {
-            throw new DaoException("exception.dao.jdbc.remember.get-entity", e.getCause());
+            throw new DaoException("exception.dao.jdbc.remember.valueOf-entity", e.getCause());
         }
     }
 

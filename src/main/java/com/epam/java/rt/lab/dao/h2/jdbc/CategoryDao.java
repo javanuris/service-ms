@@ -82,7 +82,7 @@ public class CategoryDao extends JdbcDao {
             return (List<T>) categoryList;
         } catch (SQLException e) {
             e.printStackTrace();
-            throw new DaoException("exception.dao.jdbc.category.get-entity", e.getCause());
+            throw new DaoException("exception.dao.jdbc.category.valueOf-entity", e.getCause());
         }
     }
 

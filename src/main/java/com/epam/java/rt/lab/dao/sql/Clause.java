@@ -14,7 +14,7 @@ public interface Clause {
      * variable
      *
      * @param result    {@code StringBuilder} initiated variable, which receives
-     *                  result of the clause
+     *                  result valueOf the clause
      * @return          {@code StringBuilder} updated variable with appended clause
      * @throws DaoException
      */

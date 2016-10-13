@@ -44,7 +44,7 @@ public final class UploadManager {
         }
     }
 
-    public static String uploadFileAndGetAbsolutePath(
+    public static String receiveFileAndGetAbsolutePath(
             String sessionId, String uploadType, Part filePart)
             throws UploadException {
         List<String> contentTypeList = contentTypeListMap.get(uploadType);

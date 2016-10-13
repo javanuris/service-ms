@@ -38,7 +38,7 @@ public class NumberCompare implements Comparator<Number> {
         try {
             return new BigDecimal(number.toString());
         } catch(final NumberFormatException e) {
-            throw new RuntimeException("The given number (\"" + number + "\" of class " + number.getClass().getName() + ") does not have a parsable string representation", e);
+            throw new RuntimeException("The given number (\"" + number + "\" valueOf class " + number.getClass().getName() + ") does not have a parsable string representation", e);
         }
     }
 

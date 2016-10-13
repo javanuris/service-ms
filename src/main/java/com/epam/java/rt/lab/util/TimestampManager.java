@@ -1,30 +1,30 @@
 package com.epam.java.rt.lab.util;
 
-import org.joda.time.DateTime;
 import org.joda.time.Days;
 import org.joda.time.LocalDateTime;
 import org.joda.time.Seconds;
 
 import java.sql.Timestamp;
-import java.text.Format;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
  * category-ms
  */
-public class TimestampCompare {
+public final class TimestampManager {
+
+    private TimestampManager() {
+    }
 
     public static Timestamp getCurrentTimestamp() {
         Date now = new Date();
         return new Timestamp(now.getTime());
     }
 
-    public static Timestamp jodaToTimestamp(LocalDateTime localDateTime) {
+    private static Timestamp jodaToTimestamp(LocalDateTime localDateTime) {
         return new Timestamp(localDateTime.toDateTime().getMillis());
     }
 
-    public static LocalDateTime timestampToJoda(Timestamp timestamp) {
+    private static LocalDateTime timestampToJoda(Timestamp timestamp) {
         return LocalDateTime.fromDateFields(timestamp);
     }
 
@@ -54,7 +54,7 @@ public class TimestampCompare {
         return Seconds.secondsBetween(localDateTime1, localDateTime2).getSeconds();
     }
 
-    public static Timestamp of(String stringTimestamp) {
+    public static Timestamp valueOf(String stringTimestamp) {
         try {
             return Timestamp.valueOf(stringTimestamp);
         } catch (ClassCastException e) {
@@ -64,7 +64,7 @@ public class TimestampCompare {
     }
 
     public static Date from(String stringTimestamp) {
-        return new Date(of(stringTimestamp).getTime());
+        return new Date(valueOf(stringTimestamp).getTime());
     }
 
 }

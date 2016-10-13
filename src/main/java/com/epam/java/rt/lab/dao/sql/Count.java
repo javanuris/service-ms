@@ -23,7 +23,7 @@ public class Count extends Sql {
 
     /**
      * Initiates new {@code Count} object with defined
-     * {@code List} of column names, which should be queried
+     * {@code List} valueOf column names, which should be queried
      * in sql statement
      *
      * @param columnList        {@code List} object, which contains columns that

@@ -91,7 +91,7 @@ public class AvatarDao extends JdbcDao {
             }
             return (List<T>) avatarList;
         } catch (SQLException e) {
-            throw new DaoException("exception.dao.jdbc.avatar.get-entity", e.getCause());
+            throw new DaoException("exception.dao.jdbc.avatar.valueOf-entity", e.getCause());
         }
     }
 

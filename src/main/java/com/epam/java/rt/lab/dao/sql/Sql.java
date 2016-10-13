@@ -15,7 +15,7 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * {@code Sql} class defines abstract base sql statement
  * contains static fabric methods to create needed types
- * of sql statements
+ * valueOf sql statements
  *
  * @see Properties
  * @see WildValue
@@ -35,7 +35,7 @@ public abstract class Sql {
     private static Properties sqlProperties = new Properties();
     /** {@code Lock} object used to implement thread safe initialization */
     private static Lock propertiesLock = new ReentrantLock();
-    /** {@code List} of {@code WildValue} objects */
+    /** {@code List} valueOf {@code WildValue} objects */
     private List<WildValue> wildValueList;
 
     /**
@@ -61,11 +61,11 @@ public abstract class Sql {
     }
 
     /**
-     * Returns {@code String} representation of
+     * Returns {@code String} representation valueOf
      * sql property value
      *
-     * @param key   {@code String} representation of property key
-     * @return      {@code String} representation of property value
+     * @param key   {@code String} representation valueOf property key
+     * @return      {@code String} representation valueOf property value
      */
     public static String getProperty(String key) {
         if (sqlProperties.size() == 0) init();
@@ -73,12 +73,12 @@ public abstract class Sql {
     }
 
     /**
-     * Returns {@code List} of {@code Column} objects from
-     * {@code Array} of {@code EntityProperty} objects
+     * Returns {@code List} valueOf {@code Column} objects from
+     * {@code Array} valueOf {@code EntityProperty} objects
      *
-     * @param entityPropertyArray       {@code Array} of {@code EntityProperty}
+     * @param entityPropertyArray       {@code Array} valueOf {@code EntityProperty}
      *                                  objects
-     * @return                          {@code List} of {@code Column} objects
+     * @return                          {@code List} valueOf {@code Column} objects
      * @throws DaoException
      *
      * @see Column
@@ -113,12 +113,12 @@ public abstract class Sql {
     }
 
     /**
-     * Returns {@code List} of {@code Column} objects from
-     * {@code Array} of {@code String} representation of
+     * Returns {@code List} valueOf {@code Column} objects from
+     * {@code Array} valueOf {@code String} representation valueOf
      * column's full names (including table name)
      *
-     * @param tableAndColumnArray   {@code Array} of {@code String} objects
-     * @return                      {@code List} of {@code Column} objects
+     * @param tableAndColumnArray   {@code Array} valueOf {@code String} objects
+     * @return                      {@code List} valueOf {@code Column} objects
      * @throws DaoException
      *
      * @see Column
@@ -149,9 +149,9 @@ public abstract class Sql {
 
     /**
      * Fabric method to create {@code Insert} object with defined
-     * {@code Class} of entity
+     * {@code Class} valueOf entity
      *
-     * @param propertyClass {@code Class} of entity
+     * @param propertyClass {@code Class} valueOf entity
      * @return              {@code Insert} object
      * @throws DaoException
      *
@@ -165,9 +165,9 @@ public abstract class Sql {
 
     /**
      * Fabric method to create {@code Select} object with defined
-     * {@code Array} of {@code EntityProperty} objects
+     * {@code Array} valueOf {@code EntityProperty} objects
      *
-     * @param entityPropertyArray   {@code Array} of {@code EntityProperty} objects
+     * @param entityPropertyArray   {@code Array} valueOf {@code EntityProperty} objects
      * @return                      {@code Select} object
      * @throws DaoException
      *
@@ -182,9 +182,9 @@ public abstract class Sql {
 
     /**
      * Fabric method to create {@code Select} object with defined
-     * {@code Class} of entity
+     * {@code Class} valueOf entity
      *
-     * @param entityClass           {@code Class} of entity
+     * @param entityClass           {@code Class} valueOf entity
      * @return                      {@code Select} object
      * @throws DaoException
      *
@@ -208,9 +208,9 @@ public abstract class Sql {
 
     /**
      * Fabric method to create {@code Update} object with defined
-     * {@code Class} of entity
+     * {@code Class} valueOf entity
      *
-     * @param entityClass           {@code Class} of entity
+     * @param entityClass           {@code Class} valueOf entity
      * @return                      {@code Update} object
      * @throws DaoException
      *
@@ -224,9 +224,9 @@ public abstract class Sql {
 
     /**
      * Fabric method to create {@code Delete} object with defined
-     * {@code Class} of entity
+     * {@code Class} valueOf entity
      *
-     * @param entityClass           {@code Class} of entity
+     * @param entityClass           {@code Class} valueOf entity
      * @return                      {@code Delete} object
      * @throws DaoException
      *
@@ -258,17 +258,17 @@ public abstract class Sql {
      * Abstract method which should be implemented in inherited classes.
      * Base method to return sql statement.
      *
-     * @return                  {@code String} representation of sql statement
+     * @return                  {@code String} representation valueOf sql statement
      * @throws DaoException
      */
     public abstract String create() throws DaoException;
 
     /**
-     * Returns {@code List} of {@code WildValue} objects to replace values
+     * Returns {@code List} valueOf {@code WildValue} objects to replace values
      * in sql statements by wildcards and fill this {@code List} to set
      * prepared statement
      *
-     * @return      {@code List} of {@code WildValue} objects
+     * @return      {@code List} valueOf {@code WildValue} objects
      *
      * @see WildValue
      */

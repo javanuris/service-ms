@@ -5,10 +5,9 @@ import com.epam.java.rt.lab.dao.DaoParameter;
 import com.epam.java.rt.lab.dao.sql.OrderBy;
 import com.epam.java.rt.lab.dao.sql.Update;
 import com.epam.java.rt.lab.dao.sql.Where;
-import com.epam.java.rt.lab.entity.business.Category;
 import com.epam.java.rt.lab.entity.business.Comment;
 import com.epam.java.rt.lab.entity.business.Photo;
-import com.epam.java.rt.lab.util.TimestampCompare;
+import com.epam.java.rt.lab.util.TimestampManager;
 import com.epam.java.rt.lab.util.validator.ValidatorException;
 import com.epam.java.rt.lab.util.validator.ValidatorFactory;
 import com.epam.java.rt.lab.web.component.Page;
@@ -48,7 +47,7 @@ public class CommentService extends BaseService {
                     );
             return dao(Comment.class.getSimpleName()).read(daoParameter);
         } catch (DaoException e) {
-            throw new ServiceException("exception.service.comment.get-comment-list.dao", e.getCause());
+            throw new ServiceException("exception.service.comment.valueOf-comment-list.dao", e.getCause());
         }
     }
 
@@ -72,7 +71,7 @@ public class CommentService extends BaseService {
                     );
             return dao(Comment.class.getSimpleName()).read(daoParameter);
         } catch (DaoException e) {
-            throw new ServiceException("exception.service.comment.get-comment-list.dao", e.getCause());
+            throw new ServiceException("exception.service.comment.valueOf-comment-list.dao", e.getCause());
         }
     }
 
@@ -121,7 +120,7 @@ public class CommentService extends BaseService {
             return photoList.get(0);
         } catch (DaoException e) {
             e.printStackTrace();
-            throw new ServiceException("exception.service.comment.get-photo.dao", e.getCause());
+            throw new ServiceException("exception.service.comment.valueOf-photo.dao", e.getCause());
         } catch (ValidatorException e) {
             e.printStackTrace();
             return null;
@@ -149,7 +148,7 @@ public class CommentService extends BaseService {
             photo.setName(photoName);
             photo.setType(contentType);
             photo.setFile((FileInputStream) inputStream);
-            photo.setModified(TimestampCompare.getCurrentTimestamp());
+            photo.setModified(TimestampManager.getCurrentTimestamp());
             return dao(Photo.class.getSimpleName()).create(new DaoParameter().setEntity(photo));
         } catch (IOException e) {
             e.printStackTrace();

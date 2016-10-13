@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * {@code Where} class defines where clause of sql statement
+ * {@code Where} class defines where clause valueOf sql statement
  */
 public class Where implements Clause {
 
@@ -62,19 +62,19 @@ public class Where implements Clause {
     }
 
     /**
-     * Links to base single {@code List} of {@code WildValue} objects
+     * Links to base single {@code List} valueOf {@code WildValue} objects
      *
-     * @param wildValueList     {@code List} of {@code WildValue} objects
+     * @param wildValueList     {@code List} valueOf {@code WildValue} objects
      */
     void linkWildValue(List<WildValue> wildValueList) {
         if (this.predicate != null) linkWildValue(wildValueList, this.predicate);
     }
 
     /**
-     * Recursive method which links to base single {@code List} of
+     * Recursive method which links to base single {@code List} valueOf
      * {@code WildValue} objects from {@code Predicate} object
      *
-     * @param wildValueList     {@code List} of {@code WildValue} objects
+     * @param wildValueList     {@code List} valueOf {@code WildValue} objects
      * @param predicate         {@code Predicate} object
      */
     private void linkWildValue(List<WildValue> wildValueList, Predicate predicate) {

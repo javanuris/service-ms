@@ -17,20 +17,20 @@ public class Update extends Sql {
 
     private static final String UPDATE = "UPDATE ";
 
-    /** {@code Class} of entity */
+    /** {@code Class} valueOf entity */
     private Class entityClass;
-    /** {@code String} representation of table name */
+    /** {@code String} representation valueOf table name */
     private String table;
-    /** {@code Set} object of set clause */
+    /** {@code Set} object valueOf set clause */
     private Set set;
-    /** {@code Where} object of where clause */
+    /** {@code Where} object valueOf where clause */
     private Where where;
 
     /**
      * Initiates new {@code Update} object with defined
-     * {@code Class} of entity
+     * {@code Class} valueOf entity
      *
-     * @param entityClass       {@code Class} of entity
+     * @param entityClass       {@code Class} valueOf entity
      * @throws DaoException
      */
     Update(Class entityClass) throws DaoException {
@@ -44,7 +44,7 @@ public class Update extends Sql {
      * Returns {@code Update} object, on which this method called
      * with setting its set clause
      *
-     * @param setValueArray     {@code Array} of {@code SetValue} objects
+     * @param setValueArray     {@code Array} valueOf {@code SetValue} objects
      * @return                  {@code Update} object
      * @throws DaoException
      *
@@ -92,7 +92,7 @@ public class Update extends Sql {
     }
 
     /**
-     * {@code Set} class defines set clause of sql statement
+     * {@code Set} class defines set clause valueOf sql statement
      *
      * @see SetValue
      * @see WildValue
@@ -101,14 +101,14 @@ public class Update extends Sql {
 
         private static final String SET = " SET ";
 
-        /** {@code Array} of {@code SetValue} objects */
+        /** {@code Array} valueOf {@code SetValue} objects */
         private SetValue[] setValueArray;
 
         /**
          * Initiates new {@code Set} object from
-         * {@code Array} of {@code SetValue} objects
+         * {@code Array} valueOf {@code SetValue} objects
          *
-         * @param setValueArray     {@code Array} of {@code SetValue} objects
+         * @param setValueArray     {@code Array} valueOf {@code SetValue} objects
          *
          * @see SetValue
          */
@@ -117,10 +117,10 @@ public class Update extends Sql {
         }
 
         /**
-         * Links {@code List} of {@code WildValue} objects to get single
+         * Links {@code List} valueOf {@code WildValue} objects to valueOf single
          * {@code List} which will be set on prepared statement
          *
-         * @param wildValueList     {@code List} of {@code WildValue} objects
+         * @param wildValueList     {@code List} valueOf {@code WildValue} objects
          *
          * @see WildValue
          */
@@ -145,7 +145,7 @@ public class Update extends Sql {
     }
 
     /**
-     * {@code SetValue} class defines set value in set clause of sql statement
+     * {@code SetValue} class defines set value in set clause valueOf sql statement
      */
     public static class SetValue implements Clause {
 

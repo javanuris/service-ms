@@ -33,7 +33,7 @@ public class CategoryService extends BaseService {
                     )
             );
         } catch (DaoException e) {
-            throw new ServiceException("exception.service.category.get-category-list.dao", e.getCause());
+            throw new ServiceException("exception.service.category.valueOf-category-list.dao", e.getCause());
         }
     }
 
@@ -46,7 +46,7 @@ public class CategoryService extends BaseService {
                     ))
             );
         } catch (DaoException e) {
-            throw new ServiceException("exception.service.category.get-category-list.dao", e.getCause());
+            throw new ServiceException("exception.service.category.valueOf-category-list.dao", e.getCause());
         }
     }
 
@@ -61,7 +61,7 @@ public class CategoryService extends BaseService {
             );
             return categoryList != null && categoryList.size() > 0 ? categoryList.get(0) : null;
         } catch (DaoException e) {
-            throw new ServiceException("exception.service.category.get-category.dao", e.getCause());
+            throw new ServiceException("exception.service.category.valueOf-category.dao", e.getCause());
         }
     }
 

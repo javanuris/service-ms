@@ -26,7 +26,7 @@ public class ReflectValue extends SimpleTagSupport {
     private Object invokeItemMethod(Object itemObject, String itemMethod)
             throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         Method method = itemObject.getClass()
-                .getMethod("get".concat(itemMethod.substring(0, 1).toUpperCase()).concat(itemMethod.substring(1)));
+                .getMethod("valueOf".concat(itemMethod.substring(0, 1).toUpperCase()).concat(itemMethod.substring(1)));
         return method.invoke(itemObject);
     }
 

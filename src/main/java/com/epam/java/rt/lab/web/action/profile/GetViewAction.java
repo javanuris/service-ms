@@ -40,7 +40,7 @@ public class GetViewAction implements Action {
             req.getRequestDispatcher("/WEB-INF/jsp/profile/view.jsp").forward(req, resp);
         } catch (ViewException e) {
             e.printStackTrace();
-            throw new ActionException("exception.action.view.view-factory.get-instance", e.getCause());
+            throw new ActionException("exception.action.view.view-factory.valueOf-instance", e.getCause());
         } catch (ServletException | IOException e) {
             e.printStackTrace();
             throw new ActionException("exception.action.view.request", e.getCause());

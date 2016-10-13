@@ -22,8 +22,8 @@ public class Column implements Clause {
      * Initiates new {@code Column} object with defined
      * table and column name
      *
-     * @param tableName     {@code String} representation of table name
-     * @param columnName    {@code String} representation of column name
+     * @param tableName     {@code String} representation valueOf table name
+     * @param columnName    {@code String} representation valueOf column name
      */
     Column(String tableName, String columnName) {
         this.tableName = tableName;
@@ -35,7 +35,7 @@ public class Column implements Clause {
      * which contains full table name and column name divided
      * by point sign
      *
-     * @param tableAndColumnName    {@code String} representation of
+     * @param tableAndColumnName    {@code String} representation valueOf
      *                              table name and column name divided by point
      *                              sign
      * @return                      {@code Column} object
@@ -52,7 +52,7 @@ public class Column implements Clause {
     /**
      * Returns defined at initiation table name
      *
-     * @return                      {@code String} representation of table name
+     * @return                      {@code String} representation valueOf table name
      */
     public String getTableName() {
         return this.tableName;
@@ -61,7 +61,7 @@ public class Column implements Clause {
     /**
      * Returns defined at initiation column name
      *
-     * @return                      {@code String} representation of column name
+     * @return                      {@code String} representation valueOf column name
      */
     public String getColumnName() {
         return this.columnName;

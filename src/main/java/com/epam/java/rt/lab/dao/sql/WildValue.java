@@ -12,7 +12,7 @@ public class WildValue<T> {
 
     private static final String WILDCARD = "?";
 
-    /** {@code List} of {@code WildValue} objects */
+    /** {@code List} valueOf {@code WildValue} objects */
     private List<WildValue> wildValueList;
     /** Generic value */
     private T val;
@@ -28,16 +28,16 @@ public class WildValue<T> {
     }
 
     /**
-     * Links this object to base single {@code List} of {@code WildValue} objects
+     * Links this object to base single {@code List} valueOf {@code WildValue} objects
      *
-     * @param wildValueList     {@code List} of {@code WildValue} objects
+     * @param wildValueList     {@code List} valueOf {@code WildValue} objects
      */
     public void link(List<WildValue> wildValueList) {
         this.wildValueList = wildValueList;
     }
 
     /**
-     * Returns generic value of this object
+     * Returns generic value valueOf this object
      *
      * @return      generic value
      */
@@ -47,7 +47,7 @@ public class WildValue<T> {
 
     /**
      * Returns wildcard instead value and adds to base single {@code List}
-     * of {@code WildValue} objects replaced value
+     * valueOf {@code WildValue} objects replaced value
      *
      * @return                  {@code String} wildcard
      * @throws DaoException
