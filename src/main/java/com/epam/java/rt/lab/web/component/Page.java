@@ -20,12 +20,10 @@ public class Page {
         this.itemsOnPage = (itemsOnPage != null && itemsOnPage > 0) ? itemsOnPage : ITEMS_ON_PAGE;
     }
 
-    public Page(HttpServletRequest req) {
+    public Page(String currentPage, String itemsOnPage) {
         try {
-            String currentPage = req.getParameter("page");
             this.currentPage = ValidatorFactory.create("digits").validate(currentPage) != null ?
                     1L : Long.valueOf(currentPage) > 0 ? Long.valueOf(currentPage) : 1L;
-            String itemsOnPage = req.getParameter("items");
             this.itemsOnPage = ValidatorFactory.create("digits").validate(itemsOnPage) != null ?
                     ITEMS_ON_PAGE : Long.valueOf(itemsOnPage) > 0 ? Long.valueOf(itemsOnPage) : ITEMS_ON_PAGE;
         } catch (ValidatorException e) {

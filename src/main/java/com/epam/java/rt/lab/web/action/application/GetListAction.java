@@ -27,7 +27,7 @@ public class GetListAction implements Action {
     @Override
     public void execute(HttpServletRequest req, HttpServletResponse resp) throws ActionException {
         try (ApplicationService applicationService = new ApplicationService()) {
-            Page page = new Page(req);
+            Page page = new Page(req.getParameter("page"), req.getParameter("items"));
             Table table = new Table();
             User user = (User) req.getSession().getAttribute("user");
             if (!"authorized".equals(user.getRole().getName())) user = null;

@@ -27,7 +27,7 @@ public class GetListAction implements Action {
     @Override
     public void execute(HttpServletRequest req, HttpServletResponse resp) throws ActionException {
         try (CategoryService categoryService = new CategoryService()) {
-            Page page = new Page(req);
+            Page page = new Page(req.getParameter("page"), req.getParameter("items"));
             Table table = new Table();
             table.setEntityList(categoryService.getCategoryList(page));
             table.setHrefPrefix(UrlManager.getContextUri(req, "/category/view",
