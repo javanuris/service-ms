@@ -6,9 +6,8 @@ import com.epam.java.rt.lab.dao.sql.Update;
 import com.epam.java.rt.lab.dao.sql.Where;
 import com.epam.java.rt.lab.entity.rbac.Activate;
 import com.epam.java.rt.lab.entity.rbac.Login;
-import com.epam.java.rt.lab.entity.rbac.Remember;
 import com.epam.java.rt.lab.entity.rbac.Restore;
-import com.epam.java.rt.lab.util.GlobalProperties;
+import com.epam.java.rt.lab.util.PropertyManager;
 import com.epam.java.rt.lab.util.TimestampCompare;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -249,7 +248,7 @@ public class LoginService extends BaseService {
             login.setEmail(activate.getEmail());
             login.setSalt(activate.getSalt());
             login.setPassword(activate.getPassword());
-            login.setAttemptLeft(Integer.valueOf(GlobalProperties.getProperty("login.attempt.max")));
+            login.setAttemptLeft(Integer.valueOf(PropertyManager.getProperty("login.attempt.max")));
             login.setStatus(0);
             return login;
         } catch (ServiceException | DaoException e) {

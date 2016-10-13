@@ -1,6 +1,5 @@
 package com.epam.java.rt.lab.web.action.profile;
 
-import com.epam.java.rt.lab.entity.rbac.Activate;
 import com.epam.java.rt.lab.entity.rbac.Login;
 import com.epam.java.rt.lab.entity.rbac.Restore;
 import com.epam.java.rt.lab.entity.rbac.User;
@@ -102,7 +101,7 @@ public class PostLoginAction implements Action {
                 loginService.updateAttemptLeft(login);
             } else {
                 logger.debug("LOGIN PASSWORD EQUAL");
-                login.setAttemptLeft(Integer.valueOf(GlobalProperties.getProperty("login.attempt.max")));
+                login.setAttemptLeft(Integer.valueOf(PropertyManager.getProperty("login.attempt.max")));
                 loginService.updateAttemptLeft(login);
                 UserService userService = new UserService();
                 User user = userService.getUser(login);
@@ -146,7 +145,7 @@ public class PostLoginAction implements Action {
                 restore.setCookieValue(HashGenerator.hashString(restore.getCode()));
                 restore.setValid(TimestampCompare.secondsToTimestamp(
                         TimestampCompare.getCurrentTimestamp(),
-                        Integer.valueOf(GlobalProperties.getProperty("restore.seconds.valid"))
+                        Integer.valueOf(PropertyManager.getProperty("restore.seconds.valid"))
                 ));
                 if (loginService.addRestore(restore) == 0) {
                     logger.debug("STORING RESTORE CODE FAILED");

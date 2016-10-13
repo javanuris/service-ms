@@ -3,7 +3,7 @@ package com.epam.java.rt.lab.web.action.profile;
 import com.epam.java.rt.lab.entity.rbac.Login;
 import com.epam.java.rt.lab.service.LoginService;
 import com.epam.java.rt.lab.service.ServiceException;
-import com.epam.java.rt.lab.util.GlobalProperties;
+import com.epam.java.rt.lab.util.PropertyManager;
 import com.epam.java.rt.lab.util.HashGenerator;
 import com.epam.java.rt.lab.util.UrlManager;
 import com.epam.java.rt.lab.util.validator.FormValidator;
@@ -43,7 +43,7 @@ public class PostRestorePasswordAction implements Action {
                     } else {
                         login.setSalt(UUID.randomUUID().toString());
                         login.setPassword(HashGenerator.hashPassword(login.getSalt(), form.getItem(0).getValue()));
-                        login.setAttemptLeft(Integer.valueOf(GlobalProperties.getProperty("login.attempt.max")));
+                        login.setAttemptLeft(Integer.valueOf(PropertyManager.getProperty("login.attempt.max")));
                         loginService.updateLogin(login);
                         resp.sendRedirect(UrlManager.getContextUri(req, "/profile/login"));
                         return;

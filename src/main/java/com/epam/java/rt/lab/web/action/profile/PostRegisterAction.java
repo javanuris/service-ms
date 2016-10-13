@@ -4,7 +4,7 @@ import com.epam.java.rt.lab.entity.rbac.Activate;
 import com.epam.java.rt.lab.entity.rbac.Login;
 import com.epam.java.rt.lab.service.LoginService;
 import com.epam.java.rt.lab.service.ServiceException;
-import com.epam.java.rt.lab.util.GlobalProperties;
+import com.epam.java.rt.lab.util.PropertyManager;
 import com.epam.java.rt.lab.util.HashGenerator;
 import com.epam.java.rt.lab.util.TimestampCompare;
 import com.epam.java.rt.lab.util.UrlManager;
@@ -53,7 +53,7 @@ public class PostRegisterAction implements Action {
                         activate.setCode(UUID.randomUUID().toString());
                         activate.setValid(TimestampCompare.daysToTimestamp(
                                 TimestampCompare.getCurrentTimestamp(),
-                                Integer.valueOf(GlobalProperties.getProperty("activation.days.valid"))));
+                                Integer.valueOf(PropertyManager.getProperty("activation.days.valid"))));
                         if (loginService.addActivate(activate) == 0) {
                             logger.debug("STORING ACTIVATE CODE FAILED");
                             // TODO: need some reaction

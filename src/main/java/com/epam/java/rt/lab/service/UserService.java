@@ -183,7 +183,7 @@ public class UserService extends BaseService {
             remember.setCookieValue(HashGenerator.hashString(UUID.randomUUID().toString()));
             remember.setValid(TimestampCompare.daysToTimestamp(
                     TimestampCompare.getCurrentTimestamp(),
-                    Integer.valueOf(GlobalProperties.getProperty("remember.days.valid"))
+                    Integer.valueOf(PropertyManager.getProperty("remember.days.valid"))
             ));
             dao(Remember.class.getSimpleName()).create(new DaoParameter().setEntity(remember));
             CookieManager.setCookie(

@@ -14,24 +14,29 @@ import java.io.IOException;
 /**
  * category-ms
  */
-@MultipartConfig(maxFileSize = 10485760)
+@MultipartConfig(maxFileSize = 3145728)
 @WebServlet(urlPatterns = "/file/upload/*")
 public class UploadServlet extends HttpServlet {
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException {
-        if (req.getSession().getAttribute("user") != null) {
-            if (req.getMethod().equals("POST")) {
-                try {
-                    String absolutePath = UploadManager.
-                            uploadFileAndGetAbsolutePath(req.getSession().getId(),
-                                    req.getPathInfo().substring(1), req.getPart("file"));
-                    if (absolutePath != null) resp.getWriter().print(absolutePath);
-                } catch (UploadException e) {
-                    throw new ServletException("exception.web.servlet.upload.upload-file", e.getCause());
-                } catch (ServletException | IOException e) {
-                    throw new ServletException("exception.web.servlet.upload.get-part", e.getCause());
+        String contentLengthHeaderValue = req.getHeader("Content-Length");
+        if (contentLengthHeaderValue != null) {
+            Long contentLength = Long.valueOf(contentLengthHeaderValue);
+            try {
+                if (contentLength > 3145728) resp.sendError(500, "");
+                if (req.getSession().getAttribute("user") != null) {
+                    if (req.getMethod().equals("POST")) {
+                        String absolutePath = UploadManager.
+                                uploadFileAndGetAbsolutePath(req.getSession().getId(),
+                                        req.getPathInfo().substring(1), req.getPart("file"));
+                        if (absolutePath != null) resp.getWriter().print(absolutePath);
+                    }
                 }
+            } catch (UploadException e) {
+                throw new ServletException("exception.web.servlet.upload.upload-file", e.getCause());
+            } catch (ServletException | IOException e) {
+                throw new ServletException("exception.web.servlet.upload.get-part", e.getCause());
             }
         }
     }

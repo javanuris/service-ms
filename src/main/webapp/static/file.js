@@ -3,6 +3,7 @@ function uploadToServer(upload) {
     var $imageId = '#' + $uploadId + '-image';
     var $labelId = '#' + $uploadId + '-label';
     var $hiddenId = '#' + $uploadId + '-hidden';
+    var $srcDefault = $($hiddenId).val().split("?")[0] + "?";
     var $file = upload.files[0];
     $($labelId).text($file.name + ' - ' + $('#ui-local-uploading-file').text());
     var $formData = new FormData();
@@ -22,8 +23,13 @@ function uploadToServer(upload) {
         } else {
             $($labelId).text($('#ui-local-upload-error').text());
             $($hiddenId).val('');
-            $($imageId).attr("src", '');
+            $($imageId).attr("src", $srcDefault);
         }
+    };
+    $xhr.onerror = function() {
+        $($labelId).text($('#ui-local-upload-error').text());
+        $($hiddenId).val('');
+        $($imageId).attr("src", $srcDefault);
     };
     $xhr.send($formData);
 };
