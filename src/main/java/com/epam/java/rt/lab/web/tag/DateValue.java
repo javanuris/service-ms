@@ -29,11 +29,13 @@ public class DateValue extends SimpleTagSupport {
 
     @Override
     public void doTag() throws JspException, IOException {
-        DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.MEDIUM, locale);
-        Date dateValue = TimestampManager.from(stringValue);
+        DateFormat dateFormat = DateFormat.
+                getDateInstance(DateFormat.MEDIUM, locale);
+        Date dateValue = TimestampManager.getDate(stringValue);
         DateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
         JspWriter out = getJspContext().getOut();
-        out.print("<small>".concat(dateFormat.format(dateValue)).concat("</small> ").concat(timeFormat.format(dateValue)));
+        out.print("<small>" + dateFormat.format(dateValue)
+                  + "</small> " + timeFormat.format(dateValue));
     }
 
 }

@@ -36,7 +36,7 @@ public class UploadServlet extends HttpServlet {
             } catch (UploadException e) {
                 throw new ServletException("exception.web.servlet.upload.upload-file", e.getCause());
             } catch (ServletException | IOException e) {
-                throw new ServletException("exception.web.servlet.upload.valueOf-part", e.getCause());
+                throw new ServletException("exception.web.servlet.upload.get-part", e.getCause());
             }
         }
     }

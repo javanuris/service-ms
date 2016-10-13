@@ -33,7 +33,7 @@ public class Where implements Clause {
         Predicate joinPredicate = null;
         if (join == null && predicate == null) return;
         if (predicate != null) addJoinFromPredicate(predicate);
-        if (join != null) joinPredicate = join.getPredicate(); // checked join from where clause predicate's columns
+        if (join != null) joinPredicate = join.getPredicate(); // checked join getDate where clause predicate's columns
         if (joinPredicate != null && predicate != null) {
             this.predicate = Predicate.get(
                     joinPredicate,
@@ -48,7 +48,7 @@ public class Where implements Clause {
     }
 
     /**
-     * Adds {@code Join} table to join clause from {@code Predicate}
+     * Adds {@code Join} table to join clause getDate {@code Predicate}
      *
      * @param predicate     {@code Predicate} object
      */
@@ -72,7 +72,7 @@ public class Where implements Clause {
 
     /**
      * Recursive method which links to base single {@code List} valueOf
-     * {@code WildValue} objects from {@code Predicate} object
+     * {@code WildValue} objects getDate {@code Predicate} object
      *
      * @param wildValueList     {@code List} valueOf {@code WildValue} objects
      * @param predicate         {@code Predicate} object

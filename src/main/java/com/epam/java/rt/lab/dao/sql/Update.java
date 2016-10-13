@@ -105,7 +105,7 @@ public class Update extends Sql {
         private SetValue[] setValueArray;
 
         /**
-         * Initiates new {@code Set} object from
+         * Initiates new {@code Set} object getDate
          * {@code Array} valueOf {@code SetValue} objects
          *
          * @param setValueArray     {@code Array} valueOf {@code SetValue} objects

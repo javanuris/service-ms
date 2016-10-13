@@ -60,7 +60,7 @@ public class ApplicationService extends BaseService {
             }
             return dao(Application.class.getSimpleName()).read(daoParameter);
         } catch (DaoException e) {
-            throw new ServiceException("exception.service.application.valueOf-application-list.dao", e.getCause());
+            throw new ServiceException("exception.service.application.get-application-list.dao", e.getCause());
         }
     }
 
@@ -75,7 +75,7 @@ public class ApplicationService extends BaseService {
             );
             return applicationList != null && applicationList.size() > 0 ? applicationList.get(0) : null;
         } catch (DaoException e) {
-            throw new ServiceException("exception.service.application.valueOf-application.dao", e.getCause());
+            throw new ServiceException("exception.service.application.get-application.dao", e.getCause());
         }
     }
 
@@ -83,7 +83,6 @@ public class ApplicationService extends BaseService {
         try {
             return dao(Application.class.getSimpleName()).create(new DaoParameter().setEntity(application));
         } catch (DaoException e) {
-            e.printStackTrace();
             throw new ServiceException("exception.service.application.add-application.dao", e.getCause());
         }
     }

@@ -47,7 +47,7 @@ public class CommentService extends BaseService {
                     );
             return dao(Comment.class.getSimpleName()).read(daoParameter);
         } catch (DaoException e) {
-            throw new ServiceException("exception.service.comment.valueOf-comment-list.dao", e.getCause());
+            throw new ServiceException("exception.service.comment.get-comment-list.dao", e.getCause());
         }
     }
 
@@ -71,7 +71,7 @@ public class CommentService extends BaseService {
                     );
             return dao(Comment.class.getSimpleName()).read(daoParameter);
         } catch (DaoException e) {
-            throw new ServiceException("exception.service.comment.valueOf-comment-list.dao", e.getCause());
+            throw new ServiceException("exception.service.comment.get-comment-list.dao", e.getCause());
         }
     }
 
@@ -92,7 +92,6 @@ public class CommentService extends BaseService {
                     ))
             );
         } catch (DaoException e) {
-            e.printStackTrace();
             throw new ServiceException("exception.service.comment.update-comment.dao", e.getCause());
         }
     }
@@ -101,7 +100,6 @@ public class CommentService extends BaseService {
         try {
             return dao(Comment.class.getSimpleName()).create(new DaoParameter().setEntity(comment));
         } catch (DaoException e) {
-            e.printStackTrace();
             throw new ServiceException("exception.service.comment.add-comment.dao", e.getCause());
         }
     }
@@ -119,10 +117,8 @@ public class CommentService extends BaseService {
             if (photoList == null || photoList.size() == 0) return null;
             return photoList.get(0);
         } catch (DaoException e) {
-            e.printStackTrace();
-            throw new ServiceException("exception.service.comment.valueOf-photo.dao", e.getCause());
+            throw new ServiceException("exception.service.comment.get-photo.dao", e.getCause());
         } catch (ValidatorException e) {
-            e.printStackTrace();
             return null;
         }
     }
@@ -147,14 +143,12 @@ public class CommentService extends BaseService {
             Photo photo = new Photo();
             photo.setName(photoName);
             photo.setType(contentType);
-            photo.setFile((FileInputStream) inputStream);
+            photo.setFile(inputStream);
             photo.setModified(TimestampManager.getCurrentTimestamp());
             return dao(Photo.class.getSimpleName()).create(new DaoParameter().setEntity(photo));
         } catch (IOException e) {
-            e.printStackTrace();
             throw new ServiceException("exception.service.comment.add-photo.file", e.getCause());
         } catch (DaoException e) {
-            e.printStackTrace();
             throw new ServiceException("exception.service.comment.add-photo.dao", e.getCause());
         }
     }

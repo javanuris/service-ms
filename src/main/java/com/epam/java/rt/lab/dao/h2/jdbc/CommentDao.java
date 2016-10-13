@@ -89,7 +89,7 @@ public class CommentDao extends JdbcDao {
             return (List<T>) commentList;
         } catch (SQLException e) {
             e.printStackTrace();
-            throw new DaoException("exception.dao.jdbc.comment.valueOf-entity", e.getCause());
+            throw new DaoException("exception.dao.jdbc.comment.get-entity", e.getCause());
         }
     }
 

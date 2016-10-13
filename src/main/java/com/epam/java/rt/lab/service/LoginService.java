@@ -38,8 +38,7 @@ public class LoginService extends BaseService {
             );
             return loginList != null && loginList.size() > 0 ? loginList.get(0) : null;
         } catch (DaoException e) {
-            e.printStackTrace();
-            throw new ServiceException("exception.service.login.valueOf-login.dao", e.getCause());
+            throw new ServiceException("exception.service.login.get-login.dao", e.getCause());
         }
     }
 
@@ -61,7 +60,6 @@ public class LoginService extends BaseService {
                     ))
             );
         } catch (DaoException e) {
-            e.printStackTrace();
             throw new ServiceException("exception.service.login.update-attempt-left.dao", e.getCause());
         }
     }
@@ -89,7 +87,6 @@ public class LoginService extends BaseService {
                     ))
             );
         } catch (DaoException e) {
-            e.printStackTrace();
             throw new ServiceException("exception.service.login.update-login.dao", e.getCause());
         }
     }
@@ -105,7 +102,6 @@ public class LoginService extends BaseService {
         try {
             return dao(Login.class.getSimpleName()).create(new DaoParameter().setEntity(login));
         } catch (DaoException e) {
-            e.printStackTrace();
             throw new ServiceException("exception.service.login.add-login.dao", e.getCause());
         }
     }
@@ -123,7 +119,6 @@ public class LoginService extends BaseService {
                     .setEntity(restore)
             );
         } catch (DaoException e) {
-            e.printStackTrace();
             throw new ServiceException("exception.service.login.add-restore.dao", e.getCause());
         }
     }
@@ -149,7 +144,6 @@ public class LoginService extends BaseService {
             }
             return result;
         } catch (DaoException e) {
-            e.printStackTrace();
             throw new ServiceException("exception.service.login.remove-restore-list.dao", e.getCause());
         }
     }
@@ -187,8 +181,7 @@ public class LoginService extends BaseService {
             removeRestoreList(restoreList);
             return null;
         } catch (DaoException e) {
-            e.printStackTrace();
-            throw new ServiceException("exception.service.login.valueOf-restore-login.dao", e.getCause());
+            throw new ServiceException("exception.service.login.get-restore-login.dao", e.getCause());
         }
     }
 
@@ -205,7 +198,6 @@ public class LoginService extends BaseService {
             if (activateList != null) removeActivateList(activateList);
             return dao(Activate.class.getSimpleName()).create(new DaoParameter().setEntity(activate));
         } catch (DaoException e) {
-            e.printStackTrace();
             throw new ServiceException("exception.service.login.add-activate.dao", e.getCause());
         }
     }
@@ -225,7 +217,6 @@ public class LoginService extends BaseService {
             }
             return result;
         } catch (DaoException e) {
-            e.printStackTrace();
             throw new ServiceException("exception.service.login.remove-activate-list.dao", e.getCause());
         }
     }
@@ -252,8 +243,7 @@ public class LoginService extends BaseService {
             login.setStatus(0);
             return login;
         } catch (ServiceException | DaoException e) {
-            e.printStackTrace();
-            throw new ServiceException("exception.service.login.valueOf-actvate-login.dao", e.getCause());
+            throw new ServiceException("exception.service.login.get-actvate-login.dao", e.getCause());
         }
     }
 
@@ -268,83 +258,8 @@ public class LoginService extends BaseService {
                     ))
             );
         } catch (DaoException e) {
-            e.printStackTrace();
             throw new ServiceException("exception.service.login.remove-activate.dao", e.getCause());
         }
     }
 
-
-//    public Login confirmActivationCode(String activationEmail, String activationCode) throws DaoException {
-//        if (activationEmail == null || activationCode == null) return null;
-//        Login login = new Login();
-//        login.setEmail(activationEmail);
-//        Map<String, Object> activationMap = getRelEntity(login, "Activation");
-//        removeRelEntity(login, "Activation");
-//        if (activationMap == null || !activationCode.equals(activationMap.valueOf("code")) ||
-//                TimestampCompare.secondsBetweenTimestamps(TimestampCompare.getCurrentTimestamp(),
-//                (Timestamp) activationMap.valueOf("valid")) <= 0) return null;
-//        login.setPassword((String) activationMap.valueOf("password.regex"));
-//        login.setAttemptLeft(Integer.valueOf(GlobalProperties.getProperty("login.attempt.max")));
-//        login.setStatus(0);
-//        return login;
-//    }
-//
-
-//    public int addLogin(Login login) throws DaoException {
-//        Dao_ dao = daoFactory.createDao("Login");
-//        return dao.create(login);
-//    }
-//
-//    public int updatePassword(Login login)
-//            throws DaoException, SQLException, ConnectionException {
-//        logger.debug("updateLogin");
-//        Dao_ dao = daoFactory.createDao("Login");
-//        return dao.update(login, "id", "password.regex");
-//    }
-//
-//
-//    public boolean isLoginExists(String email) throws DaoException {
-//        Login login = new Login();
-//        login.setEmail(email);
-//        Dao_ dao = daoFactory.createDao("Login");
-//        if (dao.getFirst(login, "email.regex", null) != null) return true;
-//        Map<String, Object> activationMap = (Map<String, Object>) dao.getRelEntity(login, "Activation");
-//        return activationMap != null;
-//    }
-//
-//    private <T> Map<String, Object> getRelEntity(T entity, String relEntityName) throws DaoException {
-//        Dao_ dao = daoFactory.createDao("Login");
-//        Map<String, Object> relEntityMap = (Map<String, Object>) dao.getRelEntity(entity, relEntityName);
-//        return relEntityMap;
-//    }
-//
-//    private <T> void setRelEntity(T entity, String relEntityName, Object relEntity) throws DaoException {
-//        if (relEntity != null) {
-//            Dao_ dao = daoFactory.createDao("Login");
-//            dao.setRelEntity(entity, relEntityName, relEntity);
-//        }
-//    }
-//
-//    private <T> void removeRelEntity(T entity, String relEntityName) throws DaoException {
-//        Dao_ dao = daoFactory.createDao("Login");
-//        dao.removeRelEntity(entity, relEntityName);
-//    }
-//
-//    public String createActivationCode(String email, String password) throws DaoException {
-//        try {
-//            String activationCode = HashGenerator.hashString(email.concat(password));
-//            Login login = new Login();
-//            login.setEmail(email);
-//            login.setPassword(password);
-//            setRelEntity(login, "Activation", activationCode);
-//            return activationCode;
-//        } catch (DaoException e) {
-//            e.printStackTrace();
-//            throw e;
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        return null;
-//    }
-//
 }

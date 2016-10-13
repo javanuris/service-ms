@@ -87,7 +87,7 @@ public class RestoreDao extends JdbcDao {
             }
             return (List<T>) restoreList;
         } catch (SQLException e) {
-            throw new DaoException("exception.dao.jdbc.restore.valueOf-entity", e.getCause());
+            throw new DaoException("exception.dao.jdbc.restore.get-entity", e.getCause());
         }
     }
 

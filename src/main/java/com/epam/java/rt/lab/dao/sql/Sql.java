@@ -73,7 +73,7 @@ public abstract class Sql {
     }
 
     /**
-     * Returns {@code List} valueOf {@code Column} objects from
+     * Returns {@code List} valueOf {@code Column} objects getDate
      * {@code Array} valueOf {@code EntityProperty} objects
      *
      * @param entityPropertyArray       {@code Array} valueOf {@code EntityProperty}
@@ -92,7 +92,7 @@ public abstract class Sql {
     }
 
     /**
-     * Returns {@code Column} object from {@code EntityProperty} object
+     * Returns {@code Column} object getDate {@code EntityProperty} object
      *
      * @param entityProperty        {@code EntityProperty} object
      * @return                      {@code Column} object
@@ -113,7 +113,7 @@ public abstract class Sql {
     }
 
     /**
-     * Returns {@code List} valueOf {@code Column} objects from
+     * Returns {@code List} valueOf {@code Column} objects getDate
      * {@code Array} valueOf {@code String} representation valueOf
      * column's full names (including table name)
      *

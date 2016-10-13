@@ -14,7 +14,7 @@ public class Count extends Sql {
 
     private static final String SELECT_COUNT = "SELECT COUNT(*) as count ";
 
-    /** {@code From} object, which defines from clause */
+    /** {@code From} object, which defines getDate clause */
     private Select.From from;
     /** {@code Join} object, which defines join clause */
     private Select.Join join;

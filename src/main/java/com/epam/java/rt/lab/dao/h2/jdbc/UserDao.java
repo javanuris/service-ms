@@ -96,7 +96,7 @@ public class UserDao extends JdbcDao {
             }
             return (List<T>) userList;
         } catch (SQLException e) {
-            throw new DaoException("exception.dao.jdbc.user.valueOf-entity", e.getCause());
+            throw new DaoException("exception.dao.jdbc.user.get-entity", e.getCause());
         } catch (RoleException e) {
             e.printStackTrace();
             throw new DaoException("exception.dao.jdbc.user.role-factory", e.getCause());

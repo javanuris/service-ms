@@ -112,7 +112,7 @@ public class Insert extends Sql {
 
         /**
          * Initiates new {@code InsertValue} object with defined
-         * {@code EntityProperty} object and generic value, from which
+         * {@code EntityProperty} object and generic value, getDate which
          * created new {@code WildValue} object
          *
          * @param entityProperty    {@code EntityProperty} object

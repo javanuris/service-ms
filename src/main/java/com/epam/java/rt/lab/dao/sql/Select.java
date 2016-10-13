@@ -132,7 +132,7 @@ public class Select extends Sql implements Iterable<Column> {
     }
 
     /**
-     * {@code From} class defines from clause valueOf sql statement
+     * {@code From} class defines getDate clause valueOf sql statement
      *
      * @see Column
      */
@@ -231,7 +231,7 @@ public class Select extends Sql implements Iterable<Column> {
 
         /**
          * Fills {@code List} valueOf {@code Predicate} objects for where clause
-         * from table name, which should be selected or joined.
+         * getDate table name, which should be selected or joined.
          *
          * @param predicateList     {@code List} valueOf {@code Predicate} objects
          * @param tableName         {@code String} representation valueOf table name

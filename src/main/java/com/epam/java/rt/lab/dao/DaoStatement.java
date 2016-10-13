@@ -79,11 +79,11 @@ public class DaoStatement implements AutoCloseable {
             } else {
                 Method method = DaoStatement.statementMethodMap.get(setValue.getClass());
                 if (method == null)
-                    throw new DaoException("exception.dao.jdbc.dao-statement.set-statement-value.valueOf-method");
+                    throw new DaoException("exception.dao.jdbc.dao-statement.set-statement-value.get-method");
                 method.invoke(this.statement, setIndex, setValue);
             }
         } catch (IllegalAccessException | SQLException | InvocationTargetException e) {
-            throw new DaoException("exception.dao.jdbc.dao-statement.set-statement-value.valueOf-invoke-method", e.getCause());
+            throw new DaoException("exception.dao.jdbc.dao-statement.set-statement-value.get-invoke-method", e.getCause());
         }
     }
 

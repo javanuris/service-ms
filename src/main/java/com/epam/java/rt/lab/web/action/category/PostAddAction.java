@@ -56,7 +56,7 @@ public class PostAddAction implements Action {
             req.getRequestDispatcher("/WEB-INF/jsp/category/edit.jsp").forward(req, resp);
         } catch (ServiceException e) {
             e.printStackTrace();
-            throw new ActionException("exception.action.category.edit.user-category.valueOf-user", e.getCause());
+            throw new ActionException("exception.action.category.edit.user-category.get-user", e.getCause());
         } catch (FormException e) {
             throw new ActionException("exception.action.category.user.edit.form", e.getCause());
         } catch (ServletException | IOException e) {

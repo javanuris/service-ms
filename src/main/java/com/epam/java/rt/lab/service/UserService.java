@@ -48,7 +48,7 @@ public class UserService extends BaseService {
             );
             return userList != null && userList.size() > 0 ? userList.get(0) : null;
         } catch (DaoException e) {
-            throw new ServiceException("exception.service.user.valueOf-user.dao", e.getCause());
+            throw new ServiceException("exception.service.user.get-user.dao", e.getCause());
         }
     }
 
@@ -69,7 +69,6 @@ public class UserService extends BaseService {
                     ))
             );
         } catch (DaoException e) {
-            e.printStackTrace();
             throw new ServiceException("exception.service.user.update-user.dao", e.getCause());
         }
     }
@@ -111,10 +110,8 @@ public class UserService extends BaseService {
             super.daoFactory.commitTransaction();
             return userId;
         } catch (DaoException e) {
-            e.printStackTrace();
             throw new ServiceException("exception.service.user.add-user.dao", e.getCause());
         } catch (RoleException e) {
-            e.printStackTrace();
             throw new ServiceException("exception.service.user.add-user.role-factory", e.getCause());
         }
     }
@@ -130,7 +127,7 @@ public class UserService extends BaseService {
             );
             return userList != null && userList.size() > 0 ? userList.get(0) : null;
         } catch (DaoException e) {
-            throw new ServiceException("exception.service.user.valueOf-user.dao", e.getCause());
+            throw new ServiceException("exception.service.user.get-user.dao", e.getCause());
         }
     }
 
@@ -145,8 +142,7 @@ public class UserService extends BaseService {
             );
             return userList != null && userList.size() > 0 ? userList.get(0) : null;
         } catch (DaoException e) {
-            e.printStackTrace();
-            throw new ServiceException("exception.service.user.valueOf-user.dao", e.getCause());
+            throw new ServiceException("exception.service.user.get-user.dao", e.getCause());
         }
     }
 
@@ -164,7 +160,7 @@ public class UserService extends BaseService {
                     )
             );
         } catch (DaoException e) {
-            throw new ServiceException("exception.service.user.valueOf-user-list.dao", e.getCause());
+            throw new ServiceException("exception.service.user.get-user-list.dao", e.getCause());
         }
     }
 
@@ -197,10 +193,8 @@ public class UserService extends BaseService {
                     UrlManager.getContextUri(req, "/")
             );
         } catch (DaoException e) {
-            e.printStackTrace();
             throw new ServiceException("exception.service.login.add-remember.dao", e.getCause());
         } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
             throw new ServiceException("exception.service.user.add-remember.hash", e.getCause());
         }
     }
@@ -222,7 +216,6 @@ public class UserService extends BaseService {
                     ))
             );
         } catch (DaoException e) {
-            e.printStackTrace();
             throw new ServiceException("exception.service.user.remove-user-remember.dao", e.getCause());
         }
     }
@@ -260,8 +253,7 @@ public class UserService extends BaseService {
                 return null;
             return user;
         } catch (DaoException e) {
-            e.printStackTrace();
-            throw new ServiceException("exception.service.user.valueOf-user-remember.dao", e.getCause());
+            throw new ServiceException("exception.service.user.get-user-remember.dao", e.getCause());
         }
     }
 
@@ -277,12 +269,8 @@ public class UserService extends BaseService {
             );
             if (avatarList == null || avatarList.size() == 0) return null;
             return avatarList.get(0);
-        } catch (DaoException e) {
-            e.printStackTrace();
-            throw new ServiceException("exception.service.user.valueOf-avatar.dao", e.getCause());
-        } catch (ValidatorException e) {
-            e.printStackTrace();
-            return null;
+        } catch (DaoException | ValidatorException e) {
+            throw new ServiceException("exception.service.user.get-avatar.dao", e.getCause());
         }
     }
 
@@ -321,10 +309,8 @@ public class UserService extends BaseService {
                 );
             }
         } catch (IOException e) {
-            e.printStackTrace();
             throw new ServiceException("exception.service.user.set-avatar.file", e.getCause());
         } catch (DaoException e) {
-            e.printStackTrace();
             throw new ServiceException("exception.service.user.set-avatar.dao", e.getCause());
         }
     }
@@ -339,7 +325,6 @@ public class UserService extends BaseService {
                     ))
             );
         } catch (DaoException e) {
-            e.printStackTrace();
             throw new ServiceException("exception.service.user.remove-avatar.dao", e.getCause());
         }
     }

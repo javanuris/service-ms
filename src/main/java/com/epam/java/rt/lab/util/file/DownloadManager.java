@@ -63,7 +63,7 @@ public final class DownloadManager {
                 throw new UtilException(e.getCause());
             }
         } else {
-            return null;
+            throw new UtilException();
         }
     }
 

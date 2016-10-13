@@ -80,7 +80,7 @@ public class GetEditAction implements Action {
             }
         } catch (ServiceException e) {
             e.printStackTrace();
-            throw new ActionException("exception.action.user.edit.user-category.valueOf-user", e.getCause());
+            throw new ActionException("exception.action.user.edit.user-category.get-user", e.getCause());
         } catch (ValidatorException e) {
             e.printStackTrace();
             throw new ActionException("exception.action.user.edit.validator.id", e.getCause());

@@ -91,7 +91,7 @@ public class PhotoDao extends JdbcDao {
             }
             return (List<T>) photoList;
         } catch (SQLException e) {
-            throw new DaoException("exception.dao.jdbc.photo.valueOf-entity", e.getCause());
+            throw new DaoException("exception.dao.jdbc.photo.get-entity", e.getCause());
         }
     }
 

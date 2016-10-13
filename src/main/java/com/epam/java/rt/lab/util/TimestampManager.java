@@ -63,8 +63,10 @@ public final class TimestampManager {
         }
     }
 
-    public static Date from(String stringTimestamp) {
-        return new Date(valueOf(stringTimestamp).getTime());
+    public static Date getDate(String stringTimestamp) {
+        Timestamp timestamp = valueOf(stringTimestamp);
+        return timestamp == null ? null
+                                 : new Date(timestamp.getTime());
     }
 
 }

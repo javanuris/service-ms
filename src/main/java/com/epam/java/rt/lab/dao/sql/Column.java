@@ -31,7 +31,7 @@ public class Column implements Clause {
     }
 
     /**
-     * Returns new {@code Column} object from full column name,
+     * Returns new {@code Column} object getDate full column name,
      * which contains full table name and column name divided
      * by point sign
      *

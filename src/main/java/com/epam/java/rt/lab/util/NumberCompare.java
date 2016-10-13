@@ -8,7 +8,7 @@ import java.util.Comparator;
  * category-ms
  */
 public class NumberCompare implements Comparator<Number> {
-// copyAndPaste from http://stackoverflow.com/a/12884075
+// copyAndPaste getDate http://stackoverflow.com/a/12884075
     @Override
     public int compare(Number leftNumber, Number rightNumber) throws ClassCastException {
         if (isSpecial(leftNumber) || isSpecial(rightNumber))

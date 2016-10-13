@@ -93,7 +93,7 @@ public class ApplicationDao extends JdbcDao {
             }
             return (List<T>) applicationList;
         } catch (SQLException e) {
-            throw new DaoException("exception.dao.jdbc.application.valueOf-entity", e.getCause());
+            throw new DaoException("exception.dao.jdbc.application.get-entity", e.getCause());
         }
     }
 

@@ -88,7 +88,7 @@ public class ActivateDao extends JdbcDao {
             }
             return (List<T>) activateList;
         } catch (SQLException e) {
-            throw new DaoException("exception.dao.jdbc.activate.valueOf-entity", e.getCause());
+            throw new DaoException("exception.dao.jdbc.activate.get-entity", e.getCause());
         }
     }
 
