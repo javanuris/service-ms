@@ -6,14 +6,14 @@ import com.epam.java.rt.lab.dao.DaoParameter;
 import com.epam.java.rt.lab.dao.sql.OrderBy;
 import com.epam.java.rt.lab.dao.sql.Update;
 import com.epam.java.rt.lab.dao.sql.Where;
-import com.epam.java.rt.lab.entity.rbac.Avatar;
-import com.epam.java.rt.lab.entity.rbac.Login;
-import com.epam.java.rt.lab.entity.rbac.Remember;
-import com.epam.java.rt.lab.entity.rbac.User;
+import com.epam.java.rt.lab.entity.access.Avatar;
+import com.epam.java.rt.lab.entity.access.Login;
+import com.epam.java.rt.lab.entity.access.Remember;
+import com.epam.java.rt.lab.entity.access.User;
 import com.epam.java.rt.lab.util.*;
 import com.epam.java.rt.lab.util.validator.ValidatorException;
 import com.epam.java.rt.lab.util.validator.ValidatorFactory;
-import com.epam.java.rt.lab.web.access.RoleException;
+import com.epam.java.rt.lab.web.access.AccessException;
 import com.epam.java.rt.lab.web.access.RoleFactory;
 import com.epam.java.rt.lab.web.component.Page;
 import org.slf4j.Logger;
@@ -111,7 +111,7 @@ public class UserService extends BaseService {
             return userId;
         } catch (DaoException e) {
             throw new ServiceException("exception.service.user.add-user.dao", e.getCause());
-        } catch (RoleException e) {
+        } catch (AccessException e) {
             throw new ServiceException("exception.service.user.add-user.role-factory", e.getCause());
         }
     }

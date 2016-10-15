@@ -3,7 +3,7 @@ package com.epam.java.rt.lab.web.action.application;
 import com.epam.java.rt.lab.entity.business.Application;
 import com.epam.java.rt.lab.entity.business.Category;
 import com.epam.java.rt.lab.entity.business.Comment;
-import com.epam.java.rt.lab.entity.rbac.User;
+import com.epam.java.rt.lab.entity.access.User;
 import com.epam.java.rt.lab.service.ApplicationService;
 import com.epam.java.rt.lab.service.CategoryService;
 import com.epam.java.rt.lab.service.CommentService;

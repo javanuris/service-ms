@@ -1,7 +1,7 @@
 package com.epam.java.rt.lab.web.action.profile;
 
-import com.epam.java.rt.lab.entity.rbac.Activate;
-import com.epam.java.rt.lab.entity.rbac.Login;
+import com.epam.java.rt.lab.entity.access.Activate;
+import com.epam.java.rt.lab.entity.access.Login;
 import com.epam.java.rt.lab.service.LoginService;
 import com.epam.java.rt.lab.service.ServiceException;
 import com.epam.java.rt.lab.util.PropertyManager;

@@ -1,8 +1,8 @@
 package com.epam.java.rt.lab.web.action.profile;
 
-import com.epam.java.rt.lab.entity.rbac.Login;
-import com.epam.java.rt.lab.entity.rbac.Restore;
-import com.epam.java.rt.lab.entity.rbac.User;
+import com.epam.java.rt.lab.entity.access.Login;
+import com.epam.java.rt.lab.entity.access.Restore;
+import com.epam.java.rt.lab.entity.access.User;
 import com.epam.java.rt.lab.service.LoginService;
 import com.epam.java.rt.lab.service.ServiceException;
 import com.epam.java.rt.lab.service.UserService;

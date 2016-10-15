@@ -1,10 +1,9 @@
-package com.epam.java.rt.lab.entity.rbac;
+package com.epam.java.rt.lab.entity.access;
 
 import com.epam.java.rt.lab.entity.BaseEntity;
 import com.epam.java.rt.lab.entity.EntityProperty;
 import com.epam.java.rt.lab.entity.File;
 
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.sql.Timestamp;
 

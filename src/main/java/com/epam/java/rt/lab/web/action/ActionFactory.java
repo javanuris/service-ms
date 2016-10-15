@@ -1,7 +1,8 @@
 package com.epam.java.rt.lab.web.action;
 
+import com.epam.java.rt.lab.exception.AppException;
+import com.epam.java.rt.lab.util.PropertyManager;
 import com.epam.java.rt.lab.web.access.Permission;
-import com.epam.java.rt.lab.web.access.RoleException;
 import com.epam.java.rt.lab.web.access.RoleFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,93 +10,83 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Service Management System
- */
+import static com.epam.java.rt.lab.web.action.ActionExceptionCode.*;
+
 public final class ActionFactory {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ActionFactory.class);
+    private static final Logger LOGGER = LoggerFactory.
+            getLogger(ActionFactory.class);
+
+    private static final String GET = "Get";
+    private static final String POST = "Post";
+    private static final String WARN_ACTION_CLASS_NOT_FOUND =
+            "Action class not found";
 
     private static class Holder {
 
-        private static final ActionFactory INSTANCE;
+        private static final ActionFactory INSTANCE = new ActionFactory();
 
-        static {
-            try {
-                INSTANCE = new ActionFactory();
-            } catch (Exception e) {
-                throw new ExceptionInInitializerError(e);
-            }
-        }
     }
 
     private Map<String, Action> actionMap = new HashMap<>();
 
-    private ActionFactory() throws ActionException {
-        fillActionMap();
+    private ActionFactory() {
     }
 
-    private void fillActionMap() throws ActionException {
-        String point = ".";
-        String get = "Get";
-        String post = "Post";
+    public void initActionMap() throws AppException {
         this.actionMap.clear();
-        String actionPackagePath = ActionFactory.class.getPackage().getName().concat(point);
-        try {
-            for (Permission permission : RoleFactory.getInstance().getPermissionList()) {
-                String actionName = permission.getActionName();
-                String actionPath = actionPackagePath;
-                int pointIndex = actionName.lastIndexOf(point) + 1;
-                if (pointIndex > 0) {
-                    actionPath = actionPackagePath.concat(actionName.substring(0, pointIndex));
-                    actionName = actionName.substring(pointIndex);
-                }
-                addAction(
-                        get,
-                        permission.getUri(),
-                        actionPath,
-                        actionName
-                );
-                addAction(
-                        post,
-                        permission.getUri(),
-                        actionPath,
-                        actionName
-                );
+        String actionPackagePath = ActionFactory.class.getPackage().getName();
+        for (Permission permission : RoleFactory.getInstance().
+                getPermissionList()) {
+            String actionPath = actionPackagePath + PropertyManager.POINT;
+            String actionName = permission.getActionName();
+            int lastPointIndex = actionName.lastIndexOf(PropertyManager.POINT)
+                    + 1;
+            if (lastPointIndex > 0) {
+                actionPath = actionPath + actionName.substring(0,
+                        lastPointIndex);
+                actionName = actionName.substring(lastPointIndex);
             }
-        } catch (RoleException e) {
-            e.printStackTrace();
-            throw new ActionException("exception.action.factory.role-factory", e.getCause());
+            addAction(GET, permission.getUri(), actionPath, actionName);
+            addAction(POST, permission.getUri(), actionPath, actionName);
+        }
+        if (this.actionMap.size() == 0) {
+            throw new AppException(ACTION_MAP_EMPTY);
         }
     }
 
-    private void addAction(String method, String uri, String actionPath, String actionName) throws ActionException {
+    private void addAction(String method, String uri, String actionPath,
+                           String actionName) throws AppException {
         try {
-            actionName = actionPath.concat(method).concat(actionName);
-            Class actionClass = Class.forName(actionName);
+            Class actionClass = Class.forName(actionPath + method + actionName);
             Action actionObject = (Action) actionClass.newInstance();
-            this.actionMap.put(getActionMapKey(method.toUpperCase(), uri), actionObject);
-        } catch (IllegalAccessException | ClassNotFoundException e) {
-            LOGGER.debug("exception.action.factory.not-found: {}", actionName);
-        } catch (InstantiationException e) {
-            throw new ActionException("exception.action.factory.action-object", e.getCause());
+            this.actionMap.put(getActionMapKey(method, uri), actionObject);
+        } catch (ClassNotFoundException e) {
+            LOGGER.warn(WARN_ACTION_CLASS_NOT_FOUND
+                    + PropertyManager.LEFT_PARENTHESIS
+                    + actionPath + method + actionName
+                    + PropertyManager.RIGHT_PARENTHESIS);
+        } catch (IllegalAccessException | InstantiationException e) {
+            throw new AppException(ACTION_OBJECT_INSTANTIATE_ERROR);
         }
     }
 
     private static String getActionMapKey(String method, String pathInfo) {
-        return method.concat(pathInfo);
+        return method.toUpperCase() + pathInfo.toLowerCase();
     }
 
-    public static ActionFactory getInstance() throws ActionException {
-        try {
-            return Holder.INSTANCE;
-        } catch (ExceptionInInitializerError e) {
-            throw new ActionException("exception.action.factory.init", e.getCause());
+    public static ActionFactory getInstance() {
+        return Holder.INSTANCE;
+    }
+
+    public Action create(String method, String pathInfo) throws AppException {
+        Action actionObject = this.actionMap.
+                get(getActionMapKey(method, pathInfo));
+        if (actionObject == null) {
+            String[] detailArray = {method, pathInfo};
+            throw new AppException(ACTION_BY_URI_NOT_FOUND, detailArray);
         }
-    }
-
-    public Action create(String method, String pathInfo) {
-        return this.actionMap.get(getActionMapKey(method, pathInfo));
+        return actionObject;
     }
 
 }

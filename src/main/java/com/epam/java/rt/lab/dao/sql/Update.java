@@ -2,7 +2,6 @@ package com.epam.java.rt.lab.dao.sql;
 
 import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.entity.EntityProperty;
-import com.epam.java.rt.lab.entity.rbac.Login;
 import com.epam.java.rt.lab.util.StringArray;
 
 import java.util.ArrayList;

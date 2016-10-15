@@ -1,6 +1,6 @@
 package com.epam.java.rt.lab.web.action.application;
 
-import com.epam.java.rt.lab.entity.rbac.User;
+import com.epam.java.rt.lab.entity.access.User;
 import com.epam.java.rt.lab.service.ApplicationService;
 import com.epam.java.rt.lab.service.ServiceException;
 import com.epam.java.rt.lab.util.UrlManager;

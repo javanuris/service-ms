@@ -3,8 +3,8 @@ package com.epam.java.rt.lab.dao.h2.jdbc;
 import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.dao.DaoParameter;
 import com.epam.java.rt.lab.dao.sql.*;
-import com.epam.java.rt.lab.entity.rbac.Login;
-import com.epam.java.rt.lab.entity.rbac.Restore;
+import com.epam.java.rt.lab.entity.access.Login;
+import com.epam.java.rt.lab.entity.access.Restore;
 
 import java.sql.Connection;
 import java.sql.ResultSet;

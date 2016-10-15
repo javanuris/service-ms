@@ -5,7 +5,7 @@ import com.epam.java.rt.lab.dao.DaoParameter;
 import com.epam.java.rt.lab.dao.sql.*;
 import com.epam.java.rt.lab.entity.business.Application;
 import com.epam.java.rt.lab.entity.business.Category;
-import com.epam.java.rt.lab.entity.rbac.User;
+import com.epam.java.rt.lab.entity.access.User;
 
 import java.sql.Connection;
 import java.sql.ResultSet;

@@ -1,7 +1,7 @@
 package com.epam.java.rt.lab.dao.sql;
 
-import com.epam.java.rt.lab.entity.rbac.Login;
-import com.epam.java.rt.lab.entity.rbac.Restore;
+import com.epam.java.rt.lab.entity.access.Login;
+import com.epam.java.rt.lab.entity.access.Restore;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

@@ -1,11 +1,8 @@
 package com.epam.java.rt.lab.web.action.application;
 
 import com.epam.java.rt.lab.entity.business.Application;
-import com.epam.java.rt.lab.entity.business.Category;
-import com.epam.java.rt.lab.entity.business.Comment;
-import com.epam.java.rt.lab.entity.rbac.User;
+import com.epam.java.rt.lab.entity.access.User;
 import com.epam.java.rt.lab.service.ApplicationService;
-import com.epam.java.rt.lab.service.CategoryService;
 import com.epam.java.rt.lab.service.CommentService;
 import com.epam.java.rt.lab.service.ServiceException;
 import com.epam.java.rt.lab.util.UrlManager;
@@ -24,7 +21,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 
 /**

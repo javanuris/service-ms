@@ -1,7 +1,5 @@
 package com.epam.java.rt.lab.util;
 
-import com.epam.java.rt.lab.entity.rbac.Remember;
-
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

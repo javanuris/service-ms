@@ -6,7 +6,7 @@ import com.epam.java.rt.lab.dao.sql.Column;
 import com.epam.java.rt.lab.dao.sql.Insert;
 import com.epam.java.rt.lab.dao.sql.Select;
 import com.epam.java.rt.lab.dao.sql.Sql;
-import com.epam.java.rt.lab.entity.rbac.Activate;
+import com.epam.java.rt.lab.entity.access.Activate;
 
 import java.sql.Connection;
 import java.sql.ResultSet;

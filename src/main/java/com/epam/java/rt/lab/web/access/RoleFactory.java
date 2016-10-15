@@ -1,81 +1,92 @@
 package com.epam.java.rt.lab.web.access;
 
+import com.epam.java.rt.lab.exception.AppException;
+import com.epam.java.rt.lab.util.PropertyManager;
 import com.epam.java.rt.lab.util.StringArray;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 
-/**
- * category-ms
- */
+import static com.epam.java.rt.lab.web.access.AccessExceptionCode.*;
+
 public final class RoleFactory {
 
     private static final String ANONYMOUS = "anonymous";
     private static final String AUTHORIZED = "authorized";
+    private static final String ACCESS_PROPERTY_FILE = "access.properties";
 
     private static class Holder {
 
-        private static final RoleFactory INSTANCE;
+        private static final RoleFactory INSTANCE = new RoleFactory();
 
-        static {
-            try {
-                INSTANCE = new RoleFactory();
-            } catch (Exception e) {
-                throw new ExceptionInInitializerError(e);
-            }
-        }
     }
 
     private Map<String, Role> roleMap = new HashMap<>();
     private List<Permission> permissionList = new ArrayList<>();
 
-    private RoleFactory() throws RoleException {
-        fillRoleMap();
+    private RoleFactory() {
     }
 
-    private void fillRoleMap() throws RoleException {
+    public static RoleFactory getInstance() {
+        return Holder.INSTANCE;
+    }
+
+    public void initRoleMap() throws AppException {
+        ClassLoader classLoader = RoleFactory.class.getClassLoader();
+        InputStream inputStream = classLoader.
+                getResourceAsStream(ACCESS_PROPERTY_FILE);
         Properties properties = new Properties();
-        String comma = ",";
-        String roles = "roles";
         try {
-            properties.load(RoleFactory.class.getClassLoader().getResourceAsStream("rbac.properties"));
-            this.roleMap.clear();
+            properties.load(inputStream);
             this.permissionList.clear();
-            List<String> uriList = new ArrayList<>();
-            for (String roleName : StringArray.splitSpaceLessNames(properties.getProperty(roles), comma)) {
-                Role role = new Role(roleName);
-                for (String uri : StringArray.splitSpaceLessNames(properties.getProperty(roleName), comma)) {
-                    if (!uriList.contains(uri)) {
-                        uriList.add(uri);
-                        this.permissionList.add(new Permission(uri, properties.getProperty(uri)));
-                    }
-                    role.addPermission(uri);
+            this.roleMap.clear();
+            Enumeration<?> uris = properties.propertyNames();
+            while (uris.hasMoreElements()) {
+                String uri = (String) uris.nextElement();
+                String actionAndRoles = properties.getProperty(uri);
+                String[] actionAndRolesArray = StringArray.
+                        splitSpaceLessNames(actionAndRoles,
+                                PropertyManager.COMMA);
+                Permission permission = new Permission(uri,
+                        actionAndRolesArray[0]);
+                this.permissionList.add(permission);
+                for (int i = 1; i < actionAndRolesArray.length; i++) {
+                    addPermissionToRole(permission, actionAndRolesArray[i]);
                 }
-                this.roleMap.put(roleName, role);
+            }
+            if (this.roleMap.size() == 0 || this.permissionList.size() == 0) {
+                String[] detailArray = {ACCESS_PROPERTY_FILE};
+                throw new AppException(PROPERTY_EMPTY_OR_CONTENT_ERROR,
+                        detailArray);
             }
         } catch (IOException e) {
-            e.printStackTrace();
-            throw new RoleException("exception.web.access.role-factory.properties", e.getCause());
+            String[] detailArray = {ACCESS_PROPERTY_FILE, e.getMessage()};
+            throw new AppException(PROPERTY_READ_ERROR, e.getCause(),
+                    detailArray);
         }
     }
 
-    public static RoleFactory getInstance() throws RoleException {
-        try {
-            return Holder.INSTANCE;
-        } catch (ExceptionInInitializerError e) {
-            throw new RoleException("exception.web.access.role-factory.init", e.getCause());
-        }
+    private void addPermissionToRole(Permission permission, String roleName) {
+        Role role = this.roleMap.get(roleName);
+        if (role == null) role = new Role(roleName);
+        role.addPermission(permission.getUri());
     }
 
-    public Role create(String roleName) throws RoleException {
+    public Role create(String roleName) throws AppException {
+        Role role = this.roleMap.get(roleName);
+        if (role == null) {
+            String[] detailArray = {ACCESS_PROPERTY_FILE, roleName};
+            throw new AppException(ROLE_NOT_FOUND, detailArray);
+        }
         return this.roleMap.get(roleName);
     }
 
-    public Role createAnonymous() throws RoleException {
+    public Role createAnonymous() throws AppException {
         return this.roleMap.get(ANONYMOUS);
     }
 
-    public Role createAuthorized() throws RoleException {
+    public Role createAuthorized() throws AppException {
         return this.roleMap.get(AUTHORIZED);
     }
 

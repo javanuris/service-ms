@@ -1,8 +1,6 @@
 package com.epam.java.rt.lab.util.file;
 
 import com.epam.java.rt.lab.entity.File;
-import com.epam.java.rt.lab.entity.business.Photo;
-import com.epam.java.rt.lab.entity.rbac.Avatar;
 import com.epam.java.rt.lab.service.CommentService;
 import com.epam.java.rt.lab.service.ServiceException;
 import com.epam.java.rt.lab.service.UserService;
@@ -10,10 +8,7 @@ import com.epam.java.rt.lab.util.TimestampManager;
 import com.epam.java.rt.lab.util.UtilException;
 import org.h2.util.IOUtils;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Timestamp;

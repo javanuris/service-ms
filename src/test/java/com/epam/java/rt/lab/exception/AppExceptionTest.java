@@ -1,13 +1,12 @@
 package com.epam.java.rt.lab.exception;
 
 import com.epam.java.rt.lab.exception.AppException.AppExceptionCode;
-import com.epam.java.rt.lab.util.PropertyManager;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import static com.epam.java.rt.lab.util.PropertyManager.EQUAL;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class AppExceptionTest {
 

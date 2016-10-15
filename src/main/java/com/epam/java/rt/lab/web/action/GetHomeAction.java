@@ -1,26 +1,27 @@
 package com.epam.java.rt.lab.web.action;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.epam.java.rt.lab.exception.AppException;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-/**
- * Service Management System
- */
+import static com.epam.java.rt.lab.web.action.ActionExceptionCode.ACTION_FORWARD_TO_JSP_ERROR;
+
 public class GetHomeAction implements Action {
-    private static final Logger logger = LoggerFactory.getLogger(GetHomeAction.class);
+
+    private static final String JSP = "/WEB-INF/jsp/home.jsp";
 
     @Override
-    public void execute(HttpServletRequest req, HttpServletResponse resp) throws ActionException {
+    public void execute(HttpServletRequest req, HttpServletResponse resp)
+            throws AppException {
         try {
-            logger.debug("/WEB-INF/jsp/home.jsp");
-            req.getRequestDispatcher("/WEB-INF/jsp/home.jsp").forward(req, resp);
+            req.getRequestDispatcher(JSP).forward(req, resp);
         } catch (ServletException | IOException e) {
-            throw new ActionException(e.getMessage());
+            String[] detailArray = {e.getMessage(), JSP};
+            throw new AppException(ACTION_FORWARD_TO_JSP_ERROR, e.getMessage(),
+                    detailArray);
         }
     }
 

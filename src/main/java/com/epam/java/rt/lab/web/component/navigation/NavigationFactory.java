@@ -2,7 +2,7 @@ package com.epam.java.rt.lab.web.component.navigation;
 
 import com.epam.java.rt.lab.util.StringArray;
 import com.epam.java.rt.lab.web.access.Role;
-import com.epam.java.rt.lab.web.access.RoleException;
+import com.epam.java.rt.lab.web.access.AccessException;
 import com.epam.java.rt.lab.web.access.RoleFactory;
 
 import java.io.IOException;
@@ -73,7 +73,7 @@ public class NavigationFactory {
         } catch (IOException e) {
             e.printStackTrace();
             throw new NavigationException("exception.component.nav.properties", e.getCause());
-        } catch (RoleException e) {
+        } catch (AccessException e) {
             e.printStackTrace();
             throw new NavigationException("exception.component.navigation.role-factory", e.getCause());
         }

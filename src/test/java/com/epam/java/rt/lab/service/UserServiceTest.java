@@ -1,7 +1,7 @@
 package com.epam.java.rt.lab.service;
 
-import com.epam.java.rt.lab.entity.rbac.Login;
-import com.epam.java.rt.lab.entity.rbac.User;
+import com.epam.java.rt.lab.entity.access.Login;
+import com.epam.java.rt.lab.entity.access.User;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

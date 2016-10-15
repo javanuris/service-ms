@@ -1,13 +1,13 @@
 package com.epam.java.rt.lab.web.action.user;
 
-import com.epam.java.rt.lab.entity.rbac.User;
+import com.epam.java.rt.lab.entity.access.User;
 import com.epam.java.rt.lab.service.ServiceException;
 import com.epam.java.rt.lab.service.UserService;
 import com.epam.java.rt.lab.util.UrlManager;
 import com.epam.java.rt.lab.util.validator.ValidatorException;
 import com.epam.java.rt.lab.util.validator.ValidatorFactory;
 import com.epam.java.rt.lab.web.access.Role;
-import com.epam.java.rt.lab.web.access.RoleException;
+import com.epam.java.rt.lab.web.access.AccessException;
 import com.epam.java.rt.lab.web.access.RoleFactory;
 import com.epam.java.rt.lab.web.action.Action;
 import com.epam.java.rt.lab.web.action.ActionException;
@@ -88,7 +88,7 @@ public class GetEditAction implements Action {
             throw new ActionException("exception.action.access.user.edit.form", e.getCause());
         } catch (ServletException | IOException e) {
             throw new ActionException("exception.action.access.user.edit.jsp", e.getCause());
-        } catch (RoleException e) {
+        } catch (AccessException e) {
             throw new ActionException("exception.action.access.user.edit.role-factory", e.getCause());
         }
     }

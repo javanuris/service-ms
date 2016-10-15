@@ -1,11 +1,11 @@
 package com.epam.java.rt.lab.web.servlet;
 
-import com.epam.java.rt.lab.entity.rbac.User;
+import com.epam.java.rt.lab.entity.access.User;
 import com.epam.java.rt.lab.service.ServiceException;
 import com.epam.java.rt.lab.service.UserService;
 import com.epam.java.rt.lab.util.CookieManager;
 import com.epam.java.rt.lab.util.UrlManager;
-import com.epam.java.rt.lab.web.access.RoleException;
+import com.epam.java.rt.lab.web.access.AccessException;
 import com.epam.java.rt.lab.web.access.RoleFactory;
 import com.epam.java.rt.lab.web.component.navigation.NavigationException;
 import com.epam.java.rt.lab.web.component.navigation.NavigationFactory;
@@ -89,7 +89,7 @@ public class RbacFilter implements Filter {
         } catch (NavigationException e) {
             e.printStackTrace();
 //            throw new ServletException("exception.filter.access.do-filter.navigation", e.getCause());
-        } catch (RoleException e) {
+        } catch (AccessException e) {
             e.printStackTrace();
 //            throw new ServletException("exception.filter.access.do-filter.role-factory", e.getCause());
         } catch (ServletException e) {

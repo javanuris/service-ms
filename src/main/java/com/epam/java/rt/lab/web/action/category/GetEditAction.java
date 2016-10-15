@@ -1,19 +1,13 @@
 package com.epam.java.rt.lab.web.action.category;
 
 import com.epam.java.rt.lab.entity.business.Category;
-import com.epam.java.rt.lab.entity.rbac.User;
 import com.epam.java.rt.lab.service.CategoryService;
 import com.epam.java.rt.lab.service.ServiceException;
-import com.epam.java.rt.lab.service.UserService;
 import com.epam.java.rt.lab.util.UrlManager;
 import com.epam.java.rt.lab.util.validator.ValidatorException;
 import com.epam.java.rt.lab.util.validator.ValidatorFactory;
-import com.epam.java.rt.lab.web.access.Role;
-import com.epam.java.rt.lab.web.access.RoleException;
-import com.epam.java.rt.lab.web.access.RoleFactory;
 import com.epam.java.rt.lab.web.action.Action;
 import com.epam.java.rt.lab.web.action.ActionException;
-import com.epam.java.rt.lab.web.action.profile.GetLoginAction;
 import com.epam.java.rt.lab.web.component.form.Form;
 import com.epam.java.rt.lab.web.component.form.FormControl;
 import com.epam.java.rt.lab.web.component.form.FormException;

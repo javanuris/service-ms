@@ -1,4 +1,4 @@
-package com.epam.java.rt.lab.entity.rbac;
+package com.epam.java.rt.lab.entity.access;
 
 import com.epam.java.rt.lab.entity.BaseEntity;
 import com.epam.java.rt.lab.entity.EntityProperty;
@@ -8,34 +8,31 @@ import java.sql.Timestamp;
 /**
  * category-ms
  */
-public class Restore extends BaseEntity {
-    private Login login;
-    private String code;
+public class Remember extends BaseEntity {
+    private User user;
     private String cookieName;
     private String cookieValue;
     private Timestamp valid;
 
     public enum Property implements EntityProperty {
         ID,
-        LOGIN_ID,
-        CODE,
+        USER_ID,
         COOKIE_NAME,
         COOKIE_VALUE,
         VALID;
 
         @Override
         public Class getEntityClass() {
-            return Restore.class;
+            return Remember.class;
         }
     }
 
-    public Restore() {
+    public Remember() {
     }
 
-    public Restore(Long id, Login login, String code, String cookieName, String cookieValue, Timestamp valid) {
+    public Remember(Long id, User user, String cookieName, String cookieValue, Timestamp valid) {
         super(id);
-        this.login = login;
-        this.code = code;
+        this.user = user;
         this.cookieName = cookieName;
         this.cookieValue = cookieValue;
         this.valid = valid;
@@ -49,20 +46,12 @@ public class Restore extends BaseEntity {
         super.setId(id);
     }
 
-    public Login getLogin() {
-        return login;
+    public User getUser() {
+        return user;
     }
 
-    public void setLogin(Login login) {
-        this.login = login;
-    }
-
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public String getCookieName() {

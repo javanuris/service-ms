@@ -2,7 +2,7 @@ package com.epam.java.rt.lab.entity.business;
 
 import com.epam.java.rt.lab.entity.BaseEntity;
 import com.epam.java.rt.lab.entity.EntityProperty;
-import com.epam.java.rt.lab.entity.rbac.User;
+import com.epam.java.rt.lab.entity.access.User;
 
 import java.sql.Timestamp;
 

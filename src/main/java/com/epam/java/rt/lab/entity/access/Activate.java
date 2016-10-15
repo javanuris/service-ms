@@ -1,4 +1,4 @@
-package com.epam.java.rt.lab.entity.rbac;
+package com.epam.java.rt.lab.entity.access;
 
 import com.epam.java.rt.lab.entity.BaseEntity;
 import com.epam.java.rt.lab.entity.EntityProperty;

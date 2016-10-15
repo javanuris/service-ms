@@ -10,28 +10,16 @@ import java.util.Arrays;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
+import static com.epam.java.rt.lab.exception.AppExceptionCode.NULL_EXCEPTION;
 import static com.epam.java.rt.lab.util.PropertyManager.DEF_LOCALE_COUNTRY_KEY;
 import static com.epam.java.rt.lab.util.PropertyManager.DEF_LOCALE_LANG_KEY;
 import static com.epam.java.rt.lab.util.StringArray.combine;
 
+/**
+ * The class {@code AppException} extends {@code Exception} class
+ * and contain additional fields and enum to output detailed exception logs
+ */
 public class AppException extends Exception {
-
-    public enum AppExceptionCode implements ExceptionCode {
-        NULL_EXCEPTION(0),
-        NULL_NOT_ALLOWED(1);
-
-        private final int number;
-
-        private AppExceptionCode(int number) {
-            this.number = number;
-        }
-
-        @Override
-        public int getNumber() {
-            return this.number;
-        }
-
-    }
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AppException.class);
     private static final String EXCEPTION_BUNDLE = "i18n/exception";
@@ -119,9 +107,9 @@ public class AppException extends Exception {
         log();
     }
 
-    protected AppException(ExceptionCode exceptionCode, String message,
-                           Throwable cause, boolean enableSuppression,
-                           boolean writableStackTrace, String[] detailArray) {
+    public AppException(ExceptionCode exceptionCode, String message,
+                        Throwable cause, boolean enableSuppression,
+                        boolean writableStackTrace, String[] detailArray) {
         super(message, cause, enableSuppression, writableStackTrace);
         this.exceptionCode = exceptionCode;
         this.detailArray = detailArray;
@@ -138,7 +126,7 @@ public class AppException extends Exception {
 
     private String exceptionMessage() {
         if (exceptionCode == null) {
-            exceptionCode = AppExceptionCode.NULL_EXCEPTION;
+            exceptionCode = NULL_EXCEPTION;
         }
         String key = exceptionCode.getClass().getSimpleName()
                 + PropertyManager.POINT + exceptionCode;

@@ -1,10 +1,8 @@
 package com.epam.java.rt.lab.web.action.category;
 
 import com.epam.java.rt.lab.entity.business.Category;
-import com.epam.java.rt.lab.entity.rbac.User;
 import com.epam.java.rt.lab.service.CategoryService;
 import com.epam.java.rt.lab.service.ServiceException;
-import com.epam.java.rt.lab.service.UserService;
 import com.epam.java.rt.lab.util.UrlManager;
 import com.epam.java.rt.lab.util.validator.ValidatorException;
 import com.epam.java.rt.lab.util.validator.ValidatorFactory;

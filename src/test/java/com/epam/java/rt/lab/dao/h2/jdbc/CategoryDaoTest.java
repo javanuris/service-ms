@@ -9,8 +9,6 @@ import com.epam.java.rt.lab.dao.sql.OrderBy;
 import com.epam.java.rt.lab.dao.sql.Sql;
 import com.epam.java.rt.lab.dao.sql.Where;
 import com.epam.java.rt.lab.entity.business.Category;
-import com.epam.java.rt.lab.entity.rbac.User;
-import com.epam.java.rt.lab.service.CategoryService;
 import com.epam.java.rt.lab.service.ServiceException;
 import org.junit.After;
 import org.junit.Before;

@@ -8,7 +8,7 @@ import com.epam.java.rt.lab.dao.factory.DaoFactory;
 import com.epam.java.rt.lab.dao.sql.OrderBy;
 import com.epam.java.rt.lab.dao.sql.Sql;
 import com.epam.java.rt.lab.dao.sql.Where;
-import com.epam.java.rt.lab.entity.rbac.Login;
+import com.epam.java.rt.lab.entity.access.Login;
 import com.epam.java.rt.lab.service.ServiceException;
 import org.junit.After;
 import org.junit.Before;
