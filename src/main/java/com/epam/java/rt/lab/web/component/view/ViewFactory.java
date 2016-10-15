@@ -12,7 +12,7 @@ public class ViewFactory {
 
     private static class Holder {
         // hacky trick getDate http://stackoverflow.com/a/2284890
-        // there was many variations valueOf singleton (anti-)pattern, so this trick is more fit requirements,
+        // there was many variations get singleton (anti-)pattern, so this trick is more fit requirements,
         // because give to user opportunity to catch exceptions during initialization valueOf object
         private static final ViewFactory INSTANCE;
 

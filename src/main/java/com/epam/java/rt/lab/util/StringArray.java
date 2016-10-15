@@ -1,5 +1,6 @@
 package com.epam.java.rt.lab.util;
 
+import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.dao.sql.Clause;
 
 import java.util.ArrayList;
@@ -17,11 +18,21 @@ public class StringArray {
         return source.replaceAll(SPACE, "").split(regex);
     }
 
-    public static <T> String combine(List<T> sourceList, String delimiter) throws Exception {
-        return combine(new StringBuilder(), sourceList, delimiter).toString();
+    public static <T> String combine(List<T> sourceList, String delimiter) {
+        StringBuilder result = new StringBuilder();
+        boolean first = true;
+        for (T source : sourceList) {
+            if (first) {
+                first = false;
+            } else {
+                result.append(delimiter);
+            }
+            result.append(source.toString());
+        }
+        return result.toString();
     }
 
-    public static <T> StringBuilder combine(StringBuilder result, List<T> sourceList, String delimiter) throws Exception {
+    public static <T> StringBuilder combine(StringBuilder result, List<T> sourceList, String delimiter) throws DaoException {
         boolean first = true;
         for (T source : sourceList) {
             if (first) {

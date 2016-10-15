@@ -1,5 +1,6 @@
 package com.epam.java.rt.lab.web.listener;
 
+import com.epam.java.rt.lab.exception.AppException;
 import com.epam.java.rt.lab.util.PropertyManager;
 import com.epam.java.rt.lab.util.UtilException;
 import com.epam.java.rt.lab.util.file.UploadException;
@@ -19,6 +20,7 @@ public class InitAppListener implements ServletContextListener {
     public void contextInitialized(ServletContextEvent servletContextEvent) {
         try {
             PropertyManager.initGlobalProperties();
+            AppException.initExceptionBundle();
             UploadManager.initContentTypeListMap();
         } catch (UtilException | UploadException e) {
             throw new RuntimeException();

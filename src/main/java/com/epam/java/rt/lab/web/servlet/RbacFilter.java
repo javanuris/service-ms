@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.*;
+import javax.servlet.ServletException;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -27,13 +28,13 @@ public class RbacFilter implements Filter {
     private static final Logger logger = LoggerFactory.getLogger(RbacFilter.class);
 
     @Override
-    public void init(FilterConfig filterConfig) throws ServletException {
+    public void init(FilterConfig filterConfig) {
 
     }
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)
-            throws IOException, ServletException {
+            throws IOException {
 
         logger.debug("RbacFilter");
         try (UserService userService = new UserService()) {
@@ -84,13 +85,15 @@ public class RbacFilter implements Filter {
             }
         } catch (ServiceException e) {
             e.printStackTrace();
-            throw new ServletException("exception.filter.access.do-filter.user-category", e.getCause());
+//            throw new ServletException("exception.filter.access.do-filter.user-category", e.getCause());
         } catch (NavigationException e) {
             e.printStackTrace();
-            throw new ServletException("exception.filter.access.do-filter.navigation", e.getCause());
+//            throw new ServletException("exception.filter.access.do-filter.navigation", e.getCause());
         } catch (RoleException e) {
             e.printStackTrace();
-            throw new ServletException("exception.filter.access.do-filter.role-factory", e.getCause());
+//            throw new ServletException("exception.filter.access.do-filter.role-factory", e.getCause());
+        } catch (ServletException e) {
+            e.printStackTrace();
         }
     }
 

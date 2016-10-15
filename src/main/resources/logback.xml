@@ -3,17 +3,17 @@
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{5} - %msg%n</pattern>
+            <pattern>%d{yyyy-MM-dd_HH:mm:ss.SSS} [%thread] %-5level %logger{10} [%X{exceptionSource}:%X{exceptionCode}] - %msg%n</pattern>
         </encoder>
     </appender>
 
-    <appender name="EXCEPTION" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>..\logs\exception.log</file>
+    <appender name="EXCEPTION_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs\exception.log</file>
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <Pattern>%d{yyyy-MM-dd_HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</Pattern>
+            <pattern>%d{yyyy-MM-dd_HH:mm:ss.SSS} [%thread] %-5level %logger{10} [%X{exceptionSource}:%X{exceptionCode}] - %msg%n</pattern>
         </encoder>
         <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
-            <FileNamePattern>..\logs\oop.%i.log.zip</FileNamePattern>
+            <FileNamePattern>..\logs\exception.%i.log.zip</FileNamePattern>
             <MinIndex>1</MinIndex>
             <MaxIndex>5</MaxIndex>
         </rollingPolicy>
@@ -22,13 +22,13 @@
         </triggeringPolicy>
     </appender>
 
-    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>..\logs\exception.log</file>
+    <appender name="INFO_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs\info.log</file>
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <Pattern>%d{yyyy-MM-dd_HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</Pattern>
+            <pattern>%d{yyyy-MM-dd_HH:mm:ss.SSS} [%thread] %-5level %logger{10} [%X{exceptionSource}:%X{exceptionCode}] - %msg%n</pattern>
         </encoder>
         <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
-            <FileNamePattern>..\logs\oop.%i.log.zip</FileNamePattern>
+            <FileNamePattern>..\logs\info.%i.log.zip</FileNamePattern>
             <MinIndex>1</MinIndex>
             <MaxIndex>5</MaxIndex>
         </rollingPolicy>
@@ -40,41 +40,17 @@
     <!--
     exceptions log
     -->
-    <logger name="com.epam.java.rt.lab.dao.DaoException.ERROR" level="DEBUG" additivity="false">
+    <logger name="com.epam.java.rt.lab.exception.AppException" level="ERROR" additivity="false">
         <appender-ref ref="STDOUT" />
-        <appender-ref ref="EXCEPTION" />
+        <appender-ref ref="EXCEPTION_FILE" />
     </logger>
 
     <!--
-    layers log
+    info log
     -->
-    <logger name="com.epam.java.rt.lab.dao.Dao.INFO" level="DEBUG" additivity="false">
+    <logger level="INFO" additivity="false">
         <appender-ref ref="STDOUT" />
-        <appender-ref ref="FILE" />
-    </logger>
-
-    <logger name="com.epam.java.rt.lab.dao.Dao.DEBUG" level="DEBUG" additivity="false">
-        <appender-ref ref="STDOUT" />
-        <appender-ref ref="FILE" />
-    </logger>
-
-    <!--
-
-    -->
-
-    <!--
-    logger defines what appender will be used to exact NAMED logger in class / LoggerFactory.getLogger(name);
-    in this example we made name by concatenating '.class.getName()' and '.INFO';
-    so Logger('.WARN') outputs to 'STDOUT'-appender and to 'FILE;-appender,
-    but Logger('.INFO') outputs only to 'STDOUT'-appender;
-    -->
-    <logger name="com.epam.java.rt.lab.task.star.system.service.Analyzer.INFO" level="DEBUG" additivity="false">
-        <appender-ref ref="STDOUT" />
-    </logger>
-
-
-    <logger name="LOGGER" level="TRACE" additivity="false">
-        <appender-ref ref="STDOUT" />
+        <appender-ref ref="INFO_FILE" />
     </logger>
 
     <!--

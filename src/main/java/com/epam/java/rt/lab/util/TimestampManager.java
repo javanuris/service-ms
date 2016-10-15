@@ -8,7 +8,7 @@ import java.sql.Timestamp;
 import java.util.Date;
 
 /**
- * category-ms
+ * {@code TimestampManager} class is a util class to work with timestamp representation of date
  */
 public final class TimestampManager {
 
@@ -21,10 +21,12 @@ public final class TimestampManager {
     }
 
     private static Timestamp jodaToTimestamp(LocalDateTime localDateTime) {
+//        if (localDateTime == null) throw new UtilException("");
         return new Timestamp(localDateTime.toDateTime().getMillis());
     }
 
     private static LocalDateTime timestampToJoda(Timestamp timestamp) {
+
         return LocalDateTime.fromDateFields(timestamp);
     }
 

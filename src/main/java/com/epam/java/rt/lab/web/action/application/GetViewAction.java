@@ -60,7 +60,7 @@ public class GetViewAction implements Action {
                             UrlManager.getRequestParameterString(parameterMap), "id=".concat(id)));
                     req.setAttribute("commentPhotoRef", UrlManager.getContextUri(req, "/file/download/photo?id="));
                     req.setAttribute("userAvatarRef", UrlManager.getContextUri(req, "/file/download/avatar?id="));
-                    Page page = new Page(null, null);
+                    Page page = new Page("", "");
                     req.setAttribute("commentList", commentService.getCommentList(page, Long.valueOf(id)));
                     if (page.getCountItems() > 10) {
                         parameterMap.put("rel", "application");
