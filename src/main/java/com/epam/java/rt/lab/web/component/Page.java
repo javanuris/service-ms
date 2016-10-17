@@ -1,9 +1,7 @@
 package com.epam.java.rt.lab.web.component;
 
-import com.epam.java.rt.lab.util.validator.ValidatorException;
-import com.epam.java.rt.lab.util.validator.ValidatorFactory;
-
-import javax.servlet.http.HttpServletRequest;
+import com.epam.java.rt.lab.exception.AppException;
+import com.epam.java.rt.lab.web.validator.ValidatorFactory;
 
 /**
  * category-ms
@@ -22,11 +20,11 @@ public class Page {
 
     public Page(String currentPage, String itemsOnPage) {
         try {
-            this.currentPage = ValidatorFactory.create("digits").validate(currentPage) != null ?
+            this.currentPage = ValidatorFactory.getInstance().create("digits").validate(currentPage) != null ?
                     1L : Long.valueOf(currentPage) > 0 ? Long.valueOf(currentPage) : 1L;
-            this.itemsOnPage = ValidatorFactory.create("digits").validate(itemsOnPage) != null ?
+            this.itemsOnPage = ValidatorFactory.getInstance().create("digits").validate(itemsOnPage) != null ?
                     ITEMS_ON_PAGE : Long.valueOf(itemsOnPage) > 0 ? Long.valueOf(itemsOnPage) : ITEMS_ON_PAGE;
-        } catch (ValidatorException e) {
+        } catch (AppException e) {
             this.currentPage = 1L;
             this.itemsOnPage = ITEMS_ON_PAGE;
         }

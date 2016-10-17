@@ -2,7 +2,7 @@ package com.epam.java.rt.lab.dao.sql;
 
 import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.entity.EntityProperty;
-import com.epam.java.rt.lab.util.StringArray;
+import com.epam.java.rt.lab.util.StringCombiner;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -134,7 +134,7 @@ public class Update extends Sql {
         public StringBuilder appendClause(StringBuilder result) throws DaoException {
             try {
                 return this.setValueArray == null || this.setValueArray.length == 0 ? result :
-                        StringArray.combine(result.append(SET), new ArrayList<>(Arrays.asList(this.setValueArray)), Sql.COMMA_DELIMITER);
+                        StringCombiner.combine(result.append(SET), new ArrayList<>(Arrays.asList(this.setValueArray)), Sql.COMMA_DELIMITER);
             } catch (Exception e) {
                 e.printStackTrace();
                 throw new DaoException("exception.dao.sql.set-values.combine", e.getCause());

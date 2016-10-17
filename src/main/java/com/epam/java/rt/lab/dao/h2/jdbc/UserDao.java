@@ -5,7 +5,7 @@ import com.epam.java.rt.lab.dao.DaoParameter;
 import com.epam.java.rt.lab.dao.sql.*;
 import com.epam.java.rt.lab.entity.access.Login;
 import com.epam.java.rt.lab.entity.access.User;
-import com.epam.java.rt.lab.web.access.AccessException;
+import com.epam.java.rt.lab.exception.AppException;
 import com.epam.java.rt.lab.web.access.RoleFactory;
 
 import java.sql.Connection;
@@ -97,8 +97,7 @@ public class UserDao extends JdbcDao {
             return (List<T>) userList;
         } catch (SQLException e) {
             throw new DaoException("exception.dao.jdbc.user.get-entity", e.getCause());
-        } catch (AccessException e) {
-            e.printStackTrace();
+        } catch (AppException e) {
             throw new DaoException("exception.dao.jdbc.user.role-factory", e.getCause());
         }
     }

@@ -1,14 +1,19 @@
 package com.epam.java.rt.lab.web.access;
 
 import com.epam.java.rt.lab.exception.AppException;
-import com.epam.java.rt.lab.util.PropertyManager;
-import com.epam.java.rt.lab.util.StringArray;
+import com.epam.java.rt.lab.util.StringCombiner;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
 
-import static com.epam.java.rt.lab.web.access.AccessExceptionCode.*;
+import static com.epam.java.rt.lab.exception.AppExceptionCode.PROPERTY_EMPTY_OR_CONTENT_ERROR;
+import static com.epam.java.rt.lab.exception.AppExceptionCode.PROPERTY_READ_ERROR;
+import static com.epam.java.rt.lab.util.PropertyManager.COMMA;
+import static com.epam.java.rt.lab.web.access.AccessExceptionCode.ROLE_NOT_FOUND;
 
 public final class RoleFactory {
 
@@ -23,7 +28,6 @@ public final class RoleFactory {
     }
 
     private Map<String, Role> roleMap = new HashMap<>();
-    private List<Permission> permissionList = new ArrayList<>();
 
     private RoleFactory() {
     }
@@ -39,37 +43,36 @@ public final class RoleFactory {
         Properties properties = new Properties();
         try {
             properties.load(inputStream);
-            this.permissionList.clear();
             this.roleMap.clear();
             Enumeration<?> uris = properties.propertyNames();
             while (uris.hasMoreElements()) {
                 String uri = (String) uris.nextElement();
-                String actionAndRoles = properties.getProperty(uri);
-                String[] actionAndRolesArray = StringArray.
-                        splitSpaceLessNames(actionAndRoles,
-                                PropertyManager.COMMA);
-                Permission permission = new Permission(uri,
-                        actionAndRolesArray[0]);
-                this.permissionList.add(permission);
-                for (int i = 1; i < actionAndRolesArray.length; i++) {
-                    addPermissionToRole(permission, actionAndRolesArray[i]);
+                String uriRoles = properties.getProperty(uri);
+                String[] uriRoleArray = StringCombiner.
+                        splitSpaceLessNames(uriRoles, COMMA);
+                Permission permission = new Permission(uri);
+                for (int i = 0; i < uriRoleArray.length; i++) {
+                    addPermissionToRole(permission, uriRoleArray[i]);
                 }
             }
-            if (this.roleMap.size() == 0 || this.permissionList.size() == 0) {
+            if (this.roleMap.size() == 0) {
                 String[] detailArray = {ACCESS_PROPERTY_FILE};
                 throw new AppException(PROPERTY_EMPTY_OR_CONTENT_ERROR,
                         detailArray);
             }
         } catch (IOException e) {
-            String[] detailArray = {ACCESS_PROPERTY_FILE, e.getMessage()};
-            throw new AppException(PROPERTY_READ_ERROR, e.getCause(),
-                    detailArray);
+            String[] detailArray = {ACCESS_PROPERTY_FILE};
+            throw new AppException(PROPERTY_READ_ERROR,
+                    e.getMessage(), e.getCause(), detailArray);
         }
     }
 
     private void addPermissionToRole(Permission permission, String roleName) {
         Role role = this.roleMap.get(roleName);
-        if (role == null) role = new Role(roleName);
+        if (role == null) {
+            role = new Role(roleName);
+            this.roleMap.put(roleName, role);
+        }
         role.addPermission(permission.getUri());
     }
 
@@ -88,10 +91,6 @@ public final class RoleFactory {
 
     public Role createAuthorized() throws AppException {
         return this.roleMap.get(AUTHORIZED);
-    }
-
-    public List<Permission> getPermissionList() {
-        return this.permissionList;
     }
 
     public Map<String, Role> getRoleMap() {

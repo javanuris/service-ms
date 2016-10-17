@@ -1,26 +1,34 @@
 package com.epam.java.rt.lab.web.action;
 
 import com.epam.java.rt.lab.exception.AppException;
-import com.epam.java.rt.lab.util.PropertyManager;
-import com.epam.java.rt.lab.web.access.Permission;
-import com.epam.java.rt.lab.web.access.RoleFactory;
+import com.epam.java.rt.lab.util.StringCombiner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
+import static com.epam.java.rt.lab.exception.AppExceptionCode.PROPERTY_EMPTY_OR_CONTENT_ERROR;
+import static com.epam.java.rt.lab.exception.AppExceptionCode.PROPERTY_READ_ERROR;
+import static com.epam.java.rt.lab.util.PropertyManager.COMMA;
+import static com.epam.java.rt.lab.util.PropertyManager.POINT;
 import static com.epam.java.rt.lab.web.action.ActionExceptionCode.*;
 
 public final class ActionFactory {
 
-    private static final Logger LOGGER = LoggerFactory.
+    static final Logger LOGGER = LoggerFactory.
             getLogger(ActionFactory.class);
 
-    private static final String GET = "Get";
-    private static final String POST = "Post";
-    private static final String WARN_ACTION_CLASS_NOT_FOUND =
-            "Action class not found";
+    private static final String ACTION_PROPERTY_FILE = "action.properties";
+    private static final int JSP_NAME = 0;
+    private static final int GET_ACTION = 1;
+    private static final int POST_ACTION = 2;
+    private static final String GET = "GET";
+    private static final String POST = "POST";
 
     private static class Holder {
 
@@ -34,40 +42,55 @@ public final class ActionFactory {
     }
 
     public void initActionMap() throws AppException {
-        this.actionMap.clear();
-        String actionPackagePath = ActionFactory.class.getPackage().getName();
-        for (Permission permission : RoleFactory.getInstance().
-                getPermissionList()) {
-            String actionPath = actionPackagePath + PropertyManager.POINT;
-            String actionName = permission.getActionName();
-            int lastPointIndex = actionName.lastIndexOf(PropertyManager.POINT)
-                    + 1;
-            if (lastPointIndex > 0) {
-                actionPath = actionPath + actionName.substring(0,
-                        lastPointIndex);
-                actionName = actionName.substring(lastPointIndex);
+        String actionPackagePath = ActionFactory.class.
+                getPackage().getName() + POINT;
+        ClassLoader classLoader = ActionFactory.class.getClassLoader();
+        InputStream inputStream = classLoader.
+                getResourceAsStream(ACTION_PROPERTY_FILE);
+        Properties properties = new Properties();
+        try {
+            properties.load(inputStream);
+            this.actionMap.clear();
+            Enumeration<?> uris = properties.propertyNames();
+            while (uris.hasMoreElements()) {
+                String uri = (String) uris.nextElement();
+                String uriProperties = properties.getProperty(uri);
+                String[] uriPropertyArray = StringCombiner.
+                        splitSpaceLessNames(uriProperties, COMMA);
+                addAction(GET, uri, uriPropertyArray[JSP_NAME],
+                        uriPropertyArray[GET_ACTION]);
+                if (uriPropertyArray.length - 1 == POST_ACTION) {
+                    addAction(GET, uri, uriPropertyArray[JSP_NAME],
+                            uriPropertyArray[POST_ACTION]);
+                }
             }
-            addAction(GET, permission.getUri(), actionPath, actionName);
-            addAction(POST, permission.getUri(), actionPath, actionName);
-        }
-        if (this.actionMap.size() == 0) {
-            throw new AppException(ACTION_MAP_EMPTY);
+            if (this.actionMap.size() == 0) {
+                String[] detailArray = {ACTION_PROPERTY_FILE};
+                throw new AppException(PROPERTY_EMPTY_OR_CONTENT_ERROR,
+                        detailArray);
+            }
+        } catch (IOException e) {
+            String[] detailArray = {ACTION_PROPERTY_FILE, e.getMessage()};
+            throw new AppException(PROPERTY_READ_ERROR, e.getCause(),
+                    detailArray);
         }
     }
 
-    private void addAction(String method, String uri, String actionPath,
+    private void addAction(String method, String uri, String jspName,
                            String actionName) throws AppException {
         try {
-            Class actionClass = Class.forName(actionPath + method + actionName);
+            Class actionClass = Class.forName(actionName);
             Action actionObject = (Action) actionClass.newInstance();
+            ((BaseAction) actionObject).setJspName(jspName);
             this.actionMap.put(getActionMapKey(method, uri), actionObject);
         } catch (ClassNotFoundException e) {
-            LOGGER.warn(WARN_ACTION_CLASS_NOT_FOUND
-                    + PropertyManager.LEFT_PARENTHESIS
-                    + actionPath + method + actionName
-                    + PropertyManager.RIGHT_PARENTHESIS);
+            String[] detailArray = {actionName};
+            throw new AppException(ACTION_CLASS_NOT_FOUND,
+                    e.getMessage(), e.getCause(), detailArray);
         } catch (IllegalAccessException | InstantiationException e) {
-            throw new AppException(ACTION_OBJECT_INSTANTIATE_ERROR);
+            String[] detailArray = {actionName};
+            throw new AppException(ACTION_OBJECT_INSTANTIATE_ERROR,
+                    e.getMessage(), e.getCause(), detailArray);
         }
     }
 

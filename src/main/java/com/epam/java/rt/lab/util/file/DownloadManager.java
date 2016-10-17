@@ -1,17 +1,21 @@
 package com.epam.java.rt.lab.util.file;
 
 import com.epam.java.rt.lab.entity.File;
+import com.epam.java.rt.lab.exception.AppException;
 import com.epam.java.rt.lab.service.CommentService;
 import com.epam.java.rt.lab.service.ServiceException;
 import com.epam.java.rt.lab.service.UserService;
 import com.epam.java.rt.lab.util.TimestampManager;
-import com.epam.java.rt.lab.util.UtilException;
 import org.h2.util.IOUtils;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Timestamp;
+
+import static com.epam.java.rt.lab.exception.AppExceptionCode.NULL_NOT_ALLOWED;
+import static com.epam.java.rt.lab.util.file.FileExceptionCode.FILE_ACCESS_ERROR;
+import static com.epam.java.rt.lab.util.file.FileExceptionCode.FILE_NOT_FOUND;
 
 public final class DownloadManager {
 
@@ -21,10 +25,13 @@ public final class DownloadManager {
     public static void sendFile(String ifModifiedSinceHeader,
                                 Timestamp lastModified, String contentType,
                                 InputStream fileStream,
-                                HttpServletResponse resp) throws UtilException {
-        Timestamp ifModifiedSince = ifModifiedSinceHeader != null
-                ? TimestampManager.valueOf(ifModifiedSinceHeader)
-                : null;
+                                HttpServletResponse resp) throws AppException {
+        if (fileStream == null || resp == null) {
+            throw new AppException(NULL_NOT_ALLOWED);
+        }
+        Timestamp ifModifiedSince = ((!TimestampManager.
+                isTimestamp(ifModifiedSinceHeader)) ? null
+                : Timestamp.valueOf(ifModifiedSinceHeader));
         if (ifModifiedSince == null || lastModified == null
                 || TimestampManager.secondsBetweenTimestamps(ifModifiedSince,
                 lastModified) > 1) {
@@ -36,7 +43,8 @@ public final class DownloadManager {
                 IOUtils.copy(fileStream, resp.getOutputStream());
                 fileStream.close();
             } catch (IOException e) {
-                throw new UtilException(e.getCause());
+                throw new AppException(FILE_ACCESS_ERROR,
+                        e.getMessage(), e.getCause());
             }
         } else {
             resp.setStatus(304);
@@ -44,21 +52,29 @@ public final class DownloadManager {
     }
 
     public static File getFileFromDatabase(String pathInfo, String id)
-            throws UtilException {
+            throws AppException {
+        if (pathInfo == null || id == null) {
+            throw new AppException(NULL_NOT_ALLOWED);
+        }
         if ("/avatar".equals(pathInfo)) {
             try (UserService userService = new UserService()) {
                 return userService.getAvatar(id);
             } catch (ServiceException e) {
-                throw new UtilException(e.getCause());
+                String[] detailArray = {pathInfo, id};
+                throw new AppException(FILE_NOT_FOUND,
+                        e.getMessage(), e.getCause(), detailArray);
             }
         } else if ("/photo".equals(pathInfo)) {
             try (CommentService commentService = new CommentService()) {
                 return commentService.getPhoto(id);
             } catch (ServiceException e) {
-                throw new UtilException(e.getCause());
+                String[] detailArray = {pathInfo, id};
+                throw new AppException(FILE_NOT_FOUND,
+                        e.getMessage(), e.getCause(), detailArray);
             }
         } else {
-            throw new UtilException();
+            String[] detailArray = {pathInfo, id};
+            throw new AppException(FILE_NOT_FOUND, detailArray);
         }
     }
 

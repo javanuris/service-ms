@@ -3,7 +3,7 @@ package com.epam.java.rt.lab.dao.sql;
 import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.entity.BaseEntity;
 import com.epam.java.rt.lab.entity.EntityProperty;
-import com.epam.java.rt.lab.util.StringArray;
+import com.epam.java.rt.lab.util.StringCombiner;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -194,7 +194,7 @@ public abstract class Sql {
         if (entityClass == null)
             throw new DaoException("exception.dao.sql.Select.null-entity-class");
         return new Select(getColumnList(
-                StringArray.splitSpaceLessNames(
+                StringCombiner.splitSpaceLessNames(
                         getProperty(
                                 entityClass
                                         .getName()
@@ -242,7 +242,7 @@ public abstract class Sql {
         if (entityClass == null)
             throw new DaoException("exception.dao.sql.Count.null-entity-class");
         return new Count(getColumnList(
-                StringArray.splitSpaceLessNames(
+                StringCombiner.splitSpaceLessNames(
                         getProperty(
                                 entityClass
                                         .getName()

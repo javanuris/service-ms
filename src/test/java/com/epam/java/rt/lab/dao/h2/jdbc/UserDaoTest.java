@@ -9,7 +9,10 @@ import com.epam.java.rt.lab.dao.sql.OrderBy;
 import com.epam.java.rt.lab.dao.sql.Sql;
 import com.epam.java.rt.lab.dao.sql.Where;
 import com.epam.java.rt.lab.entity.access.User;
+import com.epam.java.rt.lab.exception.AppException;
 import com.epam.java.rt.lab.service.ServiceException;
+import com.epam.java.rt.lab.util.PropertyManager;
+import com.epam.java.rt.lab.web.access.RoleFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -26,9 +29,9 @@ import static org.junit.Assert.assertNotNull;
  */
 public class UserDaoTest {
 
-    private static final String USER_READ_A = "SELECT \"User\".id, \"User\".first_name, \"User\".middle_name, \"User\".last_name, \"User\".avatar_id, \"Login\".id, \"Role\".id FROM \"User\" JOIN \"Login\", \"Role\" WHERE \"User\".login_id = \"Login\".id AND \"User\".role_id = \"Role\".id AND \"User\".id = ?";
-    private static final String USER_READ_B = "SELECT \"User\".id, \"User\".first_name, \"User\".middle_name, \"User\".last_name, \"User\".avatar_id, \"Login\".id, \"Role\".id FROM \"User\" JOIN \"Login\", \"Role\" WHERE \"User\".login_id = \"Login\".id AND \"User\".role_id = \"Role\".id ORDER BY \"User\".first_name ASC";
-    private static final String USER_READ_C = "SELECT \"User\".id, \"User\".first_name, \"User\".middle_name, \"User\".last_name, \"User\".avatar_id, \"Login\".id, \"Role\".id FROM \"User\" JOIN \"Login\", \"Role\" WHERE \"User\".login_id = \"Login\".id AND \"User\".role_id = \"Role\".id LIMIT 0, 10";
+    private static final String USER_READ_A = "SELECT \"User\".id, \"User\".first_name, \"User\".middle_name, \"User\".last_name, \"User\".role_name, \"User\".avatar_id, \"Login\".id FROM \"User\" JOIN \"Login\" WHERE \"User\".login_id = \"Login\".id AND \"User\".id = ?";
+    private static final String USER_READ_B = "SELECT \"User\".id, \"User\".first_name, \"User\".middle_name, \"User\".last_name, \"User\".role_name, \"User\".avatar_id, \"Login\".id FROM \"User\" JOIN \"Login\" WHERE \"User\".login_id = \"Login\".id ORDER BY \"User\".first_name ASC";
+    private static final String USER_READ_C = "SELECT \"User\".id, \"User\".first_name, \"User\".middle_name, \"User\".last_name, \"User\".role_name, \"User\".avatar_id, \"Login\".id FROM \"User\" JOIN \"Login\" WHERE \"User\".login_id = \"Login\".id LIMIT 0, 10";
 
     private DaoFactory daoFactory;
     private DaoParameter daoParameter;
@@ -36,6 +39,9 @@ public class UserDaoTest {
 
     @Before
     public void setUp() throws Exception {
+        PropertyManager.initGlobalProperties();
+        AppException.initExceptionBundle();
+        RoleFactory.getInstance().initRoleMap();
         try {
             this.daoFactory = AbstractDaoFactory.createDaoFactory();
         } catch (DaoException e) {

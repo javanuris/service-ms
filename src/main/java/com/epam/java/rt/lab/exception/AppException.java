@@ -1,19 +1,16 @@
 package com.epam.java.rt.lab.exception;
 
 import com.epam.java.rt.lab.util.PropertyManager;
+import com.epam.java.rt.lab.util.StringCombiner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Locale;
-import java.util.ResourceBundle;
+import java.util.*;
 
 import static com.epam.java.rt.lab.exception.AppExceptionCode.NULL_EXCEPTION;
 import static com.epam.java.rt.lab.util.PropertyManager.DEF_LOCALE_COUNTRY_KEY;
 import static com.epam.java.rt.lab.util.PropertyManager.DEF_LOCALE_LANG_KEY;
-import static com.epam.java.rt.lab.util.StringArray.combine;
 
 /**
  * The class {@code AppException} extends {@code Exception} class
@@ -117,6 +114,8 @@ public class AppException extends Exception {
     }
 
     private void log() {
+        MDC.put("exceptionCause",
+                this.getStackTrace()[0].toString());
         MDC.put("exceptionSource",
                 this.exceptionCode.getClass().getSimpleName());
         MDC.put("exceptionCode",
@@ -130,17 +129,24 @@ public class AppException extends Exception {
         }
         String key = exceptionCode.getClass().getSimpleName()
                 + PropertyManager.POINT + exceptionCode;
-        return exceptionBundle.getString(key) + getDetailsString()
+        String message = key;
+        try {
+            message = exceptionBundle.getString(key);
+        } catch (MissingResourceException e) {
+            //
+        }
+        return message + getDetailsString()
                 + ((super.getMessage() == null) ? ""
-                : "\n" + super.getMessage());
+                : PropertyManager.SPACE + super.getMessage());
     }
 
     private String getDetailsString() {
         if (this.detailArray == null) return "";
         return PropertyManager.SPACE + PropertyManager.LEFT_PARENTHESIS +
-                combine(new ArrayList<>(Arrays.asList(this.detailArray)),
+                StringCombiner.combine(new ArrayList<>(Arrays.
+                        asList(this.detailArray)),
                         PropertyManager.COMMA_WITH_SPACE)
-                + PropertyManager.RIGHT_PARENTHESIS;
+                        + PropertyManager.RIGHT_PARENTHESIS;
     }
 
     public ExceptionCode getExceptionCode() {

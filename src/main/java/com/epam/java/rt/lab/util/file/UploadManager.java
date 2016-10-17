@@ -1,7 +1,9 @@
 package com.epam.java.rt.lab.util.file;
 
+import com.epam.java.rt.lab.exception.AppException;
+import com.epam.java.rt.lab.exception.AppExceptionCode;
 import com.epam.java.rt.lab.util.PropertyManager;
-import com.epam.java.rt.lab.util.StringArray;
+import com.epam.java.rt.lab.util.StringCombiner;
 
 import javax.servlet.http.Part;
 import java.io.File;
@@ -11,6 +13,10 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
+
+import static com.epam.java.rt.lab.exception.AppExceptionCode.NULL_NOT_ALLOWED;
+import static com.epam.java.rt.lab.util.PropertyManager.*;
+import static com.epam.java.rt.lab.util.file.FileExceptionCode.*;
 
 public final class UploadManager {
 
@@ -23,7 +29,7 @@ public final class UploadManager {
     private UploadManager() {
     }
 
-    public static void initContentTypeListMap() throws UploadException {
+    public static void initContentTypeListMap() throws AppException {
         ClassLoader classLoader = UploadManager.class.getClassLoader();
         InputStream inputStream = classLoader.
                 getResourceAsStream(CONTENT_TYPE_PROPERTY_FILE);
@@ -34,30 +40,38 @@ public final class UploadManager {
             while (names.hasMoreElements()) {
                 String key = (String) names.nextElement();
                 String property = properties.getProperty(key);
-                String[] typeArray = StringArray.
+                String[] typeArray = StringCombiner.
                         splitSpaceLessNames(property, PropertyManager.COMMA);
                 List<String> typeList = new ArrayList<>(Arrays.asList(typeArray));
                 contentTypeListMap.put(key, typeList);
             }
         } catch (IOException e) {
-            throw new UploadException(e.getCause());
+            String[] detailArray = {CONTENT_TYPE_PROPERTY_FILE};
+            throw new AppException(AppExceptionCode.PROPERTY_READ_ERROR,
+                    e.getMessage(), e.getCause(), detailArray);
         }
     }
 
     public static String receiveFileAndGetAbsolutePath(
             String sessionId, String uploadType, Part filePart)
-            throws UploadException {
+            throws AppException {
+        if (sessionId == null || uploadType == null || filePart == null) {
+            throw new AppException(NULL_NOT_ALLOWED);
+        }
         List<String> contentTypeList = contentTypeListMap.get(uploadType);
-        if (contentTypeList == null) return null;
+        if (contentTypeList == null) {
+            String[] detailArray = {uploadType};
+            throw new AppException(UPLOAD_TYPE_ERROR, detailArray);
+        }
         String contentType = filePart.getContentType();
-        if (!contentTypeList.contains(contentType)) return null;
+        if (!contentTypeList.contains(contentType)) {
+            String[] detailArray = {contentType};
+            throw new AppException(CONTENT_TYPE_ERROR, detailArray);
+        }
         String fileName = filePart.getSubmittedFileName();
-        contentType = contentType.replaceAll(PropertyManager.SLASH,
-                                             PropertyManager.UNDERSCORE);
-        String prefix = PropertyManager.POINT + uploadType
-                + PropertyManager.POINT + contentType
-                + PropertyManager.POINT;
-        String postfix = PropertyManager.POINT + sessionId;
+        contentType = contentType.replaceAll(SLASH, UNDERSCORE);
+        String prefix = POINT + uploadType + POINT + contentType + POINT;
+        String postfix = POINT + sessionId;
         try {
             File outputFile = File.createTempFile(fileName + prefix, postfix);
             InputStream inputStream = filePart.getInputStream();
@@ -70,7 +84,9 @@ public final class UploadManager {
                                     getBytes(charsetUtf8);
             return FILE_PATH_PREFIX + new String(outputFilePath, charsetLatin1);
         } catch (IOException e) {
-            throw new UploadException(e.getCause());
+            String[] detailArray = {fileName + prefix + POINT + postfix};
+            throw new AppException(FILE_ACCESS_ERROR,
+                    e.getMessage(), e.getCause(), detailArray);
         }
     }
 

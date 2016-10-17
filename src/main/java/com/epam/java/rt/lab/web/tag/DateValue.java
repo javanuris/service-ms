@@ -6,14 +6,12 @@ import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.tagext.SimpleTagSupport;
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-/**
- * category-ms
- */
 public class DateValue extends SimpleTagSupport {
 
     private String stringValue;
@@ -31,11 +29,14 @@ public class DateValue extends SimpleTagSupport {
     public void doTag() throws JspException, IOException {
         DateFormat dateFormat = DateFormat.
                 getDateInstance(DateFormat.MEDIUM, locale);
-        Date dateValue = TimestampManager.getDate(stringValue);
-        DateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
-        JspWriter out = getJspContext().getOut();
-        out.print("<small>" + dateFormat.format(dateValue)
-                  + "</small> " + timeFormat.format(dateValue));
+        if (TimestampManager.isTimestamp(stringValue)) {
+            Timestamp timestamp = Timestamp.valueOf(stringValue);
+            Date dateValue = new Date(timestamp.getTime());
+            DateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
+            JspWriter out = getJspContext().getOut();
+            out.print("<small>" + dateFormat.format(dateValue)
+                    + "</small> " + timeFormat.format(dateValue));
+        }
     }
 
 }

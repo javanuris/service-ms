@@ -1,8 +1,8 @@
 package com.epam.java.rt.lab.web.servlet;
 
 import com.epam.java.rt.lab.entity.File;
+import com.epam.java.rt.lab.exception.AppException;
 import com.epam.java.rt.lab.util.PropertyManager;
-import com.epam.java.rt.lab.util.UtilException;
 import com.epam.java.rt.lab.util.file.DownloadManager;
 
 import javax.servlet.ServletException;
@@ -46,7 +46,7 @@ public class DownloadServlet extends HttpServlet {
                             new Timestamp(file.lastModified()), contentType,
                             new FileInputStream(file), resp);
                 }
-            } catch (UtilException | FileNotFoundException e) {
+            } catch (AppException | FileNotFoundException e) {
                 throw new ServletException(e.getCause());
             }
         }

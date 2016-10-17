@@ -1,8 +1,8 @@
 package com.epam.java.rt.lab.web.component.form;
 
-import com.epam.java.rt.lab.util.StringArray;
-import com.epam.java.rt.lab.util.validator.ValidatorException;
-import com.epam.java.rt.lab.util.validator.ValidatorFactory;
+import com.epam.java.rt.lab.exception.AppException;
+import com.epam.java.rt.lab.util.StringCombiner;
+import com.epam.java.rt.lab.web.validator.ValidatorFactory;
 
 import java.io.IOException;
 import java.util.*;
@@ -47,10 +47,10 @@ public final class FormFactory {
         try {
             properties.load(FormFactory.class.getClassLoader().getResourceAsStream("form.properties"));
             this.formMap.clear();
-            for (String formName : StringArray.splitSpaceLessNames(properties.getProperty(forms), comma)) {
+            for (String formName : StringCombiner.splitSpaceLessNames(properties.getProperty(forms), comma)) {
                 Form form = new Form(formName, properties.getProperty(formName.concat(action)));
                 List<FormControl> formControlList = new ArrayList<>();
-                for (String controlName : StringArray.splitSpaceLessNames(properties.getProperty(formName.concat(controls)), comma)) {
+                for (String controlName : StringCombiner.splitSpaceLessNames(properties.getProperty(formName.concat(controls)), comma)) {
                     String propertyPrefix = formName.concat(point).concat(controlName);
                     formControlList.add(
                             new FormControl(
@@ -60,7 +60,7 @@ public final class FormFactory {
                                     properties.getProperty(propertyPrefix.concat(placeholder)),
                                     properties.getProperty(propertyPrefix.concat(action)),
                                     properties.getProperty(propertyPrefix.concat(subAction)),
-                                    ValidatorFactory.create(properties.getProperty(propertyPrefix.concat(validator))),
+                                    ValidatorFactory.getInstance().create(properties.getProperty(propertyPrefix.concat(validator))),
                                     properties.getProperty(propertyPrefix.concat(dictionary))
                             )
                     );
@@ -68,7 +68,7 @@ public final class FormFactory {
                 form.setFormControlList(formControlList);
                 this.formMap.put(formName, form);
             }
-        } catch (IOException | ValidatorException e) {
+        } catch (IOException | AppException e) {
             e.printStackTrace();
             throw new FormException("exception.component.form.properties", e.getCause());
         }

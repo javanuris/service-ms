@@ -3,10 +3,6 @@ package com.epam.java.rt.lab.dao.sql;
 import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.entity.BaseEntity;
 import com.epam.java.rt.lab.entity.EntityProperty;
-import com.epam.java.rt.lab.util.StringArray;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * {@code Insert} class defines sql statement,

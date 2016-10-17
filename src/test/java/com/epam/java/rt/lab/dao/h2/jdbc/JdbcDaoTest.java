@@ -54,12 +54,12 @@ public class JdbcDaoTest {
                 .setWherePredicate(Where.Predicate.get(
                         Login.Property.EMAIL,
                         Where.Predicate.PredicateOperator.EQUAL,
-                        "test@test.com"
+                        "admin@test.com"
                 )
         ));
         assertNotNull("read() failed", loginList);
         Login login = loginList.get(0);
-        assertEquals("read(login) failed", "test@test.com", login.getEmail());
+        assertEquals("read(login) failed", "admin@test.com", login.getEmail());
     }
 
     @Test

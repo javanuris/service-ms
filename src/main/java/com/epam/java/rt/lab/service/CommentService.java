@@ -7,10 +7,10 @@ import com.epam.java.rt.lab.dao.sql.Update;
 import com.epam.java.rt.lab.dao.sql.Where;
 import com.epam.java.rt.lab.entity.business.Comment;
 import com.epam.java.rt.lab.entity.business.Photo;
+import com.epam.java.rt.lab.exception.AppException;
 import com.epam.java.rt.lab.util.TimestampManager;
-import com.epam.java.rt.lab.util.validator.ValidatorException;
-import com.epam.java.rt.lab.util.validator.ValidatorFactory;
 import com.epam.java.rt.lab.web.component.Page;
+import com.epam.java.rt.lab.web.validator.ValidatorFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -106,7 +106,7 @@ public class CommentService extends BaseService {
 
     public Photo getPhoto(String id) throws ServiceException {
         try {
-            if (ValidatorFactory.create("digits").validate(id) != null) return null;
+            if (ValidatorFactory.getInstance().create("digits").validate(id) != null) return null;
             List<Photo> photoList = dao(Photo.class.getSimpleName()).read(new DaoParameter()
                     .setWherePredicate(Where.Predicate.get(
                             Photo.Property.ID,
@@ -118,7 +118,7 @@ public class CommentService extends BaseService {
             return photoList.get(0);
         } catch (DaoException e) {
             throw new ServiceException("exception.service.comment.get-photo.dao", e.getCause());
-        } catch (ValidatorException e) {
+        } catch (AppException e) {
             return null;
         }
     }

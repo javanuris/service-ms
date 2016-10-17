@@ -1,6 +1,5 @@
 package com.epam.java.rt.lab.exception;
 
-import com.epam.java.rt.lab.exception.AppException.AppExceptionCode;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -13,10 +12,12 @@ public class AppExceptionTest {
     private static final ExceptionCode EXCEPTION_CODE =
             AppExceptionCode.NULL_NOT_ALLOWED;
     private static final String GET_MESSAGE_RESULT = "Null недопустим";
-    private static final String GET_LOCALIZED_MESSAGE_RESULT = "Null недопустим";
+    private static final String GET_LOCALIZED_MESSAGE_RESULT =
+            "Null недопустим";
     private static final String DETAIL_NAME = "test_name";
     private static final String DETAIL_VALUE = "test_value";
-    private static final String GET_DETAILED_MESSAGE_RESULT = "Null недопустим (test_name=test_value)";
+    private static final String GET_DETAILED_MESSAGE_RESULT =
+            "Null недопустим (test_name=test_value)";
 
     private AppException appException;
 

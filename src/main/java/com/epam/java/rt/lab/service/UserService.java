@@ -10,12 +10,11 @@ import com.epam.java.rt.lab.entity.access.Avatar;
 import com.epam.java.rt.lab.entity.access.Login;
 import com.epam.java.rt.lab.entity.access.Remember;
 import com.epam.java.rt.lab.entity.access.User;
+import com.epam.java.rt.lab.exception.AppException;
 import com.epam.java.rt.lab.util.*;
-import com.epam.java.rt.lab.util.validator.ValidatorException;
-import com.epam.java.rt.lab.util.validator.ValidatorFactory;
-import com.epam.java.rt.lab.web.access.AccessException;
 import com.epam.java.rt.lab.web.access.RoleFactory;
 import com.epam.java.rt.lab.web.component.Page;
+import com.epam.java.rt.lab.web.validator.ValidatorFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -111,7 +110,7 @@ public class UserService extends BaseService {
             return userId;
         } catch (DaoException e) {
             throw new ServiceException("exception.service.user.add-user.dao", e.getCause());
-        } catch (AccessException e) {
+        } catch (AppException e) {
             throw new ServiceException("exception.service.user.add-user.role-factory", e.getCause());
         }
     }
@@ -196,6 +195,8 @@ public class UserService extends BaseService {
             throw new ServiceException("exception.service.login.add-remember.dao", e.getCause());
         } catch (NoSuchAlgorithmException e) {
             throw new ServiceException("exception.service.user.add-remember.hash", e.getCause());
+        } catch (AppException e) {
+            e.printStackTrace();
         }
     }
 
@@ -254,12 +255,15 @@ public class UserService extends BaseService {
             return user;
         } catch (DaoException e) {
             throw new ServiceException("exception.service.user.get-user-remember.dao", e.getCause());
+        } catch (AppException e) {
+            e.printStackTrace();
+            throw new ServiceException("exception.service.user.get-user-remember.dao", e.getCause());
         }
     }
 
     public Avatar getAvatar(String id) throws ServiceException {
         try {
-            if (ValidatorFactory.create("digits").validate(id) != null) return null;
+            if (ValidatorFactory.getInstance().create("digits").validate(id) != null) return null;
             List<Avatar> avatarList = dao(Avatar.class.getSimpleName()).read(new DaoParameter()
                     .setWherePredicate(Where.Predicate.get(
                             Avatar.Property.ID,
@@ -269,7 +273,7 @@ public class UserService extends BaseService {
             );
             if (avatarList == null || avatarList.size() == 0) return null;
             return avatarList.get(0);
-        } catch (DaoException | ValidatorException e) {
+        } catch (DaoException | AppException e) {
             throw new ServiceException("exception.service.user.get-avatar.dao", e.getCause());
         }
     }

@@ -1,7 +1,7 @@
 package com.epam.java.rt.lab.dao.sql;
 
 import com.epam.java.rt.lab.dao.DaoException;
-import com.epam.java.rt.lab.util.StringArray;
+import com.epam.java.rt.lab.util.StringCombiner;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -96,7 +96,7 @@ public class Select extends Sql implements Iterable<Column> {
     public String create() throws DaoException {
         try {
             StringBuilder result = new StringBuilder();
-            result = this.from.appendClause(StringArray.combine(result.append(SELECT), this.columnList, COMMA_DELIMITER));
+            result = this.from.appendClause(StringCombiner.combine(result.append(SELECT), this.columnList, COMMA_DELIMITER));
             if (this.join != null) {
                 this.join.appendClause(result);
                 if (this.where == null)
@@ -248,7 +248,7 @@ public class Select extends Sql implements Iterable<Column> {
                 String joinExpression = getProperty(tableName.concat(JOIN_AMPERSAND).concat(joinTableName));
                 if (joinExpression == null) joinExpression = getProperty(joinTableName.concat(JOIN_AMPERSAND).concat(tableName));
                 if (joinExpression != null) {
-                    String[] split = StringArray.splitSpaceLessNames(joinExpression, JOIN_AMPERSAND);
+                    String[] split = StringCombiner.splitSpaceLessNames(joinExpression, JOIN_AMPERSAND);
                     predicateList.add(new Where.Predicate(
                             Column.of(split[0]),
                             Where.Predicate.PredicateOperator.EQUAL,
@@ -262,7 +262,7 @@ public class Select extends Sql implements Iterable<Column> {
         public StringBuilder appendClause(StringBuilder result) throws DaoException {
             try {
                 return joinList.size() == 0 ? result :
-                        result.append(JOIN).append(StringArray.combine(this.joinList, COMMA_DELIMITER));
+                        result.append(JOIN).append(StringCombiner.combine(this.joinList, COMMA_DELIMITER));
             } catch (Exception e) {
                 throw new DaoException("exception.dao.sql.join.combine", e.getCause());
             }

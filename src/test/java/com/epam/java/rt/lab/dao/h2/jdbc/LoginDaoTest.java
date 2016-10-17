@@ -27,9 +27,9 @@ import static org.junit.Assert.assertNotNull;
  */
 public class LoginDaoTest {
 
-    private static final String LOGIN_READ_A = "SELECT \"Login\".id, \"Login\".email, \"Login\".password, \"Login\".attempt_left, \"Login\".status FROM \"Login\" WHERE \"Login\".id = ?";
-    private static final String LOGIN_READ_B = "SELECT \"Login\".id, \"Login\".email, \"Login\".password, \"Login\".attempt_left, \"Login\".status FROM \"Login\" ORDER BY \"Login\".email ASC";
-    private static final String LOGIN_READ_C = "SELECT \"Login\".id, \"Login\".email, \"Login\".password, \"Login\".attempt_left, \"Login\".status FROM \"Login\" LIMIT 0, 10";
+    private static final String LOGIN_READ_A = "SELECT \"Login\".id, \"Login\".email, \"Login\".salt, \"Login\".password, \"Login\".attempt_left, \"Login\".status FROM \"Login\" WHERE \"Login\".id = ?";
+    private static final String LOGIN_READ_B = "SELECT \"Login\".id, \"Login\".email, \"Login\".salt, \"Login\".password, \"Login\".attempt_left, \"Login\".status FROM \"Login\" ORDER BY \"Login\".email ASC";
+    private static final String LOGIN_READ_C = "SELECT \"Login\".id, \"Login\".email, \"Login\".salt, \"Login\".password, \"Login\".attempt_left, \"Login\".status FROM \"Login\" LIMIT 0, 10";
 
     private DaoFactory daoFactory;
     private DaoParameter daoParameter;

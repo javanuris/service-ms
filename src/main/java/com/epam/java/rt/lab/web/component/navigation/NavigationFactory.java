@@ -1,8 +1,8 @@
 package com.epam.java.rt.lab.web.component.navigation;
 
-import com.epam.java.rt.lab.util.StringArray;
+import com.epam.java.rt.lab.exception.AppException;
+import com.epam.java.rt.lab.util.StringCombiner;
 import com.epam.java.rt.lab.web.access.Role;
-import com.epam.java.rt.lab.web.access.AccessException;
 import com.epam.java.rt.lab.web.access.RoleFactory;
 
 import java.io.IOException;
@@ -44,7 +44,7 @@ public class NavigationFactory {
         try {
             properties.load(NavigationFactory.class.getClassLoader().getResourceAsStream("nav.properties"));
             List<Navigation> navigationList = new ArrayList<>();
-            for (String navigationName : StringArray.splitSpaceLessNames(properties.getProperty(navs), comma)) {
+            for (String navigationName : StringCombiner.splitSpaceLessNames(properties.getProperty(navs), comma)) {
                 Navigation navigation = new Navigation(
                         properties.getProperty(navigationName.concat(uri)),
                         properties.getProperty(navigationName.concat(label))
@@ -52,7 +52,7 @@ public class NavigationFactory {
                 String subNavsProperty = properties.getProperty(navigationName.concat(subNavs));
                 if (subNavsProperty != null) {
                     String subNamPrefix = navigationName.concat(point);
-                    for (String subNavigationName : StringArray.splitSpaceLessNames(subNavsProperty, comma)) {
+                    for (String subNavigationName : StringCombiner.splitSpaceLessNames(subNavsProperty, comma)) {
                         navigation.addNavigation(new Navigation(
                                 properties.getProperty(subNamPrefix.concat(subNavigationName).concat(uri)),
                                 properties.getProperty(subNamPrefix.concat(subNavigationName).concat(label))
@@ -73,9 +73,8 @@ public class NavigationFactory {
         } catch (IOException e) {
             e.printStackTrace();
             throw new NavigationException("exception.component.nav.properties", e.getCause());
-        } catch (AccessException e) {
-            e.printStackTrace();
-            throw new NavigationException("exception.component.navigation.role-factory", e.getCause());
+//        } catch (AppException e) {
+//            throw new NavigationException("exception.component.navigation.role-factory", e.getCause());
         }
     }
 

@@ -25,9 +25,9 @@ import static org.junit.Assert.*;
  */
 public class CategoryDaoTest {
 
-    private static final String CATEGORY_READ_A = "SELECT \"Category\".id, \"Category\".created, \"Category\".category_id, \"Category\".name FROM \"Category\" WHERE \"Category\".id = ?";
-    private static final String CATEGORY_READ_B = "SELECT \"Category\".id, \"Category\".created, \"Category\".category_id, \"Category\".name FROM \"Category\" ORDER BY \"Category\".name ASC";
-    private static final String CATEGORY_READ_C = "SELECT \"Category\".id, \"Category\".created, \"Category\".category_id, \"Category\".name FROM \"Category\" LIMIT 0, 10";
+    private static final String CATEGORY_READ_A = "SELECT \"Category\".id, \"Category\".created, \"Category\".parent_id, \"Category\".name FROM \"Category\" WHERE \"Category\".id = ?";
+    private static final String CATEGORY_READ_B = "SELECT \"Category\".id, \"Category\".created, \"Category\".parent_id, \"Category\".name FROM \"Category\" ORDER BY \"Category\".name ASC";
+    private static final String CATEGORY_READ_C = "SELECT \"Category\".id, \"Category\".created, \"Category\".parent_id, \"Category\".name FROM \"Category\" LIMIT 0, 10";
 
     private DaoFactory daoFactory;
     private DaoParameter daoParameter;

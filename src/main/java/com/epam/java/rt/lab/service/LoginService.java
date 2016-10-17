@@ -7,6 +7,7 @@ import com.epam.java.rt.lab.dao.sql.Where;
 import com.epam.java.rt.lab.entity.access.Activate;
 import com.epam.java.rt.lab.entity.access.Login;
 import com.epam.java.rt.lab.entity.access.Restore;
+import com.epam.java.rt.lab.exception.AppException;
 import com.epam.java.rt.lab.util.PropertyManager;
 import com.epam.java.rt.lab.util.TimestampManager;
 import org.slf4j.Logger;
@@ -243,6 +244,9 @@ public class LoginService extends BaseService {
             login.setStatus(0);
             return login;
         } catch (ServiceException | DaoException e) {
+            throw new ServiceException("exception.service.login.get-actvate-login.dao", e.getCause());
+        } catch (AppException e) {
+            e.printStackTrace();
             throw new ServiceException("exception.service.login.get-actvate-login.dao", e.getCause());
         }
     }

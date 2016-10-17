@@ -5,7 +5,7 @@ import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.dao.DaoParameter;
 import com.epam.java.rt.lab.dao.DaoStatement;
 import com.epam.java.rt.lab.dao.sql.Sql;
-import com.epam.java.rt.lab.util.StringArray;
+import com.epam.java.rt.lab.util.StringCombiner;
 
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
@@ -213,7 +213,7 @@ public abstract class JdbcDao implements Dao {
 
         private EntityMethod(Class entityClass, String methodData) throws DaoException {
             try {
-                String[] split = StringArray.splitSpaceLessNames(methodData, ",");
+                String[] split = StringCombiner.splitSpaceLessNames(methodData, ",");
                 switch (split[0]) {
                     case "boolean":
                         this.primitive = Primitive.BOOLEAN;

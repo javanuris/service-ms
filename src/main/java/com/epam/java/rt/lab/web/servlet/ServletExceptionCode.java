@@ -1,14 +1,15 @@
-package com.epam.java.rt.lab.web.access;
+package com.epam.java.rt.lab.web.servlet;
 
 import com.epam.java.rt.lab.exception.ExceptionCode;
 
-public enum AccessExceptionCode implements ExceptionCode {
+public enum ServletExceptionCode implements ExceptionCode {
 
-    ROLE_NOT_FOUND(0);
+    CONTENT_LENGTH_HEADER_ERROR(0),
+    CONTENT_LENGTH_ERROR(1);
 
     private final int number;
 
-    AccessExceptionCode(int number) {
+    ServletExceptionCode(int number) {
         this.number = number;
     }
 

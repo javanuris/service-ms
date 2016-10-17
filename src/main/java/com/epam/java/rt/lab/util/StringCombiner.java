@@ -2,15 +2,21 @@ package com.epam.java.rt.lab.util;
 
 import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.dao.sql.Clause;
+import com.epam.java.rt.lab.exception.AppException;
+import com.epam.java.rt.lab.exception.AppExceptionCode;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+
+import static com.epam.java.rt.lab.exception.AppExceptionCode.NULL_NOT_ALLOWED;
+import static com.epam.java.rt.lab.util.PropertyManager.EQUAL;
 
 /**
  * category-ms
  */
-public class StringArray {
+public class StringCombiner {
 
     public static final String SPACE = " ";
 
@@ -47,6 +53,19 @@ public class StringArray {
             }
         }
         return result;
+    }
+
+    public static String combine(Map<String, String> map, String delimiter)
+            throws AppException {
+        if (map == null || delimiter == null) {
+            throw new AppException(NULL_NOT_ALLOWED);
+        }
+        StringBuilder result = new StringBuilder();
+        for (Map.Entry entry : map.entrySet()) {
+            result.append(delimiter).append(entry.getKey()).
+                    append(EQUAL).append(entry.getValue());
+        }
+        return result.toString().substring(delimiter.length());
     }
 
 }

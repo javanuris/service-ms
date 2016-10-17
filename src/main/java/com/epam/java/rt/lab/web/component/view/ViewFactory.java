@@ -1,6 +1,6 @@
 package com.epam.java.rt.lab.web.component.view;
 
-import com.epam.java.rt.lab.util.StringArray;
+import com.epam.java.rt.lab.util.StringCombiner;
 
 import java.io.IOException;
 import java.util.*;
@@ -43,10 +43,10 @@ public class ViewFactory {
         try {
             properties.load(ViewFactory.class.getClassLoader().getResourceAsStream("view.properties"));
             this.viewMap.clear();
-            for (String viewName : StringArray.splitSpaceLessNames(properties.getProperty(views), comma)) {
+            for (String viewName : StringCombiner.splitSpaceLessNames(properties.getProperty(views), comma)) {
                 View view = new View();
                 List<ViewControl> viewControlList = new ArrayList<>();
-                for (String controlName : StringArray.splitSpaceLessNames(properties.getProperty(viewName.concat(controls)), comma)) {
+                for (String controlName : StringCombiner.splitSpaceLessNames(properties.getProperty(viewName.concat(controls)), comma)) {
                     String propertyPrefix = viewName.concat(point).concat(controlName);
                     viewControlList.add(
                             new ViewControl(

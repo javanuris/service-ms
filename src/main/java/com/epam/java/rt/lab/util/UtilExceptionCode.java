@@ -4,7 +4,9 @@ import com.epam.java.rt.lab.exception.ExceptionCode;
 
 enum UtilExceptionCode implements ExceptionCode {
 
-    PROPERTY_READ_ERROR(0);
+    PROPERTY_READ_ERROR(0),
+    VALUE_OUT_OF_RANGE(1),
+    TIMESTAMP_FORMAT_ERROR(2);
 
     private final int number;
 

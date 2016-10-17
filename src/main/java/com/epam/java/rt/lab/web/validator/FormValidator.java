@@ -1,4 +1,4 @@
-package com.epam.java.rt.lab.util.validator;
+package com.epam.java.rt.lab.web.validator;
 
 import com.epam.java.rt.lab.web.component.form.Form;
 import com.epam.java.rt.lab.web.component.form.FormControl;

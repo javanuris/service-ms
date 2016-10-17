@@ -1,6 +1,6 @@
 package com.epam.java.rt.lab.web.component.form;
 
-import com.epam.java.rt.lab.util.validator.Validator;
+import com.epam.java.rt.lab.web.validator.Validator;
 
 import java.util.ArrayList;
 import java.util.List;

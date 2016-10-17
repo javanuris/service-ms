@@ -1,9 +1,15 @@
 package com.epam.java.rt.lab.util;
 
+import com.epam.java.rt.lab.exception.AppException;
+
 import javax.servlet.http.HttpServletRequest;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
+
+import static com.epam.java.rt.lab.exception.AppExceptionCode.NULL_NOT_ALLOWED;
+import static com.epam.java.rt.lab.util.PropertyManager.AMPERSAND;
+import static com.epam.java.rt.lab.util.PropertyManager.QUESTION;
 
 /**
  * category-ms
@@ -103,6 +109,22 @@ public class UrlManager {
             }
         }
         return parameterString.toString();
+    }
+
+    public static String getUriWithContext(HttpServletRequest req,
+                                           String uri) throws AppException {
+        if (req == null || uri == null) throw new AppException(NULL_NOT_ALLOWED);
+        return req.getContextPath() + uri;
+    }
+
+    public static String getUriWithContext(HttpServletRequest req,
+                                           String uri,
+                                           Map<String, String> parameterMap)
+            throws AppException {
+        if (parameterMap == null) throw new AppException(NULL_NOT_ALLOWED);
+        return getUriWithContext(req, uri) + QUESTION
+                + StringCombiner.combine(parameterMap, AMPERSAND);
+
     }
 
 }
