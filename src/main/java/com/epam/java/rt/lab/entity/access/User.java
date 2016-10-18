@@ -1,7 +1,7 @@
 package com.epam.java.rt.lab.entity.access;
 
-import com.epam.java.rt.lab.entity.EntityProperty;
 import com.epam.java.rt.lab.entity.BaseEntity;
+import com.epam.java.rt.lab.entity.EntityProperty;
 import com.epam.java.rt.lab.web.access.Role;
 
 /**
@@ -29,6 +29,8 @@ public class User extends BaseEntity {
             return User.class;
         }
     }
+
+    public static final User NULL_USER = new User();
 
     public User() {
     }

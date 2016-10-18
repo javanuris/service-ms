@@ -2,6 +2,7 @@ package com.epam.java.rt.lab.web.action.profile;
 
 import com.epam.java.rt.lab.exception.AppException;
 import com.epam.java.rt.lab.web.action.Action;
+import com.epam.java.rt.lab.web.action.BaseAction;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -9,7 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * Service Management System
  */
-public class PostLoginAction implements Action {
+public class PostLoginAction extends BaseAction implements Action {
 
     private enum Submit {
         LOGIN,
@@ -89,7 +90,7 @@ public class PostLoginAction implements Action {
 //                        NavigationFactory.getInstance().create(user.getRole().getName()));
 //                if (form.getItem(2).getValue() != null) {
 //                    logger.debug("LOGIN USER REMEMBER");
-//                    userService.addRemember(req, resp, user);
+//                    userService.addUserRemember(req, resp, user);
 //                }
 //                return true;
 //            }

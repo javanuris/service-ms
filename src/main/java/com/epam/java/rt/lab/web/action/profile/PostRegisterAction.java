@@ -2,6 +2,7 @@ package com.epam.java.rt.lab.web.action.profile;
 
 import com.epam.java.rt.lab.exception.AppException;
 import com.epam.java.rt.lab.web.action.Action;
+import com.epam.java.rt.lab.web.action.BaseAction;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -9,7 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * Service Management System
  */
-public class PostRegisterAction implements Action {
+public class PostRegisterAction extends BaseAction implements Action {
 
     @Override
     public void execute(HttpServletRequest req, HttpServletResponse resp)

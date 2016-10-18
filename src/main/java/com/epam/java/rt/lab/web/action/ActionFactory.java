@@ -14,8 +14,7 @@ import java.util.Properties;
 
 import static com.epam.java.rt.lab.exception.AppExceptionCode.PROPERTY_EMPTY_OR_CONTENT_ERROR;
 import static com.epam.java.rt.lab.exception.AppExceptionCode.PROPERTY_READ_ERROR;
-import static com.epam.java.rt.lab.util.PropertyManager.COMMA;
-import static com.epam.java.rt.lab.util.PropertyManager.POINT;
+import static com.epam.java.rt.lab.util.PropertyManager.*;
 import static com.epam.java.rt.lab.web.action.ActionExceptionCode.*;
 
 public final class ActionFactory {
@@ -27,8 +26,6 @@ public final class ActionFactory {
     private static final int JSP_NAME = 0;
     private static final int GET_ACTION = 1;
     private static final int POST_ACTION = 2;
-    private static final String GET = "GET";
-    private static final String POST = "POST";
 
     private static class Holder {
 
@@ -42,6 +39,7 @@ public final class ActionFactory {
     }
 
     public void initActionMap() throws AppException {
+        LOGGER.debug("initActionMap()");
         String actionPackagePath = ActionFactory.class.
                 getPackage().getName() + POINT;
         ClassLoader classLoader = ActionFactory.class.getClassLoader();
@@ -58,10 +56,10 @@ public final class ActionFactory {
                 String[] uriPropertyArray = StringCombiner.
                         splitSpaceLessNames(uriProperties, COMMA);
                 addAction(GET, uri, uriPropertyArray[JSP_NAME],
-                        uriPropertyArray[GET_ACTION]);
+                        actionPackagePath + uriPropertyArray[GET_ACTION]);
                 if (uriPropertyArray.length - 1 == POST_ACTION) {
-                    addAction(GET, uri, uriPropertyArray[JSP_NAME],
-                            uriPropertyArray[POST_ACTION]);
+                    addAction(POST, uri, uriPropertyArray[JSP_NAME],
+                            actionPackagePath + uriPropertyArray[POST_ACTION]);
                 }
             }
             if (this.actionMap.size() == 0) {
@@ -70,18 +68,20 @@ public final class ActionFactory {
                         detailArray);
             }
         } catch (IOException e) {
-            String[] detailArray = {ACTION_PROPERTY_FILE, e.getMessage()};
-            throw new AppException(PROPERTY_READ_ERROR, e.getCause(),
-                    detailArray);
+            String[] detailArray = {ACTION_PROPERTY_FILE};
+            throw new AppException(PROPERTY_READ_ERROR,
+                    e.getMessage(), e.getCause(), detailArray);
         }
     }
 
     private void addAction(String method, String uri, String jspName,
                            String actionName) throws AppException {
+        LOGGER.debug("addAction({}, {}, {}, {})",
+                method, uri, jspName, actionName);
         try {
             Class actionClass = Class.forName(actionName);
             Action actionObject = (Action) actionClass.newInstance();
-            ((BaseAction) actionObject).setJspName(jspName);
+            ((BaseAction) actionObject).setJspName(JSP_BASE_PATH + jspName);
             this.actionMap.put(getActionMapKey(method, uri), actionObject);
         } catch (ClassNotFoundException e) {
             String[] detailArray = {actionName};
@@ -103,6 +103,7 @@ public final class ActionFactory {
     }
 
     public Action create(String method, String pathInfo) throws AppException {
+        LOGGER.debug("create({}, {})", method, pathInfo);
         Action actionObject = this.actionMap.
                 get(getActionMapKey(method, pathInfo));
         if (actionObject == null) {

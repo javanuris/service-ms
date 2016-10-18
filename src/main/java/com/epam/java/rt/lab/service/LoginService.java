@@ -40,6 +40,9 @@ public class LoginService extends BaseService {
             return loginList != null && loginList.size() > 0 ? loginList.get(0) : null;
         } catch (DaoException e) {
             throw new ServiceException("exception.service.login.get-login.dao", e.getCause());
+        } catch (AppException e) {
+            e.printStackTrace();
+            throw new ServiceException("exception.service.login.get-login.dao", e.getCause());
         }
     }
 
@@ -61,6 +64,9 @@ public class LoginService extends BaseService {
                     ))
             );
         } catch (DaoException e) {
+            throw new ServiceException("exception.service.login.update-attempt-left.dao", e.getCause());
+        } catch (AppException e) {
+            e.printStackTrace();
             throw new ServiceException("exception.service.login.update-attempt-left.dao", e.getCause());
         }
     }
@@ -89,6 +95,9 @@ public class LoginService extends BaseService {
             );
         } catch (DaoException e) {
             throw new ServiceException("exception.service.login.update-login.dao", e.getCause());
+        } catch (AppException e) {
+            e.printStackTrace();
+            throw new ServiceException("exception.service.login.update-login.dao", e.getCause());
         }
     }
 
@@ -103,6 +112,9 @@ public class LoginService extends BaseService {
         try {
             return dao(Login.class.getSimpleName()).create(new DaoParameter().setEntity(login));
         } catch (DaoException e) {
+            throw new ServiceException("exception.service.login.add-login.dao", e.getCause());
+        } catch (AppException e) {
+            e.printStackTrace();
             throw new ServiceException("exception.service.login.add-login.dao", e.getCause());
         }
     }
@@ -120,6 +132,9 @@ public class LoginService extends BaseService {
                     .setEntity(restore)
             );
         } catch (DaoException e) {
+            throw new ServiceException("exception.service.login.add-restore.dao", e.getCause());
+        } catch (AppException e) {
+            e.printStackTrace();
             throw new ServiceException("exception.service.login.add-restore.dao", e.getCause());
         }
     }
@@ -145,6 +160,9 @@ public class LoginService extends BaseService {
             }
             return result;
         } catch (DaoException e) {
+            throw new ServiceException("exception.service.login.remove-restore-list.dao", e.getCause());
+        } catch (AppException e) {
+            e.printStackTrace();
             throw new ServiceException("exception.service.login.remove-restore-list.dao", e.getCause());
         }
     }
@@ -183,6 +201,9 @@ public class LoginService extends BaseService {
             return null;
         } catch (DaoException e) {
             throw new ServiceException("exception.service.login.get-restore-login.dao", e.getCause());
+        } catch (AppException e) {
+            e.printStackTrace();
+            throw new ServiceException("exception.service.login.get-restore-login.dao", e.getCause());
         }
     }
 
@@ -199,6 +220,9 @@ public class LoginService extends BaseService {
             if (activateList != null) removeActivateList(activateList);
             return dao(Activate.class.getSimpleName()).create(new DaoParameter().setEntity(activate));
         } catch (DaoException e) {
+            throw new ServiceException("exception.service.login.add-activate.dao", e.getCause());
+        } catch (AppException e) {
+            e.printStackTrace();
             throw new ServiceException("exception.service.login.add-activate.dao", e.getCause());
         }
     }
@@ -218,6 +242,9 @@ public class LoginService extends BaseService {
             }
             return result;
         } catch (DaoException e) {
+            throw new ServiceException("exception.service.login.remove-activate-list.dao", e.getCause());
+        } catch (AppException e) {
+            e.printStackTrace();
             throw new ServiceException("exception.service.login.remove-activate-list.dao", e.getCause());
         }
     }
@@ -243,7 +270,7 @@ public class LoginService extends BaseService {
             login.setAttemptLeft(Integer.valueOf(PropertyManager.getProperty("login.attempt.max")));
             login.setStatus(0);
             return login;
-        } catch (ServiceException | DaoException e) {
+        } catch (DaoException e) {
             throw new ServiceException("exception.service.login.get-actvate-login.dao", e.getCause());
         } catch (AppException e) {
             e.printStackTrace();
@@ -262,6 +289,9 @@ public class LoginService extends BaseService {
                     ))
             );
         } catch (DaoException e) {
+            throw new ServiceException("exception.service.login.remove-activate.dao", e.getCause());
+        } catch (AppException e) {
+            e.printStackTrace();
             throw new ServiceException("exception.service.login.remove-activate.dao", e.getCause());
         }
     }

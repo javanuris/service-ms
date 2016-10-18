@@ -8,6 +8,7 @@ import com.epam.java.rt.lab.util.CookieManager;
 import com.epam.java.rt.lab.util.PropertyManager;
 import com.epam.java.rt.lab.util.UrlManager;
 import com.epam.java.rt.lab.web.action.Action;
+import com.epam.java.rt.lab.web.action.BaseAction;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -24,7 +25,7 @@ import static com.epam.java.rt.lab.web.action.ActionExceptionCode.ACTION_INSTANT
  * @see UrlManager
  * @see UserService
  */
-public class GetLogoutAction implements Action {
+public class GetLogoutAction extends BaseAction implements Action {
 
     @Override
     public void execute(HttpServletRequest req, HttpServletResponse resp)
@@ -41,10 +42,6 @@ public class GetLogoutAction implements Action {
             userService.removeUserRemember(user);
             resp.sendRedirect(UrlManager.getContextUri(req,
                     PropertyManager.SLASH));
-        } catch (ServiceException e) {
-            String[] detailArray = {UserService.class.getSimpleName()};
-            throw new AppException(ACTION_INSTANTIATE_SERVICE_ERROR,
-                    e.getMessage(), e.getCause(), detailArray);
         } catch (IOException e) {
             String[] detailArray = {PropertyManager.SLASH};
             throw new AppException(ACTION_INSTANTIATE_SERVICE_ERROR,

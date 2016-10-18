@@ -2,11 +2,12 @@ package com.epam.java.rt.lab.web.action.application;
 
 import com.epam.java.rt.lab.exception.AppException;
 import com.epam.java.rt.lab.web.action.Action;
+import com.epam.java.rt.lab.web.action.BaseAction;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-public class PostCommentAction implements Action {
+public class PostCommentAction extends BaseAction implements Action {
 
     private enum Submit {
         SAVE_PROFILE,

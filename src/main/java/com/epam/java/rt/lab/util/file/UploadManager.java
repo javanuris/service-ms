@@ -69,11 +69,10 @@ public final class UploadManager {
             throw new AppException(CONTENT_TYPE_ERROR, detailArray);
         }
         String fileName = filePart.getSubmittedFileName();
-        contentType = contentType.replaceAll(SLASH, UNDERSCORE);
-        String prefix = POINT + uploadType + POINT + contentType + POINT;
-        String postfix = POINT + sessionId;
+        String prefix = getPrefixFromMetaInfo(fileName, uploadType, contentType);
+        String suffix = POINT + sessionId;
         try {
-            File outputFile = File.createTempFile(fileName + prefix, postfix);
+            File outputFile = File.createTempFile(prefix, suffix);
             InputStream inputStream = filePart.getInputStream();
             Files.copy(inputStream, outputFile.toPath(),
                        StandardCopyOption.REPLACE_EXISTING);
@@ -84,10 +83,35 @@ public final class UploadManager {
                                     getBytes(charsetUtf8);
             return FILE_PATH_PREFIX + new String(outputFilePath, charsetLatin1);
         } catch (IOException e) {
-            String[] detailArray = {fileName + prefix + POINT + postfix};
+            String[] detailArray = {prefix, suffix};
             throw new AppException(FILE_ACCESS_ERROR,
                     e.getMessage(), e.getCause(), detailArray);
         }
+    }
+
+    private static String getPrefixFromMetaInfo(String fileName,
+                                                String uploadType,
+                                                String contentType) {
+        contentType = contentType.replaceAll(SLASH, UNDERSCORE);
+        return fileName + POINT + uploadType + POINT + contentType + POINT;
+    }
+
+    public static String[] getMetaInfoFromPrefix(String fileNamePrefix,
+                                                 String uploadType)
+            throws AppException {
+        if (fileNamePrefix == null || uploadType == null) {
+            throw new AppException(NULL_NOT_ALLOWED);
+        }
+        int prefixLastPoint = fileNamePrefix.lastIndexOf(ESCAPED_POINT);
+        fileNamePrefix = fileNamePrefix.substring(0, prefixLastPoint);
+        uploadType = ESCAPED_POINT + uploadType + ESCAPED_POINT;
+        String[] result = fileNamePrefix.split(uploadType);
+        if (result.length != 2) {
+            String[] detailArray = {fileNamePrefix, uploadType};
+            throw new AppException(META_INFO_ERROR, detailArray);
+        }
+        result[1] = result[1].replaceAll(UNDERSCORE, SLASH);
+        return result;
     }
 
 }

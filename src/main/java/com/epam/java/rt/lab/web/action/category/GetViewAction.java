@@ -2,6 +2,7 @@ package com.epam.java.rt.lab.web.action.category;
 
 import com.epam.java.rt.lab.exception.AppException;
 import com.epam.java.rt.lab.web.action.Action;
+import com.epam.java.rt.lab.web.action.BaseAction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,7 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * Service Management System
  */
-public class GetViewAction implements Action {
+public class GetViewAction extends BaseAction implements Action {
     private static final Logger logger = LoggerFactory.getLogger(GetViewAction.class);
 
     @Override

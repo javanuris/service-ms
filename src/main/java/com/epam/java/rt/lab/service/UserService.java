@@ -1,22 +1,22 @@
 package com.epam.java.rt.lab.service;
 
-import com.epam.java.rt.lab.dao.Dao;
 import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.dao.DaoParameter;
 import com.epam.java.rt.lab.dao.sql.OrderBy;
-import com.epam.java.rt.lab.dao.sql.Update;
+import com.epam.java.rt.lab.dao.sql.Update.SetValue;
 import com.epam.java.rt.lab.dao.sql.Where;
+import com.epam.java.rt.lab.dao.sql.Where.Predicate.PredicateOperator;
 import com.epam.java.rt.lab.entity.access.Avatar;
 import com.epam.java.rt.lab.entity.access.Login;
 import com.epam.java.rt.lab.entity.access.Remember;
 import com.epam.java.rt.lab.entity.access.User;
+import com.epam.java.rt.lab.entity.access.User.Property;
 import com.epam.java.rt.lab.exception.AppException;
 import com.epam.java.rt.lab.util.*;
+import com.epam.java.rt.lab.util.file.UploadManager;
 import com.epam.java.rt.lab.web.access.RoleFactory;
 import com.epam.java.rt.lab.web.component.Page;
 import com.epam.java.rt.lab.web.validator.ValidatorFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -24,62 +24,76 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
+import java.sql.Timestamp;
 import java.util.List;
-import java.util.UUID;
 
-/**
- * category-ms
- */
+import static com.epam.java.rt.lab.entity.access.Avatar.NULL_AVATAR;
+import static com.epam.java.rt.lab.entity.access.User.NULL_USER;
+import static com.epam.java.rt.lab.exception.AppExceptionCode.NULL_NOT_ALLOWED;
+import static com.epam.java.rt.lab.service.ServiceExceptionCode.*;
+import static com.epam.java.rt.lab.util.CookieManager.getCookieValue;
+import static com.epam.java.rt.lab.util.CookieManager.getUserAgentCookieName;
+import static com.epam.java.rt.lab.util.PropertyManager.*;
+import static com.epam.java.rt.lab.web.validator.ValidatorFactory.DIGITS;
+
 public class UserService extends BaseService {
 
-    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
-
-    public User getUser(Login login) throws ServiceException {
+    public User getUser(Login login) throws AppException {
+        if (login == null) {
+            throw new AppException(NULL_NOT_ALLOWED);
+        }
         try {
-            List<User> userList = dao(User.class.getSimpleName()).read(new DaoParameter()
-                    .setWherePredicate(Where.Predicate.get(
-                            User.Property.LOGIN_ID,
-                            Where.Predicate.PredicateOperator.EQUAL,
-                            login.getId()
-                    ))
-            );
-            return userList != null && userList.size() > 0 ? userList.get(0) : null;
+            DaoParameter daoParameter = new DaoParameter();
+            daoParameter.setWherePredicate(Where.Predicate.
+                    get(Property.LOGIN_ID, PredicateOperator.EQUAL,
+                            login.getId()));
+            List<User> userList = dao(User.class.getSimpleName()).
+                    read(daoParameter);
+            return ((userList != null) && (userList.size() > 0))
+                    ? userList.get(0)
+                    : NULL_USER;
         } catch (DaoException e) {
-            throw new ServiceException("exception.service.user.get-user.dao", e.getCause());
+            String[] detailArray = {String.valueOf(login.getId())};
+            throw new AppException(GET_USER_ERROR,
+                    e.getMessage(), e.getCause(), detailArray);
         }
     }
 
-    public int updateUser(User user) throws ServiceException {
+    public int updateUser(User user) throws AppException {
+        if (user == null) {
+            throw new AppException(NULL_NOT_ALLOWED);
+        }
         try {
-            return dao(User.class.getSimpleName()).update(new DaoParameter()
-                    .setSetValueArray(
-                            new Update.SetValue(User.Property.FIRST_NAME, user.getFirstName()),
-                            new Update.SetValue(User.Property.MIDDLE_NAME, user.getMiddleName()),
-                            new Update.SetValue(User.Property.LAST_NAME, user.getLastName()),
-                            new Update.SetValue(User.Property.AVATAR_ID, user.getAvatarId()),
-                            new Update.SetValue(User.Property.ROLE_NAME, user.getRole().getName())
-                    )
-                    .setWherePredicate(Where.Predicate.get(
-                            User.Property.ID,
-                            Where.Predicate.PredicateOperator.EQUAL,
-                            user.getId()
-                    ))
-            );
+            DaoParameter daoParameter = new DaoParameter();
+            daoParameter.setSetValueArray(
+                    new SetValue(Property.FIRST_NAME, user.getFirstName()),
+                    new SetValue(Property.MIDDLE_NAME, user.getMiddleName()),
+                    new SetValue(Property.LAST_NAME, user.getLastName()),
+                    new SetValue(Property.AVATAR_ID, user.getAvatarId()),
+                    new SetValue(Property.ROLE_NAME, user.getRole().getName()));
+            daoParameter.setWherePredicate(Where.Predicate.
+                    get(Property.ID, PredicateOperator.EQUAL, user.getId()));
+            return dao(User.class.getSimpleName()).update(daoParameter);
         } catch (DaoException e) {
-            throw new ServiceException("exception.service.user.update-user.dao", e.getCause());
+            String[] detailArray = {String.valueOf(user.getId())};
+            throw new AppException(GET_USER_ERROR,
+                    e.getMessage(), e.getCause(), detailArray);
         }
     }
 
-    public int updateUser(User user, String avatarPath) throws ServiceException {
+    public int updateUser(User user, String avatarPath)
+            throws AppException {
+        if (user == null || avatarPath == null) {
+            throw new AppException(NULL_NOT_ALLOWED);
+        }
         int result = 0;
-        String[] pair = avatarPath.split("\\?");
-        if (pair.length == 2) pair = pair[1].split("=");
-        if ("id".equals(pair[0])) {
+        String[] pair = avatarPath.split(ESCAPED_QUESTION);
+        if (pair.length == 2) pair = pair[1].split(EQUAL);
+        if (ID.equals(pair[0])) {
             // avatar not changed
             result = updateUser(user);
-        } else if ("path".equals(pair[0])) {
+        } else if (PATH.equals(pair[0])) {
             // avatar recently uploaded
             setAvatar(user, pair[1]);
             result = updateUser(user);
@@ -98,238 +112,255 @@ public class UserService extends BaseService {
         return result;
     }
 
-    public Long addUser(Login login) throws ServiceException {
+    public User addUser(Login login) throws AppException {
+        if (login == null) {
+            throw new AppException(NULL_NOT_ALLOWED);
+        }
         try (LoginService loginService = new LoginService()) {
-            super.daoFactory.beginTransaction(Connection.TRANSACTION_REPEATABLE_READ);
+            super.daoFactory.
+                    beginTransaction(Connection.TRANSACTION_REPEATABLE_READ);
             User user = new User();
             login.setId(loginService.addLogin(login));
             user.setLogin(login);
             user.setRole(RoleFactory.getInstance().createAuthorized());
-            Long userId = dao(User.class.getSimpleName()).create(new DaoParameter().setEntity(user));
-            super.daoFactory.commitTransaction();
-            return userId;
-        } catch (DaoException e) {
-            throw new ServiceException("exception.service.user.add-user.dao", e.getCause());
-        } catch (AppException e) {
-            throw new ServiceException("exception.service.user.add-user.role-factory", e.getCause());
-        }
-    }
-
-    public User getUser(Long id) throws ServiceException {
-        try {
-            List<User> userList = dao(User.class.getSimpleName()).read(new DaoParameter()
-                    .setWherePredicate(Where.Predicate.get(
-                            User.Property.ID,
-                            Where.Predicate.PredicateOperator.EQUAL,
-                            id
-                    ))
-            );
-            return userList != null && userList.size() > 0 ? userList.get(0) : null;
-        } catch (DaoException e) {
-            throw new ServiceException("exception.service.user.get-user.dao", e.getCause());
-        }
-    }
-
-    public User getAnonymous() throws ServiceException {
-        try {
-            List<User> userList = dao(User.class.getSimpleName()).read(new DaoParameter()
-                    .setWherePredicate(Where.Predicate.get(
-                            Login.Property.EMAIL,
-                            Where.Predicate.PredicateOperator.EQUAL,
-                            ""
-                    ))
-            );
-            return userList != null && userList.size() > 0 ? userList.get(0) : null;
-        } catch (DaoException e) {
-            throw new ServiceException("exception.service.user.get-user.dao", e.getCause());
-        }
-    }
-
-    public List<User> getUserList(Page page) throws ServiceException {
-        try {
             DaoParameter daoParameter = new DaoParameter();
-            page.setCountItems(dao(User.class.getSimpleName()).count(daoParameter));
-            return dao(User.class.getSimpleName()).read(new DaoParameter()
-                    .setOrderByCriteriaArray(OrderBy.Criteria.asc(
-                            User.Property.FIRST_NAME
-                    ))
-                    .setLimit(
-                            (page.getCurrentPage() - 1) * page.getItemsOnPage(),
-                            page.getItemsOnPage()
-                    )
-            );
-        } catch (DaoException e) {
-            throw new ServiceException("exception.service.user.get-user-list.dao", e.getCause());
-        }
-    }
-
-    /**
-     *
-     * @param user
-     * @return
-     * @throws ServiceException
-     */
-    public void addRemember(HttpServletRequest req, HttpServletResponse resp, User user)
-            throws ServiceException {
-        try {
-            Remember remember = new Remember();
-            remember.setUser(user);
-            remember.setCookieName(CookieManager.getUserAgentCookieName(req));
-            remember.setCookieValue(HashGenerator.hashString(UUID.randomUUID().toString()));
-            remember.setValid(TimestampManager.daysToTimestamp(
-                    TimestampManager.getCurrentTimestamp(),
-                    Integer.valueOf(PropertyManager.getProperty("remember.days.valid"))
-            ));
-            dao(Remember.class.getSimpleName()).create(new DaoParameter().setEntity(remember));
-            CookieManager.setCookie(
-                    resp,
-                    remember.getCookieName(),
-                    remember.getCookieValue(),
-                    TimestampManager.secondsBetweenTimestamps(
-                            TimestampManager.getCurrentTimestamp(),
-                            remember.getValid()
-                    ),
-                    UrlManager.getContextUri(req, "/")
-            );
-        } catch (DaoException e) {
-            throw new ServiceException("exception.service.login.add-remember.dao", e.getCause());
-        } catch (NoSuchAlgorithmException e) {
-            throw new ServiceException("exception.service.user.add-remember.hash", e.getCause());
-        } catch (AppException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     *
-     * @param user
-     * @return
-     * @throws ServiceException
-     */
-    public int removeUserRemember(User user)
-            throws ServiceException {
-        try {
-            return dao(Remember.class.getSimpleName()).delete(new DaoParameter()
-                    .setWherePredicate(Where.Predicate.get(
-                            Remember.Property.USER_ID,
-                            Where.Predicate.PredicateOperator.EQUAL,
-                            user.getId()
-                    ))
-            );
-        } catch (DaoException e) {
-            throw new ServiceException("exception.service.user.remove-user-remember.dao", e.getCause());
-        }
-    }
-
-    /**
-     *
-     * @param cookieName
-     * @param cookieValue
-     * @return
-     * @throws ServiceException
-     */
-    public User getUserRemember(String cookieName, String cookieValue) throws ServiceException {
-        try {
-            Dao dao = dao(Remember.class.getSimpleName());
-            List<Remember> rememberList = dao.read(new DaoParameter()
-                    .setWherePredicate(Where.Predicate.get(
-                            Where.Predicate.get(
-                                    Remember.Property.COOKIE_NAME,
-                                    Where.Predicate.PredicateOperator.EQUAL,
-                                    cookieName
-                            ),
-                            Where.Predicate.PredicateOperator.AND,
-                            Where.Predicate.get(
-                                    Remember.Property.COOKIE_VALUE,
-                                    Where.Predicate.PredicateOperator.EQUAL,
-                                    cookieValue
-                            )
-                    ))
-            );
-            if (rememberList == null || rememberList.size() == 0) return null;
-            User user = rememberList.get(0).getUser();
-            removeUserRemember(user);
-            if (TimestampManager.secondsBetweenTimestamps(
-                    TimestampManager.getCurrentTimestamp(), rememberList.get(0).getValid()) < 0)
-                return null;
+            daoParameter.setEntity(user);
+            user.setId(dao(User.class.getSimpleName()).create(daoParameter));
+            super.daoFactory.commitTransaction();
             return user;
         } catch (DaoException e) {
-            throw new ServiceException("exception.service.user.get-user-remember.dao", e.getCause());
-        } catch (AppException e) {
-            e.printStackTrace();
-            throw new ServiceException("exception.service.user.get-user-remember.dao", e.getCause());
+            throw new AppException(GET_USER_ERROR,
+                    e.getMessage(), e.getCause());
+        } catch (ServiceException e) {
+            throw new AppException(GET_USER_ERROR,
+                    e.getMessage(), e.getCause());
         }
     }
 
-    public Avatar getAvatar(String id) throws ServiceException {
+    public User getUser(Long id) throws AppException {
+        if (id == null) throw new AppException(NULL_NOT_ALLOWED);
         try {
-            if (ValidatorFactory.getInstance().create("digits").validate(id) != null) return null;
-            List<Avatar> avatarList = dao(Avatar.class.getSimpleName()).read(new DaoParameter()
-                    .setWherePredicate(Where.Predicate.get(
-                            Avatar.Property.ID,
-                            Where.Predicate.PredicateOperator.EQUAL,
-                            id
-                    ))
-            );
-            if (avatarList == null || avatarList.size() == 0) return null;
+            DaoParameter daoParameter = new DaoParameter();
+            daoParameter.setWherePredicate(Where.Predicate.
+                    get(Property.ID, PredicateOperator.EQUAL, id));
+            List<User> userList = dao(User.class.getSimpleName()).
+                    read(daoParameter);
+            return ((userList != null) && (userList.size() > 0))
+                    ? userList.get(0)
+                    : NULL_USER;
+        } catch (DaoException e) {
+            throw new AppException(GET_USER_ERROR,
+                    e.getMessage(), e.getCause());
+        }
+    }
+
+    public User getAnonymous() throws AppException {
+        try {
+            DaoParameter daoParameter = new DaoParameter();
+            daoParameter.setWherePredicate(Where.Predicate.
+                    get(Login.Property.EMAIL, PredicateOperator.EQUAL, ""));
+            List<User> userList = dao(User.class.getSimpleName()).
+                    read(daoParameter);
+            return ((userList != null) && (userList.size() > 0))
+                    ? userList.get(0)
+                    : NULL_USER;
+        } catch (DaoException e) {
+            throw new AppException(GET_USER_ERROR,
+                    e.getMessage(), e.getCause());
+        }
+    }
+
+    public List<User> getUserList(Page page) throws AppException {
+        if (page == null) throw new AppException(NULL_NOT_ALLOWED);
+        try {
+            DaoParameter daoParameter = new DaoParameter();
+            Long count = dao(User.class.getSimpleName()).count(daoParameter);
+            page.setCountItems(count);
+            daoParameter.setOrderByCriteriaArray(OrderBy.Criteria.
+                    asc(Property.FIRST_NAME));
+            daoParameter.setLimit((page.getCurrentPage() - 1)
+                    * page.getItemsOnPage(), page.getItemsOnPage());
+            return dao(User.class.getSimpleName()).read(daoParameter);
+        } catch (DaoException e) {
+            throw new AppException(NULL_NOT_ALLOWED,
+                    e.getMessage(), e.getCause());
+        }
+    }
+
+    public User getUserRemember(HttpServletRequest req,
+                                HttpServletResponse resp)
+            throws AppException {
+        if (req == null || resp == null) {
+            throw new AppException(NULL_NOT_ALLOWED);
+        }
+        String rememberCookieName = getUserAgentCookieName(req);
+        String rememberCookieValue = getCookieValue(req, rememberCookieName);
+        if (rememberCookieValue == null) return NULL_USER;
+        List<Remember> rememberList =
+                getRememberList(rememberCookieName, rememberCookieValue);
+        if (rememberList == null
+                || rememberList.size() == 0) return NULL_USER;
+        User user = rememberList.get(0).getUser();
+        if (user == null) return NULL_USER;
+        Timestamp currentTimestamp = TimestampManager.getCurrentTimestamp();
+        Timestamp validTimestamp = rememberList.get(0).getValid();
+        if (TimestampManager.secondsBetweenTimestamps(currentTimestamp,
+                validTimestamp) < 0) return NULL_USER;
+        if (user.getLogin().getAttemptLeft() == 0
+                || user.getLogin().getStatus() < 0) return NULL_USER;
+        removeUserRemember(user);
+        CookieManager.removeCookie(req, resp, rememberCookieName,
+                UrlManager.getUriWithContext(req, ""));
+        rememberCookieValue = HashGenerator.hashString();
+        Remember remember = addRemember(rememberCookieName,
+                rememberCookieValue, user);
+        currentTimestamp = TimestampManager.getCurrentTimestamp();
+        int maxAge = TimestampManager.
+                secondsBetweenTimestamps(currentTimestamp, remember.getValid());
+        CookieManager.setCookie(resp, rememberCookieName, rememberCookieValue,
+                maxAge, UrlManager.getUriWithContext(req, SLASH));
+        return user;
+    }
+
+    public int removeUserRemember(User user)
+            throws AppException {
+        if (user == null) throw new AppException(NULL_NOT_ALLOWED);
+        try {
+            DaoParameter daoParameter = new DaoParameter();
+            daoParameter.setWherePredicate(Where.Predicate.
+                    get(Remember.Property.USER_ID, PredicateOperator.EQUAL,
+                            user.getId()));
+            return dao(Remember.class.getSimpleName()).delete(daoParameter);
+        } catch (DaoException e) {
+            throw new AppException(REMOVE_REMEMBER_ERROR,
+                    e.getMessage(), e.getCause());
+        }
+    }
+
+    private Remember addRemember(String rememberCookieName,
+                                 String rememberCookieValue, User user)
+            throws AppException {
+        String rememberValidString = PropertyManager.
+                getProperty(REMEMBER_DAYS_VALID_KEY);
+        if (rememberValidString == null
+                || ValidatorFactory.getInstance().create(DIGITS).
+                validate(rememberValidString).length == 0) {
+            throw new AppException(NULL_NOT_ALLOWED);
+        }
+        Remember remember = new Remember();
+        remember.setUser(user);
+        remember.setCookieName(rememberCookieName);
+        remember.setCookieValue(rememberCookieValue);
+        Timestamp currentTimestamp = TimestampManager.getCurrentTimestamp();
+        remember.setValid(TimestampManager.daysToTimestamp(currentTimestamp,
+                Integer.valueOf(rememberValidString)));
+        try {
+            DaoParameter daoParameter = new DaoParameter();
+            daoParameter.setEntity(remember);
+            dao(Remember.class.getSimpleName()).create(daoParameter);
+            return remember;
+        } catch (DaoException e) {
+            throw new AppException(ADD_REMEMBER_ERROR,
+                    e.getMessage(), e.getCause());
+        }
+    }
+
+    private List<Remember> getRememberList(String cookieName,
+                                           String cookieValue)
+            throws AppException {
+        try {
+            DaoParameter daoParameter = new DaoParameter();
+            daoParameter.setWherePredicate(Where.Predicate.
+                    get(Where.Predicate.
+                                    get(Remember.Property.COOKIE_NAME,
+                                            PredicateOperator.EQUAL, cookieName),
+                            PredicateOperator.AND,
+                            Where.Predicate.get(Remember.Property.COOKIE_VALUE,
+                                    PredicateOperator.EQUAL, cookieValue)));
+            return dao(Remember.class.getSimpleName()).read(daoParameter);
+
+        } catch (DaoException e) {
+            // TODO: replace DaoException
+            throw new AppException(GET_REMEMBER_ERROR,
+                    e.getMessage(), e.getCause());
+        }
+    }
+
+    public Avatar getAvatar(String id) throws AppException {
+        if (id == null) throw new AppException(NULL_NOT_ALLOWED);
+        try {
+            if (ValidatorFactory.getInstance().create(ValidatorFactory.DIGITS).
+                    validate(id).length > 0) return NULL_AVATAR;
+            DaoParameter daoParameter = new DaoParameter();
+            daoParameter.setWherePredicate(Where.Predicate.
+                    get(Avatar.Property.ID, PredicateOperator.EQUAL, id));
+            List<Avatar> avatarList = dao(Avatar.class.getSimpleName()).
+                    read(daoParameter);
+            if (avatarList == null || avatarList.size() == 0) {
+                return NULL_AVATAR;
+            }
             return avatarList.get(0);
         } catch (DaoException | AppException e) {
-            throw new ServiceException("exception.service.user.get-avatar.dao", e.getCause());
+            throw new AppException(GET_USER_ERROR,
+                    e.getMessage(), e.getCause());
         }
     }
 
-    public void setAvatar(User user, String filePath) throws ServiceException {
-        String fileName = filePath.substring(filePath.lastIndexOf("\\") + 1);
-        int avatarInfoIndex = fileName.lastIndexOf(".avatar.");
-        String avatarName = fileName.substring(0, avatarInfoIndex);
-        avatarInfoIndex = avatarInfoIndex + 8;
-        String contentType = fileName.substring(avatarInfoIndex,
-                fileName.indexOf(".", avatarInfoIndex)).replaceAll("_", "/");
-        try (InputStream inputStream = new FileInputStream(new File(filePath))) {
+    public void setAvatar(User user, String filePath) throws AppException {
+        if (user == null || filePath == null) {
+            throw new AppException(NULL_NOT_ALLOWED);
+        }
+        int backslashLastIndex = filePath.lastIndexOf(ESCAPED_BACKSLASH);
+        String fileName = filePath.substring(backslashLastIndex + 1);
+        String[] metaInfo = UploadManager.
+                getMetaInfoFromPrefix(fileName, AVATAR_UPLOAD_TYPE);
+        String avatarName = metaInfo[0];
+        String contentType = metaInfo[1];
+        File file = new File(filePath);
+        try (InputStream inputStream = new FileInputStream(file)) {
             Avatar avatar = new Avatar();
             avatar.setId(user.getAvatarId());
             avatar.setName(avatarName);
             avatar.setType(contentType);
-            avatar.setFile((FileInputStream) inputStream);
+            avatar.setFile(inputStream);
             avatar.setModified(TimestampManager.getCurrentTimestamp());
             if (avatar.getId() == null) {
-                Long avatarId = dao(Avatar.class.getSimpleName()).create(new DaoParameter()
-                        .setEntity(avatar)
-                );
+                DaoParameter daoParameter = new DaoParameter();
+                daoParameter.setEntity(avatar);
+                Long avatarId = dao(Avatar.class.getSimpleName()).
+                        create(daoParameter);
                 user.setAvatarId(avatarId);
             } else {
-                dao(Avatar.class.getSimpleName()).update(new DaoParameter()
-                        .setSetValueArray(
-                                new Update.SetValue(Avatar.Property.NAME, avatar.getName()),
-                                new Update.SetValue(Avatar.Property.TYPE, avatar.getType()),
-                                new Update.SetValue(Avatar.Property.FILE, avatar.getFile()),
-                                new Update.SetValue(Avatar.Property.MODIFIED, avatar.getModified())
-                        )
-                        .setWherePredicate(Where.Predicate.get(
-                                Avatar.Property.ID,
-                                Where.Predicate.PredicateOperator.EQUAL,
-                                avatar.getId()
-                        ))
-                );
+                DaoParameter daoParameter = new DaoParameter();
+                daoParameter.setSetValueArray(
+                        new SetValue(Avatar.Property.NAME, avatar.getName()),
+                        new SetValue(Avatar.Property.TYPE, avatar.getType()),
+                        new SetValue(Avatar.Property.FILE, avatar.getFile()),
+                        new SetValue(Avatar.Property.MODIFIED,
+                                avatar.getModified()));
+                daoParameter.setWherePredicate(Where.Predicate.
+                        get(Avatar.Property.ID, PredicateOperator.EQUAL,
+                                avatar.getId()));
+                dao(Avatar.class.getSimpleName()).update(daoParameter);
             }
         } catch (IOException e) {
-            throw new ServiceException("exception.service.user.set-avatar.file", e.getCause());
+            String[] detailArray = {filePath};
+            throw new AppException(AVATAR_FILE_ACCESS_ERROR,
+                    e.getMessage(), e.getCause(), detailArray);
         } catch (DaoException e) {
-            throw new ServiceException("exception.service.user.set-avatar.dao", e.getCause());
+            throw new AppException(CREATE_DAO_FACTORY_OR_DAO_ERROR);
         }
     }
 
-    public int removeAvatar(Long avatarId) throws ServiceException {
+    public int removeAvatar(Long avatarId) throws AppException {
         try {
-            return dao(Avatar.class.getSimpleName()).delete(new DaoParameter()
-                    .setWherePredicate(Where.Predicate.get(
-                            Avatar.Property.ID,
-                            Where.Predicate.PredicateOperator.EQUAL,
-                            avatarId
-                    ))
-            );
+            DaoParameter daoParameter = new DaoParameter();
+            daoParameter.setWherePredicate(Where.Predicate.
+                    get(Avatar.Property.ID, PredicateOperator.EQUAL, avatarId));
+            return dao(Avatar.class.getSimpleName()).delete(daoParameter);
         } catch (DaoException e) {
-            throw new ServiceException("exception.service.user.remove-avatar.dao", e.getCause());
+            throw new AppException(GET_USER_ERROR,
+                    e.getMessage(), e.getCause());
         }
     }
 }

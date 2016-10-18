@@ -3,9 +3,6 @@ package com.epam.java.rt.lab.web.access;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * category-ms
- */
 public class Role {
 
     private String name;

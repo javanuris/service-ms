@@ -6,6 +6,7 @@ import com.epam.java.rt.lab.dao.sql.OrderBy;
 import com.epam.java.rt.lab.dao.sql.Where;
 import com.epam.java.rt.lab.entity.business.Application;
 import com.epam.java.rt.lab.entity.access.User;
+import com.epam.java.rt.lab.exception.AppException;
 import com.epam.java.rt.lab.web.component.Page;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +43,9 @@ public class ApplicationService extends BaseService {
             return dao(Application.class.getSimpleName()).read(daoParameter);
         } catch (DaoException e) {
             throw new ServiceException("exception.service.application.get-application-list.dao", e.getCause());
+        } catch (AppException e) {
+            e.printStackTrace();
+            throw new ServiceException("exception.service.application.get-application-list.dao", e.getCause());
         }
     }
 
@@ -57,6 +61,9 @@ public class ApplicationService extends BaseService {
             return applicationList != null && applicationList.size() > 0 ? applicationList.get(0) : null;
         } catch (DaoException e) {
             throw new ServiceException("exception.service.application.get-application.dao", e.getCause());
+        } catch (AppException e) {
+            e.printStackTrace();
+            throw new ServiceException("exception.service.application.get-application.dao", e.getCause());
         }
     }
 
@@ -64,6 +71,9 @@ public class ApplicationService extends BaseService {
         try {
             return dao(Application.class.getSimpleName()).create(new DaoParameter().setEntity(application));
         } catch (DaoException e) {
+            throw new ServiceException("exception.service.application.add-application.dao", e.getCause());
+        } catch (AppException e) {
+            e.printStackTrace();
             throw new ServiceException("exception.service.application.add-application.dao", e.getCause());
         }
     }

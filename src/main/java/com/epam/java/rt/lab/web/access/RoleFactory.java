@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import static com.epam.java.rt.lab.exception.AppExceptionCode.NULL_NOT_ALLOWED;
 import static com.epam.java.rt.lab.exception.AppExceptionCode.PROPERTY_EMPTY_OR_CONTENT_ERROR;
 import static com.epam.java.rt.lab.exception.AppExceptionCode.PROPERTY_READ_ERROR;
 import static com.epam.java.rt.lab.util.PropertyManager.COMMA;
@@ -77,6 +78,7 @@ public final class RoleFactory {
     }
 
     public Role create(String roleName) throws AppException {
+        if (roleName == null) throw new AppException(NULL_NOT_ALLOWED);
         Role role = this.roleMap.get(roleName);
         if (role == null) {
             String[] detailArray = {ACCESS_PROPERTY_FILE, roleName};

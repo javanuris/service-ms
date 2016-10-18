@@ -10,16 +10,18 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-@WebServlet(urlPatterns = "/servlet/*")
+import static com.epam.java.rt.lab.util.PropertyManager.*;
+
+@WebServlet(urlPatterns = SERVLET_PATH + SLASH + ASTERISK)
 public class FrontServlet extends HttpServlet {
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
         try {
-            if ("/".equals(req.getPathInfo())) {
+            if (SLASH.equals(req.getPathInfo())) {
                 ActionFactory.getInstance().
-                        create(req.getMethod(), "/home").execute(req, resp);
+                        create(req.getMethod(), HOME_PATH).execute(req, resp);
             } else {
                 ActionFactory.getInstance().
                         create(req.getMethod(), req.getPathInfo()).

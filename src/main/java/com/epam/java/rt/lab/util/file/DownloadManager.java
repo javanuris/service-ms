@@ -59,10 +59,8 @@ public final class DownloadManager {
         if ("/avatar".equals(pathInfo)) {
             try (UserService userService = new UserService()) {
                 return userService.getAvatar(id);
-            } catch (ServiceException e) {
-                String[] detailArray = {pathInfo, id};
-                throw new AppException(FILE_NOT_FOUND,
-                        e.getMessage(), e.getCause(), detailArray);
+            } catch (AppException e) {
+                throw e;
             }
         } else if ("/photo".equals(pathInfo)) {
             try (CommentService commentService = new CommentService()) {

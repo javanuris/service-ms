@@ -25,6 +25,8 @@ public class Avatar extends BaseEntity implements File {
         }
     }
 
+    public static final Avatar NULL_AVATAR = new Avatar();
+
     private String name;
     private String type;
     private InputStream file;

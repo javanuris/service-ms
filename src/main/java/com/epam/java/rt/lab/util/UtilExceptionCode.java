@@ -6,7 +6,8 @@ enum UtilExceptionCode implements ExceptionCode {
 
     PROPERTY_READ_ERROR(0),
     VALUE_OUT_OF_RANGE(1),
-    TIMESTAMP_FORMAT_ERROR(2);
+    TIMESTAMP_FORMAT_ERROR(2),
+    NO_SUCH_ALGORITHM(3);
 
     private final int number;
 

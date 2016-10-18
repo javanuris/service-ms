@@ -29,7 +29,8 @@ public class UploadServlet extends HttpServlet {
             if (req.getSession().getAttribute(USER_ATTR) == null) {
                 throw new AppException(NULL_NOT_ALLOWED);
             }
-            String contentLengthHeaderValue = req.getHeader("Content-Length");
+            String contentLengthHeaderValue =
+                    req.getHeader(HEADER_CONTENT_LENGTH);
             if (contentLengthHeaderValue == null
                     || ValidatorFactory.getInstance().create(DIGITS).
                     validate(contentLengthHeaderValue) == null) {
@@ -39,11 +40,13 @@ public class UploadServlet extends HttpServlet {
             if (contentLength > UPLOAD_FILE_MAX_SIZE) {
                 throw new AppException(CONTENT_LENGTH_ERROR);
             }
-            if (POST.equals(req.getMethod())) {
+            String uploadType = req.getPathInfo().substring(1);
+            if (POST.equals(req.getMethod())
+                    && (AVATAR_UPLOAD_TYPE.equals(uploadType)
+                    || PHOTO_UPLOAD_TYPE.equals(uploadType))) {
                 String absolutePath = UploadManager.
                         receiveFileAndGetAbsolutePath(req.getSession().getId(),
-                                req.getPathInfo().substring(1),
-                                req.getPart("file"));
+                                uploadType, req.getPart(FILE));
                 resp.getWriter().print(absolutePath);
             }
         } catch (AppException e) {
