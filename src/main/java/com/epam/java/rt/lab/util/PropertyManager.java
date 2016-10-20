@@ -34,6 +34,7 @@ public final class PropertyManager {
     public static final String DEF_LOCALE_LANG_KEY = "def.locale.lang";
     public static final String DEF_LOCALE_COUNTRY_KEY = "def.locale.country";
     public static final String REMEMBER_DAYS_VALID_KEY = "remember.days.valid";
+    public static final String RESTORE_SECONDS_VALID_KEY = "restore.seconds.valid";
 
     public static final long UPLOAD_FILE_MAX_SIZE = 3145728;
 
@@ -53,11 +54,17 @@ public final class PropertyManager {
     public static final String USER_LAST_NAME = "lastName";
     public static final String USER_AVATAR_DOWNLOAD = "avatarDownload";
 
+    public static final String FORM_EMAIL = "email";
+    public static final String FORM_PASSWORD = "password";
+    public static final String FORM_REMEMBER_ME = "rememberMe";
+    public static final String FORM_MESSAGE_LIST = "formMessageList";
+    public static final String FORM_SUBMIT_LOGIN = "submitLogin";
+    public static final String FORM_SUBMIT_RESTORE = "submitRestore";
+
     public static final String HOME_PATH = "/home";
     public static final String LOGIN_PATH = "/profile/login";
     public static final String PROFILE_VIEW_PATH = "/profile/view";
     public static final String JSP_BASE_PATH = "/WEB-INF/jsp";
-    public static final String JSP_EXTENSION = ".jsp";
 
     public static final String SERVLET_PATH = "/servlet";
     public static final String FILE_UPLOAD_PATH = "/file/upload";

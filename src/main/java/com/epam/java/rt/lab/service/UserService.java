@@ -212,8 +212,8 @@ public class UserService extends BaseService {
         CookieManager.removeCookie(req, resp, rememberCookieName,
                 UrlManager.getUriWithContext(req, ""));
         rememberCookieValue = HashGenerator.hashString();
-        Remember remember = addRemember(rememberCookieName,
-                rememberCookieValue, user);
+        Remember remember = addUserRemember(user,
+                rememberCookieName, rememberCookieValue);
         currentTimestamp = TimestampManager.getCurrentTimestamp();
         int maxAge = TimestampManager.
                 secondsBetweenTimestamps(currentTimestamp, remember.getValid());
@@ -237,14 +237,14 @@ public class UserService extends BaseService {
         }
     }
 
-    private Remember addRemember(String rememberCookieName,
-                                 String rememberCookieValue, User user)
+    public Remember addUserRemember(User user, String rememberCookieName,
+                                     String rememberCookieValue)
             throws AppException {
         String rememberValidString = PropertyManager.
                 getProperty(REMEMBER_DAYS_VALID_KEY);
         if (rememberValidString == null
                 || ValidatorFactory.getInstance().create(DIGITS).
-                validate(rememberValidString).length == 0) {
+                validate(rememberValidString).length > 0) {
             throw new AppException(NULL_NOT_ALLOWED);
         }
         Remember remember = new Remember();

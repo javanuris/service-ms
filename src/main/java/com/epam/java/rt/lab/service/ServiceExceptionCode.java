@@ -10,7 +10,8 @@ public enum ServiceExceptionCode implements ExceptionCode {
     REMOVE_REMEMBER_ERROR(3),
     GET_REMEMBER_ERROR(4),
     GET_USER_ERROR(5),
-    AVATAR_FILE_ACCESS_ERROR(6);
+    AVATAR_FILE_ACCESS_ERROR(6),
+    NO_ASSIGNED_USER_TO_LOGIN(7);
 
     private final int number;
 

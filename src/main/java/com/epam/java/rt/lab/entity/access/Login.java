@@ -29,6 +29,8 @@ public class Login extends BaseEntity {
     private int attemptLeft;
     private int status;
 
+    public static final Login NULL_LOGIN = new Login();
+
     public Login() {
     }
 

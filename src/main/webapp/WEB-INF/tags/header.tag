@@ -1,5 +1,5 @@
 <%@tag pageEncoding="UTF-8" %>
-<%@attribute name="navigationCurrent" type="java.lang.String" %>
+<%@attribute name="current" type="java.lang.String" %>
 <%@ taglib prefix="tags" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
@@ -14,15 +14,15 @@
             </a>
         </div>
         <div class="collapse navbar-collapse" id="app-navbar-collapse" aria-expanded="false">
-            <c:if test="${sessionScope.navigationList != null}">
+            <c:if test="${sessionScope.navbar != null}">
                 <ul class="nav navbar-nav">
-                    <c:forEach var="navigation" items="${sessionScope.navigationList}">
+                    <c:forEach var="item" items="${sessionScope.navbar}">
                         <c:choose>
-                            <c:when test="${navigationCurrent.equals(navigation.uri)}">
-                                <li class="active"><a href="#"><fmt:message bundle="${ui}" key="${navigation.label}"/></a></li>
+                            <c:when test="${current.equals(item.uri)}">
+                                <li class="active"><a href="#"><fmt:message bundle="${ui}" key="${item.label}"/></a></li>
                             </c:when>
                             <c:otherwise>
-                                <li><a href="<c:url value="${navigation.uri}"/>"><fmt:message bundle="${ui}" key="${navigation.label}"/></a></li>
+                                <li><a href="<c:url value="${item.uri}"/>"><fmt:message bundle="${ui}" key="${item.label}"/></a></li>
                             </c:otherwise>
                         </c:choose>
                     </c:forEach>
@@ -32,16 +32,13 @@
                 <c:choose>
                     <c:when test="${not empty sessionScope.user}">
                         <c:choose>
-                            <c:when test="${navigationCurrent.equals('/profile/view')}">
-                                <c:set var="usernameActive" value="active"/>
-                                <c:set var="usernameHref" value="#"/>
+                            <c:when test="${current.equals('/profile/view')}">
+                                <tags:username active="active" href="#"/>
                             </c:when>
                             <c:otherwise>
-                                <c:set var="usernameActive" value=""/>
-                                <c:set var="usernameHref" value="${pageContext.request.contextPath}/profile/view"/>
+                                <tags:username active="" href="${pageContext.request.contextPath}/profile/view"/>
                             </c:otherwise>
                         </c:choose>
-                        <tags:username active="${usernameActive}" href="${usernameHref}"/>
                         <li><a href="${pageContext.request.contextPath}/profile/logout">
                             <span class="glyphicon glyphicon-log-out" aria-hidden="true"></span>
                         </a></li>

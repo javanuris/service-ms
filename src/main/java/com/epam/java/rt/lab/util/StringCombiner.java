@@ -65,6 +65,7 @@ public class StringCombiner {
             result.append(delimiter).append(entry.getKey()).
                     append(EQUAL).append(entry.getValue());
         }
+        if (result.length() < delimiter.length()) return "";
         return result.toString().substring(delimiter.length());
     }
 

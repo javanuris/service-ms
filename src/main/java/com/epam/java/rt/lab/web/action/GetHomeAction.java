@@ -17,9 +17,9 @@ public class GetHomeAction extends BaseAction implements Action {
         try {
             req.getRequestDispatcher(super.getJspName()).forward(req, resp);
         } catch (ServletException | IOException e) {
-            String[] detailArray = {e.getMessage(), super.getJspName()};
-            throw new AppException(ACTION_FORWARD_TO_JSP_ERROR, e.getCause(),
-                    detailArray);
+            String[] detailArray = {super.getJspName()};
+            throw new AppException(ACTION_FORWARD_TO_JSP_ERROR,
+                    e.getMessage(), e.getCause(), detailArray);
         }
     }
 

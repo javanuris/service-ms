@@ -51,14 +51,16 @@ public class UrlManager {
         return getContextUri(req, req.getPathInfo());
     }
 
-    public static Map<String, String> getRequestParameterMap(String parameterString) {
+    public static Map<String, String> getRequestParameterMap(
+            String parameterString) {
         Map<String, String> parameterMap = new HashMap<>();
         if (parameterString == null) return parameterMap;
         String[] parameterArray = parameterString.split("&");
         for (String parameter : parameterArray) {
             String[] parameterNameValue = parameter.split("=");
             if (parameterNameValue.length == 2
-                    && parameterNameValue[0].length() > 0 && parameterNameValue[1].length() > 0)
+                    && parameterNameValue[0].length() > 0
+                    && parameterNameValue[1].length() > 0)
                 parameterMap.put(parameterNameValue[0], parameterNameValue[1]);
 
         }

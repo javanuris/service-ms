@@ -156,7 +156,7 @@ public class Validator<T extends Number> {
             if (value != null && !value.matches(this.regex))
                 return new String[]{this.msg};
         }
-        return null;
+        return new String[]{};
     }
 
 }

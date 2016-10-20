@@ -8,7 +8,7 @@
         <c:choose>
             <c:when test="${'submit'.equals(control.type) || 'button'.equals(control.type)}">
                 <div class="col-xs-12" style="padding: 5px 0;">
-                    <tags:validation validationMessageList="${control.validationMessageList}"/>
+                    <tags:alert validationMessageList="${control.validationMessageList}"/>
                     <c:choose>
                         <c:when test="${'submit'.equals(control.type)}">
                             <button type="${control.type}" class="btn btn-default col-xs-12" name="${control.name}">
@@ -48,7 +48,7 @@
                             </c:choose>
                         </c:forEach>
                     </select>
-                    <tags:validation validationMessageList="${control.validationMessageList}"/>
+                    <tags:alert validationMessageList="${control.validationMessageList}"/>
                 </div>
             </c:when>
             <c:when test="${'select'.equals(control.type)}">
@@ -66,7 +66,7 @@
                             </c:choose>
                         </c:forEach>
                     </select>
-                    <tags:validation validationMessageList="${control.validationMessageList}"/>
+                    <tags:alert validationMessageList="${control.validationMessageList}"/>
                 </div>
             </c:when>
             <c:when test="${'file'.equals(control.type)}">
@@ -77,7 +77,7 @@
                         <div id="${control.label}-label"><fmt:message bundle="${ui}" key="message.browse-file"/></div>
                         <input id="${control.label}-hidden" name="${control.label}" value="${control.value}" hidden/>
                     </label>
-                    <tags:validation validationMessageList="${control.validationMessageList}"/>
+                    <tags:alert validationMessageList="${control.validationMessageList}"/>
                 </div>
             </c:when>
             <c:when test="${'image'.equals(control.type)}">
@@ -92,7 +92,7 @@
                         <div id="${control.name}-label"><fmt:message bundle="${ui}" key="message.browse-file"/></div>
                         <input id="${control.name}-hidden" name="${control.name}" value="${control.value}" hidden/>
                     </label>
-                    <tags:validation validationMessageList="${control.validationMessageList}"/>
+                    <tags:alert validationMessageList="${control.validationMessageList}"/>
                 </div>
             </c:when>
             <c:otherwise>
@@ -100,7 +100,7 @@
                     <label for="${control.name}"><fmt:message bundle="${ui}" key="${control.label}"/></label>
                     <c:set var="placeholder"><fmt:message bundle="${ui}" key="${control.placeholder}"/></c:set>
                     <input type="${control.type}" class="form-control" name="${control.name}" placeholder="${placeholder}" value="${control.value}"/>
-                    <tags:validation validationMessageList="${control.validationMessageList}"/>
+                    <tags:alert validationMessageList="${control.validationMessageList}"/>
                 </div>
             </c:otherwise>
         </c:choose>

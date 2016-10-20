@@ -13,9 +13,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-/**
- * category-ms
- */
 public class ApplicationService extends BaseService {
 
     private static final Logger logger = LoggerFactory.getLogger(ApplicationService.class);
