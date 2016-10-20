@@ -42,6 +42,7 @@ public final class PropertyManager {
     public static final String POST = "POST";
 
     public static final String USER_ATTR = "user";
+    public static final String LOGIN_ATTR = "login";
     public static final String JSP_ATTR = "jsp";
 
     public static final String ID = "id";
@@ -54,8 +55,17 @@ public final class PropertyManager {
     public static final String USER_LAST_NAME = "lastName";
     public static final String USER_AVATAR_DOWNLOAD = "avatarDownload";
 
+    public static final String RESTORE_EMAIL_ATTR = "restoreEmail";
+    public static final String RESTORE_REF_ATTR = "restoreRef";
+    public static final String ACTIVATION_EMAIL_ATTR = "activationEmail";
+    public static final String ACTIVATION_REF_ATTR = "activationRef";
+    public static final String MESSAGE_ATTR = "message";
+
     public static final String FORM_EMAIL = "email";
+    public static final String FORM_CODE = "code";
     public static final String FORM_PASSWORD = "password";
+    public static final String FORM_NEW_PASSWORD = "newPassword";
+    public static final String FORM_REPEAT_PASSWORD = "repeatPassword";
     public static final String FORM_REMEMBER_ME = "rememberMe";
     public static final String FORM_MESSAGE_LIST = "formMessageList";
     public static final String FORM_SUBMIT_LOGIN = "submitLogin";
@@ -64,6 +74,8 @@ public final class PropertyManager {
     public static final String HOME_PATH = "/home";
     public static final String LOGIN_PATH = "/profile/login";
     public static final String PROFILE_VIEW_PATH = "/profile/view";
+    public static final String PROFILE_RESTORE_PATH = "/profile/restore";
+    public static final String PROFILE_ACTIVATE_PATH = "/profile/activate";
     public static final String JSP_BASE_PATH = "/WEB-INF/jsp";
 
     public static final String SERVLET_PATH = "/servlet";

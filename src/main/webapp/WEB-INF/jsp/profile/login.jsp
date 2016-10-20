@@ -21,7 +21,7 @@
                             <tags:form-control type="checkbox" name="rememberMe" label="control.remember-me.label" value="${requestScope.rememberMe}"/>
                             <tags:form-button type="submit" name="submitLogin" label="control.submit.login.label" messageList="${requestScope.formMessageList}"/>
                             <tags:form-button type="submit" name="submitRestore" label="control.submit.restore-password.label"/>
-                            <tags:form-button type="button" name="buttonRegister" label="control.submit.register.label" action="${pageContext.request.contextPath}/profile/register"/>
+                            <tags:form-button type="button" name="buttonGotoRegister" label="control.button.goto-register.label" action="${pageContext.request.contextPath}/profile/register"/>
                         </form>
                     </div>
                 </div>

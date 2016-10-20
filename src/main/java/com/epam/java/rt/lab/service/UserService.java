@@ -1,5 +1,6 @@
 package com.epam.java.rt.lab.service;
 
+import com.epam.java.rt.lab.dao.Dao;
 import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.dao.DaoParameter;
 import com.epam.java.rt.lab.dao.sql.OrderBy;
@@ -29,6 +30,7 @@ import java.sql.Timestamp;
 import java.util.List;
 
 import static com.epam.java.rt.lab.entity.access.Avatar.NULL_AVATAR;
+import static com.epam.java.rt.lab.entity.access.Login.NULL_LOGIN;
 import static com.epam.java.rt.lab.entity.access.User.NULL_USER;
 import static com.epam.java.rt.lab.exception.AppExceptionCode.NULL_NOT_ALLOWED;
 import static com.epam.java.rt.lab.service.ServiceExceptionCode.*;
@@ -113,10 +115,11 @@ public class UserService extends BaseService {
     }
 
     public User addUser(Login login) throws AppException {
-        if (login == null) {
+        if (login == null || login == NULL_LOGIN) {
             throw new AppException(NULL_NOT_ALLOWED);
         }
         try (LoginService loginService = new LoginService()) {
+            dao(User.class.getSimpleName()); // initiating daoFactory
             super.daoFactory.
                     beginTransaction(Connection.TRANSACTION_REPEATABLE_READ);
             User user = new User();
@@ -129,9 +132,7 @@ public class UserService extends BaseService {
             super.daoFactory.commitTransaction();
             return user;
         } catch (DaoException e) {
-            throw new AppException(GET_USER_ERROR,
-                    e.getMessage(), e.getCause());
-        } catch (ServiceException e) {
+            e.printStackTrace();
             throw new AppException(GET_USER_ERROR,
                     e.getMessage(), e.getCause());
         }
@@ -209,7 +210,7 @@ public class UserService extends BaseService {
         if (user.getLogin().getAttemptLeft() == 0
                 || user.getLogin().getStatus() < 0) return NULL_USER;
         removeUserRemember(user);
-        CookieManager.removeCookie(req, resp, rememberCookieName,
+        CookieManager.removeCookie(resp, rememberCookieName,
                 UrlManager.getUriWithContext(req, ""));
         rememberCookieValue = HashGenerator.hashString();
         Remember remember = addUserRemember(user,
@@ -363,4 +364,5 @@ public class UserService extends BaseService {
                     e.getMessage(), e.getCause());
         }
     }
+
 }

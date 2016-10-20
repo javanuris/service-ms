@@ -108,7 +108,7 @@ public class LoginService extends BaseService {
                     getUserAgentCookieName(req);
             String rememberCookieValue =
                     HashGenerator.hashString();
-            CookieManager.removeCookie(req, resp, rememberCookieName,
+            CookieManager.removeCookie(resp, rememberCookieName,
                     UrlManager.getUriWithContext(req, SLASH));
             if (rememberMeValue.getValue() != null) {
                 Remember remember = userService.addUserRemember(user,
@@ -188,16 +188,150 @@ public class LoginService extends BaseService {
                     secondsBetweenTimestamps(currentTimestamp, validTimestamp);
             CookieManager.setCookie(resp, restoreCookieName, restoreCookieValue,
                     maxAge, UrlManager.getUriWithContext(req, ""));
-            req.getSession().setAttribute("restoreEmail",
+            req.getSession().setAttribute(RESTORE_EMAIL_ATTR,
                     emailValue.getValue());
             Map<String, String> parameterMap = new HashMap<>();
-            parameterMap.put("email", emailValue.getValue());
-            parameterMap.put("code", restoreCode);
-            req.getSession().setAttribute("restoreRef",
+            parameterMap.put(FORM_EMAIL, emailValue.getValue());
+            parameterMap.put(FORM_CODE, restoreCode);
+            req.getSession().setAttribute(RESTORE_REF_ATTR,
                     UrlManager.getUriWithContext(req,
-                            "/profile/restore", parameterMap));
+                            PROFILE_RESTORE_PATH, parameterMap));
             return true;
         }
+    }
+
+    /**
+     * @param login
+     * @param newPasswordValue
+     * @param repeatPasswordValue
+     * @return
+     * @throws AppException
+     */
+    public boolean resetPassword(Login login,
+                                 FormControlValue newPasswordValue,
+                                 FormControlValue repeatPasswordValue)
+            throws AppException {
+        if (login == null || login == NULL_LOGIN
+                || newPasswordValue == null || repeatPasswordValue == null) {
+            throw new AppException(NULL_NOT_ALLOWED);
+        }
+        boolean formValid = true;
+        Validator passwordValidator = ValidatorFactory.getInstance().
+                create(PASSWORD);
+        String[] validationMessageArray = passwordValidator.
+                validate(newPasswordValue.getValue());
+        if (validationMessageArray.length > 0) {
+            newPasswordValue.setValidationMessageList(new ArrayList<>
+                    (Arrays.asList(validationMessageArray)));
+            formValid = false;
+        }
+        validationMessageArray = passwordValidator.
+                validate(repeatPasswordValue.getValue());
+        if (validationMessageArray.length > 0) {
+            repeatPasswordValue.setValidationMessageList(new ArrayList<>
+                    (Arrays.asList(validationMessageArray)));
+            formValid = false;
+        }
+        if (!formValid) return false;
+        if (!newPasswordValue.getValue().
+                equals(repeatPasswordValue.getValue())) {
+            validationMessageArray =
+                    new String[]{"message.profile.repeat-not-equal"};
+            repeatPasswordValue.setValidationMessageList(new ArrayList<>
+                    (Arrays.asList(validationMessageArray)));
+            return false;
+        }
+        String attemptMax = PropertyManager.getProperty("login.attempt.max");
+        if (attemptMax == null || ValidatorFactory.getInstance().
+                create(DIGITS).validate(attemptMax).length > 0) {
+            throw new AppException(NULL_NOT_ALLOWED);
+        }
+        login.setSalt(UUID.randomUUID().toString());
+        login.setPassword(HashGenerator.hashPassword(login.getSalt(),
+                newPasswordValue.getValue()));
+        login.setAttemptLeft(Integer.valueOf(attemptMax));
+        updateLogin(login);
+        return true;
+    }
+
+    public boolean register(HttpServletRequest req,
+                            FormControlValue emailValue,
+                            FormControlValue newPasswordValue,
+                            FormControlValue repeatPasswordValue)
+            throws AppException {
+        if (req == null || emailValue == null || newPasswordValue == null
+                || repeatPasswordValue == null) {
+            throw new AppException(NULL_NOT_ALLOWED);
+        }
+        boolean formValid = true;
+        Validator emailValidator = ValidatorFactory.getInstance().
+                create(EMAIL);
+        String[] validationMessageArray = emailValidator.
+                validate(emailValue.getValue());
+        if (validationMessageArray.length > 0) {
+            emailValue.setValidationMessageList(new ArrayList<>
+                    (Arrays.asList(validationMessageArray)));
+            formValid = false;
+        }
+        Validator passwordValidator = ValidatorFactory.getInstance().
+                create(PASSWORD);
+        validationMessageArray = passwordValidator.
+                validate(newPasswordValue.getValue());
+        if (validationMessageArray.length > 0) {
+            newPasswordValue.setValidationMessageList(new ArrayList<>
+                    (Arrays.asList(validationMessageArray)));
+            formValid = false;
+        }
+        validationMessageArray = passwordValidator.
+                validate(repeatPasswordValue.getValue());
+        if (validationMessageArray.length > 0) {
+            repeatPasswordValue.setValidationMessageList(new ArrayList<>
+                    (Arrays.asList(validationMessageArray)));
+            formValid = false;
+        }
+        if (!formValid) return false;
+        if (!newPasswordValue.getValue().
+                equals(repeatPasswordValue.getValue())) {
+            validationMessageArray =
+                    new String[]{"message.profile.repeat-not-equal"};
+            repeatPasswordValue.setValidationMessageList(new ArrayList<>
+                    (Arrays.asList(validationMessageArray)));
+            return false;
+        }
+        Login login = getLogin(emailValue.getValue());
+        if (login != null && login != NULL_LOGIN) {
+            validationMessageArray =
+                    new String[]{"message.profile.email-already-used"};
+            emailValue.setValidationMessageList(new ArrayList<>
+                    (Arrays.asList(validationMessageArray)));
+            return false;
+        }
+        String activationDaysValid =
+                PropertyManager.getProperty("activation.days.valid");
+        if (activationDaysValid == null || ValidatorFactory.getInstance().
+                create(DIGITS).validate(activationDaysValid).length > 0) {
+            throw new AppException(NULL_NOT_ALLOWED);
+        }
+        Activate activate = new Activate();
+        activate.setEmail(emailValue.getValue());
+        activate.setSalt(UUID.randomUUID().toString());
+        activate.setPassword(HashGenerator.hashPassword(activate.getSalt(),
+                newPasswordValue.getValue()));
+        activate.setCode(UUID.randomUUID().toString());
+        Timestamp currentTimestamp = TimestampManager.getCurrentTimestamp();
+        int daysValid = Integer.valueOf(activationDaysValid);
+        activate.setValid(TimestampManager.
+                daysToTimestamp(currentTimestamp, daysValid));
+        addActivate(activate);
+        req.getSession().setAttribute(ACTIVATION_EMAIL_ATTR,
+                emailValue.getValue());
+        Map<String, String> parameterMap = new HashMap<>();
+        parameterMap.put(FORM_EMAIL, emailValue.getValue());
+        parameterMap.put(FORM_CODE, activate.getCode());
+        req.getSession().setAttribute(ACTIVATION_REF_ATTR,
+                UrlManager.getUriWithContext(req, PROFILE_ACTIVATE_PATH,
+                        parameterMap));
+        return true;
     }
 
     /**
@@ -208,6 +342,7 @@ public class LoginService extends BaseService {
     public Login getLogin(String email)
             throws AppException {
         try {
+            if (email == null) throw new AppException(NULL_NOT_ALLOWED);
             DaoParameter daoParameter = new DaoParameter();
             daoParameter.setWherePredicate(Where.Predicate.
                     get(Property.EMAIL, PredicateOperator.EQUAL, email));
@@ -247,29 +382,24 @@ public class LoginService extends BaseService {
      *
      * @param login
      * @return
-     * @throws ServiceException
+     * @throws AppException
      */
     public int updateLogin(Login login)
-            throws ServiceException {
+            throws AppException {
         try {
-            return dao(Login.class.getSimpleName()).update(new DaoParameter()
-                    .setSetValueArray(
-                            new Update.SetValue(Property.SALT, login.getSalt()),
-                            new Update.SetValue(Property.PASSWORD, login.getPassword()),
-                            new Update.SetValue(Property.ATTEMPT_LEFT, login.getAttemptLeft()),
-                            new Update.SetValue(Property.STATUS, login.getStatus())
-                    )
-                    .setWherePredicate(Where.Predicate.get(
-                            Property.ID,
-                            PredicateOperator.EQUAL,
-                            login.getId()
-                    ))
-            );
+            if (login == null) throw new AppException(NULL_NOT_ALLOWED);
+            DaoParameter daoParameter = new DaoParameter();
+            daoParameter.setSetValueArray(
+                    new Update.SetValue(Property.SALT, login.getSalt()),
+                    new Update.SetValue(Property.PASSWORD, login.getPassword()),
+                    new Update.SetValue(Property.ATTEMPT_LEFT,
+                            login.getAttemptLeft()),
+                    new Update.SetValue(Property.STATUS, login.getStatus()));
+            daoParameter.setWherePredicate(Where.Predicate.
+                    get(Property.ID, PredicateOperator.EQUAL, login.getId()));
+            return dao(Login.class.getSimpleName()).update(daoParameter);
         } catch (DaoException e) {
-            throw new ServiceException("exception.service.login.update-login.dao", e.getCause());
-        } catch (AppException e) {
-            e.printStackTrace();
-            throw new ServiceException("exception.service.login.update-login.dao", e.getCause());
+            throw new AppException(CREATE_DAO_FACTORY_OR_DAO_ERROR);
         }
     }
 
@@ -277,17 +407,17 @@ public class LoginService extends BaseService {
      *
      * @param login
      * @return
-     * @throws ServiceException
+     * @throws AppException
      */
     public Long addLogin(Login login)
-            throws ServiceException {
+            throws AppException {
         try {
-            return dao(Login.class.getSimpleName()).create(new DaoParameter().setEntity(login));
+            if (login == null) throw new AppException(NULL_NOT_ALLOWED);
+            DaoParameter daoParameter = new DaoParameter();
+            daoParameter.setEntity(login);
+            return dao(Login.class.getSimpleName()).create(daoParameter);
         } catch (DaoException e) {
-            throw new ServiceException("exception.service.login.add-login.dao", e.getCause());
-        } catch (AppException e) {
-            e.printStackTrace();
-            throw new ServiceException("exception.service.login.add-login.dao", e.getCause());
+            throw new AppException(CREATE_DAO_FACTORY_OR_DAO_ERROR);
         }
     }
 
@@ -295,7 +425,7 @@ public class LoginService extends BaseService {
      *
      * @param restore
      * @return
-     * @throws ServiceException
+     * @throws AppException
      */
     public Long addRestore(Restore restore)
             throws AppException {
@@ -315,52 +445,47 @@ public class LoginService extends BaseService {
      *
      * @param restoreList
      * @return
-     * @throws ServiceException
+     * @throws AppException
      */
     public int removeRestoreList(List<Restore> restoreList)
-            throws ServiceException {
+            throws AppException {
         try {
+            if (restoreList == null) throw new AppException(NULL_NOT_ALLOWED);
             int result = 0;
             for (Restore restore : restoreList) {
-                result += dao(Restore.class.getSimpleName()).delete(new DaoParameter()
-                        .setWherePredicate(Where.Predicate.get(
-                                Restore.Property.ID,
-                                PredicateOperator.EQUAL,
-                                restore.getId()
-                        ))
-                );
+                DaoParameter daoParameter = new DaoParameter();
+                daoParameter.setWherePredicate(Where.Predicate.
+                        get(Restore.Property.ID, PredicateOperator.EQUAL,
+                                restore.getId()));
+                result += dao(Restore.class.getSimpleName()).
+                        delete(daoParameter);
             }
             return result;
         } catch (DaoException e) {
-            throw new ServiceException("exception.service.login.remove-restore-list.dao", e.getCause());
-        } catch (AppException e) {
-            e.printStackTrace();
-            throw new ServiceException("exception.service.login.remove-restore-list.dao", e.getCause());
+            throw new AppException(CREATE_DAO_FACTORY_OR_DAO_ERROR);
         }
     }
 
-    /**
-     *
-     * @param restoreEmail
-     * @param restoreCode
-     * @param cookieName
-     * @param cookieValue
-     * @return
-     * @throws ServiceException
-     */
-    public Login getRestoreLogin(String restoreEmail, String restoreCode, String cookieName, String cookieValue)
-            throws ServiceException {
+
+    public Login getRestoreLogin(String restoreEmail, String restoreCode,
+                                 String cookieName, String cookieValue)
+            throws AppException {
         try {
+            if (restoreEmail == null || restoreCode == null
+                    || cookieName == null || cookieValue == null) {
+                throw new AppException(NULL_NOT_ALLOWED);
+            }
             Login login = getLogin(restoreEmail);
-            if (login == null) return null;
-            List<Restore> restoreList = dao(Restore.class.getSimpleName()).read(new DaoParameter()
-                    .setWherePredicate(Where.Predicate.get(
-                            Restore.Property.LOGIN_ID,
-                            PredicateOperator.EQUAL,
-                            login.getId()
-                    ))
-            );
-            if (restoreList == null || restoreList.size() == 0) return null;
+            if (login == NULL_LOGIN) return login;
+            DaoParameter daoParameter = new DaoParameter();
+            daoParameter.setWherePredicate(Where.Predicate.
+                    get(Restore.Property.LOGIN_ID, PredicateOperator.EQUAL,
+                            login.getId()));
+            List<Restore> restoreList = dao(Restore.class.getSimpleName()).
+                    read(daoParameter);
+            if (restoreList == null || restoreList.size() == 0) {
+                return NULL_LOGIN;
+            }
             for (Restore restore : restoreList) {
                 if (restore.getCode().equals(restoreCode) &&
                         restore.getCookieName().equals(cookieName) &&
@@ -370,101 +495,101 @@ public class LoginService extends BaseService {
                 }
             }
             removeRestoreList(restoreList);
-            return null;
+            return NULL_LOGIN;
         } catch (DaoException e) {
-            throw new ServiceException("exception.service.login.get-restore-login.dao", e.getCause());
-        } catch (AppException e) {
-            e.printStackTrace();
-            throw new ServiceException("exception.service.login.get-restore-login.dao", e.getCause());
+            throw new AppException(CREATE_DAO_FACTORY_OR_DAO_ERROR);
         }
     }
 
-    public Long addActivate(Activate activate)
-            throws ServiceException {
+    public Long addActivate(Activate activate) throws AppException {
         try {
-            List<Activate> activateList = dao(Activate.class.getSimpleName()).read(new DaoParameter()
-                    .setWherePredicate(Where.Predicate.get(
-                            Activate.Property.EMAIL,
-                            PredicateOperator.EQUAL,
-                            activate.getEmail()
-                    ))
-            );
-            if (activateList != null) removeActivateList(activateList);
-            return dao(Activate.class.getSimpleName()).create(new DaoParameter().setEntity(activate));
+            DaoParameter daoParameter = new DaoParameter();
+            daoParameter.setWherePredicate(Where.Predicate.
+                    get(Activate.Property.EMAIL, PredicateOperator.EQUAL,
+                            activate.getEmail()));
+            List<Activate> activateList = dao(Activate.class.getSimpleName()).
+                    read(daoParameter);
+            if (activateList != null || activateList.size() > 0) {
+                removeActivateList(activateList);
+            }
+            daoParameter = new DaoParameter();
+            daoParameter.setEntity(activate);
+            return dao(Activate.class.getSimpleName()).create(daoParameter);
         } catch (DaoException e) {
-            throw new ServiceException("exception.service.login.add-activate.dao", e.getCause());
-        } catch (AppException e) {
-            e.printStackTrace();
-            throw new ServiceException("exception.service.login.add-activate.dao", e.getCause());
+            throw new AppException(CREATE_DAO_FACTORY_OR_DAO_ERROR,
+                    e.getMessage(), e.getCause());
         }
     }
 
-    public int removeActivateList(List<Activate> activateList)
-            throws ServiceException {
+    private int removeActivateList(List<Activate> activateList)
+            throws AppException {
         try {
             int result = 0;
             for (Activate activate : activateList) {
-                result += dao(Activate.class.getSimpleName()).delete(new DaoParameter()
-                        .setWherePredicate(Where.Predicate.get(
-                                Activate.Property.ID,
-                                PredicateOperator.EQUAL,
-                                activate.getId()
-                        ))
-                );
+                DaoParameter daoParameter = new DaoParameter();
+                daoParameter.setWherePredicate(Where.Predicate.
+                        get(Activate.Property.ID, PredicateOperator.EQUAL,
+                                activate.getId()));
+                result += dao(Activate.class.getSimpleName()).
+                        delete(daoParameter);
             }
             return result;
         } catch (DaoException e) {
-            throw new ServiceException("exception.service.login.remove-activate-list.dao", e.getCause());
-        } catch (AppException e) {
-            e.printStackTrace();
-            throw new ServiceException("exception.service.login.remove-activate-list.dao", e.getCause());
+            throw new AppException(CREATE_DAO_FACTORY_OR_DAO_ERROR,
+                    e.getMessage(), e.getCause());
         }
     }
 
-    public Login getActivateLogin(String activationEmail, String activationCode) throws ServiceException {
-        if (activationEmail == null || activationCode == null) return null;
+    public Login getActivateLogin(String activationEmail, String activationCode)
+            throws AppException {
+        if (activationEmail == null || activationCode == null) {
+            throw new AppException(NULL_NOT_ALLOWED);
+        }
         try {
-            List<Activate> activateList = dao(Activate.class.getSimpleName()).read(new DaoParameter()
-                    .setWherePredicate(Where.Predicate.get(
-                            Activate.Property.EMAIL,
-                            PredicateOperator.EQUAL,
-                            activationEmail
-                    ))
-            );
-            if (activateList == null || activateList.size() == 0) return null;
+            DaoParameter daoParameter = new DaoParameter();
+            daoParameter.setWherePredicate(Where.Predicate.
+                    get(Activate.Property.EMAIL, PredicateOperator.EQUAL,
+                            activationEmail));
+            List<Activate> activateList = dao(Activate.class.getSimpleName()).
+                    read(daoParameter);
+            if (activateList == null || activateList.size() == 0) {
+                return NULL_LOGIN;
+            }
             Activate activate = activateList.get(0);
-            if (!activationCode.equals(activate.getCode()) || TimestampManager.secondsBetweenTimestamps
-                    (TimestampManager.getCurrentTimestamp(), activate.getValid()) < 0) return null;
+            Timestamp currentTimestamp = TimestampManager.getCurrentTimestamp();
+            if (!activationCode.equals(activate.getCode()) || TimestampManager.
+                    secondsBetweenTimestamps(currentTimestamp,
+                            activate.getValid()) < 0) return NULL_LOGIN;
+            String attemptMax = PropertyManager.
+                    getProperty("login.attempt.max");
+            if (attemptMax == null || ValidatorFactory.getInstance().
+                    create(DIGITS).validate(attemptMax).length > 0) {
+                throw new AppException(NULL_NOT_ALLOWED);
+            }
             Login login = new Login();
             login.setEmail(activate.getEmail());
             login.setSalt(activate.getSalt());
             login.setPassword(activate.getPassword());
-            login.setAttemptLeft(Integer.valueOf(PropertyManager.getProperty("login.attempt.max")));
+            login.setAttemptLeft(Integer.valueOf(attemptMax));
             login.setStatus(0);
             return login;
         } catch (DaoException e) {
-            throw new ServiceException("exception.service.login.get-actvate-login.dao", e.getCause());
-        } catch (AppException e) {
-            e.printStackTrace();
-            throw new ServiceException("exception.service.login.get-actvate-login.dao", e.getCause());
+            throw new AppException(CREATE_DAO_FACTORY_OR_DAO_ERROR,
+                    e.getMessage(), e.getCause());
         }
     }
 
-    public int removeActivate(String email)
-            throws ServiceException {
+    public int removeActivate(String email) throws AppException {
+        if (email == null) throw new AppException(NULL_NOT_ALLOWED);
         try {
-            return dao(Activate.class.getSimpleName()).delete(new DaoParameter()
-                    .setWherePredicate(Where.Predicate.get(
-                            Activate.Property.EMAIL,
-                            PredicateOperator.EQUAL,
-                            email
-                    ))
-            );
+            DaoParameter daoParameter = new DaoParameter();
+            daoParameter.setWherePredicate(Where.Predicate.
+                    get(Activate.Property.EMAIL, PredicateOperator.EQUAL,
+                            email));
+            return dao(Activate.class.getSimpleName()).delete(daoParameter);
         } catch (DaoException e) {
-            throw new ServiceException("exception.service.login.remove-activate.dao", e.getCause());
-        } catch (AppException e) {
-            e.printStackTrace();
-            throw new ServiceException("exception.service.login.remove-activate.dao", e.getCause());
+            throw new AppException(CREATE_DAO_FACTORY_OR_DAO_ERROR,
+                    e.getMessage(), e.getCause());
         }
     }
 

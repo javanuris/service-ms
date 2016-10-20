@@ -1,52 +1,43 @@
 package com.epam.java.rt.lab.web.action.profile;
 
+import com.epam.java.rt.lab.entity.access.Login;
 import com.epam.java.rt.lab.exception.AppException;
+import com.epam.java.rt.lab.service.LoginService;
+import com.epam.java.rt.lab.util.UrlManager;
 import com.epam.java.rt.lab.web.action.Action;
 import com.epam.java.rt.lab.web.action.BaseAction;
+import com.epam.java.rt.lab.web.component.FormControlValue;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
-/**
- * category-ms
- */
+import static com.epam.java.rt.lab.util.PropertyManager.*;
+import static com.epam.java.rt.lab.web.action.ActionExceptionCode.ACTION_FORWARD_TO_JSP_ERROR;
+
 public class PostRestoreAction extends BaseAction implements Action {
 
     @Override
     public void execute(HttpServletRequest req, HttpServletResponse resp)
             throws AppException {
-//        try (LoginService loginService = new LoginService()) {
-//            Form form = FormFactory.getInstance().create("restore-password");
-//            if (FormValidator.validate(req, form)) {
-//                if (!form.getItem(0).getValue().equals(form.getItem(1).getValue())) {
-//                    form.getItem(1).addValidationMessage("message.profile.repeat-not-equal");
-//                } else {
-//                    Login login = (Login) req.getSession().getAttribute("login");
-//                    req.removeAttribute("login");
-//                    if (login == null) {
-//                        resp.sendRedirect(UrlManager.getContextUri(req, "/home"));
-//                    } else {
-//                        login.setSalt(UUID.randomUUID().toString());
-//                        login.setPassword(HashGenerator.hashPassword(login.getSalt(), form.getItem(0).getValue()));
-//                        login.setAttemptLeft(Integer.valueOf(PropertyManager.getProperty("login.attempt.max")));
-//                        loginService.updateLogin(login);
-//                        resp.sendRedirect(UrlManager.getContextUri(req, "/profile/login"));
-//                        return;
-//                    }
-//                }
-//            }
-//            req.setAttribute("restoreForm", form);
-//            req.getRequestDispatcher("/WEB-INF/jsp/profile/restore-password.jsp").forward(req, resp);
-//        } catch (FormException e) {
-//            throw new ActionException("exception.action.profile.restore.form", e.getCause());
-//        } catch (ServletException | IOException e) {
-//            throw new ActionException("exception.action.profile.restore-password.jsp", e.getCause());
-//        } catch (ServiceException e) {
-//            e.printStackTrace();
-//            throw new ActionException("exception.action.restore-password.category", e.getCause());
-//        } catch (NoSuchAlgorithmException e) {
-//            e.printStackTrace();
-//            throw new ActionException("exception.action.restore-password.hash", e.getCause());
-//        }
+        FormControlValue newPasswordValue =
+                new FormControlValue(req.getParameter(FORM_NEW_PASSWORD));
+        FormControlValue repeatPasswordValue =
+                new FormControlValue(req.getParameter(FORM_REPEAT_PASSWORD));
+        try (LoginService loginService = new LoginService()) {
+            Login login = (Login) req.getSession().getAttribute(LOGIN_ATTR);
+            if (loginService.resetPassword(login,
+                    newPasswordValue, repeatPasswordValue)) {
+                req.getSession().removeAttribute(LOGIN_ATTR);
+                resp.sendRedirect(UrlManager.getUriWithContext(req, LOGIN_PATH));
+                return;
+            }
+            req.setAttribute(FORM_NEW_PASSWORD, newPasswordValue);
+            req.setAttribute(FORM_REPEAT_PASSWORD, repeatPasswordValue);
+            req.getRequestDispatcher(super.getJspName()).forward(req, resp);
+        } catch (ServletException | IOException e) {
+            throw new AppException(ACTION_FORWARD_TO_JSP_ERROR);
+        }
     }
 }

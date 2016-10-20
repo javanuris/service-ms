@@ -36,7 +36,7 @@ public class GetLogoutAction extends BaseAction implements Action {
 //            req.getSession().removeAttribute("user");
 //            req.getSession().removeAttribute("navigationList");
             req.getSession().invalidate();
-            CookieManager.removeCookie(req, resp,
+            CookieManager.removeCookie(resp,
                     CookieManager.getUserAgentCookieName(req),
                     UrlManager.getContextUri(req, PropertyManager.SLASH));
             userService.removeUserRemember(user);
