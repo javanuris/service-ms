@@ -1,6 +1,13 @@
 package com.epam.java.rt.lab.dao.sql;
 
+import com.epam.java.rt.lab.dao.DaoStatement;
+import com.epam.java.rt.lab.dao.factory.AbstractDaoFactory;
+import com.epam.java.rt.lab.dao.h2.jdbc.JdbcDao;
 import com.epam.java.rt.lab.entity.access.Login;
+import com.epam.java.rt.lab.exception.AppException;
+import com.epam.java.rt.lab.util.PropertyManager;
+import com.epam.java.rt.lab.util.TimestampManager;
+import com.epam.java.rt.lab.web.validator.ValidatorFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -8,22 +15,28 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
 
-/**
- * category-ms
- */
 public class SelectTest {
 
     private Select select;
 
     @Before
     public void setUp() throws Exception {
+        PropertyManager.initGlobalProperties();
+        AppException.initExceptionBundle();
+        TimestampManager.initDateList();
+        TimestampManager.initTimeList();
+        ValidatorFactory.getInstance().initValidatorMap();
+        AbstractDaoFactory.initDatabaseProperties();
+        JdbcDao.initDaoProperties();
+        Sql.initSqlProperties();
+        DaoStatement.initStatementMethodMap();
         List<Column> columnList = new ArrayList<>();
-        columnList.add(Column.of("\"Restore\".id"));
-        columnList.add(Column.of("\"Restore\".code"));
-        columnList.add(Column.of("\"Login\".id"));
-        columnList.add(Column.of("\"Login\".email"));
+        columnList.add(Column.from("\"Restore\".id"));
+        columnList.add(Column.from("\"Restore\".code"));
+        columnList.add(Column.from("\"Login\".id"));
+        columnList.add(Column.from("\"Login\".email"));
         this.select = new Select(columnList);
         assertNotNull("Instantiating failed", this.select);
     }

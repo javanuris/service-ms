@@ -1,5 +1,9 @@
 package com.epam.java.rt.lab.web.listener;
 
+import com.epam.java.rt.lab.dao.DaoStatement;
+import com.epam.java.rt.lab.dao.factory.AbstractDaoFactory;
+import com.epam.java.rt.lab.dao.h2.jdbc.JdbcDao;
+import com.epam.java.rt.lab.dao.sql.Sql;
 import com.epam.java.rt.lab.exception.AppException;
 import com.epam.java.rt.lab.util.PropertyManager;
 import com.epam.java.rt.lab.util.TimestampManager;
@@ -25,6 +29,10 @@ public class AppInitListener implements ServletContextListener {
             ValidatorFactory.getInstance().initValidatorMap();
             RoleFactory.getInstance().initRoleMap();
             ActionFactory.getInstance().initActionMap();
+            AbstractDaoFactory.initDatabaseProperties();
+            JdbcDao.initDaoProperties();
+            Sql.initSqlProperties();
+            DaoStatement.initStatementMethodMap();
             UploadManager.initContentTypeListMap();
         } catch (AppException e) {
             throw new RuntimeException();

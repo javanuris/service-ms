@@ -1,12 +1,16 @@
 package com.epam.java.rt.lab.dao.sql;
 
-import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.entity.EntityProperty;
+import com.epam.java.rt.lab.exception.AppException;
 import com.epam.java.rt.lab.util.StringCombiner;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import static com.epam.java.rt.lab.dao.sql.SqlExceptionCode.ENTITY_PROPERTY_NOT_FROM_ENTITY;
+import static com.epam.java.rt.lab.exception.AppExceptionCode.NULL_NOT_ALLOWED;
+import static com.epam.java.rt.lab.util.PropertyManager.COMMA_WITH_SPACE;
 
 /**
  * {@code Update} class defines sql statement
@@ -16,25 +20,28 @@ public class Update extends Sql {
 
     private static final String UPDATE = "UPDATE ";
 
-    /** {@code Class} valueOf entity */
+    /**
+     * {@code Class} of entity
+     */
     private Class entityClass;
-    /** {@code String} representation valueOf table name */
+    /** {@code String} representation of table name */
     private String table;
-    /** {@code Set} object valueOf set clause */
+    /** {@code Set} object of set clause */
     private Set set;
-    /** {@code Where} object valueOf where clause */
+    /** {@code Where} object of where clause */
     private Where where;
 
     /**
      * Initiates new {@code Update} object with defined
-     * {@code Class} valueOf entity
+     * {@code Class} of entity
      *
-     * @param entityClass       {@code Class} valueOf entity
-     * @throws DaoException
+     * @param entityClass       {@code Class} of entity
+     * @throws AppException
      */
-    Update(Class entityClass) throws DaoException {
-        if (entityClass == null)
-            throw new DaoException("exception.dao.sql.update.empty-class");
+    Update(Class entityClass) throws AppException {
+        if (entityClass == null) {
+            throw new AppException(NULL_NOT_ALLOWED);
+        }
         this.entityClass = entityClass;
         this.table = getProperty(entityClass.getName());
     }
@@ -43,16 +50,19 @@ public class Update extends Sql {
      * Returns {@code Update} object, on which this method called
      * with setting its set clause
      *
-     * @param setValueArray     {@code Array} valueOf {@code SetValue} objects
+     * @param setValueArray     {@code Array} of {@code SetValue} objects
      * @return                  {@code Update} object
-     * @throws DaoException
+     * @throws AppException
      *
      * @see SetValue
      */
-    public Update set(SetValue[] setValueArray) throws DaoException {
-        for (SetValue setValue : setValueArray)
-            if (!entityClass.equals(setValue.entityProperty.getEntityClass()))
-                throw new DaoException("exception.dao.sql.update.entity-class-property");
+    public Update set(SetValue[] setValueArray) throws AppException {
+        if (setValueArray == null) throw new AppException(NULL_NOT_ALLOWED);
+        for (SetValue setValue : setValueArray) {
+            if (!entityClass.equals(setValue.entityProperty.getEntityClass())) {
+                throw new AppException(ENTITY_PROPERTY_NOT_FROM_ENTITY);
+            }
+        }
         this.set = new Set(setValueArray);
         this.set.linkWildValue(getWildValueList());
         return this;
@@ -64,34 +74,28 @@ public class Update extends Sql {
      *
      * @param predicate         {@code Predicate} object
      * @return                  {@code Update} object
-     * @throws DaoException
+     * @throws AppException
      *
      * @see com.epam.java.rt.lab.dao.sql.Where.Predicate
      */
-    public Update where(Where.Predicate predicate) throws DaoException {
-        if (predicate == null)
-            throw new DaoException("exception.dao.sql.update.empty-predicate");
+    public Update where(Where.Predicate predicate) throws AppException {
+        if (predicate == null) {
+            throw new AppException(NULL_NOT_ALLOWED);
+        }
         this.where = new Where(null, predicate);
         this.where.linkWildValue(getWildValueList());
         return this;
     }
 
     @Override
-    public String create() throws DaoException {
-        try {
-            return this.where.appendClause(
-                    this.set.appendClause(
-                            new StringBuilder().append(UPDATE).append(table)
-                    )
-            ).toString();
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new DaoException("exception.dao.sql.update.combine", e.getCause());
-        }
+    public String create() throws AppException {
+        return this.where.appendClause(this.set.
+                appendClause(new StringBuilder().
+                        append(UPDATE).append(table))).toString();
     }
 
     /**
-     * {@code Set} class defines set clause valueOf sql statement
+     * {@code Set} class defines set clause of sql statement
      *
      * @see SetValue
      * @see WildValue
@@ -100,14 +104,14 @@ public class Update extends Sql {
 
         private static final String SET = " SET ";
 
-        /** {@code Array} valueOf {@code SetValue} objects */
+        /** {@code Array} of {@code SetValue} objects */
         private SetValue[] setValueArray;
 
         /**
          * Initiates new {@code Set} object getDate
-         * {@code Array} valueOf {@code SetValue} objects
+         * {@code Array} of {@code SetValue} objects
          *
-         * @param setValueArray     {@code Array} valueOf {@code SetValue} objects
+         * @param setValueArray     {@code Array} of {@code SetValue} objects
          *
          * @see SetValue
          */
@@ -116,35 +120,35 @@ public class Update extends Sql {
         }
 
         /**
-         * Links {@code List} valueOf {@code WildValue} objects to valueOf single
+         * Links {@code List} valueOf {@code WildValue} objects to of single
          * {@code List} which will be set on prepared statement
          *
-         * @param wildValueList     {@code List} valueOf {@code WildValue} objects
+         * @param wildValueList     {@code List} of {@code WildValue} objects
          *
          * @see WildValue
          */
         private void linkWildValue(List<WildValue> wildValueList) {
             if (this.setValueArray != null) {
-                for (SetValue setValue : this.setValueArray)
+                for (SetValue setValue : this.setValueArray) {
                     setValue.wildValue.link(wildValueList);
+                }
             }
         }
 
         @Override
-        public StringBuilder appendClause(StringBuilder result) throws DaoException {
-            try {
-                return this.setValueArray == null || this.setValueArray.length == 0 ? result :
-                        StringCombiner.combine(result.append(SET), new ArrayList<>(Arrays.asList(this.setValueArray)), Sql.COMMA_DELIMITER);
-            } catch (Exception e) {
-                e.printStackTrace();
-                throw new DaoException("exception.dao.sql.set-values.combine", e.getCause());
-            }
+        public StringBuilder appendClause(StringBuilder result)
+                throws AppException {
+            return ((this.setValueArray == null)
+                    || (this.setValueArray.length == 0)) ? result
+                    : StringCombiner.combine(result.append(SET),
+                    new ArrayList<>(Arrays.asList(this.setValueArray)),
+                    COMMA_WITH_SPACE);
         }
 
     }
 
     /**
-     * {@code SetValue} class defines set value in set clause valueOf sql statement
+     * {@code SetValue} class defines set value in set clause of sql statement
      */
     public static class SetValue implements Clause {
 
@@ -161,22 +165,27 @@ public class Update extends Sql {
          *
          * @param entityProperty        {@code EntityProperty} object
          * @param value                 generic value
-         * @param <T>
-         * @throws DaoException
+         * @throws AppException
          *
          * @see EntityProperty
          */
-        public <T> SetValue(EntityProperty entityProperty, T value) throws DaoException {
-            if (entityProperty == null)
-                throw new DaoException("exception.dao.update.empty-entity-property");
+        public <T> SetValue(EntityProperty entityProperty, T value)
+                throws AppException {
+            if (entityProperty == null) {
+                throw new AppException(NULL_NOT_ALLOWED);
+            }
             this.entityProperty = entityProperty;
-            this.wildValue = new WildValue(value);
+            this.wildValue = new WildValue<T>(value);
         }
 
         @Override
-        public StringBuilder appendClause(StringBuilder result) throws DaoException {
-            return result.append(getColumn(this.entityProperty).getColumnName()).append(EQUAL).append(this.wildValue.makeWildcard());
+        public StringBuilder appendClause(StringBuilder result)
+                throws AppException {
+            return result.append(getColumn(this.entityProperty).
+                    getColumnName()).append(EQUAL).
+                    append(this.wildValue.makeWildcard());
         }
+
     }
 
 }

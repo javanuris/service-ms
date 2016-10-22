@@ -1,24 +1,21 @@
 package com.epam.java.rt.lab.dao.factory;
 
 import com.epam.java.rt.lab.dao.Dao;
-import com.epam.java.rt.lab.dao.DaoException;
+import com.epam.java.rt.lab.exception.AppException;
 
 import java.sql.Connection;
 
-/**
- * category-ms
- */
 public interface DaoFactory {
 
-    Connection getConnection() throws DaoException;
+    Connection getConnection() throws AppException;
 
-    void beginTransaction(int transactionIsolation) throws DaoException;
+    void beginTransaction(int transactionIsolation) throws AppException;
 
-    void commitTransaction() throws DaoException;
+    void commitTransaction() throws AppException;
 
-    void rollbackTransaction() throws DaoException;
+    void rollbackTransaction() throws AppException;
 
-    Dao createDao(String daoShortName) throws DaoException;
+    Dao createDao(String daoShortName) throws AppException;
 
-    void close() throws DaoException;
+    void close() throws AppException;
 }

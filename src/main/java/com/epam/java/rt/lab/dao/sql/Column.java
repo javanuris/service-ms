@@ -1,8 +1,9 @@
 package com.epam.java.rt.lab.dao.sql;
 
-import com.epam.java.rt.lab.dao.DaoException;
+import com.epam.java.rt.lab.exception.AppException;
 
-import static com.epam.java.rt.lab.dao.sql.Sql.SIGN_POINT;
+import static com.epam.java.rt.lab.exception.AppExceptionCode.NULL_NOT_ALLOWED;
+import static com.epam.java.rt.lab.util.PropertyManager.POINT;
 
 /**
  * {@code Column} class defines {@code Column} object for sql statement
@@ -31,28 +32,31 @@ public class Column implements Clause {
     }
 
     /**
-     * Returns new {@code Column} object getDate full column name,
+     * Returns new {@code Column} object from full column name,
      * which contains full table name and column name divided
      * by point sign
      *
-     * @param tableAndColumnName    {@code String} representation valueOf
+     * @param tableAndColumnName    {@code String} representation of
      *                              table name and column name divided by point
      *                              sign
      * @return                      {@code Column} object
-     * @throws DaoException
+     * @throws AppException
      */
-    static Column of(String tableAndColumnName) throws DaoException {
-        if (tableAndColumnName == null || !tableAndColumnName.contains(SIGN_POINT))
-            throw new DaoException("exception.dao.sql.column.table-and-column-name");
-        String tableName = tableAndColumnName.substring(0, tableAndColumnName.lastIndexOf("."));
-        String columnName = tableAndColumnName.substring(tableAndColumnName.lastIndexOf(".") + 1);
+    static Column from(String tableAndColumnName) throws AppException {
+        if (tableAndColumnName == null
+                || !tableAndColumnName.contains(POINT)) {
+            throw new AppException(NULL_NOT_ALLOWED);
+        }
+        int lastPointIndex = tableAndColumnName.lastIndexOf(POINT);
+        String tableName = tableAndColumnName.substring(0, lastPointIndex);
+        String columnName = tableAndColumnName.substring(lastPointIndex + 1);
         return new Column(tableName, columnName);
     }
 
     /**
      * Returns defined at initiation table name
      *
-     * @return                      {@code String} representation valueOf table name
+     * @return                      {@code String} representation of table name
      */
     public String getTableName() {
         return this.tableName;
@@ -61,15 +65,17 @@ public class Column implements Clause {
     /**
      * Returns defined at initiation column name
      *
-     * @return                      {@code String} representation valueOf column name
+     * @return                      {@code String} representation of column name
      */
     public String getColumnName() {
         return this.columnName;
     }
 
     @Override
-    public StringBuilder appendClause(StringBuilder result) throws DaoException {
-        return result.append(this.tableName).append(SIGN_POINT).append(this.columnName);
+    public StringBuilder appendClause(StringBuilder result)
+            throws AppException {
+        if (result == null) throw new AppException(NULL_NOT_ALLOWED);
+        return result.append(this.tableName + POINT + this.columnName);
     }
 
 }

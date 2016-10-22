@@ -7,9 +7,6 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-/**
- * category-ms
- */
 public class ReflectValue extends SimpleTagSupport {
 
     private String entityMethod;
@@ -24,9 +21,11 @@ public class ReflectValue extends SimpleTagSupport {
     }
 
     private Object invokeItemMethod(Object itemObject, String itemMethod)
-            throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+            throws NoSuchMethodException, InvocationTargetException,
+            IllegalAccessException {
         Method method = itemObject.getClass()
-                .getMethod("get".concat(itemMethod.substring(0, 1).toUpperCase()).concat(itemMethod.substring(1)));
+                .getMethod("get" + itemMethod.substring(0, 1).toUpperCase()
+                        + itemMethod.substring(1));
         return method.invoke(itemObject);
     }
 
@@ -38,7 +37,8 @@ public class ReflectValue extends SimpleTagSupport {
                 if (itemObject == null) return "";
             }
             return String.valueOf(itemObject);
-        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+        } catch (NoSuchMethodException | IllegalAccessException
+                | InvocationTargetException e) {
             //
         }
         return "";

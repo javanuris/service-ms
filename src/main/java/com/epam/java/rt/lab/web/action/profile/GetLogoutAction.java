@@ -2,7 +2,6 @@ package com.epam.java.rt.lab.web.action.profile;
 
 import com.epam.java.rt.lab.entity.access.User;
 import com.epam.java.rt.lab.exception.AppException;
-import com.epam.java.rt.lab.service.ServiceException;
 import com.epam.java.rt.lab.service.UserService;
 import com.epam.java.rt.lab.util.CookieManager;
 import com.epam.java.rt.lab.util.PropertyManager;
@@ -33,8 +32,6 @@ public class GetLogoutAction extends BaseAction implements Action {
         try (UserService userService = new UserService()) {
             User user = (User) req.getSession().
                     getAttribute(PropertyManager.USER_ATTR);
-//            req.getSession().removeAttribute("user");
-//            req.getSession().removeAttribute("navigationList");
             req.getSession().invalidate();
             CookieManager.removeCookie(resp,
                     CookieManager.getUserAgentCookieName(req),

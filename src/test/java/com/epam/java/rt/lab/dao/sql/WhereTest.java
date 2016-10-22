@@ -1,7 +1,14 @@
 package com.epam.java.rt.lab.dao.sql;
 
+import com.epam.java.rt.lab.dao.DaoStatement;
+import com.epam.java.rt.lab.dao.factory.AbstractDaoFactory;
+import com.epam.java.rt.lab.dao.h2.jdbc.JdbcDao;
 import com.epam.java.rt.lab.entity.access.Login;
 import com.epam.java.rt.lab.entity.access.Restore;
+import com.epam.java.rt.lab.exception.AppException;
+import com.epam.java.rt.lab.util.PropertyManager;
+import com.epam.java.rt.lab.util.TimestampManager;
+import com.epam.java.rt.lab.web.validator.ValidatorFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -11,12 +18,10 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
-/**
- * category-ms
- */
 public class WhereTest {
 
-    private static final String WHERE = " WHERE \"Login\".id = \"Restore\".login_id AND \"Login\".id = \"Login\".email AND \"Restore\".id = ?";
+    private static final String WHERE =
+            " WHERE \"Login\".id = \"Restore\".login_id AND \"Login\".id = \"Login\".email AND \"Restore\".id = ?";
     private static final String FROM_TABLE = "\"Login\"";
 
     private Where where;
@@ -24,6 +29,15 @@ public class WhereTest {
 
     @Before
     public void setUp() throws Exception {
+        PropertyManager.initGlobalProperties();
+        AppException.initExceptionBundle();
+        TimestampManager.initDateList();
+        TimestampManager.initTimeList();
+        ValidatorFactory.getInstance().initValidatorMap();
+        AbstractDaoFactory.initDatabaseProperties();
+        JdbcDao.initDaoProperties();
+        Sql.initSqlProperties();
+        DaoStatement.initStatementMethodMap();
         this.wildValueList = new ArrayList<>();
         List<Where.Predicate> predicateList = new ArrayList<>();
         predicateList.add(
@@ -48,7 +62,8 @@ public class WhereTest {
                 Where.Predicate.get(predicateList)
         );
         assertNotNull("Instantiating failed", this.where);
-        assertEquals("toString() failed", WHERE, this.where.appendClause(new StringBuilder()).toString());
+        assertEquals("toString() failed", WHERE,
+                this.where.appendClause(new StringBuilder()).toString());
     }
 
     @After

@@ -30,6 +30,8 @@ public class Photo extends BaseEntity implements File {
     private InputStream file;
     private Timestamp modified;
 
+    public static final Photo NULL_PHOTO = new Photo();
+
     public Photo() {
     }
 

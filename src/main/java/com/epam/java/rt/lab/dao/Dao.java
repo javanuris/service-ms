@@ -1,20 +1,19 @@
 package com.epam.java.rt.lab.dao;
 
+import com.epam.java.rt.lab.exception.AppException;
+
 import java.util.List;
 
-/**
- * category-ms
- */
 public interface Dao {
 
-    Long create(DaoParameter daoParameter) throws DaoException;
+    Long create(DaoParameter daoParameter) throws AppException;
 
-    <T> List<T> read(DaoParameter daoParameter) throws DaoException;
+    <T> List<T> read(DaoParameter daoParameter) throws AppException;
 
-    int update(DaoParameter daoParameter) throws DaoException;
+    int update(DaoParameter daoParameter) throws AppException;
 
-    int delete(DaoParameter daoParameter) throws DaoException;
+    int delete(DaoParameter daoParameter) throws AppException;
 
-    Long count(DaoParameter daoParameter) throws DaoException;
+    Long count(DaoParameter daoParameter) throws AppException;
 
 }

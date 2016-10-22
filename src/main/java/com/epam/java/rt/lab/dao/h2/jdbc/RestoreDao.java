@@ -1,10 +1,14 @@
 package com.epam.java.rt.lab.dao.h2.jdbc;
 
-import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.dao.DaoParameter;
-import com.epam.java.rt.lab.dao.sql.*;
+import com.epam.java.rt.lab.dao.sql.Column;
+import com.epam.java.rt.lab.dao.sql.Insert.InsertValue;
+import com.epam.java.rt.lab.dao.sql.Select;
+import com.epam.java.rt.lab.dao.sql.Sql;
 import com.epam.java.rt.lab.entity.access.Login;
 import com.epam.java.rt.lab.entity.access.Restore;
+import com.epam.java.rt.lab.entity.access.Restore.Property;
+import com.epam.java.rt.lab.exception.AppException;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -12,57 +16,60 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * category-ms
- */
+import static com.epam.java.rt.lab.dao.DaoExceptionCode.SQL_OPERATION_ERROR;
+import static com.epam.java.rt.lab.exception.AppExceptionCode.NULL_NOT_ALLOWED;
+
 public class RestoreDao extends JdbcDao {
 
-    public RestoreDao(Connection connection) {
+    public RestoreDao(Connection connection) throws AppException {
         super(connection);
     }
 
     @Override
-    Sql getSqlCreate(DaoParameter daoParameter) throws DaoException {
+    Sql getSqlCreate(DaoParameter daoParameter) throws AppException {
+        if (daoParameter == null) throw new AppException(NULL_NOT_ALLOWED);
         Restore restore = (Restore) daoParameter.getEntity();
-        return Sql
-                .insert(restore)
-                .values(
-                        new Insert.InsertValue(Restore.Property.LOGIN_ID, restore.getLogin().getId()),
-                        new Insert.InsertValue(Restore.Property.CODE, restore.getCode()),
-                        new Insert.InsertValue(Restore.Property.COOKIE_NAME, restore.getCookieName()),
-                        new Insert.InsertValue(Restore.Property.COOKIE_VALUE, restore.getCookieValue()),
-                        new Insert.InsertValue(Restore.Property.VALID, restore.getValid())
-                );
+        return Sql.insert(restore).values(
+                new InsertValue(Property.LOGIN_ID, restore.getLogin().getId()),
+                new InsertValue(Property.CODE, restore.getCode()),
+                new InsertValue(Property.COOKIE_NAME, restore.getCookieName()),
+                new InsertValue(Property.COOKIE_VALUE,
+                        restore.getCookieValue()),
+                new InsertValue(Property.VALID, restore.getValid()));
     }
 
     @Override
-    Sql getSqlRead(DaoParameter daoParameter) throws DaoException {
-        return Sql
-                .select(Restore.class)
-                .where(daoParameter.getWherePredicate())
-                .orderBy(daoParameter.getOrderByCriteriaArray())
-                .limit(daoParameter.getLimitOffset(), daoParameter.getLimitCount());
+    Sql getSqlRead(DaoParameter daoParameter) throws AppException {
+        if (daoParameter == null) throw new AppException(NULL_NOT_ALLOWED);
+        return Sql.select(Restore.class).
+                where(daoParameter.getWherePredicate()).
+                orderBy(daoParameter.getOrderByCriteriaArray()).
+                limit(daoParameter.getLimitOffset(),
+                        daoParameter.getLimitCount());
     }
 
     @Override
-    Sql getSqlUpdate(DaoParameter daoParameter) throws DaoException {
+    Sql getSqlUpdate(DaoParameter daoParameter) throws AppException {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    Sql getSqlDelete(DaoParameter daoParameter) throws DaoException {
-        return Sql
-                .delete(Restore.class)
-                .where(daoParameter.getWherePredicate());
+    Sql getSqlDelete(DaoParameter daoParameter) throws AppException {
+        if (daoParameter == null) throw new AppException(NULL_NOT_ALLOWED);
+        return Sql.delete(Restore.class).
+                where(daoParameter.getWherePredicate());
     }
 
     @Override
-    Sql getSqlCount(DaoParameter daoParameter) throws DaoException {
-        return null;
+    Sql getSqlCount(DaoParameter daoParameter) throws AppException {
+        throw new UnsupportedOperationException();
     }
 
     @Override
-    <T> List<T> getEntity(ResultSet resultSet, Sql sql) throws DaoException {
+    <T> List<T> getEntity(ResultSet resultSet, Sql sql) throws AppException {
+        if (resultSet == null || sql == null) {
+            throw new AppException(NULL_NOT_ALLOWED);
+        }
         Select select = (Select) sql;
         String restoreTableName = Sql.getProperty(Restore.class.getName());
         String loginTableName = Sql.getProperty(Login.class.getName());
@@ -75,11 +82,14 @@ public class RestoreDao extends JdbcDao {
                     columnIndex++;
                     if (restoreTableName.equals(column.getTableName())) {
                         if (restore == null) restore = new Restore();
-                        setEntityProperty(column.getTableName(), column.getColumnName(), restore, resultSet.getObject(columnIndex));
+                        setEntityProperty(column.getTableName(),
+                                column.getColumnName(), restore,
+                                resultSet.getObject(columnIndex));
                     } else {
                         if (loginTableName.equals(column.getTableName())) {
                             restore.setLogin((new LoginDao(getConnection())
-                                    .getLogin((Long) resultSet.getObject(columnIndex))));
+                                    .getLogin((Long) resultSet.
+                                            getObject(columnIndex))));
                         }
                     }
                 }
@@ -87,9 +97,9 @@ public class RestoreDao extends JdbcDao {
             }
             return (List<T>) restoreList;
         } catch (SQLException e) {
-            throw new DaoException("exception.dao.jdbc.restore.get-entity", e.getCause());
+            throw new AppException(SQL_OPERATION_ERROR,
+                    e.getMessage(), e.getCause());
         }
     }
-
 
 }

@@ -75,6 +75,8 @@ public class NavigationFactory {
             throw new NavigationException("exception.component.nav.properties", e.getCause());
 //        } catch (AppException e) {
 //            throw new NavigationException("exception.component.navigation.role-factory", e.getCause());
+        } catch (AppException e) {
+            e.printStackTrace();
         }
     }
 

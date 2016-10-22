@@ -1,18 +1,14 @@
 package com.epam.java.rt.lab.connection;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.epam.java.rt.lab.exception.AppException;
 
 import java.sql.*;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Executor;
 
-/**
- * category-ms
- */
 public class PooledConnection implements Connection {
-    private static final Logger logger = LoggerFactory.getLogger(PooledConnection.class);
+
     private Connection connection;
 
     PooledConnection(Connection connection) throws SQLException {
@@ -27,8 +23,9 @@ public class PooledConnection implements Connection {
                 this.connection.rollback();
                 this.connection.setAutoCommit(true);
             }
-            if (this.connection.isReadOnly()) this.connection.setReadOnly(false);
-            logger.info("Pooled connection cleared");
+            if (this.connection.isReadOnly()) {
+                this.connection.setReadOnly(false);
+            }
         }
     }
 
@@ -38,7 +35,8 @@ public class PooledConnection implements Connection {
     }
 
     @Override
-    public PreparedStatement prepareStatement(String sql) throws SQLException {
+    public PreparedStatement prepareStatement(String sql)
+            throws SQLException {
         return this.connection.prepareStatement(sql);
     }
 
@@ -78,15 +76,16 @@ public class PooledConnection implements Connection {
 
     @Override // reason method for subclassing
     public void close() throws SQLException {
-        boolean done = false;
-        while (!done) {
+        int tryCount = 0;
+        while (true) {
             try {
-                ((ConnectionPool) ConnectionPool.getInstance()).releaseConnection(this);
-                done = true;
-                logger.info("Pooled connection released");
-            } catch (ConnectionException e) {
-                done = false;
-                logger.error("Pooled connection release error", e);
+                ConnectionPool.getInstance().releaseConnection(this);
+                break;
+            } catch (AppException e) {
+                tryCount++;
+                if (tryCount > 50) {
+                    throw new SQLException(e.getMessage(), e.getCause());
+                }
             }
         }
     }
@@ -142,18 +141,28 @@ public class PooledConnection implements Connection {
     }
 
     @Override
-    public Statement createStatement(int resultSetType, int resultSetConcurrency) throws SQLException {
-        return this.connection.createStatement(resultSetType, resultSetConcurrency);
+    public Statement createStatement(int resultSetType,
+                                     int resultSetConcurrency)
+            throws SQLException {
+        return this.connection.createStatement(resultSetType,
+                resultSetConcurrency);
     }
 
     @Override
-    public PreparedStatement prepareStatement(String sql, int resultSetType, int resultSetConcurrency) throws SQLException {
-        return this.connection.prepareCall(sql, resultSetType, resultSetConcurrency);
+    public PreparedStatement prepareStatement(String sql,
+                                              int resultSetType,
+                                              int resultSetConcurrency)
+            throws SQLException {
+        return this.connection.prepareCall(sql, resultSetType,
+                resultSetConcurrency);
     }
 
     @Override
-    public CallableStatement prepareCall(String sql, int resultSetType, int resultSetConcurrency) throws SQLException {
-        return this.connection.prepareCall(sql, resultSetType, resultSetConcurrency);
+    public CallableStatement prepareCall(String sql, int resultSetType,
+                                         int resultSetConcurrency)
+            throws SQLException {
+        return this.connection.prepareCall(sql, resultSetType,
+                resultSetConcurrency);
     }
 
     @Override
@@ -197,32 +206,48 @@ public class PooledConnection implements Connection {
     }
 
     @Override
-    public Statement createStatement(int resultSetType, int resultSetConcurrency, int resultSetHoldability) throws SQLException {
-        return this.connection.createStatement(resultSetType, resultSetConcurrency, resultSetHoldability);
+    public Statement createStatement(int resultSetType,
+                                     int resultSetConcurrency,
+                                     int resultSetHoldability)
+            throws SQLException {
+        return this.connection.createStatement(resultSetType,
+                resultSetConcurrency, resultSetHoldability);
     }
 
     @Override
-    public PreparedStatement prepareStatement(String sql, int resultSetType, int resultSetConcurrency, int resultSetHoldability) throws SQLException {
-        return this.connection.prepareCall(sql, resultSetType, resultSetConcurrency);
+    public PreparedStatement prepareStatement(String sql, int resultSetType,
+                                              int resultSetConcurrency,
+                                              int resultSetHoldability)
+            throws SQLException {
+        return this.connection.prepareCall(sql, resultSetType,
+                resultSetConcurrency);
     }
 
     @Override
-    public CallableStatement prepareCall(String sql, int resultSetType, int resultSetConcurrency, int resultSetHoldability) throws SQLException {
-        return this.connection.prepareCall(sql, resultSetType, resultSetConcurrency, resultSetHoldability);
+    public CallableStatement prepareCall(String sql, int resultSetType,
+                                         int resultSetConcurrency,
+                                         int resultSetHoldability)
+            throws SQLException {
+        return this.connection.prepareCall(sql, resultSetType,
+                resultSetConcurrency, resultSetHoldability);
     }
 
     @Override
-    public PreparedStatement prepareStatement(String sql, int autoGeneratedKeys) throws SQLException {
+    public PreparedStatement prepareStatement(String sql,
+                                              int autoGeneratedKeys)
+            throws SQLException {
         return this.connection.prepareStatement(sql, autoGeneratedKeys);
     }
 
     @Override
-    public PreparedStatement prepareStatement(String sql, int[] columnIndexes) throws SQLException {
+    public PreparedStatement prepareStatement(String sql, int[] columnIndexes)
+            throws SQLException {
         return this.connection.prepareStatement(sql, columnIndexes);
     }
 
     @Override
-    public PreparedStatement prepareStatement(String sql, String[] columnNames) throws SQLException {
+    public PreparedStatement prepareStatement(String sql, String[] columnNames)
+            throws SQLException {
         return this.connection.prepareStatement(sql, columnNames);
     }
 
@@ -252,12 +277,14 @@ public class PooledConnection implements Connection {
     }
 
     @Override
-    public void setClientInfo(String name, String value) throws SQLClientInfoException {
+    public void setClientInfo(String name, String value)
+            throws SQLClientInfoException {
         this.connection.setClientInfo(name, value);
     }
 
     @Override
-    public void setClientInfo(Properties properties) throws SQLClientInfoException {
+    public void setClientInfo(Properties properties)
+            throws SQLClientInfoException {
         this.connection.setClientInfo(properties);
     }
 
@@ -272,12 +299,14 @@ public class PooledConnection implements Connection {
     }
 
     @Override
-    public Array createArrayOf(String typeName, Object[] elements) throws SQLException {
+    public Array createArrayOf(String typeName, Object[] elements)
+            throws SQLException {
         return this.connection.createArrayOf(typeName, elements);
     }
 
     @Override
-    public Struct createStruct(String typeName, Object[] attributes) throws SQLException {
+    public Struct createStruct(String typeName, Object[] attributes)
+            throws SQLException {
         return this.connection.createStruct(typeName, attributes);
     }
 
@@ -297,7 +326,8 @@ public class PooledConnection implements Connection {
     }
 
     @Override
-    public void setNetworkTimeout(Executor executor, int milliseconds) throws SQLException {
+    public void setNetworkTimeout(Executor executor, int milliseconds)
+            throws SQLException {
         this.connection.setNetworkTimeout(executor, milliseconds);
     }
 

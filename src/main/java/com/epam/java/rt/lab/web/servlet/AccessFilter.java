@@ -2,9 +2,7 @@ package com.epam.java.rt.lab.web.servlet;
 
 import com.epam.java.rt.lab.entity.access.User;
 import com.epam.java.rt.lab.exception.AppException;
-import com.epam.java.rt.lab.service.ServiceException;
 import com.epam.java.rt.lab.service.UserService;
-import com.epam.java.rt.lab.util.CookieManager;
 import com.epam.java.rt.lab.util.UrlManager;
 import com.epam.java.rt.lab.web.access.RoleFactory;
 import com.epam.java.rt.lab.web.component.navigation.NavigationException;

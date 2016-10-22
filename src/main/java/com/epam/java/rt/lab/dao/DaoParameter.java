@@ -10,7 +10,8 @@ import com.epam.java.rt.lab.entity.EntityProperty;
 import java.util.Map;
 
 /**
- *  used to exchange parameters between category layer and dao layer, and through dao methods
+ *  used to exchange parameters between business layer
+ *  and dao layer, and through dao methods
  */
 public class DaoParameter {
 
@@ -40,7 +41,8 @@ public class DaoParameter {
         return this.orderByCriteriaArray;
     }
 
-    public DaoParameter setOrderByCriteriaArray(OrderBy.Criteria... orderByCriteriaArray) {
+    public DaoParameter setOrderByCriteriaArray(
+            OrderBy.Criteria... orderByCriteriaArray) {
         this.orderByCriteriaArray = orderByCriteriaArray;
         return this;
     }

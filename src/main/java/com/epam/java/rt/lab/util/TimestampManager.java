@@ -64,28 +64,32 @@ public final class TimestampManager {
     }
 
     public static void initDateList() throws AppException {
-        for (int year = 1900; year <= 2100; year++) {
-            for (int month = 1; month <= 12; month++) {
-                for (int day = 1; day <= daysInMonth(year, month); day++) {
-                    StringBuilder stringDate = new StringBuilder();
-                    stringDate.append(String.format("%04d", year));
-                    stringDate.append(String.format("%02d", month));
-                    stringDate.append(String.format("%02d", day));
-                    TimestampManager.dateList.add(stringDate.toString());
+        if (TimestampManager.dateList.size() == 0) {
+            for (int year = 1900; year <= 2100; year++) {
+                for (int month = 1; month <= 12; month++) {
+                    for (int day = 1; day <= daysInMonth(year, month); day++) {
+                        StringBuilder stringDate = new StringBuilder();
+                        stringDate.append(String.format("%04d", year));
+                        stringDate.append(String.format("%02d", month));
+                        stringDate.append(String.format("%02d", day));
+                        TimestampManager.dateList.add(stringDate.toString());
+                    }
                 }
             }
         }
     }
 
     public static void initTimeList() {
-        for (int hour = 0; hour <= 23; hour++) {
-            for (int minute = 0; minute <= 59; minute++) {
-                for (int second = 0; second <= 59; second++) {
-                    StringBuilder stringTime = new StringBuilder();
-                    stringTime.append(String.format("%02d", hour));
-                    stringTime.append(String.format("%02d", minute));
-                    stringTime.append(String.format("%02d", second));
-                    TimestampManager.timeList.add(stringTime.toString());
+        if (TimestampManager.timeList.size() == 0) {
+            for (int hour = 0; hour <= 23; hour++) {
+                for (int minute = 0; minute <= 59; minute++) {
+                    for (int second = 0; second <= 59; second++) {
+                        StringBuilder stringTime = new StringBuilder();
+                        stringTime.append(String.format("%02d", hour));
+                        stringTime.append(String.format("%02d", minute));
+                        stringTime.append(String.format("%02d", second));
+                        TimestampManager.timeList.add(stringTime.toString());
+                    }
                 }
             }
         }

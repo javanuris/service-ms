@@ -29,6 +29,8 @@ public class Application extends BaseEntity {
         }
     }
 
+    public static final Application NULL_APPLICATION = new Application();
+
     public Application() {
     }
 

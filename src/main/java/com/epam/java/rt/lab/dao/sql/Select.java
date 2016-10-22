@@ -1,11 +1,15 @@
 package com.epam.java.rt.lab.dao.sql;
 
-import com.epam.java.rt.lab.dao.DaoException;
+import com.epam.java.rt.lab.dao.sql.Where.Predicate;
+import com.epam.java.rt.lab.exception.AppException;
 import com.epam.java.rt.lab.util.StringCombiner;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import static com.epam.java.rt.lab.exception.AppExceptionCode.NULL_NOT_ALLOWED;
+import static com.epam.java.rt.lab.util.PropertyManager.*;
 
 /**
  * {@code Select} class defines sql statement,
@@ -15,13 +19,15 @@ import java.util.List;
  * @see OrderBy
  * @see Limit
  * @see com.epam.java.rt.lab.dao.sql.OrderBy.Criteria
- * @see com.epam.java.rt.lab.dao.sql.Where.Predicate
+ * @see Predicate
  */
 public class Select extends Sql implements Iterable<Column> {
 
     private static final String SELECT = "SELECT ";
 
-    /** {@code List} valueOf {@code Column} objects */
+    /**
+     * {@code List} of {@code Column} objects
+     */
     private List<Column> columnList;
     /** {@code From} object */
     private From from;
@@ -36,14 +42,15 @@ public class Select extends Sql implements Iterable<Column> {
 
     /**
      * Initiates new {@code Select} object with defined
-     * {@code List} valueOf {@code Column} objects
+     * {@code List} of {@code Column} objects
      *
-     * @param columnList        {@code List} valueOf {@code Column} objects
-     * @throws DaoException
+     * @param columnList        {@code List} of {@code Column} objects
+     * @throws AppException
      */
-    Select(List<Column> columnList) throws DaoException {
-        if (columnList == null || columnList.size() == 0)
-            throw new DaoException("exception.dao.sql.Select.empty-column-list");
+    Select(List<Column> columnList) throws AppException {
+        if (columnList == null || columnList.size() == 0) {
+            throw new AppException(NULL_NOT_ALLOWED);
+        }
         this.columnList = columnList;
         this.join = new Join();
         this.from = new From(columnList, join);
@@ -55,11 +62,12 @@ public class Select extends Sql implements Iterable<Column> {
      *
      * @param predicate     {@code Predicate} object
      * @return              {@code Select} object, on which this method called
-     * @throws DaoException
+     * @throws AppException
      *
-     * @see com.epam.java.rt.lab.dao.sql.Where.Predicate
+     * @see Predicate
      */
-    public Select where(Where.Predicate predicate) throws DaoException {
+    public Select where(Predicate predicate) throws AppException {
+//        if (predicate == null) throw new AppException(NULL_NOT_ALLOWED);
         this.where = new Where(join, predicate);
         this.where.linkWildValue(getWildValueList());
         return this;
@@ -69,12 +77,15 @@ public class Select extends Sql implements Iterable<Column> {
      * Returns {@code Select} object, on which this method called
      * with defined its order by clause
      *
-     * @param criteriaArray {@code Array} valueOf {@code Criteria} objects
+     * @param criteriaArray {@code Array} of {@code Criteria} objects
      * @return              {@code Select} object, on which this method called
+     * @throws AppException
      *
      * @see com.epam.java.rt.lab.dao.sql.OrderBy.Criteria
      */
-    public Select orderBy(OrderBy.Criteria[] criteriaArray) {
+    public Select orderBy(OrderBy.Criteria[] criteriaArray)
+            throws AppException {
+//        if (criteriaArray == null) throw new AppException(NULL_NOT_ALLOWED);
         this.orderBy = new OrderBy(criteriaArray);
         return this;
     }
@@ -93,23 +104,21 @@ public class Select extends Sql implements Iterable<Column> {
     }
 
     @Override
-    public String create() throws DaoException {
-        try {
-            StringBuilder result = new StringBuilder();
-            result = this.from.appendClause(StringCombiner.combine(result.append(SELECT), this.columnList, COMMA_DELIMITER));
-            if (this.join != null) {
-                this.join.appendClause(result);
-                if (this.where == null)
-                    this.where = new Where(this.join, null);
-            }
-            if (this.where != null) this.where.appendClause(result);
-            if (this.orderBy != null) this.orderBy.appendClause(result);
-            if (this.limit != null) this.limit.appendClause(result);
-//            System.out.println(result.toString());
-            return result.toString();
-        } catch (Exception e) {
-            throw new DaoException("exception.dao.sql.Select.combine", e.getCause());
+    public String create() throws AppException {
+        StringBuilder result = new StringBuilder();
+        result.append(SELECT);
+        result = StringCombiner.combine(result, this.columnList,
+                COMMA_WITH_SPACE);
+        result = this.from.appendClause(result);
+        if (this.join != null) {
+            this.join.appendClause(result);
+            if (this.where == null)
+                this.where = new Where(this.join, null);
         }
+        if (this.where != null) this.where.appendClause(result);
+        if (this.orderBy != null) this.orderBy.appendClause(result);
+        if (this.limit != null) this.limit.appendClause(result);
+        return result.toString();
     }
 
     @Override
@@ -132,7 +141,7 @@ public class Select extends Sql implements Iterable<Column> {
     }
 
     /**
-     * {@code From} class defines getDate clause valueOf sql statement
+     * {@code From} class defines getDate clause of sql statement
      *
      * @see Column
      */
@@ -147,35 +156,42 @@ public class Select extends Sql implements Iterable<Column> {
          * Initiates new {@code From} object with defined
          * {@code From} object
          *
-         * @param columnList    {@code List} valueOf {@Column} objects
+         * @param columnList    {@code List} of {@code Column} objects
          * @param join          {@code Join} object to pre initiate join clause
          *                      according to selected columns
+         * @throws AppException
          */
-        From(List<Column> columnList, Join join) {
+        From(List<Column> columnList, Join join) throws AppException {
             this.from = columnList.get(0).getTableName();
             join.setFrom(this.from);
-            for (Column column : columnList) join.addJoin(column.getTableName());
+            for (Column column : columnList) {
+                join.addJoin(column.getTableName());
+            }
         }
 
         @Override
         public StringBuilder appendClause(StringBuilder result) {
-            return result.append(FROM).append(this.from );
+            return result.append(FROM).append(this.from);
         }
 
     }
 
     /**
-     * {@cdoe Join} class defines join clause valueOf sql statement
+     * {@code Join} class defines join clause of sql statement
      *
-     * @see com.epam.java.rt.lab.dao.sql.Where.Predicate
+     * @see Predicate
      */
     public static class Join implements Clause {
 
         private static final String JOIN = " JOIN ";
 
-        /** {@code String} representation valueOf base table name */
+        /**
+         * {@code String} representation of base table name
+         */
         private String from;
-        /** {@code List} valueOf {@code Stirng} objects which defines join table names */
+        /**
+         * {@code List} of {@code Stirng} objects which defines join table names
+         */
         private List<String> joinList;
 
         /**
@@ -206,9 +222,11 @@ public class Select extends Sql implements Iterable<Column> {
         /**
          * Adds join table name to join clause
          *
-         * @param join  {@code String} representation valueOf join table name
+         * @param join  {@code String} representation of join table name
+         * @throws AppException
          */
-        void addJoin(String join) {
+        void addJoin(String join) throws AppException {
+            if (join == null) throw new AppException(NULL_NOT_ALLOWED);
             if (!from.equals(join) && !this.joinList.contains(join))
                 this.joinList.add(join);
         }
@@ -217,55 +235,63 @@ public class Select extends Sql implements Iterable<Column> {
          * Returns {@code Predicate} object for where clause
          *
          * @return      {@code Predicate} object
-         * @throws DaoException
+         * @throws AppException
          *
-         * @see com.epam.java.rt.lab.dao.sql.Where.Predicate
+         * @see Predicate
          */
-        Where.Predicate getPredicate() throws DaoException {
-            List<Where.Predicate> predicateList = new ArrayList<>();
+        Predicate getPredicate() throws AppException {
+            List<Predicate> predicateList = new ArrayList<>();
             getPredicate(predicateList, this.from, 0);
-            for (int i = 0; i < this.joinList.size() - 1; i++)
+            for (int i = 0; i < this.joinList.size() - 1; i++) {
                 getPredicate(predicateList, this.joinList.get(i), i + 1);
-            return Where.Predicate.get(predicateList);
+            }
+            return Predicate.get(predicateList);
         }
 
         /**
-         * Fills {@code List} valueOf {@code Predicate} objects for where clause
-         * getDate table name, which should be selected or joined.
+         * Fills {@code List} of {@code Predicate} objects for where clause
+         * from table name, which should be selected or joined.
          *
-         * @param predicateList     {@code List} valueOf {@code Predicate} objects
-         * @param tableName         {@code String} representation valueOf table name
-         * @param startIndex        {@code int} starting index in {@code List} valueOf
+         * @param predicateList     {@code List} of {@code Predicate} objects
+         * @param tableName         {@code String} representation of table name
+         * @param startIndex        {@code int} starting index in {@code List} of
          *                          {@code Predicate} objects, to which should be
          *                          found referenced columns
-         * @throws DaoException
+         * @throws AppException
          *
-         * @see com.epam.java.rt.lab.dao.sql.Where.Predicate
+         * @see Predicate
          */
-        private void getPredicate(List<Where.Predicate> predicateList, String tableName, int startIndex) throws DaoException {
+        private void getPredicate(List<Predicate> predicateList,
+                                  String tableName, int startIndex)
+                throws AppException {
+            if (predicateList == null || tableName == null) {
+                throw new AppException(NULL_NOT_ALLOWED);
+            }
             for (int i = startIndex; i < this.joinList.size(); i++) {
                 String joinTableName = this.joinList.get(i);
-                String joinExpression = getProperty(tableName.concat(JOIN_AMPERSAND).concat(joinTableName));
-                if (joinExpression == null) joinExpression = getProperty(joinTableName.concat(JOIN_AMPERSAND).concat(tableName));
+                String joinExpression =
+                        getProperty(tableName + AMPERSAND + joinTableName);
+                if (joinExpression == null) {
+                    joinExpression =
+                            getProperty(joinTableName + AMPERSAND + tableName);
+                }
                 if (joinExpression != null) {
-                    String[] split = StringCombiner.splitSpaceLessNames(joinExpression, JOIN_AMPERSAND);
-                    predicateList.add(new Where.Predicate(
-                            Column.of(split[0]),
-                            Where.Predicate.PredicateOperator.EQUAL,
-                            Column.of(split[1])
-                    ));
+                    String[] split = StringCombiner.
+                            splitSpaceLessNames(joinExpression, AMPERSAND);
+                    Predicate predicate = new Predicate(Column.from(split[0]),
+                            Predicate.PredicateOperator.EQUAL,
+                            Column.from(split[1]));
+                    predicateList.add(predicate);
                 }
             }
         }
 
         @Override
-        public StringBuilder appendClause(StringBuilder result) throws DaoException {
-            try {
-                return joinList.size() == 0 ? result :
-                        result.append(JOIN).append(StringCombiner.combine(this.joinList, COMMA_DELIMITER));
-            } catch (Exception e) {
-                throw new DaoException("exception.dao.sql.join.combine", e.getCause());
-            }
+        public StringBuilder appendClause(StringBuilder result)
+                throws AppException {
+            return ((joinList.size() == 0) ? result
+                    : result.append(JOIN).
+                    append(StringCombiner.combine(this.joinList, COMMA)));
         }
 
     }
@@ -278,9 +304,13 @@ public class Select extends Sql implements Iterable<Column> {
 
         private static final String LIMIT = " LIMIT ";
 
-        /** {@code Long} representation valueOf limit offset value */
+        /**
+         * {@code Long} representation of limit offset value
+         */
         private Long offset;
-        /** {@code Long} representation valueOf limit count value */
+        /**
+         * {@code Long} representation of limit count value
+         */
         private Long count;
 
         /**
@@ -297,12 +327,13 @@ public class Select extends Sql implements Iterable<Column> {
         }
 
         @Override
-        public StringBuilder appendClause(StringBuilder result) throws DaoException {
-            return offset == null || count == null || offset < 0 || count <= 0 ? result :
-                    result.append(LIMIT)
-                            .append(String.valueOf(this.offset))
-                            .append(Sql.COMMA_DELIMITER)
-                            .append(String.valueOf(this.count));
+        public StringBuilder appendClause(StringBuilder result)
+                throws AppException {
+            if (result == null) throw new AppException(NULL_NOT_ALLOWED);
+            return ((offset == null || count == null
+                    || offset < 0 || count <= 0) ? result
+                    : result.append(LIMIT).append(String.valueOf(this.offset)).
+                    append(COMMA_WITH_SPACE).append(String.valueOf(this.count)));
         }
 
     }

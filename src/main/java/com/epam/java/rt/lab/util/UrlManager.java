@@ -11,9 +11,6 @@ import static com.epam.java.rt.lab.exception.AppExceptionCode.NULL_NOT_ALLOWED;
 import static com.epam.java.rt.lab.util.PropertyManager.AMPERSAND;
 import static com.epam.java.rt.lab.util.PropertyManager.QUESTION;
 
-/**
- * category-ms
- */
 public class UrlManager {
 
     private UrlManager() {

@@ -1,8 +1,10 @@
 package com.epam.java.rt.lab.dao.sql;
 
-import com.epam.java.rt.lab.dao.DaoException;
+import com.epam.java.rt.lab.exception.AppException;
 
 import java.util.List;
+
+import static com.epam.java.rt.lab.exception.AppExceptionCode.NULL_NOT_ALLOWED;
 
 /**
  * {@code Count} class defines sql statement,
@@ -23,16 +25,17 @@ public class Count extends Sql {
 
     /**
      * Initiates new {@code Count} object with defined
-     * {@code List} valueOf column names, which should be queried
+     * {@code List} of column names, which should be queried
      * in sql statement
      *
      * @param columnList        {@code List} object, which contains columns that
      *                          should be queried in sql statement
-     * @throws DaoException
+     * @throws AppException
      */
-    Count(List<Column> columnList) throws DaoException {
-        if (columnList == null || columnList.size() == 0)
-            throw new DaoException("exception.dao.sql.Select.empty-column-list");
+    Count(List<Column> columnList) throws AppException {
+        if (columnList == null || columnList.size() == 0) {
+            throw new AppException(NULL_NOT_ALLOWED);
+        }
         this.join = new Select.Join();
         this.from = new Select.From(columnList, join);
     }
@@ -44,32 +47,28 @@ public class Count extends Sql {
      * @param predicate     {@code Predicate} object, which defines
      *                      where predicate for sql statement
      * @return              {@code Count} object, on which this method called
-     * @throws DaoException
+     * @throws AppException
      *
      * @see com.epam.java.rt.lab.dao.sql.Where.Predicate
      */
-    public Count where(Where.Predicate predicate) throws DaoException {
+    public Count where(Where.Predicate predicate) throws AppException {
         this.where = new Where(join, predicate);
         this.where.linkWildValue(getWildValueList());
         return this;
     }
 
     @Override
-    public String create() throws DaoException {
-        try {
-            StringBuilder result = new StringBuilder();
-            result = this.from.appendClause(result.append(SELECT_COUNT));
-            if (this.join != null) {
-                this.join.appendClause(result);
-                if (this.where == null)
-                    this.where = new Where(this.join, null);
+    public String create() throws AppException {
+        StringBuilder result = new StringBuilder();
+        result = this.from.appendClause(result.append(SELECT_COUNT));
+        if (this.join != null) {
+            this.join.appendClause(result);
+            if (this.where == null) {
+                this.where = new Where(this.join, null);
             }
-            if (this.where != null) this.where.appendClause(result);
-//            System.out.println(result.toString());
-            return result.toString();
-        } catch (Exception e) {
-            throw new DaoException("exception.dao.sql.Select.combine", e.getCause());
         }
+        if (this.where != null) this.where.appendClause(result);
+        return result.toString();
     }
 
 }

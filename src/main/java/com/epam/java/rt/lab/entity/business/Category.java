@@ -5,9 +5,6 @@ import com.epam.java.rt.lab.entity.EntityProperty;
 
 import java.sql.Timestamp;
 
-/**
- * category-ms
- */
 public class Category extends BaseEntity {
 
     private Long parentId;
@@ -25,6 +22,8 @@ public class Category extends BaseEntity {
             return Category.class;
         }
     }
+
+    public static final Category NULL_CATEGORY = new Category();
 
     public Category() {
     }

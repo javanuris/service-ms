@@ -142,11 +142,15 @@ public class AppException extends Exception {
 
     private String getDetailsString() {
         if (this.detailArray == null) return "";
-        return PropertyManager.SPACE + PropertyManager.LEFT_PARENTHESIS +
-                StringCombiner.combine(new ArrayList<>(Arrays.
-                        asList(this.detailArray)),
-                        PropertyManager.COMMA_WITH_SPACE)
-                        + PropertyManager.RIGHT_PARENTHESIS;
+        try {
+            return PropertyManager.SPACE + PropertyManager.LEFT_PARENTHESIS +
+                    StringCombiner.combine(new ArrayList<>(Arrays.
+                                    asList(this.detailArray)),
+                            PropertyManager.COMMA_WITH_SPACE)
+                    + PropertyManager.RIGHT_PARENTHESIS;
+        } catch (AppException e) {
+            return "";
+        }
     }
 
     public ExceptionCode getExceptionCode() {

@@ -7,9 +7,6 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-/**
- * category-ms
- */
 public class LoginServiceTest {
 
     LoginService loginService;

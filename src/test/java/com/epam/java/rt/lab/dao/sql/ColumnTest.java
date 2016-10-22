@@ -1,13 +1,17 @@
 package com.epam.java.rt.lab.dao.sql;
 
+import com.epam.java.rt.lab.dao.DaoStatement;
+import com.epam.java.rt.lab.dao.factory.AbstractDaoFactory;
+import com.epam.java.rt.lab.dao.h2.jdbc.JdbcDao;
+import com.epam.java.rt.lab.exception.AppException;
+import com.epam.java.rt.lab.util.PropertyManager;
+import com.epam.java.rt.lab.util.TimestampManager;
+import com.epam.java.rt.lab.web.validator.ValidatorFactory;
 import org.junit.*;
 import org.junit.runners.MethodSorters;
 
 import static org.junit.Assert.*;
 
-/**
- * category-ms
- */
 //@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class ColumnTest {
 
@@ -19,9 +23,19 @@ public class ColumnTest {
 
     @Before
     public void setUp() throws Exception {
+        PropertyManager.initGlobalProperties();
+        AppException.initExceptionBundle();
+        TimestampManager.initDateList();
+        TimestampManager.initTimeList();
+        ValidatorFactory.getInstance().initValidatorMap();
+        AbstractDaoFactory.initDatabaseProperties();
+        JdbcDao.initDaoProperties();
+        Sql.initSqlProperties();
+        DaoStatement.initStatementMethodMap();
         this.column = new Column(TABLE_NAME, COLUMN_NAME);
         assertNotNull("Instantiating failed", this.column);
-        assertEquals("toString() failed", TABLE_COLUMN_NAME, this.column.appendClause(new StringBuilder()).toString());
+        assertEquals("toString() failed", TABLE_COLUMN_NAME,
+                this.column.appendClause(new StringBuilder()).toString());
     }
 
     @After
@@ -31,19 +45,22 @@ public class ColumnTest {
 
     @Test
     public void of() throws Exception {
-        this.column = Column.of(TABLE_COLUMN_NAME);
+        this.column = Column.from(TABLE_COLUMN_NAME);
         assertNotNull("Instantiating failed", this.column);
-        assertEquals("toString() failed", TABLE_COLUMN_NAME, this.column.appendClause(new StringBuilder()).toString());
+        assertEquals("toString() failed", TABLE_COLUMN_NAME,
+                this.column.appendClause(new StringBuilder()).toString());
     }
 
     @Test
     public void getTableName() throws Exception {
-        assertEquals("getTableName() failed", TABLE_NAME, this.column.getTableName());
+        assertEquals("getTableName() failed", TABLE_NAME,
+                this.column.getTableName());
     }
 
     @Test
     public void getColumnName() throws Exception {
-        assertEquals("getColumnName() failed", COLUMN_NAME, this.column.getColumnName());
+        assertEquals("getColumnName() failed", COLUMN_NAME,
+                this.column.getColumnName());
     }
 
 }

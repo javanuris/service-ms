@@ -1,5 +1,6 @@
 package com.epam.java.rt.lab.web.component.view;
 
+import com.epam.java.rt.lab.exception.AppException;
 import com.epam.java.rt.lab.util.StringCombiner;
 
 import java.io.IOException;
@@ -63,6 +64,8 @@ public class ViewFactory {
         } catch (IOException e) {
             e.printStackTrace();
             throw new ViewException("exception.component.view.properties", e.getCause());
+        } catch (AppException e) {
+            e.printStackTrace();
         }
     }
 

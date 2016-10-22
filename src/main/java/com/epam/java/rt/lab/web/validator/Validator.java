@@ -4,9 +4,6 @@ import com.epam.java.rt.lab.util.NumberCompare;
 
 import java.sql.Timestamp;
 
-/**
- * category-ms
- */
 public class Validator<T extends Number> {
     private ValidatorType type;
     private String msg;
@@ -17,10 +14,11 @@ public class Validator<T extends Number> {
 
     enum ValidatorType {
         BOOLEAN, NUMBER, FUTURE, PAST, PATTERN,
-        BOOLEAN_OR_NULL, NUMBER_OR_NULL, FUTURE_OR_NULL, PAST_OR_NULL, PATTERN_OR_NULL
+        BOOLEAN_OR_NULL, NUMBER_OR_NULL, FUTURE_OR_NULL,
+        PAST_OR_NULL, PATTERN_OR_NULL
     }
 
-    Validator(ValidatorType type, String msg) {
+    private Validator(ValidatorType type, String msg) {
         this.type = type;
         this.msg = msg;
     }
@@ -29,14 +27,16 @@ public class Validator<T extends Number> {
         return new Validator(ValidatorType.BOOLEAN, msg);
     }
 
-    static <T extends Number> Validator getNumber(String msg, T numberMin, T numberMax) {
+    static <T extends Number> Validator getNumber(String msg,
+                                                  T numberMin, T numberMax) {
         Validator validator = new Validator<T>(ValidatorType.NUMBER, msg);
         validator.numberMin = numberMin;
         validator.numberMax = numberMax;
         return validator;
     }
 
-    private static Validator getTimestamp(ValidatorType validatorType, String msg, Timestamp timestamp) {
+    private static Validator getTimestamp(ValidatorType validatorType,
+                                          String msg, Timestamp timestamp) {
         Validator validator = new Validator(validatorType, msg);
         validator.compareTimestamp = timestamp;
         return validator;
@@ -60,8 +60,11 @@ public class Validator<T extends Number> {
         return new Validator(ValidatorType.BOOLEAN_OR_NULL, msg);
     }
 
-    static <T extends Number> Validator getNumberOrNull(String msg, T numberMin, T numberMax) {
-        Validator validator = new Validator<T>(ValidatorType.NUMBER_OR_NULL, msg);
+    static <T extends Number> Validator getNumberOrNull(String msg,
+                                                        T numberMin,
+                                                        T numberMax) {
+        Validator validator = new Validator<T>(
+                ValidatorType.NUMBER_OR_NULL, msg);
         validator.numberMin = numberMin;
         validator.numberMax = numberMax;
         return validator;
@@ -112,32 +115,36 @@ public class Validator<T extends Number> {
     public String[] validate(String value) {
         if (this.type.equals(ValidatorType.BOOLEAN)) {
             if (!isParsable(value) ||
-                    (!Boolean.TRUE.toString().equals(value) &&
-                            !Boolean.FALSE.toString().equals(value)))
+                    (!Boolean.TRUE.toString().equals(value)
+                            && !Boolean.FALSE.toString().equals(value)))
                 return new String[]{this.msg};
         } else if (this.type.equals(ValidatorType.BOOLEAN_OR_NULL)) {
-            if (isParsable(value) &&
-                    !Boolean.TRUE.toString().equals(value) &&
-                    !Boolean.FALSE.toString().equals(value))
+            if (isParsable(value) && !Boolean.TRUE.toString().equals(value)
+                    && !Boolean.FALSE.toString().equals(value))
                 return new String[]{this.msg};
-        } else if (this.type.equals(ValidatorType.NUMBER) ||
-                this.type.equals(ValidatorType.NUMBER_OR_NULL)) {
+        } else if (this.type.equals(ValidatorType.NUMBER)
+                || this.type.equals(ValidatorType.NUMBER_OR_NULL)) {
             if (isParsable(value) || this.type.equals(ValidatorType.NUMBER)) {
                 try {
                     if (!isParsable(value)) return new String[]{this.msg};
-                    Number number = NumberCompare.getNumber(value, this.numberMin);
+                    Number number = NumberCompare.
+                            getNumber(value, this.numberMin);
                     NumberCompare numberCompare = new NumberCompare();
-                    if ((this.numberMin != null && (numberCompare.compare(this.numberMin, number) > 0)) ||
-                            (this.numberMax != null && (numberCompare.compare(number, this.numberMax) > 0))) {
+                    if ((this.numberMin != null
+                            && (numberCompare.
+                            compare(this.numberMin,number) > 0))
+                            || (this.numberMax != null && (numberCompare.
+                            compare(number, this.numberMax) > 0))) {
                         if (this.numberMin != null || this.numberMax != null) {
                             String range;
-                            if (this.numberMin != null && this.numberMax != null) {
-                                range = this.numberMin.toString().concat(" .. ")
-                                        .concat(this.numberMax.toString());
+                            if (this.numberMin != null
+                                    && this.numberMax != null) {
+                                range = this.numberMin.toString() + " .. "
+                                        + this.numberMax.toString();
                             } else if (this.numberMin != null) {
-                                range = ">= ".concat(this.numberMin.toString());
+                                range = ">= " + this.numberMin.toString();
                             } else {
-                                range = "<= ".concat(this.numberMax.toString());
+                                range = "<= " + this.numberMax.toString();
                             }
                             return new String[]{this.msg, range};
                         } else {
@@ -148,7 +155,7 @@ public class Validator<T extends Number> {
                     return new String[]{this.msg};
                 }
             }
-            // TODO: FUTURE AND PAST VALIDATION (EMPTY TIMESTAMP MEANS CURRENT)
+            // TODO: FUTURE AND PAST VALIDATION
         } else if (this.type.equals(ValidatorType.PATTERN)) {
             if (value == null || !value.matches(this.regex))
                 return new String[]{this.msg};

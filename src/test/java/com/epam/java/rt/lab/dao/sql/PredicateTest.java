@@ -1,7 +1,13 @@
 package com.epam.java.rt.lab.dao.sql;
 
-import com.epam.java.rt.lab.dao.DaoException;
+import com.epam.java.rt.lab.dao.DaoStatement;
+import com.epam.java.rt.lab.dao.factory.AbstractDaoFactory;
+import com.epam.java.rt.lab.dao.h2.jdbc.JdbcDao;
 import com.epam.java.rt.lab.entity.access.Login;
+import com.epam.java.rt.lab.exception.AppException;
+import com.epam.java.rt.lab.util.PropertyManager;
+import com.epam.java.rt.lab.util.TimestampManager;
+import com.epam.java.rt.lab.web.validator.ValidatorFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -9,11 +15,9 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
-/**
- * category-ms
- */
 public class PredicateTest {
 
     private static final String LOGIN_ID_EMAIL_PREDICATE_AND_LOGIN_ID_EMAIL_PREDICATE =
@@ -30,13 +34,23 @@ public class PredicateTest {
 
     @Before
     public void setUp() throws Exception {
+        PropertyManager.initGlobalProperties();
+        AppException.initExceptionBundle();
+        TimestampManager.initDateList();
+        TimestampManager.initTimeList();
+        ValidatorFactory.getInstance().initValidatorMap();
+        AbstractDaoFactory.initDatabaseProperties();
+        JdbcDao.initDaoProperties();
+        Sql.initSqlProperties();
+        DaoStatement.initStatementMethodMap();
         this.predicate = new Where.Predicate(
-                Column.of("\"Login\".id"),
+                Column.from("\"Login\".id"),
                 Where.Predicate.PredicateOperator.EQUAL,
-                Column.of("\"Login\".email")
+                Column.from("\"Login\".email")
         );
         assertNotNull("Instantiating failed", this.predicate);
-        assertEquals("toString() failed", LOGIN_ID_EQUAL_LOGIN_EMAIL, this.predicate.appendClause(new StringBuilder()).toString());
+        assertEquals("toString() failed", LOGIN_ID_EQUAL_LOGIN_EMAIL,
+                this.predicate.appendClause(new StringBuilder()).toString());
         this.wildValueList = new ArrayList<>();
     }
 
@@ -53,7 +67,8 @@ public class PredicateTest {
                 Login.Property.EMAIL
         );
         assertNotNull("Instantiating failed", this.predicate);
-        assertEquals("get(EntityProperty) failed", LOGIN_ID_EQUAL_LOGIN_EMAIL, this.predicate.appendClause(new StringBuilder()).toString());
+        assertEquals("get(EntityProperty) failed", LOGIN_ID_EQUAL_LOGIN_EMAIL,
+                this.predicate.appendClause(new StringBuilder()).toString());
     }
 
     @Test
@@ -64,8 +79,11 @@ public class PredicateTest {
                 100
         );
         assertNotNull("Instantiating failed", this.predicate);
-        for (WildValue wildValue : this.predicate.wildValueArray) wildValue.link(wildValueList);
-        assertEquals("get(EntityValue) failed", LOGIN_ID_EQUAL_WILDCARD, this.predicate.appendClause(new StringBuilder()).toString());
+        for (WildValue wildValue : this.predicate.wildValueArray) {
+            wildValue.link(wildValueList);
+        }
+        assertEquals("get(EntityValue) failed", LOGIN_ID_EQUAL_WILDCARD,
+                this.predicate.appendClause(new StringBuilder()).toString());
     }
 
     @Test
@@ -84,10 +102,12 @@ public class PredicateTest {
                 )
         );
         assertNotNull("Instantiating failed", this.predicate);
-        assertEquals("get(Predicate) failed", LOGIN_ID_EMAIL_PREDICATE_AND_LOGIN_ID_EMAIL_PREDICATE, this.predicate.appendClause(new StringBuilder()).toString());
+        assertEquals("get(Predicate) failed",
+                LOGIN_ID_EMAIL_PREDICATE_AND_LOGIN_ID_EMAIL_PREDICATE,
+                this.predicate.appendClause(new StringBuilder()).toString());
     }
 
-    @Test(expected = DaoException.class)
+    @Test(expected = AppException.class)
     public void getPredicateToPredicateException() throws Exception {
         this.predicate = Where.Predicate.get(
                 Where.Predicate.get(
@@ -103,21 +123,25 @@ public class PredicateTest {
                 )
         );
         assertNotNull("Instantiating failed", this.predicate);
-        assertEquals("get(Predicate) failed", LOGIN_ID_EMAIL_PREDICATE_AND_LOGIN_ID_EMAIL_PREDICATE, this.predicate.appendClause(new StringBuilder()).toString());
+        assertEquals("get(Predicate) failed",
+                LOGIN_ID_EMAIL_PREDICATE_AND_LOGIN_ID_EMAIL_PREDICATE,
+                this.predicate.appendClause(new StringBuilder()).toString());
     }
 
     @Test
     public void isNull() throws Exception {
         this.predicate = Where.Predicate.isNull(Login.Property.ID);
         assertNotNull("Instantiating failed", this.predicate);
-        assertEquals("isNull() failed", LOGIN_ID_IS_NULL, this.predicate.appendClause(new StringBuilder()).toString());
+        assertEquals("isNull() failed", LOGIN_ID_IS_NULL,
+                this.predicate.appendClause(new StringBuilder()).toString());
     }
 
     @Test
     public void isNotNull() throws Exception {
         this.predicate = Where.Predicate.isNotNull(Login.Property.ID);
         assertNotNull("Instantiating failed", this.predicate);
-        assertEquals("isNotNull() failed", LOGIN_ID_IS_NOT_NULL, this.predicate.appendClause(new StringBuilder()).toString());
+        assertEquals("isNotNull() failed", LOGIN_ID_IS_NOT_NULL,
+                this.predicate.appendClause(new StringBuilder()).toString());
     }
 
     @Test
@@ -137,10 +161,14 @@ public class PredicateTest {
                         100
                 )
         );
-        for (WildValue wildValue : joinPredicateList.get(1).wildValueArray) wildValue.link(wildValueList);
+        for (WildValue wildValue : joinPredicateList.get(1).wildValueArray) {
+            wildValue.link(wildValueList);
+        }
         this.predicate = Where.Predicate.get(joinPredicateList);
         assertNotNull("Instantiating failed", this.predicate);
-        assertEquals("get(PredicateList) failed", LOGIN_ID_EMAIL_PREDICATE_AND_LOGIN_ID_WILDCARD_PREDICATE, this.predicate.appendClause(new StringBuilder()).toString());
+        assertEquals("get(PredicateList) failed",
+                LOGIN_ID_EMAIL_PREDICATE_AND_LOGIN_ID_WILDCARD_PREDICATE,
+                this.predicate.appendClause(new StringBuilder()).toString());
     }
 
 }

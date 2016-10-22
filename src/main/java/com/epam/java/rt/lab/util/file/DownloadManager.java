@@ -3,7 +3,6 @@ package com.epam.java.rt.lab.util.file;
 import com.epam.java.rt.lab.entity.File;
 import com.epam.java.rt.lab.exception.AppException;
 import com.epam.java.rt.lab.service.CommentService;
-import com.epam.java.rt.lab.service.ServiceException;
 import com.epam.java.rt.lab.service.UserService;
 import com.epam.java.rt.lab.util.TimestampManager;
 import org.h2.util.IOUtils;
@@ -65,10 +64,6 @@ public final class DownloadManager {
         } else if ("/photo".equals(pathInfo)) {
             try (CommentService commentService = new CommentService()) {
                 return commentService.getPhoto(id);
-            } catch (ServiceException e) {
-                String[] detailArray = {pathInfo, id};
-                throw new AppException(FILE_NOT_FOUND,
-                        e.getMessage(), e.getCause(), detailArray);
             }
         } else {
             String[] detailArray = {pathInfo, id};

@@ -1,6 +1,6 @@
 package com.epam.java.rt.lab.dao.sql;
 
-import com.epam.java.rt.lab.dao.DaoException;
+import com.epam.java.rt.lab.exception.AppException;
 
 /**
  * This interface used to define appendClause implementation
@@ -14,11 +14,12 @@ public interface Clause {
      * variable
      *
      * @param result    {@code StringBuilder} initiated variable, which receives
-     *                  result valueOf the clause
-     * @return          {@code StringBuilder} updated variable with appended clause
-     * @throws DaoException
+     *                  result of the clause
+     * @return          {@code StringBuilder} updated variable with
+     *                  appended clause
+     * @throws AppException
      */
-    StringBuilder appendClause(StringBuilder result) throws DaoException;
+    StringBuilder appendClause(StringBuilder result) throws AppException;
 
 }
 

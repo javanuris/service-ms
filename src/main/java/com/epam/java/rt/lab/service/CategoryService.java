@@ -1,110 +1,62 @@
 package com.epam.java.rt.lab.service;
 
-import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.dao.DaoParameter;
-import com.epam.java.rt.lab.dao.sql.OrderBy;
-import com.epam.java.rt.lab.dao.sql.Update;
-import com.epam.java.rt.lab.dao.sql.Where;
+import com.epam.java.rt.lab.dao.sql.OrderBy.Criteria;
+import com.epam.java.rt.lab.dao.sql.Update.SetValue;
+import com.epam.java.rt.lab.dao.sql.Where.Predicate;
 import com.epam.java.rt.lab.entity.business.Category;
+import com.epam.java.rt.lab.entity.business.Category.Property;
 import com.epam.java.rt.lab.exception.AppException;
 import com.epam.java.rt.lab.web.component.Page;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-/**
- * category-ms
- */
+import static com.epam.java.rt.lab.entity.business.Category.NULL_CATEGORY;
+
 public class CategoryService extends BaseService {
 
-    private static final Logger logger = LoggerFactory.getLogger(CategoryService.class);
-
-    public List<Category> getCategoryList(Page page) throws ServiceException {
-        try {
-            DaoParameter daoParameter = new DaoParameter();
-            page.setCountItems(dao(Category.class.getSimpleName()).count(daoParameter));
-            return dao(Category.class.getSimpleName()).read(new DaoParameter()
-                    .setOrderByCriteriaArray(OrderBy.Criteria.asc(
-                            Category.Property.NAME
-                    ))
-                    .setLimit(
-                            (page.getCurrentPage() - 1) * page.getItemsOnPage(),
-                            page.getItemsOnPage()
-                    )
-            );
-        } catch (DaoException e) {
-            throw new ServiceException("exception.service.category.get-category-list.dao", e.getCause());
-        } catch (AppException e) {
-            e.printStackTrace();
-            throw new ServiceException("exception.service.category.get-category-list.dao", e.getCause());
-        }
+    public List<Category> getCategoryList(Page page) throws AppException {
+        DaoParameter daoParameter = new DaoParameter();
+        page.setCountItems(dao(Category.class.getSimpleName()).
+                count(daoParameter));
+        daoParameter = new DaoParameter();
+        daoParameter.setOrderByCriteriaArray(Criteria.asc(Property.NAME));
+        daoParameter.setLimit((page.getCurrentPage() - 1)
+                * page.getItemsOnPage(), page.getItemsOnPage());
+        return dao(Category.class.getSimpleName()).read(daoParameter);
     }
 
-    public List<Category> getCategoryList() throws ServiceException {
-        try {
-            DaoParameter daoParameter = new DaoParameter();
-            return dao(Category.class.getSimpleName()).read(new DaoParameter()
-                    .setOrderByCriteriaArray(OrderBy.Criteria.asc(
-                            Category.Property.NAME
-                    ))
-            );
-        } catch (DaoException e) {
-            throw new ServiceException("exception.service.category.get-category-list.dao", e.getCause());
-        } catch (AppException e) {
-            e.printStackTrace();
-            throw new ServiceException("exception.service.category.get-category-list.dao", e.getCause());
-        }
+    public List<Category> getCategoryList() throws AppException {
+        DaoParameter daoParameter = new DaoParameter();
+        daoParameter.setOrderByCriteriaArray(Criteria.asc(Property.NAME));
+        return dao(Category.class.getSimpleName()).read(daoParameter);
     }
 
-    public Category getCategory(Long id) throws ServiceException {
-        try {
-            List<Category> categoryList = dao(Category.class.getSimpleName()).read(new DaoParameter()
-                    .setWherePredicate(Where.Predicate.get(
-                            Category.Property.ID,
-                            Where.Predicate.PredicateOperator.EQUAL,
-                            id
-                    ))
-            );
-            return categoryList != null && categoryList.size() > 0 ? categoryList.get(0) : null;
-        } catch (DaoException e) {
-            throw new ServiceException("exception.service.category.get-category.dao", e.getCause());
-        } catch (AppException e) {
-            e.printStackTrace();
-            throw new ServiceException("exception.service.category.get-category.dao", e.getCause());
-        }
+    public Category getCategory(Long id) throws AppException {
+        DaoParameter daoParameter = new DaoParameter();
+        daoParameter.setWherePredicate(Predicate.
+                get(Property.ID, Predicate.PredicateOperator.EQUAL, id));
+        List<Category> categoryList = dao(Category.class.getSimpleName()).
+                read(daoParameter);
+        return ((categoryList != null) && (categoryList.size() > 0))
+                ? categoryList.get(0) : NULL_CATEGORY;
     }
 
-    public int updateCategory(Category category) throws ServiceException {
-        try {
-            return dao(Category.class.getSimpleName()).update(new DaoParameter()
-                    .setSetValueArray(
-                            new Update.SetValue(Category.Property.PARENT_ID, category.getParentId()),
-                            new Update.SetValue(Category.Property.NAME, category.getName())
-                    )
-                    .setWherePredicate(Where.Predicate.get(
-                            Category.Property.ID,
-                            Where.Predicate.PredicateOperator.EQUAL,
-                            category.getId()
-                    ))
-            );
-        } catch (DaoException e) {
-            throw new ServiceException("exception.service.category.update-category.dao", e.getCause());
-        } catch (AppException e) {
-            e.printStackTrace();
-            throw new ServiceException("exception.service.category.update-category.dao", e.getCause());
-        }
+    public int updateCategory(Category category) throws AppException {
+        DaoParameter daoParameter = new DaoParameter();
+        daoParameter.setSetValueArray(
+                new SetValue(Property.PARENT_ID, category.getParentId()),
+                new SetValue(Property.NAME, category.getName()));
+        daoParameter.setWherePredicate(Predicate.
+                get(Property.ID, Predicate.PredicateOperator.EQUAL,
+                        category.getId()));
+        return dao(Category.class.getSimpleName()).update(daoParameter);
     }
 
-    public Long addCategory(Category category) throws ServiceException {
-        try {
-            return dao(Category.class.getSimpleName()).create(new DaoParameter().setEntity(category));
-        } catch (DaoException e) {
-            throw new ServiceException("exception.service.category.add-category.dao", e.getCause());
-        } catch (AppException e) {
-            e.printStackTrace();
-            throw new ServiceException("exception.service.category.add-category.dao", e.getCause());
-        }
+    public Long addCategory(Category category) throws AppException {
+        DaoParameter daoParameter = new DaoParameter();
+        daoParameter.setEntity(category);
+        return dao(Category.class.getSimpleName()).create(daoParameter);
     }
 
 }

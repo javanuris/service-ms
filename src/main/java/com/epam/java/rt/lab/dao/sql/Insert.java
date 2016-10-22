@@ -1,8 +1,12 @@
 package com.epam.java.rt.lab.dao.sql;
 
-import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.entity.BaseEntity;
 import com.epam.java.rt.lab.entity.EntityProperty;
+import com.epam.java.rt.lab.exception.AppException;
+
+import static com.epam.java.rt.lab.dao.sql.SqlExceptionCode.PROPERTY_NOT_ASSIGNABLE_TO_TABLE;
+import static com.epam.java.rt.lab.exception.AppExceptionCode.NULL_NOT_ALLOWED;
+import static com.epam.java.rt.lab.util.PropertyManager.COMMA;
 
 /**
  * {@code Insert} class defines sql statement,
@@ -12,14 +16,16 @@ public class Insert extends Sql {
 
     private static final String INSERT = "INSERT INTO ";
     private static final String BEFORE_NAMES = " (";
-    private static final String BEFORE_VALUES = ") VALUES (";
+    private static final String BETWEEN_NAMES_AND_VALUES = ") VALUES (";
     private static final String AFTER_VALUES = ")";
 
     /** {@code BaseEntity} object, which should be inserted to database */
     private BaseEntity entity;
-    /** {@code String} representation pf table name */
+    /**
+     * {@code String} representation of table name
+     */
     private String table;
-    /** {@code Array} valueOf {@code InsertValue} objects */
+    /** {@code Array} of {@code InsertValue} objects */
     private InsertValue[] insertValueArray;
 
     /**
@@ -27,25 +33,23 @@ public class Insert extends Sql {
      * {@code BaseEntity} object
      *
      * @param entity        {@code BaseEntity} object
-     * @throws DaoException
+     * @throws AppException
      */
-    Insert(BaseEntity entity) throws DaoException {
-        if (entity == null)
-            throw new DaoException("exception.dao.sql.insert.empty-entity");
+    Insert(BaseEntity entity) throws AppException {
+        if (entity == null) throw new AppException(NULL_NOT_ALLOWED);
         this.entity = entity;
         this.table = getProperty(entity.getClass().getName());
     }
 
     /**
      * Initiates new {@code Insert} object with defined
-     * {@code Class} valueOf entity to define table name
+     * {@code Class} of entity to define table name
      *
-     * @param propertyClass {@code Class} valueOf entity
-     * @throws DaoException
+     * @param propertyClass {@code Class} of entity
+     * @throws AppException
      */
-    Insert(Class propertyClass) throws DaoException {
-        if (propertyClass == null)
-            throw new DaoException("exception.dao.sql.insert.empty-entity");
+    Insert(Class propertyClass) throws AppException {
+        if (propertyClass == null) throw new AppException(NULL_NOT_ALLOWED);
         this.table = getProperty(propertyClass.getName());
     }
 
@@ -53,16 +57,18 @@ public class Insert extends Sql {
      * Returns {@code Insert} object, on which this method called
      * with setting its values clause
      *
-     * @param insertValueArray  {@code Array} valueOf {@code InsertValue} objects
+     * @param insertValueArray  {@code Array} of {@code InsertValue} objects
      * @return                  {@code Insert} object, on which this method called
-     * @throws DaoException
+     * @throws AppException
      *
      * @see InsertValue
      */
-    public Insert values(InsertValue... insertValueArray) throws DaoException {
+    public Insert values(InsertValue... insertValueArray) throws AppException {
         for (InsertValue insertValue : insertValueArray) {
-            if (!entity.getClass().equals(insertValue.entityProperty.getEntityClass()))
-                throw new DaoException("exception.dao.sql.insert.entity-class-property");
+            if (!entity.getClass().equals(insertValue.
+                    entityProperty.getEntityClass())) {
+                throw new AppException(PROPERTY_NOT_ASSIGNABLE_TO_TABLE);
+            }
             insertValue.value.link(getWildValueList());
         }
         this.insertValueArray = insertValueArray;
@@ -70,24 +76,24 @@ public class Insert extends Sql {
     }
 
     @Override
-    public String create() throws DaoException {
+    public String create() throws AppException {
         boolean first = true;
         StringBuilder result = new StringBuilder();
         StringBuilder values = new StringBuilder();
         result.append(INSERT).append(table).append(BEFORE_NAMES);
-        values.append(BEFORE_VALUES);
+        values.append(BETWEEN_NAMES_AND_VALUES);
         for (InsertValue insertValue : this.insertValueArray) {
             if (first) {
                 first = false;
             } else {
-                result.append(COMMA_DELIMITER);
-                values.append(COMMA_DELIMITER);
+                result.append(COMMA);
+                values.append(COMMA);
             }
-            result.append(getColumn(insertValue.entityProperty).getColumnName());
+            Column column = getColumn(insertValue.entityProperty);
+            result.append(column.getColumnName());
             values.append(insertValue.value.makeWildcard());
         }
         result.append(values).append(AFTER_VALUES);
-//        System.out.println(result);
         return result.toString();
     }
 
@@ -114,14 +120,15 @@ public class Insert extends Sql {
          * @param entityProperty    {@code EntityProperty} object
          * @param value             generic value
          * @param <T>
-         * @throws DaoException
+         * @throws AppException
          *
          * @see EntityProperty
          * @see WildValue
          */
-        public <T> InsertValue(EntityProperty entityProperty, T value) throws DaoException {
+        public <T> InsertValue(EntityProperty entityProperty, T value)
+                throws AppException {
             this.entityProperty = entityProperty;
-            this.value = new WildValue(value);
+            this.value = new WildValue<T>(value);
         }
 
     }

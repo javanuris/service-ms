@@ -1,7 +1,8 @@
 package com.epam.java.rt.lab.connection;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.epam.java.rt.lab.exception.AppException;
+import com.epam.java.rt.lab.exception.AppExceptionCode;
+import com.epam.java.rt.lab.web.validator.ValidatorFactory;
 
 import javax.sql.DataSource;
 import java.io.PrintWriter;
@@ -16,43 +17,60 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-/**
- * category-ms
- */
+import static com.epam.java.rt.lab.connection.ConnectionExceptionCode.*;
+import static com.epam.java.rt.lab.exception.AppExceptionCode.PROPERTY_READ_ERROR;
+import static com.epam.java.rt.lab.web.validator.ValidatorFactory.DIGITS;
+
 public class ConnectionPool implements DataSource {
-    private static final Logger logger = LoggerFactory.getLogger(ConnectionPool.class);
-    private static String databaseUrl;
-    private static String databaseUsername;
-    private static String databasePassword;
-    private static Integer databaseMaxConnections;
+
+    private static final String URL = "url";
+    private static final String USERNAME = "username";
+    private static final String PASSWORD = "password";
+    private static final String MAX_CONNECTIONS = "max-connections";
+
+    private static class InstanceHolder {
+
+        private static final ConnectionPool INSTANCE = new ConnectionPool();
+
+    }
+
+    private String databaseUrl;
+    private String databaseUsername;
+    private String databasePassword;
     private Semaphore connectionsSemaphore;
     private BlockingQueue<PooledConnection> availableConnectionsQueue;
     private AtomicInteger grantedConnections = new AtomicInteger();
 
     private ConnectionPool() {
-        connectionsSemaphore = new Semaphore(ConnectionPool.databaseMaxConnections);
-        availableConnectionsQueue = new ArrayBlockingQueue<PooledConnection>(ConnectionPool.databaseMaxConnections);
     }
 
-    public static DataSource getInstance() throws ConnectionException {
+    public static ConnectionPool getInstance() {
         return InstanceHolder.INSTANCE;
     }
 
-    public static void initProperties(Properties properties) throws ConnectionException {
-        String databaseUrl = properties.getProperty("url");
-        String databaseUsername = properties.getProperty("username");
-        String databasePassword = properties.getProperty("password.regex");
-        String databaseMaxConnections = properties.getProperty("max-connections");
-        if (databaseUrl == null || databaseMaxConnections == null)
-            throw new ConnectionException("exception.connection.init-properties");
-        ConnectionPool.databaseUrl = databaseUrl;
-        ConnectionPool.databaseUsername = databaseUsername;
-        ConnectionPool.databasePassword = databasePassword;
-        ConnectionPool.databaseMaxConnections = Integer.valueOf(databaseMaxConnections);
+    public void initDatabaseProperties(Properties properties)
+            throws AppException {
+        String databaseUrl = properties.getProperty(URL);
+        String databaseUsername = properties.getProperty(USERNAME);
+        String databasePassword = properties.getProperty(PASSWORD);
+        String databaseMaxConnections = properties.getProperty(MAX_CONNECTIONS);
+        if (databaseUrl == null || databaseMaxConnections == null
+                || ValidatorFactory.getInstance().create(DIGITS).
+                validate(databaseMaxConnections).length > 0) {
+            throw new AppException(PROPERTY_READ_ERROR);
+        }
+        this.databaseUrl = databaseUrl;
+        this.databaseUsername = databaseUsername;
+        this.databasePassword = databasePassword;
+        Integer databaseMaxConnectionsValue =
+                Integer.valueOf(databaseMaxConnections);
+        this.connectionsSemaphore =
+                new Semaphore(databaseMaxConnectionsValue);
+        this.availableConnectionsQueue =
+                new ArrayBlockingQueue<>(databaseMaxConnectionsValue);
     }
 
-    public boolean shutdown(long millis) throws ConnectionException {
-        logger.debug("Shutdown initiated");
+    public boolean shutdown(long millis) throws AppException {
         try {
             connectionsSemaphore = new Semaphore(0);
             long timeoutMillis = System.currentTimeMillis() + millis;
@@ -62,16 +80,20 @@ public class ConnectionPool implements DataSource {
             }
             return grantedConnections.get() == 0;
         } catch (InterruptedException e) {
-            throw new ConnectionException("Shutdown sleep timed out");
+            throw new AppException(SHUTDOWN_TIMEOUT_ERROR,
+                    e.getMessage(), e.getCause());
         }
     }
 
-    public void releaseConnection(Connection connection) throws ConnectionException {
+    public void releaseConnection(Connection connection)
+            throws AppException {
         try {
-            availableConnectionsQueue.offer((PooledConnection) connection, 100, TimeUnit.MILLISECONDS);
+            availableConnectionsQueue.offer((PooledConnection) connection,
+                    100, TimeUnit.MILLISECONDS);
             connectionsSemaphore.release();
         } catch (InterruptedException e) {
-            throw new ConnectionException(e.getMessage());
+            throw new AppException(RELEASE_CONNECTION_TIMEOUT_ERROR,
+                    e.getMessage(), e.getCause());
         }
     }
 
@@ -81,10 +103,12 @@ public class ConnectionPool implements DataSource {
             if (connectionsSemaphore.tryAcquire(100, TimeUnit.MILLISECONDS)) {
                 PooledConnection pooledConnection;
                 if (availableConnectionsQueue.size() == 0) {
-                    pooledConnection = new PooledConnection
-                            (DriverManager.getConnection(databaseUrl, databaseUsername, databasePassword));
+                    pooledConnection = new PooledConnection(DriverManager.
+                            getConnection(databaseUrl, databaseUsername,
+                                    databasePassword));
                 } else {
-                    pooledConnection = availableConnectionsQueue.poll(100, TimeUnit.MILLISECONDS);
+                    pooledConnection = availableConnectionsQueue.
+                            poll(100, TimeUnit.MILLISECONDS);
                     pooledConnection.clearConnection();
                 }
                 return pooledConnection;
@@ -92,13 +116,15 @@ public class ConnectionPool implements DataSource {
         } catch (InterruptedException e) {
             throw new SQLException(e.getMessage());
         }
-        return null;
+        throw new SQLException();
     }
 
     @Override
-    public Connection getConnection(String username, String password) throws SQLException {
+    public Connection getConnection(String username, String password)
+            throws SQLException {
         throw new UnsupportedOperationException
-                ("Get connection should be requested with predefined in properties username and password");
+                ("Get connection should be requested with predefined"
+                        + " in properties username and password");
     }
 
     @Override
@@ -132,12 +158,9 @@ public class ConnectionPool implements DataSource {
     }
 
     @Override
-    public java.util.logging.Logger getParentLogger() throws SQLFeatureNotSupportedException {
+    public java.util.logging.Logger getParentLogger()
+            throws SQLFeatureNotSupportedException {
         return null;
-    }
-
-    private static class InstanceHolder {
-        private static final ConnectionPool INSTANCE = new ConnectionPool();
     }
 
 }

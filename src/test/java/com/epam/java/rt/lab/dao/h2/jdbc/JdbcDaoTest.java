@@ -1,44 +1,49 @@
 package com.epam.java.rt.lab.dao.h2.jdbc;
 
 import com.epam.java.rt.lab.dao.Dao;
-import com.epam.java.rt.lab.dao.DaoException;
 import com.epam.java.rt.lab.dao.DaoParameter;
+import com.epam.java.rt.lab.dao.DaoStatement;
 import com.epam.java.rt.lab.dao.factory.AbstractDaoFactory;
 import com.epam.java.rt.lab.dao.factory.DaoFactory;
-import com.epam.java.rt.lab.dao.sql.Where;
+import com.epam.java.rt.lab.dao.sql.Sql;
+import com.epam.java.rt.lab.dao.sql.Where.Predicate;
 import com.epam.java.rt.lab.entity.access.Login;
-import com.epam.java.rt.lab.service.ServiceException;
+import com.epam.java.rt.lab.entity.access.Login.Property;
+import com.epam.java.rt.lab.exception.AppException;
+import com.epam.java.rt.lab.util.PropertyManager;
+import com.epam.java.rt.lab.util.TimestampManager;
+import com.epam.java.rt.lab.web.validator.ValidatorFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
-/**
- * category-ms
- */
 public class JdbcDaoTest {
 
     private DaoFactory daoFactory;
-    private DaoParameter daoParameter;
     private Dao dao;
 
     @Before
     public void setUp() throws Exception {
-        try {
-            this.daoFactory = AbstractDaoFactory.createDaoFactory();
-        } catch (DaoException e) {
-            e.printStackTrace();
-            throw new ServiceException("exception.service.base.dao", e.getCause());
-        }
+        PropertyManager.initGlobalProperties();
+        AppException.initExceptionBundle();
+        TimestampManager.initDateList();
+        TimestampManager.initTimeList();
+        ValidatorFactory.getInstance().initValidatorMap();
+        AbstractDaoFactory.initDatabaseProperties();
+        JdbcDao.initDaoProperties();
+        Sql.initSqlProperties();
+        DaoStatement.initStatementMethodMap();
+        this.daoFactory = AbstractDaoFactory.createDaoFactory();
     }
 
     @After
     public void tearDown() throws Exception {
-        this.daoParameter = null;
-        this.daoFactory.close();
+        if (this.daoFactory != null) this.daoFactory.close();
         this.daoFactory = null;
     }
 
@@ -50,13 +55,11 @@ public class JdbcDaoTest {
     @Test
     public void read() throws Exception {
         Dao dao = this.daoFactory.createDao("Login");
-        List<Login> loginList = dao.read(new DaoParameter()
-                .setWherePredicate(Where.Predicate.get(
-                        Login.Property.EMAIL,
-                        Where.Predicate.PredicateOperator.EQUAL,
-                        "admin@test.com"
-                )
-        ));
+        DaoParameter daoParameter = new DaoParameter();
+        daoParameter.setWherePredicate(Predicate.
+                get(Property.EMAIL, Predicate.PredicateOperator.EQUAL,
+                        "admin@test.com"));
+        List<Login> loginList = dao.read(daoParameter);
         assertNotNull("read() failed", loginList);
         Login login = loginList.get(0);
         assertEquals("read(login) failed", "admin@test.com", login.getEmail());

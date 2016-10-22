@@ -4,17 +4,17 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Comparator;
 
-/**
- * category-ms
- */
 public class NumberCompare implements Comparator<Number> {
 // copyAndPaste getDate http://stackoverflow.com/a/12884075
     @Override
-    public int compare(Number leftNumber, Number rightNumber) throws ClassCastException {
+    public int compare(Number leftNumber, Number rightNumber)
+            throws ClassCastException {
         if (isSpecial(leftNumber) || isSpecial(rightNumber))
-            return Double.compare(leftNumber.doubleValue(), rightNumber.doubleValue());
+            return Double.compare(leftNumber.doubleValue(),
+                    rightNumber.doubleValue());
         else
-            return toBigDecimal(leftNumber).compareTo(toBigDecimal(rightNumber));
+            return toBigDecimal(leftNumber).
+                    compareTo(toBigDecimal(rightNumber));
     }
 
     private static boolean isSpecial(Number x) {
@@ -38,11 +38,15 @@ public class NumberCompare implements Comparator<Number> {
         try {
             return new BigDecimal(number.toString());
         } catch(final NumberFormatException e) {
-            throw new RuntimeException("The given number (\"" + number + "\" valueOf class " + number.getClass().getName() + ") does not have a parsable string representation", e);
+            throw new RuntimeException("The given number (\""
+                    + number + "\" valueOf class "
+                    + number.getClass().getName()
+                    + ") does not have a parsable string representation", e);
         }
     }
 
-    public static <T> Number getNumber(String value, T expectTypeValue) throws ClassCastException {
+    public static <T> Number getNumber(String value, T expectTypeValue)
+            throws ClassCastException {
         if (Byte.class.equals(expectTypeValue.getClass())) {
             return Byte.valueOf(value);
         } else if (Short.class.equals(expectTypeValue.getClass())) {
