@@ -7,7 +7,11 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import static com.epam.java.rt.lab.util.PropertyManager.ESCAPED_POINT;
+
 public class ReflectValue extends SimpleTagSupport {
+
+    private static final String GET_PREFIX = "get";
 
     private String entityMethod;
     private Object entityObject;
@@ -23,16 +27,16 @@ public class ReflectValue extends SimpleTagSupport {
     private Object invokeItemMethod(Object itemObject, String itemMethod)
             throws NoSuchMethodException, InvocationTargetException,
             IllegalAccessException {
-        Method method = itemObject.getClass()
-                .getMethod("get" + itemMethod.substring(0, 1).toUpperCase()
-                        + itemMethod.substring(1));
+        Method method = itemObject.getClass().getMethod(GET_PREFIX
+                + itemMethod.substring(0, 1).toUpperCase()
+                + itemMethod.substring(1));
         return method.invoke(itemObject);
     }
 
     private String getStringValue() {
         try {
             Object itemObject = this.entityObject;
-            for (String itemMethod : this.entityMethod.split("\\.")) {
+            for (String itemMethod : this.entityMethod.split(ESCAPED_POINT)) {
                 itemObject = invokeItemMethod(itemObject, itemMethod);
                 if (itemObject == null) return "";
             }

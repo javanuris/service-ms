@@ -6,9 +6,6 @@ import com.epam.java.rt.lab.entity.access.User;
 
 import java.sql.Timestamp;
 
-/**
- * category-ms
- */
 public class Comment extends BaseEntity {
 
     private User user;

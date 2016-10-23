@@ -1,7 +1,5 @@
 package com.epam.java.rt.lab.web.component;
 
-import com.epam.java.rt.lab.web.validator.Validator;
-
 import java.util.List;
 
 public class FormControlValue {

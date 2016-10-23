@@ -7,9 +7,6 @@ import com.epam.java.rt.lab.entity.File;
 import java.io.InputStream;
 import java.sql.Timestamp;
 
-/**
- * category-ms
- */
 public class Photo extends BaseEntity implements File {
 
     public enum Property implements EntityProperty {
@@ -35,7 +32,8 @@ public class Photo extends BaseEntity implements File {
     public Photo() {
     }
 
-    public Photo(Long id, String name, String type, InputStream file, Timestamp modified) {
+    public Photo(Long id, String name, String type, InputStream file,
+                 Timestamp modified) {
         super(id);
         this.name = name;
         this.type = type;

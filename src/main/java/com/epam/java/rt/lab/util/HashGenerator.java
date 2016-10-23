@@ -24,8 +24,8 @@ public class HashGenerator {
             md.update(sourceString.getBytes());
             byte byteData[] = md.digest();
             StringBuilder hexString = new StringBuilder();
-            for (int i = 0; i < byteData.length; i++) {
-                String hex = Integer.toHexString(0xff & byteData[i]);
+            for (byte aByteData : byteData) {
+                String hex = Integer.toHexString(0xff & aByteData);
                 if (hex.length() == 1) hexString.append('0');
                 hexString.append(hex);
             }

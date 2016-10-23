@@ -14,6 +14,8 @@ import java.util.Locale;
 
 public class DateValue extends SimpleTagSupport {
 
+    private static final String TIME_FORMAT = "HH:mm:ss";
+
     private String stringValue;
     private Locale locale;
 
@@ -32,7 +34,7 @@ public class DateValue extends SimpleTagSupport {
         if (TimestampManager.isTimestamp(stringValue)) {
             Timestamp timestamp = Timestamp.valueOf(stringValue);
             Date dateValue = new Date(timestamp.getTime());
-            DateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
+            DateFormat timeFormat = new SimpleDateFormat(TIME_FORMAT);
             JspWriter out = getJspContext().getOut();
             out.print("<small>" + dateFormat.format(dateValue)
                     + "</small> " + timeFormat.format(dateValue));

@@ -1,29 +1,48 @@
 package com.epam.java.rt.lab.web.component;
 
 import com.epam.java.rt.lab.exception.AppException;
+import com.epam.java.rt.lab.web.validator.Validator;
 import com.epam.java.rt.lab.web.validator.ValidatorFactory;
 
-/**
- * category-ms
- */
+import static com.epam.java.rt.lab.util.PropertyManager.ASTERISK;
+import static com.epam.java.rt.lab.web.validator.ValidatorFactory.DIGITS;
+
 public class Page {
+
     private static final Long ITEMS_ON_PAGE = 10L;
+    private static final String PAGE_PREFIX = "page=";
+    private static final String ITEMS_PREFIX = "items=";
+
     private Long currentPage;
     private Long itemsOnPage;
     private Long countPages;
     private Long countItems;
 
     public Page(Long currentPage, Long itemsOnPage) {
-        this.currentPage = (currentPage != null && currentPage > 0) ? currentPage : 1L;
-        this.itemsOnPage = (itemsOnPage != null && itemsOnPage > 0) ? itemsOnPage : ITEMS_ON_PAGE;
+        this.currentPage = ((currentPage != null) && (currentPage > 0))
+                ? currentPage : 1L;
+        this.itemsOnPage = ((itemsOnPage != null) && (itemsOnPage > 0))
+                ? itemsOnPage : ITEMS_ON_PAGE;
     }
 
     public Page(String currentPage, String itemsOnPage) {
         try {
-            this.currentPage = ValidatorFactory.getInstance().create("digits").validate(currentPage) != null ?
-                    1L : Long.valueOf(currentPage) > 0 ? Long.valueOf(currentPage) : 1L;
-            this.itemsOnPage = ValidatorFactory.getInstance().create("digits").validate(itemsOnPage) != null ?
-                    ITEMS_ON_PAGE : Long.valueOf(itemsOnPage) > 0 ? Long.valueOf(itemsOnPage) : ITEMS_ON_PAGE;
+            Validator digitValidator =
+                    ValidatorFactory.getInstance().create(DIGITS);
+            Long currentPageValue =
+                    (digitValidator.validate(currentPage) != null)
+                            ? 1L
+                            : Long.valueOf(currentPage);
+            this.currentPage = (currentPageValue > 0)
+                    ? currentPageValue
+                    : 1L;
+            Long itemsOnPageValue =
+                    (digitValidator.validate(itemsOnPage) != null)
+                            ? ITEMS_ON_PAGE
+                            : Long.valueOf(itemsOnPage);
+            this.itemsOnPage = (itemsOnPageValue > 0)
+                    ? itemsOnPageValue
+                    : ITEMS_ON_PAGE;
         } catch (AppException e) {
             this.currentPage = 1L;
             this.itemsOnPage = ITEMS_ON_PAGE;
@@ -56,7 +75,8 @@ public class Page {
 
     public void setCountItems(Long countItems) {
         this.countItems = countItems;
-        this.countPages = countItems == null ? null : (long) Math.ceil((countItems * 1.0) / itemsOnPage);
+        this.countPages = (countItems == null) ? 0
+                : (long) Math.ceil((countItems * 1.0) / itemsOnPage);
         if (currentPage > countPages) currentPage = countPages;
     }
 
@@ -65,10 +85,12 @@ public class Page {
     }
 
     public String getRequestOnPage(Long page) {
-        return "page=".concat(page.toString()).concat("&").concat("items=").concat(itemsOnPage.toString());
+        return PAGE_PREFIX + page.toString() + ASTERISK
+                + ITEMS_PREFIX + itemsOnPage.toString();
     }
 
     public String getRequestOnItems(Long items) {
-        return "page=".concat(currentPage.toString()).concat("&").concat("items=").concat(items.toString());
+        return PAGE_PREFIX + currentPage.toString() + ASTERISK
+                + ITEMS_PREFIX + items.toString();
     }
 }

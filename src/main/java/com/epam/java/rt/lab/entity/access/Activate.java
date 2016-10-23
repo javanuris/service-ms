@@ -5,9 +5,6 @@ import com.epam.java.rt.lab.entity.EntityProperty;
 
 import java.sql.Timestamp;
 
-/**
- * category-ms
- */
 public class Activate extends BaseEntity {
 
     public enum Property implements EntityProperty {
@@ -33,7 +30,8 @@ public class Activate extends BaseEntity {
     public Activate() {
     }
 
-    public Activate(Long id, String email, String salt, String password, String code, Timestamp valid) {
+    public Activate(Long id, String email, String salt, String password,
+                    String code, Timestamp valid) {
         super(id);
         this.email = email;
         this.salt = salt;

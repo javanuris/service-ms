@@ -1,5 +1,6 @@
 package com.epam.java.rt.lab.web.listener;
 
+import com.epam.java.rt.lab.exception.AppException;
 import com.epam.java.rt.lab.util.PropertyManager;
 import com.epam.java.rt.lab.util.file.FileManager;
 import org.slf4j.Logger;
@@ -11,9 +12,6 @@ import javax.servlet.http.HttpSessionListener;
 import java.io.File;
 import java.io.IOException;
 
-/**
- * category-ms
- */
 @WebListener
 public class TempFilesListener implements HttpSessionListener {
 
@@ -30,7 +28,7 @@ public class TempFilesListener implements HttpSessionListener {
             File temporaryFile = File.createTempFile("", extension);
             String folderPath = temporaryFile.getParentFile().getParent();
             FileManager.deleteFilesWithExtension(folderPath, extension);
-        } catch (IOException e) {
+        } catch (IOException | AppException e) {
             e.printStackTrace();
         }
     }

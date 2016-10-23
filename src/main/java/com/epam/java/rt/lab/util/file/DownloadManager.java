@@ -58,8 +58,6 @@ public final class DownloadManager {
         if ("/avatar".equals(pathInfo)) {
             try (UserService userService = new UserService()) {
                 return userService.getAvatar(id);
-            } catch (AppException e) {
-                throw e;
             }
         } else if ("/photo".equals(pathInfo)) {
             try (CommentService commentService = new CommentService()) {

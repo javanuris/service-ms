@@ -5,8 +5,14 @@ import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
-@WebFilter(urlPatterns = "/*", dispatcherTypes = DispatcherType.REQUEST)
+import static com.epam.java.rt.lab.util.PropertyManager.*;
+
+@WebFilter(urlPatterns = SLASH + ASTERISK,
+        dispatcherTypes = DispatcherType.REQUEST)
 public class UrlFilter implements Filter {
+
+    private static final String DEBUG_MODE_ATTR = "debugMode";
+    private static final String UTF_8 = "UTF-8";
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
@@ -18,18 +24,18 @@ public class UrlFilter implements Filter {
                          ServletResponse servletResponse,
                          FilterChain filterChain)
             throws IOException, ServletException {
-        servletRequest.setAttribute("debugMode", true);
-        servletRequest.setCharacterEncoding("UTF-8");
+        servletRequest.setAttribute(DEBUG_MODE_ATTR, true);
+        servletRequest.setCharacterEncoding(UTF_8);
         HttpServletRequest req = (HttpServletRequest) servletRequest;
         String requestURI = req.getRequestURI().
                 substring((req).getContextPath().length()).toLowerCase();
-        if (requestURI.startsWith("/static/")
-                || requestURI.startsWith("/webjars/")
-                || requestURI.startsWith("/file/")
-                || requestURI.equals("/favicon.ico")) {
+        if (requestURI.startsWith(STATIC_PATH_WITH_SLASH)
+                || requestURI.startsWith(WEBJARS_PATH_WITH_SLASH)
+                || requestURI.startsWith(FILE_PATH_WITH_SLASH)
+                || requestURI.equals(FAVICON_PATH)) {
             filterChain.doFilter(servletRequest, servletResponse);
         } else {
-            servletRequest.getRequestDispatcher("/servlet" + requestURI).
+            servletRequest.getRequestDispatcher(SERVLET_PATH + requestURI).
                     forward(servletRequest, servletResponse);
         }
     }

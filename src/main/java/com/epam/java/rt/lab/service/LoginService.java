@@ -28,12 +28,15 @@ import static com.epam.java.rt.lab.web.validator.ValidatorFactory.*;
 public class LoginService extends BaseService {
 
     /**
+     * Authenticates user by login and assign user to session
+     *
      * @param req
      * @param resp
      * @param emailValue
      * @param passwordValue
      * @param rememberMeValue
      * @return
+     *
      * @throws AppException
      */
     public boolean login(HttpServletRequest req, HttpServletResponse resp,
@@ -125,6 +128,9 @@ public class LoginService extends BaseService {
     }
 
     /**
+     * Adds restore login password record to give an opportunity
+     * to change password through reference to restore form
+     *
      * @param req
      * @param resp
      * @param emailValue
@@ -199,6 +205,8 @@ public class LoginService extends BaseService {
     }
 
     /**
+     * Resets password to exact login
+     *
      * @param login
      * @param newPasswordValue
      * @param repeatPasswordValue
@@ -252,6 +260,15 @@ public class LoginService extends BaseService {
         return true;
     }
 
+    /**
+     *
+     * @param req
+     * @param emailValue
+     * @param newPasswordValue
+     * @param repeatPasswordValue
+     * @return
+     * @throws AppException
+     */
     public boolean register(HttpServletRequest req,
                             FormControlValue emailValue,
                             FormControlValue newPasswordValue,
@@ -335,7 +352,7 @@ public class LoginService extends BaseService {
     /**
      * @param email
      * @return
-     * @throws ServiceException
+     * @throws AppException
      */
     public Login getLogin(String email)
             throws AppException {
@@ -350,6 +367,13 @@ public class LoginService extends BaseService {
                 : NULL_LOGIN;
     }
 
+    /**
+     *
+     * @param loginId
+     * @param attemptLeft
+     * @return
+     * @throws AppException
+     */
     private int updateAttemptLeft(Long loginId, int attemptLeft)
             throws AppException {
         if (loginId == null) {
@@ -433,7 +457,15 @@ public class LoginService extends BaseService {
         return result;
     }
 
-
+    /**
+     *
+     * @param restoreEmail
+     * @param restoreCode
+     * @param cookieName
+     * @param cookieValue
+     * @return
+     * @throws AppException
+     */
     public Login getRestoreLogin(String restoreEmail, String restoreCode,
                                  String cookieName, String cookieValue)
             throws AppException {
@@ -464,6 +496,12 @@ public class LoginService extends BaseService {
         return NULL_LOGIN;
     }
 
+    /**
+     *
+     * @param activate
+     * @return
+     * @throws AppException
+     */
     public Long addActivate(Activate activate) throws AppException {
         DaoParameter daoParameter = new DaoParameter();
         daoParameter.setWherePredicate(Where.Predicate.
@@ -479,6 +517,12 @@ public class LoginService extends BaseService {
         return dao(Activate.class.getSimpleName()).create(daoParameter);
     }
 
+    /**
+     *
+     * @param activateList
+     * @return
+     * @throws AppException
+     */
     private int removeActivateList(List<Activate> activateList)
             throws AppException {
         int result = 0;
@@ -493,6 +537,13 @@ public class LoginService extends BaseService {
         return result;
     }
 
+    /**
+     *
+     * @param activationEmail
+     * @param activationCode
+     * @return
+     * @throws AppException
+     */
     public Login getActivateLogin(String activationEmail, String activationCode)
             throws AppException {
         if (activationEmail == null || activationCode == null) {
@@ -527,6 +578,12 @@ public class LoginService extends BaseService {
         return login;
     }
 
+    /**
+     *
+     * @param email
+     * @return
+     * @throws AppException
+     */
     public int removeActivate(String email) throws AppException {
         if (email == null) throw new AppException(NULL_NOT_ALLOWED);
         DaoParameter daoParameter = new DaoParameter();

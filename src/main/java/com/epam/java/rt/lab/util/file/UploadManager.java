@@ -23,8 +23,10 @@ public final class UploadManager {
     private static final String FILE_PATH_PREFIX = "filePath=";
     private static final String CHARSET_NAME_UTF_8 = "UTF-8";
     private static final String CHARSET_NAME_LATIN_1 = "ISO-8859-1";
-    private static final String CONTENT_TYPE_PROPERTY_FILE = "content-type.properties";
-    private static Map<String, List<String>> contentTypeListMap = new HashMap<>();
+    private static final String CONTENT_TYPE_PROPERTY_FILE =
+            "content-type.properties";
+    private static Map<String, List<String>> contentTypeListMap =
+            new HashMap<>();
 
     private UploadManager() {
     }

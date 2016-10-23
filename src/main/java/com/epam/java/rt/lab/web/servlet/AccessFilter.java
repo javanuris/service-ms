@@ -5,8 +5,6 @@ import com.epam.java.rt.lab.exception.AppException;
 import com.epam.java.rt.lab.service.UserService;
 import com.epam.java.rt.lab.util.UrlManager;
 import com.epam.java.rt.lab.web.access.RoleFactory;
-import com.epam.java.rt.lab.web.component.navigation.NavigationException;
-import com.epam.java.rt.lab.web.component.navigation.NavigationFactory;
 
 import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
@@ -30,7 +28,8 @@ public class AccessFilter implements Filter {
     @Override
     public void doFilter(ServletRequest servletRequest,
                          ServletResponse servletResponse,
-                         FilterChain filterChain) throws IOException {
+                         FilterChain filterChain)
+            throws IOException, ServletException {
         try (UserService userService = new UserService()) {
             HttpServletRequest req = (HttpServletRequest) servletRequest;
             HttpServletResponse resp = (HttpServletResponse) servletResponse;
@@ -39,9 +38,6 @@ public class AccessFilter implements Filter {
                 user = userService.getUserRemember(req, resp);
                 if (user != NULL_USER) {
                     req.getSession().setAttribute(USER_ATTR, user);
-                    req.getSession().setAttribute("navigationList",
-                            NavigationFactory.getInstance().
-                                    create(user.getRole().getName()));
                 }
             }
             if (user == NULL_USER) {
@@ -70,13 +66,8 @@ public class AccessFilter implements Filter {
                     }
                 }
             }
-        } catch (NavigationException e) {
-            e.printStackTrace();
-//            throw new ServletException("exception.filter.access.do-filter.navigation", e.getCause());
         } catch (AppException e) {
-//            throw new ServletException("exception.filter.access.do-filter.role-factory", e.getCause());
-        } catch (ServletException e) {
-            e.printStackTrace();
+            throw new ServletException(e.getMessage(), e.getCause());
         }
     }
 

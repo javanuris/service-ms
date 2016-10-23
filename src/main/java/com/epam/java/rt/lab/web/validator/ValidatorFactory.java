@@ -32,6 +32,8 @@ public final class ValidatorFactory {
     private static final String TIMESTAMP = ".timestamp";
     private static final String REGEX = ".regex";
 
+    private static final String VALUE_OF_METHOD = "valueOf";
+
     private static final String VALIDATOR_PROPERTY_FILE = "validator.properties";
 
     private static class Holder {
@@ -174,7 +176,7 @@ public final class ValidatorFactory {
                 throw new AppException(NOT_NUMBER_CLASS_ERROR, detailArray);
             }
             Method numberMethod = numberClass.
-                    getMethod("valueOf", String.class);
+                    getMethod(VALUE_OF_METHOD, String.class);
             return (T) numberClass.cast(numberMethod.invoke(null, stringValue));
         } catch (ClassNotFoundException | NoSuchMethodException e) {
             String[] detailArray = {numberClassName, stringValue};

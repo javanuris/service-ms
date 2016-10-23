@@ -3,9 +3,6 @@ package com.epam.java.rt.lab.entity.access;
 import com.epam.java.rt.lab.entity.EntityProperty;
 import com.epam.java.rt.lab.entity.BaseEntity;
 
-/**
- * category-ms
- */
 public class Login extends BaseEntity {
 
     public enum Property implements EntityProperty {
@@ -34,7 +31,8 @@ public class Login extends BaseEntity {
     public Login() {
     }
 
-    public Login(Long id, String email, String salt, String password, int attemptLeft, int status) {
+    public Login(Long id, String email, String salt, String password,
+                 int attemptLeft, int status) {
         super(id);
         this.email = email;
         this.salt = salt;

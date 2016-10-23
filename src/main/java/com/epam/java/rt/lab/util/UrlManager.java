@@ -9,6 +9,7 @@ import java.util.Map;
 
 import static com.epam.java.rt.lab.exception.AppExceptionCode.NULL_NOT_ALLOWED;
 import static com.epam.java.rt.lab.util.PropertyManager.AMPERSAND;
+import static com.epam.java.rt.lab.util.PropertyManager.EQUAL;
 import static com.epam.java.rt.lab.util.PropertyManager.QUESTION;
 
 public class UrlManager {
@@ -46,22 +47,6 @@ public class UrlManager {
 
     public static String getContextPathInfo(HttpServletRequest req) {
         return getContextUri(req, req.getPathInfo());
-    }
-
-    public static Map<String, String> getRequestParameterMap(
-            String parameterString) {
-        Map<String, String> parameterMap = new HashMap<>();
-        if (parameterString == null) return parameterMap;
-        String[] parameterArray = parameterString.split("&");
-        for (String parameter : parameterArray) {
-            String[] parameterNameValue = parameter.split("=");
-            if (parameterNameValue.length == 2
-                    && parameterNameValue[0].length() > 0
-                    && parameterNameValue[1].length() > 0)
-                parameterMap.put(parameterNameValue[0], parameterNameValue[1]);
-
-        }
-        return parameterMap;
     }
 
     public static String getRequestParameterString(Map<String, String> parameterMap) {
@@ -108,6 +93,22 @@ public class UrlManager {
             }
         }
         return parameterString.toString();
+    }
+
+    public static Map<String, String> getRequestParameterMap(
+            String parameterString) {
+        Map<String, String> parameterMap = new HashMap<>();
+        if (parameterString == null) return parameterMap;
+        String[] parameterArray = parameterString.split(AMPERSAND);
+        for (String parameter : parameterArray) {
+            String[] parameterNameValue = parameter.split(EQUAL);
+            if (parameterNameValue.length == 2
+                    && parameterNameValue[0].length() > 0
+                    && parameterNameValue[1].length() > 0)
+                parameterMap.put(parameterNameValue[0], parameterNameValue[1]);
+
+        }
+        return parameterMap;
     }
 
     public static String getUriWithContext(HttpServletRequest req,

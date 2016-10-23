@@ -6,9 +6,6 @@ import com.epam.java.rt.lab.entity.access.User;
 
 import java.sql.Timestamp;
 
-/**
- * category-ms
- */
 public class Application extends BaseEntity {
 
     private User user;
@@ -34,7 +31,8 @@ public class Application extends BaseEntity {
     public Application() {
     }
 
-    public Application(Long id, User user, Timestamp created, Category category, String message) {
+    public Application(Long id, User user, Timestamp created,
+                       Category category, String message) {
         super(id);
         this.user = user;
         this.created = created;

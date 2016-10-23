@@ -25,7 +25,6 @@ public class WhereTest {
     private static final String FROM_TABLE = "\"Login\"";
 
     private Where where;
-    private List<WildValue> wildValueList;
 
     @Before
     public void setUp() throws Exception {
@@ -38,7 +37,7 @@ public class WhereTest {
         JdbcDao.initDaoProperties();
         Sql.initSqlProperties();
         DaoStatement.initStatementMethodMap();
-        this.wildValueList = new ArrayList<>();
+        List<WildValue> wildValueList = new ArrayList<>();
         List<Where.Predicate> predicateList = new ArrayList<>();
         predicateList.add(
                 Where.Predicate.get(
@@ -54,7 +53,7 @@ public class WhereTest {
                         100
                 )
         );
-        predicateList.get(1).wildValueArray[0].link(this.wildValueList);
+        predicateList.get(1).wildValueArray[0].link(wildValueList);
         Select.Join join = new Select.Join();
         join.setFrom(FROM_TABLE);
         this.where = new Where(

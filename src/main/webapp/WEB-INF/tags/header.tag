@@ -14,18 +14,17 @@
             </a>
         </div>
         <div class="collapse navbar-collapse" id="app-navbar-collapse" aria-expanded="false">
-            <c:if test="${sessionScope.navbar != null}">
+            <c:if test="${not empty sessionScope.user}">
                 <ul class="nav navbar-nav">
-                    <c:forEach var="item" items="${sessionScope.navbar}">
-                        <c:choose>
-                            <c:when test="${current.equals(item.uri)}">
-                                <li class="active"><a href="#"><fmt:message bundle="${ui}" key="${item.label}"/></a></li>
-                            </c:when>
-                            <c:otherwise>
-                                <li><a href="<c:url value="${item.uri}"/>"><fmt:message bundle="${ui}" key="${item.label}"/></a></li>
-                            </c:otherwise>
-                        </c:choose>
-                    </c:forEach>
+                    <c:if test="${sessionScope.user.role.verifyPermission('/application/list')}">
+                        <tags:nav-item uri="/application/list" label="nav.application" active="${'/application/list'.equals(current)}"/>
+                    </c:if>
+                    <c:if test="${sessionScope.user.role.verifyPermission('/category/list')}">
+                        <tags:nav-item uri="/category/list" label="nav.category" active="${'/application/list'.equals(current)}"/>
+                    </c:if>
+                    <c:if test="${sessionScope.user.role.verifyPermission('/user/list')}">
+                        <tags:nav-item uri="/user/list" label="nav.user" active="${'/application/list'.equals(current)}"/>
+                    </c:if>
                 </ul>
             </c:if>
             <ul class="nav navbar-nav navbar-right">

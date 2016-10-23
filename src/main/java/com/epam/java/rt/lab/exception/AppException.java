@@ -18,7 +18,8 @@ import static com.epam.java.rt.lab.util.PropertyManager.DEF_LOCALE_LANG_KEY;
  */
 public class AppException extends Exception {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AppException.class);
+    private static final Logger LOGGER =
+            LoggerFactory.getLogger(AppException.class);
     private static final String EXCEPTION_BUNDLE = "i18n/exception";
 
     private static ResourceBundle exceptionBundle;

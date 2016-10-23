@@ -6,16 +6,17 @@ import org.joda.time.LocalDateTime;
 import org.joda.time.Seconds;
 
 import java.sql.Timestamp;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 import static com.epam.java.rt.lab.exception.AppExceptionCode.NULL_NOT_ALLOWED;
-import static com.epam.java.rt.lab.util.PropertyManager.COLON;
-import static com.epam.java.rt.lab.util.PropertyManager.HYPHEN;
-import static com.epam.java.rt.lab.util.UtilExceptionCode.TIMESTAMP_FORMAT_ERROR;
+import static com.epam.java.rt.lab.util.PropertyManager.*;
 import static com.epam.java.rt.lab.util.UtilExceptionCode.VALUE_OUT_OF_RANGE;
 
 /**
- * {@code TimestampManager} class is a util class to work with timestamp representation of date
+ * {@code TimestampManager} class is a util class to work with
+ * timestamp representation of date
  */
 public final class TimestampManager {
 
@@ -103,7 +104,7 @@ public final class TimestampManager {
         String date = partArray[0].replaceAll(HYPHEN, "");
         if (!TimestampManager.dateList.contains(date)) return false;
         String time = partArray[1].replaceAll(COLON, "");
-        partArray = time.split("\\.");
+        partArray = time.split(ESCAPED_POINT);
         time = partArray[0];
         return TimestampManager.timeList.contains(time);
     }
@@ -146,9 +147,7 @@ public final class TimestampManager {
     public static Timestamp secondsToTimestamp(Timestamp timestamp,
                                                int seconds)
             throws AppException {
-        if (timestamp == null) {
-            throw new AppException(NULL_NOT_ALLOWED);
-        }
+        if (timestamp == null) throw new AppException(NULL_NOT_ALLOWED);
         LocalDateTime localDateTime = timestampToJoda(timestamp);
         if (seconds > 0) {
             return jodaToTimestamp(localDateTime.plusSeconds(seconds));

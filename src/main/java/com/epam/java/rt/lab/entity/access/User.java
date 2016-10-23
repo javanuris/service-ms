@@ -4,9 +4,8 @@ import com.epam.java.rt.lab.entity.BaseEntity;
 import com.epam.java.rt.lab.entity.EntityProperty;
 import com.epam.java.rt.lab.web.access.Role;
 
-/**
- * category-ms
- */
+import static com.epam.java.rt.lab.util.PropertyManager.SPACE;
+
 public class User extends BaseEntity {
     private String firstName;
     private String middleName;
@@ -35,7 +34,8 @@ public class User extends BaseEntity {
     public User() {
     }
 
-    public User(Long id, String firstName, String middleName, String lastName, Login login, Role role) {
+    public User(Long id, String firstName, String middleName,
+                String lastName, Login login, Role role) {
         super(id);
         this.firstName = firstName;
         this.middleName = middleName;
@@ -100,9 +100,9 @@ public class User extends BaseEntity {
 
     public String getName() {
         String name = "";
-        if (firstName != null) name = name.concat(" ").concat(firstName);
-        if (middleName != null) name = name.concat(" ").concat(middleName);
-        if (lastName != null) name = name.concat(" ").concat(lastName);
+        if (firstName != null) name = name + SPACE + firstName;
+        if (middleName != null) name = name + SPACE + middleName;
+        if (lastName != null) name = name + SPACE + lastName;
         return name.trim();
     }
 

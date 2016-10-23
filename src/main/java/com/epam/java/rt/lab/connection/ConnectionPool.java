@@ -1,7 +1,6 @@
 package com.epam.java.rt.lab.connection;
 
 import com.epam.java.rt.lab.exception.AppException;
-import com.epam.java.rt.lab.exception.AppExceptionCode;
 import com.epam.java.rt.lab.web.validator.ValidatorFactory;
 
 import javax.sql.DataSource;
@@ -17,7 +16,8 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static com.epam.java.rt.lab.connection.ConnectionExceptionCode.*;
+import static com.epam.java.rt.lab.connection.ConnectionExceptionCode.RELEASE_CONNECTION_TIMEOUT_ERROR;
+import static com.epam.java.rt.lab.connection.ConnectionExceptionCode.SHUTDOWN_TIMEOUT_ERROR;
 import static com.epam.java.rt.lab.exception.AppExceptionCode.PROPERTY_READ_ERROR;
 import static com.epam.java.rt.lab.web.validator.ValidatorFactory.DIGITS;
 

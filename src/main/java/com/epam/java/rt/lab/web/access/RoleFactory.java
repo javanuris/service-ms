@@ -52,8 +52,8 @@ public final class RoleFactory {
                 String[] uriRoleArray = StringCombiner.
                         splitSpaceLessNames(uriRoles, COMMA);
                 Permission permission = new Permission(uri);
-                for (int i = 0; i < uriRoleArray.length; i++) {
-                    addPermissionToRole(permission, uriRoleArray[i]);
+                for (String anUriRoleArray : uriRoleArray) {
+                    addPermissionToRole(permission, anUriRoleArray);
                 }
             }
             if (this.roleMap.size() == 0) {

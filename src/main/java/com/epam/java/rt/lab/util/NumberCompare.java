@@ -5,16 +5,18 @@ import java.math.BigInteger;
 import java.util.Comparator;
 
 public class NumberCompare implements Comparator<Number> {
-// copyAndPaste getDate http://stackoverflow.com/a/12884075
+// CAP from http://stackoverflow.com/a/12884075
+
     @Override
     public int compare(Number leftNumber, Number rightNumber)
             throws ClassCastException {
-        if (isSpecial(leftNumber) || isSpecial(rightNumber))
+        if (isSpecial(leftNumber) || isSpecial(rightNumber)) {
             return Double.compare(leftNumber.doubleValue(),
                     rightNumber.doubleValue());
-        else
+        } else {
             return toBigDecimal(leftNumber).
                     compareTo(toBigDecimal(rightNumber));
+        }
     }
 
     private static boolean isSpecial(Number x) {
@@ -26,15 +28,17 @@ public class NumberCompare implements Comparator<Number> {
     }
 
     private static BigDecimal toBigDecimal(Number number) {
-        if(number instanceof BigDecimal)
-            return (BigDecimal) number;
-        if(number instanceof BigInteger)
+        if(number instanceof BigDecimal) return (BigDecimal) number;
+        if(number instanceof BigInteger) {
             return new BigDecimal((BigInteger) number);
+        }
         if(number instanceof Byte || number instanceof Short
-                || number instanceof Integer || number instanceof Long)
+                || number instanceof Integer || number instanceof Long) {
             return new BigDecimal(number.longValue());
-        if(number instanceof Float || number instanceof Double)
+        }
+        if(number instanceof Float || number instanceof Double) {
             return new BigDecimal(number.doubleValue());
+        }
         try {
             return new BigDecimal(number.toString());
         } catch(final NumberFormatException e) {

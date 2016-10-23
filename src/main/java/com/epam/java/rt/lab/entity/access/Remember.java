@@ -5,9 +5,6 @@ import com.epam.java.rt.lab.entity.EntityProperty;
 
 import java.sql.Timestamp;
 
-/**
- * category-ms
- */
 public class Remember extends BaseEntity {
     private User user;
     private String cookieName;
@@ -30,7 +27,8 @@ public class Remember extends BaseEntity {
     public Remember() {
     }
 
-    public Remember(Long id, User user, String cookieName, String cookieValue, Timestamp valid) {
+    public Remember(Long id, User user, String cookieName,
+                    String cookieValue, Timestamp valid) {
         super(id);
         this.user = user;
         this.cookieName = cookieName;

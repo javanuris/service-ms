@@ -1,7 +1,11 @@
 package com.epam.java.rt.lab.util.file;
 
+import com.epam.java.rt.lab.exception.AppException;
+
 import java.io.File;
 import java.io.FilenameFilter;
+
+import static com.epam.java.rt.lab.util.file.FileExceptionCode.FILE_DELETE_ERROR;
 
 public final class FileManager {
 
@@ -9,15 +13,19 @@ public final class FileManager {
     }
 
     public static void deleteFilesWithExtension(String folderPath,
-                                                String extension) {
-        ExtensionFilter extensionFilter = new ExtensionFilter(folderPath,
-                extension);
+                                                String extension)
+            throws AppException {
+        ExtensionFilter extensionFilter =
+                new ExtensionFilter(folderPath, extension);
         File folder = new File(folderPath);
         String[] fileArray = folder.list(extensionFilter);
         if (fileArray.length > 0) {
-            folderPath = folderPath.concat(File.separator);
+            folderPath = folderPath + File.separator;
             for (String fileName : fileArray) {
-                new File(folderPath.concat(fileName)).delete();
+                if (!new File(folderPath + fileName).delete()) {
+                    String[] detailArray = {fileName};
+                    throw new AppException(FILE_DELETE_ERROR,detailArray);
+                }
             }
         }
 
@@ -34,7 +42,7 @@ public final class FileManager {
 
         @Override
         public boolean accept(File dir, String name) {
-            return dir.equals(folderPath) && name.endsWith(extension);
+            return dir.getName().equals(folderPath) && name.endsWith(extension);
         }
     }
 

@@ -79,6 +79,10 @@ public final class PropertyManager {
     public static final String JSP_BASE_PATH = "/WEB-INF/jsp";
 
     public static final String SERVLET_PATH = "/servlet";
+    public static final String STATIC_PATH_WITH_SLASH = "/static/";
+    public static final String WEBJARS_PATH_WITH_SLASH = "/webjars/";
+    public static final String FILE_PATH_WITH_SLASH = "/file/";
+    public static final String FAVICON_PATH = "/favicon.ico";
     public static final String FILE_UPLOAD_PATH = "/file/upload";
     public static final String FILE_DOWNLOAD_PATH = "/file/download";
     public static final String FILE_AVATAR_PREFIX = "/avatar";
@@ -108,9 +112,9 @@ public final class PropertyManager {
         try {
             properties.load(inputStream);
         } catch (IOException e) {
-            String[] detailArray = {GLOBAL_PROPERTY_FILE, e.getMessage()};
-            throw new AppException(PROPERTY_READ_ERROR, e.getCause(),
-                    detailArray);
+            String[] detailArray = {GLOBAL_PROPERTY_FILE};
+            throw new AppException(PROPERTY_READ_ERROR,
+                    e.getMessage(), e.getCause(), detailArray);
         }
     }
 

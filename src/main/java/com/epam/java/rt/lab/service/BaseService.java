@@ -15,9 +15,7 @@ abstract class BaseService implements AutoCloseable{
         if (name == null) {
             throw new AppException(NULL_NOT_ALLOWED);
         }
-        if (daoFactory == null) {
-            daoFactory = AbstractDaoFactory.createDaoFactory();
-        }
+        daoFactory = AbstractDaoFactory.createDaoFactory();
         return daoFactory.createDao(name);
     }
 

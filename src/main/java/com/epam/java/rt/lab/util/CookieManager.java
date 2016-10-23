@@ -10,6 +10,9 @@ import static com.epam.java.rt.lab.exception.AppExceptionCode.NULL_NOT_ALLOWED;
 
 public class CookieManager {
 
+    private static final String X_FORWARDED_FOR = "X-FORWARDED-FOR";
+    private static final String USER_AGENT = "User-Agent";
+
     private static Cookie getCookie(HttpServletRequest req, String name)
             throws AppException {
         if (req == null || name == null) {
@@ -47,9 +50,9 @@ public class CookieManager {
         if (req.getCookies() == null) {
             throw new AppException(NULL_NOT_ALLOWED);
         }
-        String ip = req.getHeader("X-FORWARDED-FOR");
+        String ip = req.getHeader(X_FORWARDED_FOR);
         if (ip == null) ip = req.getRemoteAddr();
-        return HashGenerator.hashString(ip + req.getHeader("User-Agent") + ip);
+        return HashGenerator.hashString(ip + req.getHeader(USER_AGENT) + ip);
     }
 
     public static String getCookieValue(HttpServletRequest req,

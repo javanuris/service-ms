@@ -39,6 +39,12 @@ import static com.epam.java.rt.lab.web.validator.ValidatorFactory.DIGITS;
 
 public class UserService extends BaseService {
 
+    /**
+     *
+     * @param login
+     * @return
+     * @throws AppException
+     */
     public User getUser(Login login) throws AppException {
         if (login == null) {
             throw new AppException(NULL_NOT_ALLOWED);
@@ -54,6 +60,12 @@ public class UserService extends BaseService {
                 : NULL_USER;
     }
 
+    /**
+     *
+     * @param user
+     * @return
+     * @throws AppException
+     */
     public int updateUser(User user) throws AppException {
         if (user == null) {
             throw new AppException(NULL_NOT_ALLOWED);
@@ -70,6 +82,13 @@ public class UserService extends BaseService {
         return dao(User.class.getSimpleName()).update(daoParameter);
     }
 
+    /**
+     *
+     * @param user
+     * @param avatarPath
+     * @return
+     * @throws AppException
+     */
     public int updateUser(User user, String avatarPath)
             throws AppException {
         if (user == null || avatarPath == null) {
@@ -100,6 +119,12 @@ public class UserService extends BaseService {
         return result;
     }
 
+    /**
+     *
+     * @param login
+     * @return
+     * @throws AppException
+     */
     public User addUser(Login login) throws AppException {
         if (login == null || login == NULL_LOGIN) {
             throw new AppException(NULL_NOT_ALLOWED);
@@ -120,6 +145,12 @@ public class UserService extends BaseService {
         }
     }
 
+    /**
+     *
+     * @param id
+     * @return
+     * @throws AppException
+     */
     public User getUser(Long id) throws AppException {
         if (id == null) throw new AppException(NULL_NOT_ALLOWED);
         DaoParameter daoParameter = new DaoParameter();
@@ -132,6 +163,11 @@ public class UserService extends BaseService {
                 : NULL_USER;
     }
 
+    /**
+     *
+     * @return
+     * @throws AppException
+     */
     public User getAnonymous() throws AppException {
         DaoParameter daoParameter = new DaoParameter();
         daoParameter.setWherePredicate(Where.Predicate.
@@ -143,6 +179,12 @@ public class UserService extends BaseService {
                 : NULL_USER;
     }
 
+    /**
+     *
+     * @param page
+     * @return
+     * @throws AppException
+     */
     public List<User> getUserList(Page page) throws AppException {
         if (page == null) throw new AppException(NULL_NOT_ALLOWED);
         DaoParameter daoParameter = new DaoParameter();
@@ -155,6 +197,13 @@ public class UserService extends BaseService {
         return dao(User.class.getSimpleName()).read(daoParameter);
     }
 
+    /**
+     *
+     * @param req
+     * @param resp
+     * @return
+     * @throws AppException
+     */
     public User getUserRemember(HttpServletRequest req,
                                 HttpServletResponse resp)
             throws AppException {
@@ -190,6 +239,12 @@ public class UserService extends BaseService {
         return user;
     }
 
+    /**
+     *
+     * @param user
+     * @return
+     * @throws AppException
+     */
     public int removeUserRemember(User user)
             throws AppException {
         if (user == null) throw new AppException(NULL_NOT_ALLOWED);
@@ -200,6 +255,14 @@ public class UserService extends BaseService {
         return dao(Remember.class.getSimpleName()).delete(daoParameter);
     }
 
+    /**
+     *
+     * @param user
+     * @param rememberCookieName
+     * @param rememberCookieValue
+     * @return
+     * @throws AppException
+     */
     public Remember addUserRemember(User user, String rememberCookieName,
                                      String rememberCookieValue)
             throws AppException {
@@ -223,6 +286,13 @@ public class UserService extends BaseService {
         return remember;
     }
 
+    /**
+     *
+     * @param cookieName
+     * @param cookieValue
+     * @return
+     * @throws AppException
+     */
     private List<Remember> getRememberList(String cookieName,
                                            String cookieValue)
             throws AppException {
@@ -237,6 +307,12 @@ public class UserService extends BaseService {
         return dao(Remember.class.getSimpleName()).read(daoParameter);
     }
 
+    /**
+     *
+     * @param id
+     * @return
+     * @throws AppException
+     */
     public Avatar getAvatar(String id) throws AppException {
         if (id == null) throw new AppException(NULL_NOT_ALLOWED);
         if (ValidatorFactory.getInstance().create(ValidatorFactory.DIGITS).
@@ -252,6 +328,12 @@ public class UserService extends BaseService {
         return avatarList.get(0);
     }
 
+    /**
+     *
+     * @param user
+     * @param filePath
+     * @throws AppException
+     */
     public void setAvatar(User user, String filePath) throws AppException {
         if (user == null || filePath == null) {
             throw new AppException(NULL_NOT_ALLOWED);
@@ -296,6 +378,12 @@ public class UserService extends BaseService {
         }
     }
 
+    /**
+     *
+     * @param avatarId
+     * @return
+     * @throws AppException
+     */
     public int removeAvatar(Long avatarId) throws AppException {
         DaoParameter daoParameter = new DaoParameter();
         daoParameter.setWherePredicate(Where.Predicate.

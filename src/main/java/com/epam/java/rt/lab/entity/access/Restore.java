@@ -5,9 +5,6 @@ import com.epam.java.rt.lab.entity.EntityProperty;
 
 import java.sql.Timestamp;
 
-/**
- * category-ms
- */
 public class Restore extends BaseEntity {
     private Login login;
     private String code;
@@ -32,7 +29,8 @@ public class Restore extends BaseEntity {
     public Restore() {
     }
 
-    public Restore(Long id, Login login, String code, String cookieName, String cookieValue, Timestamp valid) {
+    public Restore(Long id, Login login, String code, String cookieName,
+                   String cookieValue, Timestamp valid) {
         super(id);
         this.login = login;
         this.code = code;
