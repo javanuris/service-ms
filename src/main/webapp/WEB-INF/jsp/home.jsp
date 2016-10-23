@@ -28,8 +28,8 @@
                             <fmt:message bundle="${ui}" key="message.info.restore.link"/>${sessionScope.restoreEmail}
                         </a>
                     </c:when>
-                    <c:when test="${not empty sessionScope.message}">
-                        <h4><fmt:message bundle="${ui}" key="${sessionScope.message}"/></h4>
+                    <c:when test="${not empty requestScope.message}">
+                        <h4><fmt:message bundle="${ui}" key="${requestScope.message}"/></h4>
                     </c:when>
                     <c:otherwise>
                         <h2><fmt:message bundle="${ui}" key="title.home"/></h2>

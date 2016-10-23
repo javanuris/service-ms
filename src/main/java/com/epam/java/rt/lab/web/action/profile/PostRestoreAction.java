@@ -30,7 +30,9 @@ public class PostRestoreAction extends BaseAction implements Action {
             if (loginService.resetPassword(login,
                     newPasswordValue, repeatPasswordValue)) {
                 req.getSession().removeAttribute(LOGIN_ATTR);
-                resp.sendRedirect(UrlManager.getUriWithContext(req, LOGIN_PATH));
+                req.getSession().setAttribute(MESSAGE_ATTR,
+                        "message.info.reset-password.success");
+                resp.sendRedirect(UrlManager.getUriWithContext(req, HOME_PATH));
                 return;
             }
             req.setAttribute(FORM_NEW_PASSWORD, newPasswordValue);

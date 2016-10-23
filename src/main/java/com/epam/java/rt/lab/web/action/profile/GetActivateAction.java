@@ -33,8 +33,10 @@ public class GetActivateAction extends BaseAction implements Action {
                 if (login != null && login != NULL_LOGIN) {
                     userService.addUser(login);
                     loginService.removeActivate(login.getEmail());
+                    req.getSession().setAttribute(MESSAGE_ATTR,
+                            "message.info.activate.success");
                     resp.sendRedirect(UrlManager.
-                            getContextUri(req, LOGIN_PATH));
+                            getContextUri(req, HOME_PATH));
                     return;
                 } else {
                     req.getSession().setAttribute(MESSAGE_ATTR,

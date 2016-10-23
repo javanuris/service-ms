@@ -13,12 +13,14 @@ import com.epam.java.rt.lab.web.validator.ValidatorFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.sql.Timestamp;
 import java.util.*;
 
 import static com.epam.java.rt.lab.entity.access.Login.NULL_LOGIN;
 import static com.epam.java.rt.lab.entity.access.Login.Property;
 import static com.epam.java.rt.lab.exception.AppExceptionCode.NULL_NOT_ALLOWED;
+import static com.epam.java.rt.lab.service.ServiceExceptionCode.GET_USER_ERROR;
 import static com.epam.java.rt.lab.service.ServiceExceptionCode.NO_ASSIGNED_USER_TO_LOGIN;
 import static com.epam.java.rt.lab.util.CookieManager.getUserAgentCookieName;
 import static com.epam.java.rt.lab.util.HashGenerator.hashPassword;
@@ -205,6 +207,50 @@ public class LoginService extends BaseService {
     }
 
     /**
+     * Resets password to exact user in session
+     *
+     * @param session
+     * @param passwordValue
+     * @param newPasswordValue
+     * @param repeatPasswordValue
+     * @return
+     * @throws AppException
+     */
+    public boolean resetPassword(HttpSession session,
+                                 FormControlValue passwordValue,
+                                 FormControlValue newPasswordValue,
+                                 FormControlValue repeatPasswordValue)
+            throws AppException {
+        if (session == null || passwordValue == null
+                || newPasswordValue == null || repeatPasswordValue == null) {
+            throw new AppException(NULL_NOT_ALLOWED);
+        }
+        User user = (User) session.getAttribute(USER_ATTR);
+        if (user == null) throw new AppException(GET_USER_ERROR);
+        Validator passwordValidator = ValidatorFactory.getInstance().
+                create(PASSWORD);
+        String[] validationMessageArray = passwordValidator.
+                validate(passwordValue.getValue());
+        if (validationMessageArray.length > 0) {
+            passwordValue.setValidationMessageList(new ArrayList<>
+                    (Arrays.asList(validationMessageArray)));
+            return false;
+        } else {
+            Login login = user.getLogin();
+            String passwordHash = HashGenerator.
+                    hashPassword(login.getSalt(), passwordValue.getValue());
+            if (!passwordHash.equals(login.getPassword())) {
+                validationMessageArray =
+                        new String[]{"message.profile.password-incorrect"};
+                passwordValue.setValidationMessageList(new ArrayList<>
+                        (Arrays.asList(validationMessageArray)));
+                return false;
+            }
+            return resetPassword(login, newPasswordValue, repeatPasswordValue);
+        }
+    }
+
+    /**
      * Resets password to exact login
      *
      * @param login
@@ -217,7 +263,7 @@ public class LoginService extends BaseService {
                                  FormControlValue newPasswordValue,
                                  FormControlValue repeatPasswordValue)
             throws AppException {
-        if (login == null || login == NULL_LOGIN
+        if (login == null
                 || newPasswordValue == null || repeatPasswordValue == null) {
             throw new AppException(NULL_NOT_ALLOWED);
         }

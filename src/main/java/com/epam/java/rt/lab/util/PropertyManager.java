@@ -43,7 +43,6 @@ public final class PropertyManager {
 
     public static final String USER_ATTR = "user";
     public static final String LOGIN_ATTR = "login";
-    public static final String JSP_ATTR = "jsp";
 
     public static final String ID = "id";
     public static final String PATH = "path";
