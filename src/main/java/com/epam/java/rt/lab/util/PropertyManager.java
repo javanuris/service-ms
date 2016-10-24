@@ -28,7 +28,7 @@ public final class PropertyManager {
     public static final String RIGHT_PARENTHESIS = ")";
 
     public static final String ESCAPED_QUESTION = "\\?";
-    public static final String ESCAPED_BACKSLASH = "\\?";
+    public static final String ESCAPED_BACKSLASH = "\\";
     public static final String ESCAPED_POINT = "\\.";
 
     public static final String DEF_LOCALE_LANG_KEY = "def.locale.lang";
@@ -69,6 +69,8 @@ public final class PropertyManager {
     public static final String FORM_MESSAGE_LIST = "formMessageList";
     public static final String FORM_SUBMIT_LOGIN = "submitLogin";
     public static final String FORM_SUBMIT_RESTORE = "submitRestore";
+    public static final String FORM_SUBMIT_SAVE_PROFILE = "submitSaveProfile";
+    public static final String FORM_SUBMIT_REMOVE_AVATAR = "submitRemoveAvatar";
 
     public static final String HOME_PATH = "/home";
     public static final String LOGIN_PATH = "/profile/login";

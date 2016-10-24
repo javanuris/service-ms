@@ -16,6 +16,7 @@ import java.util.*;
 
 import static com.epam.java.rt.lab.exception.AppExceptionCode.NULL_NOT_ALLOWED;
 import static com.epam.java.rt.lab.util.PropertyManager.*;
+import static com.epam.java.rt.lab.util.UtilExceptionCode.UPLOAD_FILE_NAME_ERROR;
 import static com.epam.java.rt.lab.util.file.FileExceptionCode.*;
 
 public final class UploadManager {
@@ -104,7 +105,10 @@ public final class UploadManager {
         if (fileNamePrefix == null || uploadType == null) {
             throw new AppException(NULL_NOT_ALLOWED);
         }
-        int prefixLastPoint = fileNamePrefix.lastIndexOf(ESCAPED_POINT);
+        int prefixLastPoint = fileNamePrefix.lastIndexOf(POINT);
+        if (prefixLastPoint == -1) {
+            throw new AppException(UPLOAD_FILE_NAME_ERROR);
+        }
         fileNamePrefix = fileNamePrefix.substring(0, prefixLastPoint);
         uploadType = ESCAPED_POINT + uploadType + ESCAPED_POINT;
         String[] result = fileNamePrefix.split(uploadType);

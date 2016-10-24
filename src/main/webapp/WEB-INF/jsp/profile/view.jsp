@@ -18,7 +18,7 @@
                         <tags:view-element type="text" label="control.first-name.label" value="${requestScope.firstName}"/>
                         <tags:view-element type="text" label="control.middle-name.label" value="${requestScope.middleName}"/>
                         <tags:view-element type="text" label="control.last-name.label" value="${requestScope.lastName}"/>
-                        <tags:view-element type="image" label="control.avatar.label" value="${requestScope.avatarDaownload}"/>
+                        <tags:view-element type="image" label="control.avatar.label" value="${requestScope.avatarDownload}"/>
                         <tags:form-button type="button" label="control.button.reset-password.label" action="${pageContext.request.contextPath}/profile/reset" />
                         <tags:form-button type="button" label="control.button.edit-profile.label" action="${pageContext.request.contextPath}/profile/edit" />
                     </div>

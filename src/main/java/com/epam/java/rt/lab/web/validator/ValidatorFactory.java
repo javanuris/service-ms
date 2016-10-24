@@ -23,6 +23,7 @@ public final class ValidatorFactory {
     public static final String DIGITS = "digits";
     public static final String EMAIL = "email";
     public static final String PASSWORD = "password";
+    public static final String NAME = "name";
 
     private static final String TYPE = ".type";
     private static final String MSG = ".msg";

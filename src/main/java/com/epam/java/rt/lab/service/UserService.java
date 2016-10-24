@@ -14,17 +14,22 @@ import com.epam.java.rt.lab.exception.AppException;
 import com.epam.java.rt.lab.util.*;
 import com.epam.java.rt.lab.util.file.UploadManager;
 import com.epam.java.rt.lab.web.access.RoleFactory;
+import com.epam.java.rt.lab.web.component.FormControlValue;
 import com.epam.java.rt.lab.web.component.Page;
+import com.epam.java.rt.lab.web.validator.Validator;
 import com.epam.java.rt.lab.web.validator.ValidatorFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static com.epam.java.rt.lab.entity.access.Avatar.NULL_AVATAR;
@@ -32,10 +37,13 @@ import static com.epam.java.rt.lab.entity.access.Login.NULL_LOGIN;
 import static com.epam.java.rt.lab.entity.access.User.NULL_USER;
 import static com.epam.java.rt.lab.exception.AppExceptionCode.NULL_NOT_ALLOWED;
 import static com.epam.java.rt.lab.service.ServiceExceptionCode.AVATAR_FILE_ACCESS_ERROR;
+import static com.epam.java.rt.lab.service.ServiceExceptionCode.GET_USER_ERROR;
 import static com.epam.java.rt.lab.util.CookieManager.getCookieValue;
 import static com.epam.java.rt.lab.util.CookieManager.getUserAgentCookieName;
 import static com.epam.java.rt.lab.util.PropertyManager.*;
 import static com.epam.java.rt.lab.web.validator.ValidatorFactory.DIGITS;
+import static com.epam.java.rt.lab.web.validator.ValidatorFactory.NAME;
+import static com.epam.java.rt.lab.web.validator.ValidatorFactory.PASSWORD;
 
 public class UserService extends BaseService {
 
@@ -84,39 +92,78 @@ public class UserService extends BaseService {
 
     /**
      *
-     * @param user
-     * @param avatarPath
+     * @param session
+     * @param firstNameValue
+     * @param middleNameValue
+     * @param lastNameValue
+     * @param avatarDownloadValue
      * @return
      * @throws AppException
      */
-    public int updateUser(User user, String avatarPath)
+    public boolean updateUser(HttpSession session,
+                              FormControlValue firstNameValue,
+                              FormControlValue middleNameValue,
+                              FormControlValue lastNameValue,
+                              FormControlValue avatarDownloadValue)
             throws AppException {
-        if (user == null || avatarPath == null) {
+        if (session == null || firstNameValue == null
+                || middleNameValue == null || lastNameValue == null
+                || avatarDownloadValue == null) {
             throw new AppException(NULL_NOT_ALLOWED);
         }
-        int result;
-        String[] pair = avatarPath.split(ESCAPED_QUESTION);
-        if (pair.length == 2) pair = pair[1].split(EQUAL);
-        if (ID.equals(pair[0])) {
-            // avatar not changed
-            result = updateUser(user);
-        } else if (PATH.equals(pair[0])) {
-            // avatar recently uploaded
-            setAvatar(user, pair[1]);
-            result = updateUser(user);
-        } else {
-            if (user.getAvatarId() != null) {
-                // avatar removed
-                Long avatarId = user.getAvatarId();
-                user.setAvatarId(null);
-                result = updateUser(user);
-                removeAvatar(avatarId);
-            } else {
+        User user = (User) session.getAttribute(USER_ATTR);
+        if (user == null) throw new AppException(GET_USER_ERROR);
+        boolean formValid = true;
+        Validator nameValidator = ValidatorFactory.getInstance().create(NAME);
+        String[] validationMessageArray = nameValidator.
+                validate(firstNameValue.getValue());
+        if (validationMessageArray.length > 0) {
+            firstNameValue.setValidationMessageList(new ArrayList<>
+                    (Arrays.asList(validationMessageArray)));
+            formValid = false;
+        }
+        validationMessageArray = nameValidator.
+                validate(middleNameValue.getValue());
+        if (validationMessageArray.length > 0) {
+            middleNameValue.setValidationMessageList(new ArrayList<>
+                    (Arrays.asList(validationMessageArray)));
+            formValid = false;
+        }
+        validationMessageArray = nameValidator.
+                validate(lastNameValue.getValue());
+        if (validationMessageArray.length > 0) {
+            lastNameValue.setValidationMessageList(new ArrayList<>
+                    (Arrays.asList(validationMessageArray)));
+            formValid = false;
+        }
+        if (!formValid) return false;
+        user.setFirstName(firstNameValue.getValue());
+        user.setMiddleName(middleNameValue.getValue());
+        user.setLastName(lastNameValue.getValue());
+        String[] pair = avatarDownloadValue.getValue().split(ESCAPED_QUESTION);
+        if (pair.length == 2) {
+            pair = pair[1].split(EQUAL);
+            if (ID.equals(pair[0])) {
                 // avatar not changed
-                result = updateUser(user);
+                updateUser(user);
+            } else if (PATH.equals(pair[0])) {
+                // avatar recently uploaded
+                setAvatar(user, pair[1]);
+                updateUser(user);
+            } else {
+                if (user.getAvatarId() != null) {
+                    // avatar removed
+                    Long avatarId = user.getAvatarId();
+                    user.setAvatarId(null);
+                    updateUser(user);
+                    removeAvatar(avatarId);
+                } else {
+                    // avatar not changed
+                    updateUser(user);
+                }
             }
         }
-        return result;
+        return true;
     }
 
     /**

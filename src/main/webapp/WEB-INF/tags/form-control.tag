@@ -36,11 +36,11 @@
             <tags:alert messageList="${value.validationMessageList}"/>
         </div>
     </c:when>
-    <c:when test="${'image'.equals(type)}">
+    <c:when test="${'avatar'.equals(type) || 'photo'.equals(type)}">
         <div class="form-group${not empty value.validationMessageList ? ' has-error' : ''}">
             <label for="${name}">${label}</label>
             <label class="btn btn-default btn-file">
-                <input id="${name}" onchange="uploadToServer(this)" type="file"/>
+                <input id="${name}" onchange="uploadToServer(this)" type="file" name="${pageContext.request.contextPath}/file/upload/${type}"/>
                 <div style="width: 100%; text-align: center;">
                     <img id="${name}-image" src="${value.value}" alt="<fmt:message bundle="${ui}" key="message.avatar-empty"/>"
                          class="img-thumbnail" style="max-width: 100%; min-width: 100%; height: auto; align-content: center;">
