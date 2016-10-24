@@ -13,6 +13,7 @@ import com.epam.java.rt.lab.entity.access.User.Property;
 import com.epam.java.rt.lab.exception.AppException;
 import com.epam.java.rt.lab.util.*;
 import com.epam.java.rt.lab.util.file.UploadManager;
+import com.epam.java.rt.lab.web.access.Role;
 import com.epam.java.rt.lab.web.access.RoleFactory;
 import com.epam.java.rt.lab.web.component.FormControlValue;
 import com.epam.java.rt.lab.web.component.Page;
@@ -43,7 +44,6 @@ import static com.epam.java.rt.lab.util.CookieManager.getUserAgentCookieName;
 import static com.epam.java.rt.lab.util.PropertyManager.*;
 import static com.epam.java.rt.lab.web.validator.ValidatorFactory.DIGITS;
 import static com.epam.java.rt.lab.web.validator.ValidatorFactory.NAME;
-import static com.epam.java.rt.lab.web.validator.ValidatorFactory.PASSWORD;
 
 public class UserService extends BaseService {
 
@@ -106,13 +106,41 @@ public class UserService extends BaseService {
                               FormControlValue lastNameValue,
                               FormControlValue avatarDownloadValue)
             throws AppException {
-        if (session == null || firstNameValue == null
-                || middleNameValue == null || lastNameValue == null
-                || avatarDownloadValue == null) {
-            throw new AppException(NULL_NOT_ALLOWED);
-        }
         User user = (User) session.getAttribute(USER_ATTR);
         if (user == null) throw new AppException(GET_USER_ERROR);
+        return updateUser(user, firstNameValue, middleNameValue,
+                lastNameValue, avatarDownloadValue, null, null, null);
+    }
+
+    /**
+     * @param user
+     * @param firstNameValue
+     * @param middleNameValue
+     * @param lastNameValue
+     * @param avatarDownloadValue
+     * @param roleNameValue
+     * @param loginAttemptLeftValue
+     * @param loginStatusValue
+     * @return
+     * @throws AppException
+     */
+    public boolean updateUser(User user,
+                              FormControlValue firstNameValue,
+                              FormControlValue middleNameValue,
+                              FormControlValue lastNameValue,
+                              FormControlValue avatarDownloadValue,
+                              FormControlValue roleNameValue,
+                              FormControlValue loginAttemptLeftValue,
+                              FormControlValue loginStatusValue)
+            throws AppException {
+        if ((user == null || firstNameValue == null
+                || middleNameValue == null || lastNameValue == null
+                || avatarDownloadValue == null)
+                || (!(roleNameValue == null && loginAttemptLeftValue == null
+                && loginStatusValue == null) && !(roleNameValue != null
+                && loginAttemptLeftValue != null && loginStatusValue != null))) {
+            throw new AppException(NULL_NOT_ALLOWED);
+        }
         boolean formValid = true;
         Validator nameValidator = ValidatorFactory.getInstance().create(NAME);
         String[] validationMessageArray = nameValidator.
@@ -136,33 +164,68 @@ public class UserService extends BaseService {
                     (Arrays.asList(validationMessageArray)));
             formValid = false;
         }
+        if (roleNameValue != null) {
+            if (RoleFactory.getInstance().getRoleMap().
+                    get(roleNameValue.getValue()) == null) {
+                validationMessageArray = new String[]
+                        {"message.profile.role-not-exist"};
+                roleNameValue.setValidationMessageList(new ArrayList<>
+                        (Arrays.asList(validationMessageArray)));
+                formValid = false;
+            }
+            Validator digitValidator = ValidatorFactory.getInstance().
+                    create(DIGITS);
+            validationMessageArray = digitValidator.
+                    validate(loginAttemptLeftValue.getValue());
+            if (validationMessageArray.length > 0) {
+                loginAttemptLeftValue.setValidationMessageList(new ArrayList<>
+                        (Arrays.asList(validationMessageArray)));
+                formValid = false;
+            }
+            if (!loginStatusValue.getValue().equals("0")
+                    && !loginStatusValue.getValue().equals("1")) {
+                validationMessageArray = new String[]
+                        {"message.profile.status-not-exist"};
+                loginStatusValue.setValidationMessageList(new ArrayList<>
+                        (Arrays.asList(validationMessageArray)));
+                formValid = false;
+            }
+        }
         if (!formValid) return false;
         user.setFirstName(firstNameValue.getValue());
         user.setMiddleName(middleNameValue.getValue());
         user.setLastName(lastNameValue.getValue());
+        if (roleNameValue != null) {
+            Role role = RoleFactory.getInstance().
+                    create(roleNameValue.getValue());
+            user.setRole(role);
+            Integer attemptLeft =
+                    Integer.valueOf(loginAttemptLeftValue.getValue());
+            user.getLogin().setAttemptLeft(attemptLeft);
+            Integer status =
+                    Integer.valueOf(loginStatusValue.getValue());
+            user.getLogin().setStatus(status);
+            LoginService loginService = new LoginService();
+            loginService.updateLogin(user.getLogin());
+        }
         String[] pair = avatarDownloadValue.getValue().split(ESCAPED_QUESTION);
         if (pair.length == 2) {
             pair = pair[1].split(EQUAL);
             if (ID.equals(pair[0])) {
                 // avatar not changed
-                updateUser(user);
+
             } else if (PATH.equals(pair[0])) {
                 // avatar recently uploaded
                 setAvatar(user, pair[1]);
-                updateUser(user);
-            } else {
-                if (user.getAvatarId() != null) {
-                    // avatar removed
-                    Long avatarId = user.getAvatarId();
-                    user.setAvatarId(null);
-                    updateUser(user);
-                    removeAvatar(avatarId);
-                } else {
-                    // avatar not changed
-                    updateUser(user);
-                }
             }
+            updateUser(user);
+            return true;
         }
+        // avatar removed
+        Long avatarId = user.getAvatarId();
+        user.setAvatarId(null);
+        updateUser(user);
+        removeAvatar(avatarId);
         return true;
     }
 
@@ -362,7 +425,7 @@ public class UserService extends BaseService {
      */
     public Avatar getAvatar(String id) throws AppException {
         if (id == null) throw new AppException(NULL_NOT_ALLOWED);
-        if (ValidatorFactory.getInstance().create(ValidatorFactory.DIGITS).
+        if (ValidatorFactory.getInstance().create(DIGITS).
                 validate(id).length > 0) return NULL_AVATAR;
         DaoParameter daoParameter = new DaoParameter();
         daoParameter.setWherePredicate(Where.Predicate.

@@ -20,8 +20,8 @@
                     <c:when test="${'date'.equals(type)}">
                         <dat:dateValue locale="${language}" stringValue="${value}"/>
                     </c:when>
-                    <c:when test="${'dictionary'.equals(type)}">
-                        <fmt:message bundle="${ui}" key="${type + '.' + value}"/>
+                    <c:when test="${type.startsWith('dictionary') && not empty value}">
+                        <fmt:message bundle="${ui}" key="${type.concat('.').concat(value)}"/>
                     </c:when>
                     <c:otherwise>${value}</c:otherwise>
                 </c:choose>

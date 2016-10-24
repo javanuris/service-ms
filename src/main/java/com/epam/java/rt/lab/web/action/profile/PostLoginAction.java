@@ -22,15 +22,15 @@ public class PostLoginAction extends BaseAction implements Action {
     public void execute(HttpServletRequest req, HttpServletResponse resp)
             throws AppException {
         FormControlValue emailValue =
-                new FormControlValue(req.getParameter(FORM_EMAIL));
+                new FormControlValue(req.getParameter(LOGIN_EMAIL));
         FormControlValue passwordValue =
-                new FormControlValue(req.getParameter(FORM_PASSWORD));
+                new FormControlValue(req.getParameter(LOGIN_PASSWORD));
         FormControlValue rememberMeValue =
-                ((req.getParameter(FORM_REMEMBER_ME) == null)
+                ((req.getParameter(REMEMBER_ME) == null)
                         ? new FormControlValue()
                         : new FormControlValue("checked"));
         try (LoginService loginService = new LoginService()) {
-            if (req.getParameter(FORM_SUBMIT_LOGIN) != null) {
+            if (req.getParameter(SUBMIT_LOGIN) != null) {
                 if (loginService.login(req, resp,
                         emailValue, passwordValue, rememberMeValue)) {
                     Map<String, String> parameterMap = UrlManager.
@@ -46,16 +46,16 @@ public class PostLoginAction extends BaseAction implements Action {
                     }
                     return;
                 }
-            } else if (req.getParameter(FORM_SUBMIT_RESTORE) != null) {
+            } else if (req.getParameter(SUBMIT_RESTORE) != null) {
                 if (loginService.restore(req, resp, emailValue)) {
                     resp.sendRedirect(UrlManager.
                             getUriWithContext(req, HOME_PATH));
                     return;
                 }
             }
-            req.setAttribute(FORM_EMAIL, emailValue);
-            req.setAttribute(FORM_PASSWORD, passwordValue);
-            req.setAttribute(FORM_REMEMBER_ME, rememberMeValue);
+            req.setAttribute(LOGIN_EMAIL, emailValue);
+            req.setAttribute(LOGIN_PASSWORD, passwordValue);
+            req.setAttribute(REMEMBER_ME, rememberMeValue);
             req.getRequestDispatcher(super.getJspName()).forward(req, resp);
         } catch (ServletException | IOException e) {
             String[] detailArray = {super.getJspName()};

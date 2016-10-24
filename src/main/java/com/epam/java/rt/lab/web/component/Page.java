@@ -4,7 +4,7 @@ import com.epam.java.rt.lab.exception.AppException;
 import com.epam.java.rt.lab.web.validator.Validator;
 import com.epam.java.rt.lab.web.validator.ValidatorFactory;
 
-import static com.epam.java.rt.lab.util.PropertyManager.ASTERISK;
+import static com.epam.java.rt.lab.util.PropertyManager.AMPERSAND;
 import static com.epam.java.rt.lab.web.validator.ValidatorFactory.DIGITS;
 
 public class Page {
@@ -30,14 +30,14 @@ public class Page {
             Validator digitValidator =
                     ValidatorFactory.getInstance().create(DIGITS);
             Long currentPageValue =
-                    (digitValidator.validate(currentPage) != null)
+                    (digitValidator.validate(currentPage).length > 0)
                             ? 1L
                             : Long.valueOf(currentPage);
             this.currentPage = (currentPageValue > 0)
                     ? currentPageValue
                     : 1L;
             Long itemsOnPageValue =
-                    (digitValidator.validate(itemsOnPage) != null)
+                    (digitValidator.validate(itemsOnPage).length > 0)
                             ? ITEMS_ON_PAGE
                             : Long.valueOf(itemsOnPage);
             this.itemsOnPage = (itemsOnPageValue > 0)
@@ -85,12 +85,12 @@ public class Page {
     }
 
     public String getRequestOnPage(Long page) {
-        return PAGE_PREFIX + page.toString() + ASTERISK
+        return PAGE_PREFIX + page.toString() + AMPERSAND
                 + ITEMS_PREFIX + itemsOnPage.toString();
     }
 
     public String getRequestOnItems(Long items) {
-        return PAGE_PREFIX + currentPage.toString() + ASTERISK
+        return PAGE_PREFIX + currentPage.toString() + AMPERSAND
                 + ITEMS_PREFIX + items.toString();
     }
 }

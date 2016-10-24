@@ -18,7 +18,7 @@
             </div>
         </div>
     </c:when>
-    <c:when test="${'select'.equals(type)}">
+    <c:when test="${type.startsWith('select')}">
         <div class="form-group${not empty value.validationMessageList ? ' has-error' : ''}">
             <label for="${name}">${label}</label>
             <select id="${name}" class="form-control" name="${name}">

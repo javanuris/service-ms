@@ -22,9 +22,9 @@ public class PostRestoreAction extends BaseAction implements Action {
     public void execute(HttpServletRequest req, HttpServletResponse resp)
             throws AppException {
         FormControlValue newPasswordValue =
-                new FormControlValue(req.getParameter(FORM_NEW_PASSWORD));
+                new FormControlValue(req.getParameter(LOGIN_NEW_PASSWORD));
         FormControlValue repeatPasswordValue =
-                new FormControlValue(req.getParameter(FORM_REPEAT_PASSWORD));
+                new FormControlValue(req.getParameter(LOGIN_REPEAT_PASSWORD));
         try (LoginService loginService = new LoginService()) {
             Login login = (Login) req.getSession().getAttribute(LOGIN_ATTR);
             if (loginService.resetPassword(login,
@@ -35,8 +35,8 @@ public class PostRestoreAction extends BaseAction implements Action {
                 resp.sendRedirect(UrlManager.getUriWithContext(req, HOME_PATH));
                 return;
             }
-            req.setAttribute(FORM_NEW_PASSWORD, newPasswordValue);
-            req.setAttribute(FORM_REPEAT_PASSWORD, repeatPasswordValue);
+            req.setAttribute(LOGIN_NEW_PASSWORD, newPasswordValue);
+            req.setAttribute(LOGIN_REPEAT_PASSWORD, repeatPasswordValue);
             req.getRequestDispatcher(super.getJspName()).forward(req, resp);
         } catch (ServletException | IOException e) {
             throw new AppException(ACTION_FORWARD_TO_JSP_ERROR);

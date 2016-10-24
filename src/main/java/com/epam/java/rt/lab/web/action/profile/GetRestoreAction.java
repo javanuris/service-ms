@@ -6,7 +6,6 @@ import com.epam.java.rt.lab.service.LoginService;
 import com.epam.java.rt.lab.util.CookieManager;
 import com.epam.java.rt.lab.util.UrlManager;
 import com.epam.java.rt.lab.web.action.Action;
-import com.epam.java.rt.lab.web.action.ActionExceptionCode;
 import com.epam.java.rt.lab.web.action.BaseAction;
 
 import javax.servlet.ServletException;
@@ -27,8 +26,8 @@ public class GetRestoreAction extends BaseAction implements Action {
         try (LoginService loginService = new LoginService()) {
             req.getSession().removeAttribute(RESTORE_EMAIL_ATTR);
             req.getSession().removeAttribute(RESTORE_REF_ATTR);
-            String email = req.getParameter(FORM_EMAIL);
-            String code = req.getParameter(FORM_CODE);
+            String email = req.getParameter(LOGIN_EMAIL);
+            String code = req.getParameter(CODE);
             if (email == null && code == null) {
                 resp.sendRedirect(UrlManager.getUriWithContext(req, HOME_PATH));
                 return;

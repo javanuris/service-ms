@@ -197,8 +197,8 @@ public class LoginService extends BaseService {
             req.getSession().setAttribute(RESTORE_EMAIL_ATTR,
                     emailValue.getValue());
             Map<String, String> parameterMap = new HashMap<>();
-            parameterMap.put(FORM_EMAIL, emailValue.getValue());
-            parameterMap.put(FORM_CODE, restoreCode);
+            parameterMap.put(LOGIN_EMAIL, emailValue.getValue());
+            parameterMap.put(CODE, restoreCode);
             req.getSession().setAttribute(RESTORE_REF_ATTR,
                     UrlManager.getUriWithContext(req,
                             PROFILE_RESTORE_PATH, parameterMap));
@@ -387,8 +387,8 @@ public class LoginService extends BaseService {
         req.getSession().setAttribute(ACTIVATION_EMAIL_ATTR,
                 emailValue.getValue());
         Map<String, String> parameterMap = new HashMap<>();
-        parameterMap.put(FORM_EMAIL, emailValue.getValue());
-        parameterMap.put(FORM_CODE, activate.getCode());
+        parameterMap.put(LOGIN_EMAIL, emailValue.getValue());
+        parameterMap.put(CODE, activate.getCode());
         req.getSession().setAttribute(ACTIVATION_REF_ATTR,
                 UrlManager.getUriWithContext(req, PROFILE_ACTIVATE_PATH,
                         parameterMap));

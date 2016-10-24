@@ -78,7 +78,7 @@ public class CommentService extends BaseService {
 
     public Photo getPhoto(String id) throws AppException {
         if (ValidatorFactory.getInstance().
-                create(ValidatorFactory.DIGITS).validate(id) != null) {
+                create(ValidatorFactory.DIGITS).validate(id).length > 0) {
             throw new AppException(NULL_NOT_ALLOWED);
         }
         DaoParameter daoParameter = new DaoParameter();

@@ -31,7 +31,6 @@ insert into "Login" (email, salt, password, attempt_left, status) values ('user8
 insert into "Login" (email, salt, password, attempt_left, status) values ('user9@test.com', '235ea634-28a6-422d-a565-aa7729878c88', '235ea634-28a6-422d-a565-aa7729878c88 5e14298c620c8294b5e9eb97452453c772d5199f2102a3d23d8df25f89595ff3', 5, 0);
 insert into "Login" (email, salt, password, attempt_left, status) values ('user0@test.com', '235ea634-28a6-422d-a565-aa7729878c88', '235ea634-28a6-422d-a565-aa7729878c88 5e14298c620c8294b5e9eb97452453c772d5199f2102a3d23d8df25f89595ff3', 5, 0);
 insert into "Login" (email, salt, password, attempt_left, status) values ('manager@test.com', '235ea634-28a6-422d-a565-aa7729878c88', '235ea634-28a6-422d-a565-aa7729878c88 5e14298c620c8294b5e9eb97452453c772d5199f2102a3d23d8df25f89595ff3', 5, 0);
-insert into "Login" (email, salt, password, attempt_left, status) values ('employee@test.com', '235ea634-28a6-422d-a565-aa7729878c88', '235ea634-28a6-422d-a565-aa7729878c88 5e14298c620c8294b5e9eb97452453c772d5199f2102a3d23d8df25f89595ff3', 5, 0);
 insert into "Login" (email, salt, password, attempt_left, status) values ('', '', '', 5, 0);
 insert into "User" (first_name, login_id, role_name) values ('anonymous', select id from "Login" where email is '', 'anonymous');
 insert into "User" (first_name, middle_name, last_name, login_id, role_name) values ('Господь', '', 'Бог', select id from "Login" where email is 'admin@test.com', 'admin');
@@ -46,7 +45,6 @@ insert into "User" (first_name, middle_name, last_name, login_id, role_name) val
 insert into "User" (first_name, middle_name, last_name, login_id, role_name) values ('Marcello', '', 'Begetti', select id from "Login" where email is 'user9@test.com', 'authorized');
 insert into "User" (first_name, middle_name, last_name, login_id, role_name) values ('Mike', '', 'Tyson', select id from "Login" where email is 'user0@test.com', 'authorized');
 insert into "User" (first_name, middle_name, last_name, login_id, role_name) values ('Евгения', '', '', select id from "Login" where email is 'manager@test.com', 'manager');
-insert into "User" (first_name, middle_name, last_name, login_id, role_name) values ('Виктория', '', 'Руффо', select id from "Login" where email is 'employee@test.com', 'employee');
 insert into "Category" (created, parent_id, name) values ('2016-10-01 12:00:00.00', null, 'Отполение / Heating');
 insert into "Category" (created, parent_id, name) values ('2016-10-01 12:00:00.00', null, 'Водоснабжение / Water Supply');
 insert into "Category" (created, parent_id, name) values ('2016-10-01 12:00:00.00', null, 'Уборка / Cleaning');

@@ -11,7 +11,7 @@
     </tags:head>
     <body>
         <tags:header current="/profile/view"/>
-        <div class="container-fluid" style="margin: 70px 0 50px 0;">
+        <div class="container-fluid" style="margin: 70px 0 30px 0;">
             <div class="col-lg-offset-4 col-lg-4 col-md-offset-3 col-md-6 col-sm-offset-2 col-sm-8 col-xs-offset-1 col-xs-10">
                 <div class="panel panel-default">
                     <div class="panel-body">

@@ -11,7 +11,7 @@
     </tags:head>
     <body>
         <tags:header current="/home"/>
-        <div class="container-fluid" style="margin: 70px 0 50px 0;">
+        <div class="container-fluid" style="margin: 70px 0 30px 0;">
             <div class="jumbotron" style="text-align: center">
                 <c:choose>
                     <c:when test="${not empty sessionScope.activationRef}">

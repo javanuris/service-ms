@@ -23,8 +23,8 @@ public class GetActivateAction extends BaseAction implements Action {
             throws AppException {
         try (LoginService loginService = new LoginService();
              UserService userService = new UserService()) {
-            String activationEmail = req.getParameter(FORM_EMAIL);
-            String activationCode = req.getParameter(FORM_CODE);
+            String activationEmail = req.getParameter(LOGIN_EMAIL);
+            String activationCode = req.getParameter(CODE);
             req.getSession().removeAttribute(ACTIVATION_EMAIL_ATTR);
             req.getSession().removeAttribute(ACTIVATION_REF_ATTR);
             if (activationEmail != null && activationCode != null) {

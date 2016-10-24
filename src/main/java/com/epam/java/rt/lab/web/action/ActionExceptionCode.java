@@ -9,7 +9,8 @@ public enum ActionExceptionCode implements ExceptionCode {
     ACTION_MAP_EMPTY(2),
     ACTION_BY_URI_NOT_FOUND(3),
     ACTION_FORWARD_TO_JSP_ERROR(4),
-    ACTION_INSTANTIATE_SERVICE_ERROR(5);
+    ACTION_INSTANTIATE_SERVICE_ERROR(5),
+    ACTION_DENIED_ERROR(6);
 
     private final int number;
 

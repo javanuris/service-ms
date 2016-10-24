@@ -4,7 +4,7 @@ import java.util.List;
 
 public class FormControlValue {
     private String value;
-    private List<String> availableValueList;
+    private List<SelectValue> availableValueList;
     private List<String> validationMessageList;
 
     public FormControlValue() {
@@ -22,11 +22,11 @@ public class FormControlValue {
         this.value = value;
     }
 
-    public List<String> getAvailableValueList() {
+    public List<SelectValue> getAvailableValueList() {
         return availableValueList;
     }
 
-    public void setAvailableValueList(List<String> availableValueList) {
+    public void setAvailableValueList(List<SelectValue> availableValueList) {
         this.availableValueList = availableValueList;
     }
 

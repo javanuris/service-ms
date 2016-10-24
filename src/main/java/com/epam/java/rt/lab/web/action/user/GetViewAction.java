@@ -1,64 +1,81 @@
 package com.epam.java.rt.lab.web.action.user;
 
+import com.epam.java.rt.lab.entity.access.User;
 import com.epam.java.rt.lab.exception.AppException;
+import com.epam.java.rt.lab.service.UserService;
+import com.epam.java.rt.lab.util.UrlManager;
 import com.epam.java.rt.lab.web.action.Action;
+import com.epam.java.rt.lab.web.action.ActionExceptionCode;
 import com.epam.java.rt.lab.web.action.BaseAction;
+import com.epam.java.rt.lab.web.component.Page;
+import com.epam.java.rt.lab.web.validator.Validator;
+import com.epam.java.rt.lab.web.validator.ValidatorFactory;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
+import static com.epam.java.rt.lab.entity.access.User.NULL_USER;
+import static com.epam.java.rt.lab.util.PropertyManager.*;
+import static com.epam.java.rt.lab.util.PropertyManager.USER_LAST_NAME;
+import static com.epam.java.rt.lab.util.PropertyManager.USER_MIDDLE_NAME;
+import static com.epam.java.rt.lab.web.action.ActionExceptionCode.ACTION_FORWARD_TO_JSP_ERROR;
+import static com.epam.java.rt.lab.web.validator.ValidatorFactory.DIGITS;
 
 public class GetViewAction extends BaseAction implements Action {
 
     @Override
     public void execute(HttpServletRequest req, HttpServletResponse resp)
             throws AppException {
-//        try (UserService userService = new UserService()) {
-//            logger.debug("/WEB-INF/jsp/user/view.jsp");
-//            Map<String, String> parameterMap = UrlManager.getRequestParameterMap(req.getQueryString());
-//            String id = parameterMap.remove("id");
-//            if (ValidatorFactory.create("digits").validate(id) != null) {
-//                resp.sendRedirect(UrlManager.getContextUri(req, "/user/list", parameterMap));
-//            } else {
-//                User user = (User) req.getSession().getAttribute("user");
-//                if (user.getId() == Long.valueOf(id)) {
-//                    resp.sendRedirect(UrlManager.getContextUri(req, "/profile/view", parameterMap));
-//                    return;
-//                }
-//                user = userService.getUser(Long.valueOf(id));
-//                if (user == null) {
-//                    resp.sendRedirect(UrlManager.getContextUri(req, "/user/list", parameterMap));
-//                } else {
-//                    View view = ViewFactory.getInstance().create("view-user-profile");
-//                    view.getControl(0).setValue(user.getFirstName());
-//                    view.getControl(1).setValue(user.getMiddleName());
-//                    view.getControl(2).setValue(user.getLastName());
-//                    view.getControl(3).setValue(
-//                            UrlManager.getContextRef(req, "/file/download/avatar", "id", user.getAvatarId())
-//                    );
-//                    view.getControl(4).setValue(user.getLogin().getEmail());
-//                    view.getControl(5).setValue(user.getRole().getName());
-//                    view.getControl(6).setValue(String.valueOf(user.getLogin().getAttemptLeft()));
-//                    view.getControl(7).setValue(String.valueOf(user.getLogin().getStatus()));
-//                    view.getControl(8).setAction(UrlManager.getContextUri(req, "/user/edit",
-//                            UrlManager.getRequestParameterString(parameterMap), "id=".concat(id)));
-//                    view.getControl(9).setAction(UrlManager.getContextUri(req, "/user/list", parameterMap));
-//                    req.setAttribute("viewProfile", view);
-//                    req.getRequestDispatcher("/WEB-INF/jsp/user/view.jsp").forward(req, resp);
-//                }
-//            }
-//        } catch (ServiceException e) {
-//            e.printStackTrace();
-//            throw new ActionException("exception.action.user.view.user-category.get-user", e.getCause());
-//        } catch (ValidatorException e) {
-//            e.printStackTrace();
-//            throw new ActionException("exception.action.user.view.validator.id", e.getCause());
-//        } catch (ViewException e) {
-//            e.printStackTrace();
-//            throw new ActionException("exception.action.user.view.view-factory.get-instance", e.getCause());
-//        } catch (ServletException | IOException e) {
-//            e.printStackTrace();
-//            throw new ActionException("exception.action.user.view.request", e.getCause());
-//        }
+        try (UserService userService = new UserService()) {
+            Map<String, String> parameterMap = UrlManager.
+                    getRequestParameterMap(req.getQueryString());
+            String id = parameterMap.remove(ID);
+            Validator validator = ValidatorFactory.getInstance().create(DIGITS);
+            if (validator.validate(id).length > 0) {
+                resp.sendRedirect(UrlManager.getUriWithContext(req,
+                        USER_LIST_PATH, parameterMap));
+                return;
+            }
+            Long idValue = Long.valueOf(id);
+            User user = (User) req.getSession().getAttribute(USER_ATTR);
+            if (user.getId().equals(idValue)) {
+                resp.sendRedirect(UrlManager.getUriWithContext(req,
+                        PROFILE_VIEW_PATH, parameterMap));
+                return;
+            }
+            user = userService.getUser(idValue);
+            if (user == null || user == NULL_USER) {
+                resp.sendRedirect(UrlManager.getUriWithContext(req,
+                        USER_LIST_PATH, parameterMap));
+                return;
+            }
+            Page page = new Page(parameterMap.get(PAGE),
+                    parameterMap.get(ITEMS));
+            req.setAttribute(PAGE, page);
+            req.setAttribute(ID, user.getId());
+            req.setAttribute(USER_FIRST_NAME, user.getFirstName());
+            req.setAttribute(USER_MIDDLE_NAME, user.getMiddleName());
+            req.setAttribute(USER_LAST_NAME, user.getLastName());
+            parameterMap = new HashMap<>();
+            parameterMap.put(ID, String.valueOf(user.getAvatarId()));
+            req.setAttribute(USER_AVATAR_DOWNLOAD,
+                    UrlManager.getUriWithContext(req,
+                            FILE_DOWNLOAD_PATH + FILE_AVATAR_PREFIX,
+                            parameterMap));
+            req.setAttribute(USER_LOGIN_EMAIL, user.getLogin().getEmail());
+            req.setAttribute(USER_ROLE_NAME, user.getRole().getName());
+            req.setAttribute(USER_LOGIN_ATTEMPT_LEFT,
+                    user.getLogin().getAttemptLeft());
+            req.setAttribute(USER_LOGIN_STATUS, user.getLogin().getStatus());
+            req.getRequestDispatcher(super.getJspName()).forward(req, resp);
+        } catch (ServletException| IOException e) {
+            throw new AppException(ACTION_FORWARD_TO_JSP_ERROR,
+                    e.getMessage(), e.getCause());
+        }
     }
 
 }
