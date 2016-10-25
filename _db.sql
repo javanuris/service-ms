@@ -45,7 +45,7 @@ insert into "User" (first_name, middle_name, last_name, login_id, role_name) val
 insert into "User" (first_name, middle_name, last_name, login_id, role_name) values ('Marcello', '', 'Begetti', select id from "Login" where email is 'user9@test.com', 'authorized');
 insert into "User" (first_name, middle_name, last_name, login_id, role_name) values ('Mike', '', 'Tyson', select id from "Login" where email is 'user0@test.com', 'authorized');
 insert into "User" (first_name, middle_name, last_name, login_id, role_name) values ('Евгения', '', '', select id from "Login" where email is 'manager@test.com', 'manager');
-insert into "Category" (created, parent_id, name) values ('2016-10-01 12:00:00.00', null, 'Отполение / Heating');
+insert into "Category" (created, parent_id, name) values ('2016-10-01 12:00:00.00', null, 'Отопление / Heating');
 insert into "Category" (created, parent_id, name) values ('2016-10-01 12:00:00.00', null, 'Водоснабжение / Water Supply');
 insert into "Category" (created, parent_id, name) values ('2016-10-01 12:00:00.00', null, 'Уборка / Cleaning');
 insert into "Category" (created, parent_id, name) values ('2016-10-01 12:00:00.00', 3, 'Уборка территории / Cleaning of territory');

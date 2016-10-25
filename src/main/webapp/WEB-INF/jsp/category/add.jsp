@@ -6,7 +6,7 @@
 <html lang="${language}">
     <tags:head>
         <jsp:attribute name="title">
-            <fmt:message bundle="${ui}" key="title.category.edit"/>
+            <fmt:message bundle="${ui}" key="title.category.add"/>
         </jsp:attribute>
     </tags:head>
     <body>
@@ -18,7 +18,7 @@
                         <form name="edit-form" action="" method="POST">
                             <tags:form-control type="select" name="parentCategory" label="control.parent-category.label" value="${requestScope.parentCategory}"/>
                             <tags:form-control type="text" name="name" label="control.name.label" value="${requestScope.name}"/>
-                            <tags:form-button type="submit" name="submitSaveCategory" label="control.submit.save-category.label" messageList="${requestScope.formMessageList}"/>
+                            <tags:form-button type="submit" name="submitAddCategory" label="control.submit.add-category.label" messageList="${requestScope.formMessageList}"/>
                             <tags:form-button type="button" name="buttonGotoCategoryList" label="control.button.goto-category-list.label" action="${pageContext.request.contextPath}/category/list?page=${requestScope.page.currentPage}&items=${requestScope.page.itemsOnPage}"/>
                         </form>
                     </div>

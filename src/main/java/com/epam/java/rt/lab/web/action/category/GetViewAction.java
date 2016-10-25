@@ -1,58 +1,70 @@
 package com.epam.java.rt.lab.web.action.category;
 
+import com.epam.java.rt.lab.entity.business.Category;
 import com.epam.java.rt.lab.exception.AppException;
+import com.epam.java.rt.lab.service.CategoryService;
+import com.epam.java.rt.lab.util.UrlManager;
 import com.epam.java.rt.lab.web.action.Action;
 import com.epam.java.rt.lab.web.action.BaseAction;
+import com.epam.java.rt.lab.web.component.Page;
+import com.epam.java.rt.lab.web.validator.Validator;
+import com.epam.java.rt.lab.web.validator.ValidatorFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.Map;
 
-/**
- * Service Management System
- */
+import static com.epam.java.rt.lab.entity.business.Category.NULL_CATEGORY;
+import static com.epam.java.rt.lab.util.PropertyManager.*;
+import static com.epam.java.rt.lab.web.action.ActionExceptionCode.ACTION_FORWARD_TO_JSP_ERROR;
+import static com.epam.java.rt.lab.web.validator.ValidatorFactory.DIGITS;
+
 public class GetViewAction extends BaseAction implements Action {
     private static final Logger logger = LoggerFactory.getLogger(GetViewAction.class);
 
     @Override
     public void execute(HttpServletRequest req, HttpServletResponse resp)
             throws AppException {
-//        try (CategoryService categoryService = new CategoryService()) {
-//            logger.debug("/WEB-INF/jsp/category/view.jsp");
-//            Map<String, String> parameterMap = UrlManager.getRequestParameterMap(req.getQueryString());
-//            String id = parameterMap.remove("id");
-//            if (ValidatorFactory.create("digits").validate(id) != null) {
-//                resp.sendRedirect(UrlManager.getContextUri(req, "/category/list", parameterMap));
-//            } else {
-//                Category category = categoryService.getCategory(Long.valueOf(id));
-//                if (category == null) {
-//                    resp.sendRedirect(UrlManager.getContextUri(req, "/category/list", parameterMap));
-//                } else {
-//                    View view = ViewFactory.getInstance().create("view-category");
-//                    if (category.getParentId() != null)
-//                        view.getControl(0).setValue(categoryService.getCategory(category.getParentId()).getName());
-//                    view.getControl(1).setValue(category.getName());
-//                    view.getControl(2).setAction(UrlManager.getContextUri(req, "/category/edit",
-//                            UrlManager.getRequestParameterString(parameterMap), "id=".concat(id)));
-//                    view.getControl(3).setAction(UrlManager.getContextUri(req, "/category/list", parameterMap));
-//                    req.setAttribute("viewCategory", view);
-//                    req.getRequestDispatcher("/WEB-INF/jsp/category/view.jsp").forward(req, resp);
-//                }
-//            }
-//        } catch (ServiceException e) {
-//            e.printStackTrace();
-//            throw new ActionException("exception.action.category.view.user-category.get-user", e.getCause());
-//        } catch (ValidatorException e) {
-//            e.printStackTrace();
-//            throw new ActionException("exception.action.category.view.validator.id", e.getCause());
-//        } catch (ViewException e) {
-//            e.printStackTrace();
-//            throw new ActionException("exception.action.category.view.view-factory.get-instance", e.getCause());
-//        } catch (ServletException | IOException e) {
-//            e.printStackTrace();
-//            throw new ActionException("exception.action.category.view.request", e.getCause());
-//        }
+        try (CategoryService categoryService = new CategoryService()) {
+            Map<String, String> parameterMap =
+                    UrlManager.getRequestParameterMap(req.getQueryString());
+            String id = parameterMap.remove(ID);
+            Validator validator = ValidatorFactory.getInstance().create(DIGITS);
+            if (validator.validate(id).length > 0) {
+                resp.sendRedirect(UrlManager.getUriWithContext(req,
+                        CATEGORY_LIST_PATH, parameterMap));
+                return;
+            }
+            Long idValue = Long.valueOf(id);
+            Category category = categoryService.getCategory(idValue);
+            if (category == null || category == NULL_CATEGORY) {
+                resp.sendRedirect(UrlManager.getUriWithContext(req,
+                        CATEGORY_LIST_PATH, parameterMap));
+                return;
+            }
+            Category parentCategory = null;
+            if (category.getParentId() != null) {
+                parentCategory = categoryService.
+                        getCategory(category.getParentId());
+            }
+            Page page = new Page(parameterMap.get(PAGE),
+                    parameterMap.get(ITEMS));
+            req.setAttribute(PAGE, page);
+            req.setAttribute(ID, category.getId());
+            req.setAttribute(CATEGORY_CREATED, category.getCreated());
+            if (parentCategory != null) {
+                req.setAttribute(CATEGORY_PARENT, parentCategory.getName());
+            }
+            req.setAttribute(CATEGORY_NAME, category.getName());
+            req.getRequestDispatcher(super.getJspName()).forward(req, resp);
+        } catch (ServletException | IOException e) {
+            throw new AppException(ACTION_FORWARD_TO_JSP_ERROR,
+                    e.getMessage(), e.getCause());
+        }
     }
 
 }
