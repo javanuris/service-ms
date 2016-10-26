@@ -66,11 +66,6 @@ public class CategoryDaoTest {
     }
 
     @Test
-    public void getSqlCreate() throws Exception {
-
-    }
-
-    @Test
     public void getSqlRead() throws Exception {
         dao = daoFactory.createDao("Category");
         this.daoParameter = new DaoParameter();
@@ -86,21 +81,6 @@ public class CategoryDaoTest {
         this.daoParameter = new DaoParameter().setLimit(0L, 10L);
         assertEquals("getSqlRead(LIMIT) failed", CATEGORY_READ_C,
                 ((CategoryDao) dao).getSqlRead(this.daoParameter).create());
-    }
-
-    @Test
-    public void getSqlUpdate() throws Exception {
-
-    }
-
-    @Test
-    public void getSqlDelete() throws Exception {
-
-    }
-
-    @Test
-    public void getSqlCount() throws Exception {
-
     }
 
     @Test

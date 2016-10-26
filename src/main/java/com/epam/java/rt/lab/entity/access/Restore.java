@@ -39,14 +39,6 @@ public class Restore extends BaseEntity {
         this.valid = valid;
     }
 
-    public Long getId() {
-        return super.getId();
-    }
-
-    public void setId(Long id) {
-        super.setId(id);
-    }
-
     public Login getLogin() {
         return login;
     }

@@ -35,15 +35,6 @@ public class Category extends BaseEntity {
         this.name = name;
     }
 
-    public Long getId() {
-
-        return super.getId();
-    }
-
-    public void setId(Long id) {
-        super.setId(id);
-    }
-
     public Long getParentId() {
         return parentId;
     }

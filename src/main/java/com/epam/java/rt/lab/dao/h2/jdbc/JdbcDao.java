@@ -32,8 +32,9 @@ import static java.sql.Statement.RETURN_GENERATED_KEYS;
 
 public abstract class JdbcDao implements Dao {
 
-    private static Map<String, EntitySetter> entitySetterMap = new HashMap<>();
-    private static Lock mapLock = new ReentrantLock();
+    private static final Map<String, EntitySetter> entitySetterMap =
+            new HashMap<>();
+    private static final Lock mapLock = new ReentrantLock();
 
     private static final String DAO_PROPERTY_FILE = "dao.properties";
 

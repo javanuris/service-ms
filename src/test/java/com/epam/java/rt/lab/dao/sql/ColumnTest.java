@@ -7,10 +7,12 @@ import com.epam.java.rt.lab.exception.AppException;
 import com.epam.java.rt.lab.util.PropertyManager;
 import com.epam.java.rt.lab.util.TimestampManager;
 import com.epam.java.rt.lab.web.validator.ValidatorFactory;
-import org.junit.*;
-import org.junit.runners.MethodSorters;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 //@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class ColumnTest {

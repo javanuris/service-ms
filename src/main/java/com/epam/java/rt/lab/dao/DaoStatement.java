@@ -21,7 +21,7 @@ import static com.epam.java.rt.lab.exception.AppExceptionCode.NULL_NOT_ALLOWED;
 
 public class DaoStatement implements AutoCloseable {
 
-    private static AtomicInteger mapReady = new AtomicInteger(0);
+    private static final AtomicInteger mapReady = new AtomicInteger(0);
     private static Map<Type, Method> statementMethodMap;
 
     private PreparedStatement statement;

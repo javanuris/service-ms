@@ -24,11 +24,6 @@ public class ActionFactoryTest {
         ActionFactory.getInstance().initActionMap();
     }
 
-    @After
-    public void tearDown() throws Exception {
-
-    }
-
     @Test
     public void create() throws Exception {
         assertNotNull("create() failed", ActionFactory.getInstance().create(GET, HOME_PATH));

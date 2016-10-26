@@ -74,11 +74,6 @@ public class UserDaoTest {
     }
 
     @Test
-    public void getSqlCreate() throws Exception {
-
-    }
-
-    @Test
     public void getSqlRead() throws Exception {
         dao = daoFactory.createDao("User");
         this.daoParameter = new DaoParameter();
@@ -94,16 +89,6 @@ public class UserDaoTest {
         this.daoParameter = new DaoParameter().setLimit(0L, 10L);
         assertEquals("getSqlRead(LIMIT) failed", USER_READ_C,
                 ((UserDao) dao).getSqlRead(this.daoParameter).create());
-    }
-
-    @Test
-    public void getSqlUpdate() throws Exception {
-
-    }
-
-    @Test
-    public void getSqlDelete() throws Exception {
-
     }
 
     @Test

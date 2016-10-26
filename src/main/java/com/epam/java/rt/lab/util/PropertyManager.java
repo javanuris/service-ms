@@ -5,8 +5,6 @@ import com.epam.java.rt.lab.exception.AppException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 import static com.epam.java.rt.lab.util.UtilExceptionCode.PROPERTY_READ_ERROR;
 
@@ -131,7 +129,7 @@ public final class PropertyManager {
 
     private static final String GLOBAL_PROPERTY_FILE = "global.properties";
 
-    private static Properties properties = new Properties();
+    private static final Properties properties = new Properties();
 
     private PropertyManager() {
     }

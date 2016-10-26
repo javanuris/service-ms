@@ -24,9 +24,7 @@ public class GetAddAction extends BaseAction implements Action {
     @Override
     public void execute(HttpServletRequest req, HttpServletResponse resp)
             throws AppException {
-        try (CategoryService categoryService = new CategoryService();
-             ApplicationService applicationService =
-                     new ApplicationService()) {
+        try (CategoryService categoryService = new CategoryService()) {
             FormControlValue parentCategoryValue = new FormControlValue("");
             List<SelectValue> valueList = new ArrayList<>();
             valueList.add(new SelectValue("", "-"));

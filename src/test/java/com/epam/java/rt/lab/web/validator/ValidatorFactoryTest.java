@@ -20,11 +20,6 @@ public class ValidatorFactoryTest {
         ValidatorFactory.getInstance().initValidatorMap();
     }
 
-    @After
-    public void tearDown() throws Exception {
-
-    }
-
     @Test
     public void create() throws Exception {
         assertNotNull("create() failed", ValidatorFactory.getInstance().create(ValidatorFactory.DIGITS));

@@ -5,7 +5,6 @@ import com.epam.java.rt.lab.exception.AppException;
 import com.epam.java.rt.lab.service.UserService;
 import com.epam.java.rt.lab.util.UrlManager;
 import com.epam.java.rt.lab.web.action.Action;
-import com.epam.java.rt.lab.web.action.ActionExceptionCode;
 import com.epam.java.rt.lab.web.action.BaseAction;
 import com.epam.java.rt.lab.web.component.Page;
 import com.epam.java.rt.lab.web.validator.Validator;
@@ -20,8 +19,6 @@ import java.util.Map;
 
 import static com.epam.java.rt.lab.entity.access.User.NULL_USER;
 import static com.epam.java.rt.lab.util.PropertyManager.*;
-import static com.epam.java.rt.lab.util.PropertyManager.USER_LAST_NAME;
-import static com.epam.java.rt.lab.util.PropertyManager.USER_MIDDLE_NAME;
 import static com.epam.java.rt.lab.web.action.ActionExceptionCode.ACTION_FORWARD_TO_JSP_ERROR;
 import static com.epam.java.rt.lab.web.validator.ValidatorFactory.DIGITS;
 

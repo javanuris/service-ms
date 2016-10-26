@@ -40,14 +40,6 @@ public class Application extends BaseEntity {
         this.message = message;
     }
 
-    public Long getId() {
-        return super.getId();
-    }
-
-    public void setId(Long id) {
-        super.setId(id);
-    }
-
     public User getUser() {
         return user;
     }

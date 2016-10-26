@@ -41,14 +41,6 @@ public class Photo extends BaseEntity implements File {
         this.modified = modified;
     }
 
-    public Long getId() {
-        return super.getId();
-    }
-
-    public void setId(Long id) {
-        super.setId(id);
-    }
-
     public String getName() {
         return name;
     }

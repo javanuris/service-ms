@@ -36,14 +36,6 @@ public class Remember extends BaseEntity {
         this.valid = valid;
     }
 
-    public Long getId() {
-        return super.getId();
-    }
-
-    public void setId(Long id) {
-        super.setId(id);
-    }
-
     public User getUser() {
         return user;
     }

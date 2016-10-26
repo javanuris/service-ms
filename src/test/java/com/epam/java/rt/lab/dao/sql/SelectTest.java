@@ -58,24 +58,4 @@ public class SelectTest {
         // no result to assert
     }
 
-    @Test
-    public void orderBy() throws Exception {
-
-    }
-
-    @Test
-    public void limit() throws Exception {
-
-    }
-
-    @Test
-    public void create() throws Exception {
-
-    }
-
-    @Test
-    public void iterator() throws Exception {
-
-    }
-
 }

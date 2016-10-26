@@ -48,11 +48,6 @@ public class JdbcDaoTest {
     }
 
     @Test
-    public void create() throws Exception {
-
-    }
-
-    @Test
     public void read() throws Exception {
         Dao dao = this.daoFactory.createDao("Login");
         DaoParameter daoParameter = new DaoParameter();
@@ -63,16 +58,6 @@ public class JdbcDaoTest {
         assertNotNull("read() failed", loginList);
         Login login = loginList.get(0);
         assertEquals("read(login) failed", "admin@test.com", login.getEmail());
-    }
-
-    @Test
-    public void update() throws Exception {
-
-    }
-
-    @Test
-    public void delete() throws Exception {
-
     }
 
 }

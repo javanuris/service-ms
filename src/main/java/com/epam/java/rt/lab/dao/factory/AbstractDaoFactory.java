@@ -22,7 +22,7 @@ public abstract class AbstractDaoFactory implements DaoFactory {
             "management-system.factory";
     private static final String DB_PROPERTY_FILE = "db.properties";
 
-    private static Properties databaseProperties = new Properties();
+    private static final Properties databaseProperties = new Properties();
 
     private Connection connection = null;
 

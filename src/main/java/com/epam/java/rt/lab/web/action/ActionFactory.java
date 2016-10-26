@@ -33,7 +33,7 @@ public final class ActionFactory {
 
     }
 
-    private Map<String, Action> actionMap = new HashMap<>();
+    private final Map<String, Action> actionMap = new HashMap<>();
 
     private ActionFactory() {
     }

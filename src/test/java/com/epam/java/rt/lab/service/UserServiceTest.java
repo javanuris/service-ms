@@ -48,14 +48,4 @@ public class UserServiceTest {
         assertNotNull("getAnonymous(Role) failed", user.getRole());
     }
 
-    @Test
-    public void getRemember() throws Exception {
-
-    }
-
-    @Test
-    public void setRemember() throws Exception {
-
-    }
-
 }

@@ -39,7 +39,7 @@ public class ConnectionPool implements DataSource {
     private String databasePassword;
     private Semaphore connectionsSemaphore;
     private BlockingQueue<PooledConnection> availableConnectionsQueue;
-    private AtomicInteger grantedConnections = new AtomicInteger();
+    private final AtomicInteger grantedConnections = new AtomicInteger();
 
     private ConnectionPool() {
     }

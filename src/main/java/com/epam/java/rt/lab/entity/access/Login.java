@@ -41,14 +41,6 @@ public class Login extends BaseEntity {
         this.status = status;
     }
 
-    public Long getId() {
-        return super.getId();
-    }
-
-    public void setId(Long id) {
-        super.setId(id);
-    }
-
     public String getSalt() {
         return salt;
     }

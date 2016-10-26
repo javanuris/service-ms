@@ -74,5 +74,5 @@ public class PostEditAction extends BaseAction implements Action {
                     e.getMessage(), e.getCause());
         }
     }
-    
+
 }

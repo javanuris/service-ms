@@ -44,14 +44,6 @@ public class User extends BaseEntity {
         this.role = role;
     }
 
-    public Long getId() {
-        return super.getId();
-    }
-
-    public void setId(Long id) {
-        super.setId(id);
-    }
-
     public String getFirstName() {
         return firstName;
     }
