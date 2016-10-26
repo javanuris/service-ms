@@ -55,7 +55,7 @@ public class GetViewAction extends BaseAction implements Action {
                     parameterMap.get(ITEMS));
             req.setAttribute(PAGE, page);
             req.setAttribute(ID, category.getId());
-            req.setAttribute(CATEGORY_CREATED, category.getCreated());
+            req.setAttribute(CREATED, category.getCreated());
             if (parentCategory != null) {
                 req.setAttribute(CATEGORY_PARENT, parentCategory.getName());
             }

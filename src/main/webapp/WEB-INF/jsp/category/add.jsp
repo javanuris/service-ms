@@ -15,7 +15,7 @@
             <div class="col-lg-offset-4 col-lg-4 col-md-offset-3 col-md-6 col-sm-offset-2 col-sm-8 col-xs-offset-1 col-xs-10">
                 <div class="panel panel-default">
                     <div class="panel-body">
-                        <form name="edit-form" action="" method="POST">
+                        <form name="add-form" action="" method="POST">
                             <tags:form-control type="select" name="parentCategory" label="control.parent-category.label" value="${requestScope.parentCategory}"/>
                             <tags:form-control type="text" name="name" label="control.name.label" value="${requestScope.name}"/>
                             <tags:form-button type="submit" name="submitAddCategory" label="control.submit.add-category.label" messageList="${requestScope.formMessageList}"/>

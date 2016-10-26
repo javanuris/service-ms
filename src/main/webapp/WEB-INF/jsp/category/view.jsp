@@ -17,7 +17,7 @@
                     <div class="panel-body">
                         <tags:view-element type="date" label="control.created.label" value="${requestScope.created}"/>
                         <tags:view-element type="text" label="control.parent-category.label" value="${requestScope.parentCategory}"/>
-                        <tags:view-element type="text" label="control.name.label" value="${requestScope.name}"/>
+                        <tags:view-element type="text" label="control.name.label" value="${requestScope.categoryName}"/>
                         <tags:form-button type="button" label="control.button.edit-category.label" action="${pageContext.request.contextPath}/category/edit?page=${requestScope.page.currentPage}&items=${requestScope.page.itemsOnPage}&id=${requestScope.id}"/>
                         <tags:form-button type="button" label="control.button.goto-category-list.label" action="${pageContext.request.contextPath}/category/list?page=${requestScope.page.currentPage}&items=${requestScope.page.itemsOnPage}"/>
                     </div>

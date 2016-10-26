@@ -20,10 +20,10 @@
                         <tags:nav-item uri="/application/list" label="nav.application" active="${'/application/list'.equals(current)}"/>
                     </c:if>
                     <c:if test="${sessionScope.user.role.verifyPermission('/category/list')}">
-                        <tags:nav-item uri="/category/list" label="nav.category" active="${'/application/list'.equals(current)}"/>
+                        <tags:nav-item uri="/category/list" label="nav.category" active="${'/category/list'.equals(current)}"/>
                     </c:if>
                     <c:if test="${sessionScope.user.role.verifyPermission('/user/list')}">
-                        <tags:nav-item uri="/user/list" label="nav.user" active="${'/application/list'.equals(current)}"/>
+                        <tags:nav-item uri="/user/list" label="nav.user" active="${'/user/list'.equals(current)}"/>
                     </c:if>
                 </ul>
             </c:if>

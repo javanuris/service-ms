@@ -25,7 +25,6 @@ public class UrlManager {
             if (parameterValueArray[i] != null)
                 parameterMap.put(parameterNameArray[i], String.valueOf(parameterValueArray[i]));
         String parameterString = getRequestParameterString(parameterMap);
-//        System.out.println(parameterString);
         if (parameterString.length() == 0) return null;
         return getContextUri(req, path, parameterString);
     }

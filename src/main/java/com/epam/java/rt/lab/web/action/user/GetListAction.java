@@ -3,9 +3,7 @@ package com.epam.java.rt.lab.web.action.user;
 import com.epam.java.rt.lab.entity.access.User;
 import com.epam.java.rt.lab.exception.AppException;
 import com.epam.java.rt.lab.service.UserService;
-import com.epam.java.rt.lab.util.UrlManager;
 import com.epam.java.rt.lab.web.action.Action;
-import com.epam.java.rt.lab.web.action.ActionExceptionCode;
 import com.epam.java.rt.lab.web.action.BaseAction;
 import com.epam.java.rt.lab.web.component.Page;
 import com.epam.java.rt.lab.web.validator.Validator;
@@ -16,9 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static com.epam.java.rt.lab.util.PropertyManager.*;
 import static com.epam.java.rt.lab.web.action.ActionExceptionCode.ACTION_FORWARD_TO_JSP_ERROR;
@@ -46,7 +42,7 @@ public class GetListAction extends BaseAction implements Action {
             }
             Page page = new Page(pageIndexValue, itemCountValue);
             List<User> userList = userService.getUserList(page);
-            req.setAttribute(USER_LIST_ATTR, userList);
+            req.setAttribute(USER_LIST, userList);
             req.setAttribute(PAGE, page);
             req.getRequestDispatcher(super.getJspName()).forward(req, resp);
         } catch (ServletException | IOException e) {

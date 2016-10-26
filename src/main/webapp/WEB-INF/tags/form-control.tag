@@ -42,7 +42,7 @@
             <label class="btn btn-default btn-file">
                 <input id="${name}" onchange="uploadToServer(this)" type="file" name="${pageContext.request.contextPath}/file/upload/${type}"/>
                 <div style="width: 100%; text-align: center;">
-                    <img id="${name}-image" src="${value.value}" alt="<fmt:message bundle="${ui}" key="message.avatar-empty"/>"
+                    <img id="${name}-image" src="${value.value}" alt="<fmt:message bundle="${ui}" key="message.${type}-empty"/>"
                          class="img-thumbnail" style="max-width: 100%; min-width: 100%; height: auto; align-content: center;">
                 </div>
                 <div id="${name}-label"><fmt:message bundle="${ui}" key="message.browse-file"/></div>

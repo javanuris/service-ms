@@ -56,7 +56,6 @@ public class SelectTest {
                 )
         );
         // no result to assert
-//        System.out.println(select.create());
     }
 
     @Test

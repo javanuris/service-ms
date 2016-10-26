@@ -21,10 +21,14 @@ import java.util.List;
 import static com.epam.java.rt.lab.entity.business.Category.NULL_CATEGORY;
 import static com.epam.java.rt.lab.exception.AppExceptionCode.NULL_NOT_ALLOWED;
 import static com.epam.java.rt.lab.web.validator.ValidatorFactory.DIGITS;
-import static com.epam.java.rt.lab.web.validator.ValidatorFactory.NAME;
 
 public class CategoryService extends BaseService {
 
+    /**
+     * @param page
+     * @return
+     * @throws AppException
+     */
     public List<Category> getCategoryList(Page page) throws AppException {
         if (page == null) {
             throw new AppException(NULL_NOT_ALLOWED);
@@ -39,12 +43,23 @@ public class CategoryService extends BaseService {
         return dao(Category.class.getSimpleName()).read(daoParameter);
     }
 
+    /**
+     *
+     * @return
+     * @throws AppException
+     */
     public List<Category> getCategoryList() throws AppException {
         DaoParameter daoParameter = new DaoParameter();
         daoParameter.setOrderByCriteriaArray(Criteria.asc(Property.NAME));
         return dao(Category.class.getSimpleName()).read(daoParameter);
     }
 
+    /**
+     *
+     * @param id
+     * @return
+     * @throws AppException
+     */
     public Category getCategory(Long id) throws AppException {
         if (id == null) {
             throw new AppException(NULL_NOT_ALLOWED);
@@ -58,6 +73,14 @@ public class CategoryService extends BaseService {
                 ? categoryList.get(0) : NULL_CATEGORY;
     }
 
+    /**
+     *
+     * @param id
+     * @param parentCategoryValue
+     * @param nameValue
+     * @return
+     * @throws AppException
+     */
     public boolean updateCategory(Long id,
                                   FormControlValue parentCategoryValue,
                                   FormControlValue nameValue)
@@ -65,48 +88,13 @@ public class CategoryService extends BaseService {
         if (id == null || parentCategoryValue == null || nameValue == null) {
             throw new AppException(NULL_NOT_ALLOWED);
         }
-        boolean formValid = true;
-        String[] validationMessageArray;
-        if (nameValue.getValue().length() == 0) {
-            validationMessageArray = new String[]
-                    {"message.category.empty-name"};
-            nameValue.setValidationMessageList(new ArrayList<>
-                    (Arrays.asList(validationMessageArray)));
-            formValid = false;
-        }
-        Long parentId = null;
-        if (parentCategoryValue.getValue().length() > 0) {
-            Validator digitValidator =
-                    ValidatorFactory.getInstance().create(DIGITS);
-            validationMessageArray = digitValidator.
-                    validate(parentCategoryValue.getValue());
-            if (validationMessageArray.length > 0) {
-                parentCategoryValue.setValidationMessageList(new ArrayList<>
-                        (Arrays.asList(validationMessageArray)));
-                formValid = false;
-            } else if (formValid) {
-                formValid = false;
-                for (SelectValue selectValue : parentCategoryValue.
-                        getAvailableValueList()) {
-                    if (parentCategoryValue.getValue().
-                            equals(selectValue.getValue())) {
-                        formValid = true;
-                        parentId = Long.
-                                valueOf(parentCategoryValue.getValue());
-                        break;
-                    }
-                }
-                if (!formValid) {
-                    validationMessageArray = new String[]
-                            {"message.category.parent-not-exist"};
-                    parentCategoryValue.setValidationMessageList(new ArrayList<>
-                            (Arrays.asList(validationMessageArray)));
-                }
-            }
-        }
-        if (!formValid) return false;
+        if (!validateFormValues(parentCategoryValue, nameValue)) return false;
         Category category = getCategory(id);
-        if (parentId != null) category.setParentId(parentId);
+        if (parentCategoryValue.getValue().length() > 0) {
+            category.setParentId(Long.valueOf(parentCategoryValue.getValue()));
+        } else {
+            category.setParentId(null);
+        }
         category.setName(nameValue.getValue());
         DaoParameter daoParameter = new DaoParameter();
         daoParameter.setSetValueArray(
@@ -119,8 +107,42 @@ public class CategoryService extends BaseService {
                 update(daoParameter) > 0);
     }
 
+    /**
+     *
+     * @param parentCategoryValue
+     * @param nameValue
+     * @return
+     * @throws AppException
+     */
     public Long addCategory(FormControlValue parentCategoryValue,
                             FormControlValue nameValue)
+            throws AppException {
+        if (parentCategoryValue == null || nameValue == null) {
+            throw new AppException(NULL_NOT_ALLOWED);
+        }
+        if (!validateFormValues(parentCategoryValue, nameValue)) return null;
+        Category category = new Category();
+        category.setCreated(TimestampManager.getCurrentTimestamp());
+        if (parentCategoryValue.getValue().length() > 0) {
+            category.setParentId(Long.valueOf(parentCategoryValue.getValue()));
+        } else {
+            category.setParentId(null);
+        }
+        category.setName(nameValue.getValue());
+        DaoParameter daoParameter = new DaoParameter();
+        daoParameter.setEntity(category);
+        return dao(Category.class.getSimpleName()).create(daoParameter);
+    }
+
+    /**
+     *
+     * @param parentCategoryValue
+     * @param nameValue
+     * @return
+     * @throws AppException
+     */
+    private boolean validateFormValues(FormControlValue parentCategoryValue,
+                                       FormControlValue nameValue)
             throws AppException {
         if (parentCategoryValue == null || nameValue == null) {
             throw new AppException(NULL_NOT_ALLOWED);
@@ -134,7 +156,6 @@ public class CategoryService extends BaseService {
                     (Arrays.asList(validationMessageArray)));
             formValid = false;
         }
-        Long parentId = null;
         if (parentCategoryValue.getValue().length() > 0) {
             Validator digitValidator =
                     ValidatorFactory.getInstance().create(DIGITS);
@@ -151,8 +172,6 @@ public class CategoryService extends BaseService {
                     if (parentCategoryValue.getValue().
                             equals(selectValue.getValue())) {
                         formValid = true;
-                        parentId = Long.
-                                valueOf(parentCategoryValue.getValue());
                         break;
                     }
                 }
@@ -164,14 +183,6 @@ public class CategoryService extends BaseService {
                 }
             }
         }
-        if (!formValid) return null;
-        Category category = new Category();
-        category.setCreated(TimestampManager.getCurrentTimestamp());
-        if (parentId != null) category.setParentId(parentId);
-        category.setName(nameValue.getValue());
-        DaoParameter daoParameter = new DaoParameter();
-        daoParameter.setEntity(category);
-        return dao(Category.class.getSimpleName()).create(daoParameter);
+        return formValid;
     }
-
 }

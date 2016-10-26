@@ -10,16 +10,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import static com.epam.java.rt.lab.exception.AppExceptionCode.NULL_NOT_ALLOWED;
-import static com.epam.java.rt.lab.exception.AppExceptionCode.PROPERTY_EMPTY_OR_CONTENT_ERROR;
-import static com.epam.java.rt.lab.exception.AppExceptionCode.PROPERTY_READ_ERROR;
-import static com.epam.java.rt.lab.util.PropertyManager.COMMA;
+import static com.epam.java.rt.lab.exception.AppExceptionCode.*;
+import static com.epam.java.rt.lab.util.PropertyManager.*;
 import static com.epam.java.rt.lab.web.access.AccessExceptionCode.ROLE_NOT_FOUND;
 
 public final class RoleFactory {
 
-    private static final String ANONYMOUS = "anonymous";
-    private static final String AUTHORIZED = "authorized";
     private static final String ACCESS_PROPERTY_FILE = "access.properties";
 
     private static class Holder {

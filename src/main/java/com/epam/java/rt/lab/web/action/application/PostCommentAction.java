@@ -1,66 +1,76 @@
 package com.epam.java.rt.lab.web.action.application;
 
+import com.epam.java.rt.lab.entity.access.User;
+import com.epam.java.rt.lab.entity.business.Application;
 import com.epam.java.rt.lab.exception.AppException;
+import com.epam.java.rt.lab.service.ApplicationService;
+import com.epam.java.rt.lab.service.CommentService;
+import com.epam.java.rt.lab.util.UrlManager;
 import com.epam.java.rt.lab.web.action.Action;
 import com.epam.java.rt.lab.web.action.BaseAction;
+import com.epam.java.rt.lab.web.component.FormControlValue;
+import com.epam.java.rt.lab.web.component.Page;
+import com.epam.java.rt.lab.web.validator.Validator;
+import com.epam.java.rt.lab.web.validator.ValidatorFactory;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.Map;
+
+import static com.epam.java.rt.lab.entity.business.Application.NULL_APPLICATION;
+import static com.epam.java.rt.lab.util.PropertyManager.*;
+import static com.epam.java.rt.lab.web.action.ActionExceptionCode.ACTION_FORWARD_TO_JSP_ERROR;
+import static com.epam.java.rt.lab.web.validator.ValidatorFactory.DIGITS;
 
 public class PostCommentAction extends BaseAction implements Action {
-
-    private enum Submit {
-        SAVE_PROFILE,
-        REMOVE_AVATAR
-    }
 
     @Override
     public void execute(HttpServletRequest req, HttpServletResponse resp)
             throws AppException {
-//        try (CommentService commentService = new CommentService();
-//             ApplicationService applicationService = new ApplicationService()) {
-//            logger.debug("/WEB-INF/jsp/category/edit.jsp");
-//            Map<String, String> parameterMap = UrlManager.getRequestParameterMap(req.getQueryString());
-//            String id = parameterMap.get("id");
-//            if (ValidatorFactory.create("digits").validate(id) != null) {
-//                parameterMap.remove("id");
-//                resp.sendRedirect(UrlManager.getContextUri(req, "/application/view", parameterMap));
-//            } else {
-//                User user = (User) req.getSession().getAttribute("user");
-//                Application application = applicationService.getApplication(Long.valueOf(id));
-//                if (application == null || (!application.getUser().getId().equals(user.getId()) &&
-//                        ("authorized".equals(user.getRole().getName())))) {
-//                    resp.sendRedirect(UrlManager.getContextUri(req, "/application/list", parameterMap));
-//                } else {
-//                    Form form = FormFactory.getInstance().create("comment-application");
-//                    form.setActionParameterString(UrlManager.getRequestParameterString(parameterMap));
-//                    if (FormValidator.validate(req, form)) {
-//                        logger.debug("FORM VALID");
-//                        Comment comment = new Comment();
-//                        comment.setCreated(TimestampManager.getCurrentTimestamp());
-//                        comment.setUser(user);
-//                        comment.setApplicationId(Long.valueOf(id));
-//                        commentService.setCommentPhoto(comment, form.getItem(0).getValue());
-//                        comment.setMessage(form.getItem(1).getValue());
-//                        commentService.addComment(comment);
-//                        resp.sendRedirect(UrlManager.getContextUri(req, "/application/view", parameterMap));
-//                        return;
-//                    }
-//                    req.setAttribute("commentApplication", form);
-//                    req.getRequestDispatcher("/WEB-INF/jsp/application/comment.jsp").forward(req, resp);
-//                }
-//            }
-//        } catch (FormException e) {
-//            throw new ActionException("exception.action.application.comment.form", e.getCause());
-//        } catch (ServletException | IOException e) {
-//            throw new ActionException("exception.action.application.comment.jsp", e.getCause());
-//        } catch (ServiceException e) {
-//            e.printStackTrace();
-//            throw new ActionException("exception.action.application.comment.service", e.getCause());
-//        } catch (ValidatorException e) {
-//            e.printStackTrace();
-//            throw new ActionException("exception.action.application.comment.validator", e.getCause());
-//        }
+        try (CommentService commentService = new CommentService();
+             ApplicationService applicationService
+                     = new ApplicationService()) {
+            Map<String, String> parameterMap =
+                    UrlManager.getRequestParameterMap(req.getQueryString());
+            String id = parameterMap.get(ID);
+            Validator validator = ValidatorFactory.getInstance().create(DIGITS);
+            if (validator.validate(id).length > 0) {
+                resp.sendRedirect(UrlManager.getUriWithContext(req,
+                        CATEGORY_LIST_PATH, parameterMap));
+                return;
+            }
+            Long idValue = Long.valueOf(id);
+            User user = (User) req.getSession().getAttribute(USER_ATTR);
+            Application application =
+                    applicationService.getApplication(idValue, user);
+            if (application == null || application == NULL_APPLICATION) {
+                resp.sendRedirect(UrlManager.getUriWithContext(req,
+                        APPLICATION_LIST_PATH, parameterMap));
+                return;
+            }
+            Page page = new Page(parameterMap.get(PAGE),
+                    parameterMap.get(ITEMS));
+            req.setAttribute(PAGE, page);
+            req.setAttribute(ID, idValue);
+            FormControlValue photoDownloadValue =
+                    new FormControlValue(req.getParameter(COMMENT_PHOTO));
+            FormControlValue messageValue =
+                    new FormControlValue(req.getParameter(COMMENT_MESSAGE));
+            if (commentService.addComment(user, idValue,
+                    photoDownloadValue, messageValue)) {
+                resp.sendRedirect(UrlManager.getUriWithContext(req,
+                        APPLICATION_VIEW_PATH, parameterMap));
+                return;
+            }
+            req.setAttribute(COMMENT_PHOTO, photoDownloadValue);
+            req.setAttribute(COMMENT_MESSAGE, messageValue);
+            req.getRequestDispatcher(super.getJspName()).forward(req, resp);
+        } catch (ServletException | IOException e) {
+            throw new AppException(ACTION_FORWARD_TO_JSP_ERROR,
+                    e.getMessage(), e.getCause());
+        }
     }
 
 }

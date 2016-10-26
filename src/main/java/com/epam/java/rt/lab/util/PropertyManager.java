@@ -38,16 +38,22 @@ public final class PropertyManager {
 
     public static final long UPLOAD_FILE_MAX_SIZE = 3145728;
 
+    public static final String ANONYMOUS = "anonymous";
+    public static final String AUTHORIZED = "authorized";
+
     public static final String GET = "GET";
     public static final String POST = "POST";
 
     public static final String USER_ATTR = "user";
     public static final String LOGIN_ATTR = "login";
-    public static final String USER_LIST_ATTR = "userList";
 
-    public static final String CATEGORY_LIST_ATTR = "categoryList";
+    public static final String USER_LIST = "userList";
+    public static final String CATEGORY_LIST = "categoryList";
+    public static final String APPLICATION_LIST = "applicationList";
+    public static final String COMMENT_LIST = "commentList";
 
     public static final String ID = "id";
+    public static final String CREATED = "created";
     public static final String PATH = "path";
     public static final String FILE = "file";
     public static final String REDIRECT = "redirect";
@@ -63,9 +69,12 @@ public final class PropertyManager {
     public static final String USER_LOGIN_ATTEMPT_LEFT = "loginAttemptLeft";
     public static final String USER_LOGIN_STATUS = "loginStatus";
 
-    public static final String CATEGORY_NAME = "name";
+    public static final String CATEGORY_NAME = "categoryName";
     public static final String CATEGORY_PARENT = "parentCategory";
-    public static final String CATEGORY_CREATED = "created";
+    public static final String APPLICATION_USER_NAME = "userName";
+    public static final String APPLICATION_MESSAGE = "applicationMessage";
+    public static final String COMMENT_PHOTO = "photoDownload";
+    public static final String COMMENT_MESSAGE = "commentMessage";
 
     public static final String RESTORE_EMAIL_ATTR = "restoreEmail";
     public static final String RESTORE_REF_ATTR = "restoreRef";
@@ -95,6 +104,8 @@ public final class PropertyManager {
     public static final String USER_VIEW_PATH = "/user/view";
     public static final String CATEGORY_LIST_PATH = "/category/list";
     public static final String CATEGORY_VIEW_PATH = "/category/view";
+    public static final String APPLICATION_LIST_PATH = "/application/list";
+    public static final String APPLICATION_VIEW_PATH = "/application/view";
     public static final String JSP_BASE_PATH = "/WEB-INF/jsp";
 
     public static final String SERVLET_PATH = "/servlet";
@@ -105,6 +116,7 @@ public final class PropertyManager {
     public static final String FILE_UPLOAD_PATH = "/file/upload";
     public static final String FILE_DOWNLOAD_PATH = "/file/download";
     public static final String FILE_AVATAR_PREFIX = "/avatar";
+    public static final String FILE_PHOTO_PREFIX = "/photo";
 
     public static final String AVATAR_UPLOAD_TYPE = "avatar";
     public static final String PHOTO_UPLOAD_TYPE = "photo";
