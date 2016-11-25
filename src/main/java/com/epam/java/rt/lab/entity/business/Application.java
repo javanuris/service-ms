@@ -1,7 +1,6 @@
 package com.epam.java.rt.lab.entity.business;
 
 import com.epam.java.rt.lab.entity.BaseEntity;
-import com.epam.java.rt.lab.entity.EntityProperty;
 import com.epam.java.rt.lab.entity.access.User;
 
 import java.sql.Timestamp;
@@ -12,19 +11,6 @@ public class Application extends BaseEntity {
     private Timestamp created;
     private Category category;
     private String message;
-
-    public enum Property implements EntityProperty {
-        ID,
-        USER_ID,
-        CREATED,
-        CATEGORY_ID,
-        MESSAGE;
-
-        @Override
-        public Class getEntityClass() {
-            return Application.class;
-        }
-    }
 
     public static final Application NULL_APPLICATION = new Application();
 

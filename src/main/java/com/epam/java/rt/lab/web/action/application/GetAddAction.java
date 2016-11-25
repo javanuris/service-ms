@@ -2,7 +2,6 @@ package com.epam.java.rt.lab.web.action.application;
 
 import com.epam.java.rt.lab.entity.business.Category;
 import com.epam.java.rt.lab.exception.AppException;
-import com.epam.java.rt.lab.service.ApplicationService;
 import com.epam.java.rt.lab.service.CategoryService;
 import com.epam.java.rt.lab.web.action.Action;
 import com.epam.java.rt.lab.web.action.BaseAction;

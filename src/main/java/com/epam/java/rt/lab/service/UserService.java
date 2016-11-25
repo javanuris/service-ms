@@ -4,12 +4,8 @@ import com.epam.java.rt.lab.dao.DaoParameter;
 import com.epam.java.rt.lab.dao.sql.OrderBy;
 import com.epam.java.rt.lab.dao.sql.Update.SetValue;
 import com.epam.java.rt.lab.dao.sql.Where;
-import com.epam.java.rt.lab.dao.sql.Where.Predicate.PredicateOperator;
-import com.epam.java.rt.lab.entity.access.Avatar;
-import com.epam.java.rt.lab.entity.access.Login;
-import com.epam.java.rt.lab.entity.access.Remember;
-import com.epam.java.rt.lab.entity.access.User;
-import com.epam.java.rt.lab.entity.access.User.Property;
+import com.epam.java.rt.lab.dao.sql.WherePredicateOperator;
+import com.epam.java.rt.lab.entity.access.*;
 import com.epam.java.rt.lab.exception.AppException;
 import com.epam.java.rt.lab.util.*;
 import com.epam.java.rt.lab.util.file.UploadManager;
@@ -59,7 +55,7 @@ public class UserService extends BaseService {
         }
         DaoParameter daoParameter = new DaoParameter();
         daoParameter.setWherePredicate(Where.Predicate.
-                get(Property.LOGIN_ID, PredicateOperator.EQUAL,
+                get(UserProperty.LOGIN_ID, WherePredicateOperator.EQUAL,
                         login.getId()));
         List<User> userList = dao(User.class.getSimpleName()).
                 read(daoParameter);
@@ -80,13 +76,16 @@ public class UserService extends BaseService {
         }
         DaoParameter daoParameter = new DaoParameter();
         daoParameter.setSetValueArray(
-                new SetValue(Property.FIRST_NAME, user.getFirstName()),
-                new SetValue(Property.MIDDLE_NAME, user.getMiddleName()),
-                new SetValue(Property.LAST_NAME, user.getLastName()),
-                new SetValue(Property.AVATAR_ID, user.getAvatarId()),
-                new SetValue(Property.ROLE_NAME, user.getRole().getName()));
+                new SetValue(UserProperty.FIRST_NAME, user.getFirstName()),
+                new SetValue(UserProperty.MIDDLE_NAME,
+                        user.getMiddleName()),
+                new SetValue(UserProperty.LAST_NAME, user.getLastName()),
+                new SetValue(UserProperty.AVATAR_ID, user.getAvatarId()),
+                new SetValue(UserProperty.ROLE_NAME,
+                        user.getRole().getName()));
         daoParameter.setWherePredicate(Where.Predicate.
-                get(Property.ID, PredicateOperator.EQUAL, user.getId()));
+                get(UserProperty.ID,
+                        WherePredicateOperator.EQUAL, user.getId()));
         return dao(User.class.getSimpleName()).update(daoParameter);
     }
 
@@ -265,7 +264,7 @@ public class UserService extends BaseService {
         if (id == null) throw new AppException(NULL_NOT_ALLOWED);
         DaoParameter daoParameter = new DaoParameter();
         daoParameter.setWherePredicate(Where.Predicate.
-                get(Property.ID, PredicateOperator.EQUAL, id));
+                get(UserProperty.ID, WherePredicateOperator.EQUAL, id));
         List<User> userList = dao(User.class.getSimpleName()).
                 read(daoParameter);
         return ((userList != null) && (userList.size() > 0))
@@ -281,7 +280,7 @@ public class UserService extends BaseService {
     public User getAnonymous() throws AppException {
         DaoParameter daoParameter = new DaoParameter();
         daoParameter.setWherePredicate(Where.Predicate.
-                get(Login.Property.EMAIL, PredicateOperator.EQUAL, ""));
+                get(LoginProperty.EMAIL, WherePredicateOperator.EQUAL, ""));
         List<User> userList = dao(User.class.getSimpleName()).
                 read(daoParameter);
         return ((userList != null) && (userList.size() > 0))
@@ -301,7 +300,7 @@ public class UserService extends BaseService {
         Long count = dao(User.class.getSimpleName()).count(daoParameter);
         page.setCountItems(count);
         daoParameter.setOrderByCriteriaArray(OrderBy.Criteria.
-                asc(Property.FIRST_NAME));
+                asc(UserProperty.FIRST_NAME));
         daoParameter.setLimit((page.getCurrentPage() - 1)
                 * page.getItemsOnPage(), page.getItemsOnPage());
         return dao(User.class.getSimpleName()).read(daoParameter);
@@ -360,7 +359,7 @@ public class UserService extends BaseService {
         if (user == null) throw new AppException(NULL_NOT_ALLOWED);
         DaoParameter daoParameter = new DaoParameter();
         daoParameter.setWherePredicate(Where.Predicate.
-                get(Remember.Property.USER_ID, PredicateOperator.EQUAL,
+                get(RememberProperty.USER_ID, WherePredicateOperator.EQUAL,
                         user.getId()));
         return dao(Remember.class.getSimpleName()).delete(daoParameter);
     }
@@ -409,11 +408,11 @@ public class UserService extends BaseService {
         DaoParameter daoParameter = new DaoParameter();
         daoParameter.setWherePredicate(Where.Predicate.
                 get(Where.Predicate.
-                                get(Remember.Property.COOKIE_NAME,
-                                        PredicateOperator.EQUAL, cookieName),
-                        PredicateOperator.AND,
-                        Where.Predicate.get(Remember.Property.COOKIE_VALUE,
-                                PredicateOperator.EQUAL, cookieValue)));
+                                get(RememberProperty.COOKIE_NAME,
+                                        WherePredicateOperator.EQUAL, cookieName),
+                        WherePredicateOperator.AND,
+                        Where.Predicate.get(RememberProperty.COOKIE_VALUE,
+                                WherePredicateOperator.EQUAL, cookieValue)));
         return dao(Remember.class.getSimpleName()).read(daoParameter);
     }
 
@@ -429,7 +428,7 @@ public class UserService extends BaseService {
                 validate(id).length > 0) return NULL_AVATAR;
         DaoParameter daoParameter = new DaoParameter();
         daoParameter.setWherePredicate(Where.Predicate.
-                get(Avatar.Property.ID, PredicateOperator.EQUAL, id));
+                get(AvatarProperty.ID, WherePredicateOperator.EQUAL, id));
         List<Avatar> avatarList = dao(Avatar.class.getSimpleName()).
                 read(daoParameter);
         if (avatarList == null || avatarList.size() == 0) {
@@ -471,13 +470,13 @@ public class UserService extends BaseService {
             } else {
                 DaoParameter daoParameter = new DaoParameter();
                 daoParameter.setSetValueArray(
-                        new SetValue(Avatar.Property.NAME, avatar.getName()),
-                        new SetValue(Avatar.Property.TYPE, avatar.getType()),
-                        new SetValue(Avatar.Property.FILE, avatar.getFile()),
-                        new SetValue(Avatar.Property.MODIFIED,
+                        new SetValue(AvatarProperty.NAME, avatar.getName()),
+                        new SetValue(AvatarProperty.TYPE, avatar.getType()),
+                        new SetValue(AvatarProperty.FILE, avatar.getFile()),
+                        new SetValue(AvatarProperty.MODIFIED,
                                 avatar.getModified()));
                 daoParameter.setWherePredicate(Where.Predicate.
-                        get(Avatar.Property.ID, PredicateOperator.EQUAL,
+                        get(AvatarProperty.ID, WherePredicateOperator.EQUAL,
                                 avatar.getId()));
                 dao(Avatar.class.getSimpleName()).update(daoParameter);
             }
@@ -497,7 +496,7 @@ public class UserService extends BaseService {
     public int removeAvatar(Long avatarId) throws AppException {
         DaoParameter daoParameter = new DaoParameter();
         daoParameter.setWherePredicate(Where.Predicate.
-                get(Avatar.Property.ID, PredicateOperator.EQUAL, avatarId));
+                get(AvatarProperty.ID, WherePredicateOperator.EQUAL, avatarId));
         return dao(Avatar.class.getSimpleName()).delete(daoParameter);
     }
 

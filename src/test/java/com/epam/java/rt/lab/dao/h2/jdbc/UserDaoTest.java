@@ -8,8 +8,9 @@ import com.epam.java.rt.lab.dao.factory.DaoFactory;
 import com.epam.java.rt.lab.dao.sql.OrderBy.Criteria;
 import com.epam.java.rt.lab.dao.sql.Sql;
 import com.epam.java.rt.lab.dao.sql.Where.Predicate;
+import com.epam.java.rt.lab.dao.sql.WherePredicateOperator;
 import com.epam.java.rt.lab.entity.access.User;
-import com.epam.java.rt.lab.entity.access.User.Property;
+import com.epam.java.rt.lab.entity.access.UserProperty;
 import com.epam.java.rt.lab.exception.AppException;
 import com.epam.java.rt.lab.util.PropertyManager;
 import com.epam.java.rt.lab.util.TimestampManager;
@@ -78,12 +79,13 @@ public class UserDaoTest {
         dao = daoFactory.createDao("User");
         this.daoParameter = new DaoParameter();
         this.daoParameter.setWherePredicate(Predicate.
-                get(Property.ID, Predicate.PredicateOperator.EQUAL, 1L));
+                get(UserProperty.ID, WherePredicateOperator.EQUAL, 1L));
         assertEquals("getSqlRead(WHERE) failed", USER_READ_A,
                 ((UserDao) dao).getSqlRead(this.daoParameter).create());
         this.daoParameter = new DaoParameter();
         this.daoParameter.
-                setOrderByCriteriaArray(Criteria.asc(Property.FIRST_NAME));
+                setOrderByCriteriaArray(Criteria.
+                        asc(UserProperty.FIRST_NAME));
         assertEquals("getSqlRead(ORDER) failed", USER_READ_B,
                 ((UserDao) dao).getSqlRead(this.daoParameter).create());
         this.daoParameter = new DaoParameter().setLimit(0L, 10L);
@@ -96,7 +98,7 @@ public class UserDaoTest {
         dao = daoFactory.createDao("User");
         this.daoParameter = new DaoParameter();
         this.daoParameter.setWherePredicate(Predicate.
-                get(Property.ID, Predicate.PredicateOperator.EQUAL, 2L));
+                get(UserProperty.ID, WherePredicateOperator.EQUAL, 2L));
         Sql sql = ((UserDao) dao).getSqlRead(this.daoParameter);
         PreparedStatement statement =
                 ((UserDao) dao).getConnection().prepareStatement(sql.create());

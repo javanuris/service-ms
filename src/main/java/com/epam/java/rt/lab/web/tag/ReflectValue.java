@@ -43,9 +43,9 @@ public class ReflectValue extends SimpleTagSupport {
             return String.valueOf(itemObject);
         } catch (NoSuchMethodException | IllegalAccessException
                 | InvocationTargetException e) {
-            //
+            // was empty
+            return "";
         }
-        return "";
     }
     @Override
     public void doTag() throws JspException, IOException {

@@ -6,7 +6,7 @@ import com.epam.java.rt.lab.dao.sql.Insert.InsertValue;
 import com.epam.java.rt.lab.dao.sql.Select;
 import com.epam.java.rt.lab.dao.sql.Sql;
 import com.epam.java.rt.lab.entity.access.Avatar;
-import com.epam.java.rt.lab.entity.access.Avatar.Property;
+import com.epam.java.rt.lab.entity.access.AvatarProperty;
 import com.epam.java.rt.lab.exception.AppException;
 
 import java.sql.Connection;
@@ -29,10 +29,11 @@ public class AvatarDao extends JdbcDao {
         if (daoParameter == null) throw new AppException(NULL_NOT_ALLOWED);
         Avatar avatar = (Avatar) daoParameter.getEntity();
         return Sql.insert(avatar).values(
-                new InsertValue(Property.NAME, avatar.getName()),
-                new InsertValue(Property.TYPE, avatar.getType()),
-                new InsertValue(Property.FILE, avatar.getFile()),
-                new InsertValue(Property.MODIFIED, avatar.getModified()));
+                new InsertValue(AvatarProperty.NAME, avatar.getName()),
+                new InsertValue(AvatarProperty.TYPE, avatar.getType()),
+                new InsertValue(AvatarProperty.FILE, avatar.getFile()),
+                new InsertValue(AvatarProperty.MODIFIED,
+                        avatar.getModified()));
     }
 
     @Override

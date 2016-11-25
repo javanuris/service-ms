@@ -7,8 +7,9 @@ import com.epam.java.rt.lab.dao.factory.AbstractDaoFactory;
 import com.epam.java.rt.lab.dao.factory.DaoFactory;
 import com.epam.java.rt.lab.dao.sql.Sql;
 import com.epam.java.rt.lab.dao.sql.Where.Predicate;
+import com.epam.java.rt.lab.dao.sql.WherePredicateOperator;
 import com.epam.java.rt.lab.entity.access.Login;
-import com.epam.java.rt.lab.entity.access.Login.Property;
+import com.epam.java.rt.lab.entity.access.LoginProperty;
 import com.epam.java.rt.lab.exception.AppException;
 import com.epam.java.rt.lab.util.PropertyManager;
 import com.epam.java.rt.lab.util.TimestampManager;
@@ -52,7 +53,7 @@ public class JdbcDaoTest {
         Dao dao = this.daoFactory.createDao("Login");
         DaoParameter daoParameter = new DaoParameter();
         daoParameter.setWherePredicate(Predicate.
-                get(Property.EMAIL, Predicate.PredicateOperator.EQUAL,
+                get(LoginProperty.EMAIL, WherePredicateOperator.EQUAL,
                         "admin@test.com"));
         List<Login> loginList = dao.read(daoParameter);
         assertNotNull("read() failed", loginList);

@@ -1,26 +1,12 @@
 package com.epam.java.rt.lab.entity.business;
 
 import com.epam.java.rt.lab.entity.BaseEntity;
-import com.epam.java.rt.lab.entity.EntityProperty;
 import com.epam.java.rt.lab.entity.File;
 
 import java.io.InputStream;
 import java.sql.Timestamp;
 
 public class Photo extends BaseEntity implements File {
-
-    public enum Property implements EntityProperty {
-        ID,
-        NAME,
-        TYPE,
-        FILE,
-        MODIFIED;
-
-        @Override
-        public Class getEntityClass() {
-            return Photo.class;
-        }
-    }
 
     private String name;
     private String type;

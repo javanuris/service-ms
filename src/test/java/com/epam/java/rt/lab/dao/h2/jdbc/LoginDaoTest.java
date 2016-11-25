@@ -8,8 +8,9 @@ import com.epam.java.rt.lab.dao.factory.DaoFactory;
 import com.epam.java.rt.lab.dao.sql.OrderBy;
 import com.epam.java.rt.lab.dao.sql.Sql;
 import com.epam.java.rt.lab.dao.sql.Where.Predicate;
+import com.epam.java.rt.lab.dao.sql.WherePredicateOperator;
 import com.epam.java.rt.lab.entity.access.Login;
-import com.epam.java.rt.lab.entity.access.Login.Property;
+import com.epam.java.rt.lab.entity.access.LoginProperty;
 import com.epam.java.rt.lab.exception.AppException;
 import com.epam.java.rt.lab.util.PropertyManager;
 import com.epam.java.rt.lab.util.TimestampManager;
@@ -71,12 +72,13 @@ public class LoginDaoTest {
         dao = daoFactory.createDao("Login");
         this.daoParameter = new DaoParameter();
         this.daoParameter.setWherePredicate(Predicate.
-                get(Property.ID, Predicate.PredicateOperator.EQUAL, 1));
+                get(LoginProperty.ID, WherePredicateOperator.EQUAL, 1));
         assertEquals("getSqlRead(WHERE) failed", LOGIN_READ_A,
                 ((LoginDao) dao).getSqlRead(this.daoParameter).create());
         this.daoParameter = new DaoParameter();
         this.daoParameter.
-                setOrderByCriteriaArray(OrderBy.Criteria.asc(Property.EMAIL));
+                setOrderByCriteriaArray(OrderBy.Criteria.
+                        asc(LoginProperty.EMAIL));
         assertEquals("getSqlRead(ORDER) failed", LOGIN_READ_B,
                 ((LoginDao) dao).getSqlRead(this.daoParameter).create());
         this.daoParameter = new DaoParameter().setLimit(0L, 10L);
@@ -89,7 +91,7 @@ public class LoginDaoTest {
         dao = daoFactory.createDao("Login");
         this.daoParameter = new DaoParameter();
         this.daoParameter.setWherePredicate(Predicate.
-                get(Property.ID, Predicate.PredicateOperator.EQUAL, 1L));
+                get(LoginProperty.ID, WherePredicateOperator.EQUAL, 1L));
         Sql sql = ((LoginDao) dao).getSqlRead(this.daoParameter);
         PreparedStatement statement =
                 ((LoginDao) dao).getConnection().prepareStatement(sql.create());

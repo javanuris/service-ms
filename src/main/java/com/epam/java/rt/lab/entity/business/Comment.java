@@ -1,7 +1,6 @@
 package com.epam.java.rt.lab.entity.business;
 
 import com.epam.java.rt.lab.entity.BaseEntity;
-import com.epam.java.rt.lab.entity.EntityProperty;
 import com.epam.java.rt.lab.entity.access.User;
 
 import java.sql.Timestamp;
@@ -13,20 +12,6 @@ public class Comment extends BaseEntity {
     private Long applicationId;
     private Long photoId;
     private String message;
-
-    public enum Property implements EntityProperty {
-        ID,
-        USER_ID,
-        CREATED,
-        APPLICATION_ID,
-        PHOTO_ID,
-        MESSAGE;
-
-        @Override
-        public Class getEntityClass() {
-            return Comment.class;
-        }
-    }
 
     public Comment() {
     }

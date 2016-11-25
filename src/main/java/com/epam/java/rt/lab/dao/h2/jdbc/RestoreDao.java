@@ -7,7 +7,7 @@ import com.epam.java.rt.lab.dao.sql.Select;
 import com.epam.java.rt.lab.dao.sql.Sql;
 import com.epam.java.rt.lab.entity.access.Login;
 import com.epam.java.rt.lab.entity.access.Restore;
-import com.epam.java.rt.lab.entity.access.Restore.Property;
+import com.epam.java.rt.lab.entity.access.RestoreProperty;
 import com.epam.java.rt.lab.exception.AppException;
 
 import java.sql.Connection;
@@ -30,12 +30,14 @@ public class RestoreDao extends JdbcDao {
         if (daoParameter == null) throw new AppException(NULL_NOT_ALLOWED);
         Restore restore = (Restore) daoParameter.getEntity();
         return Sql.insert(restore).values(
-                new InsertValue(Property.LOGIN_ID, restore.getLogin().getId()),
-                new InsertValue(Property.CODE, restore.getCode()),
-                new InsertValue(Property.COOKIE_NAME, restore.getCookieName()),
-                new InsertValue(Property.COOKIE_VALUE,
+                new InsertValue(RestoreProperty.LOGIN_ID,
+                        restore.getLogin().getId()),
+                new InsertValue(RestoreProperty.CODE, restore.getCode()),
+                new InsertValue(RestoreProperty.COOKIE_NAME,
+                        restore.getCookieName()),
+                new InsertValue(RestoreProperty.COOKIE_VALUE,
                         restore.getCookieValue()),
-                new InsertValue(Property.VALID, restore.getValid()));
+                new InsertValue(RestoreProperty.VALID, restore.getValid()));
     }
 
     @Override

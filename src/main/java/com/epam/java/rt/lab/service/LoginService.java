@@ -3,7 +3,7 @@ package com.epam.java.rt.lab.service;
 import com.epam.java.rt.lab.dao.DaoParameter;
 import com.epam.java.rt.lab.dao.sql.Update;
 import com.epam.java.rt.lab.dao.sql.Where;
-import com.epam.java.rt.lab.dao.sql.Where.Predicate.PredicateOperator;
+import com.epam.java.rt.lab.dao.sql.WherePredicateOperator;
 import com.epam.java.rt.lab.entity.access.*;
 import com.epam.java.rt.lab.exception.AppException;
 import com.epam.java.rt.lab.util.*;
@@ -18,7 +18,6 @@ import java.sql.Timestamp;
 import java.util.*;
 
 import static com.epam.java.rt.lab.entity.access.Login.NULL_LOGIN;
-import static com.epam.java.rt.lab.entity.access.Login.Property;
 import static com.epam.java.rt.lab.exception.AppExceptionCode.NULL_NOT_ALLOWED;
 import static com.epam.java.rt.lab.service.ServiceExceptionCode.GET_USER_ERROR;
 import static com.epam.java.rt.lab.service.ServiceExceptionCode.NO_ASSIGNED_USER_TO_LOGIN;
@@ -405,7 +404,7 @@ public class LoginService extends BaseService {
         if (email == null) throw new AppException(NULL_NOT_ALLOWED);
         DaoParameter daoParameter = new DaoParameter();
         daoParameter.setWherePredicate(Where.Predicate.
-                get(Property.EMAIL, PredicateOperator.EQUAL, email));
+                get(LoginProperty.EMAIL, WherePredicateOperator.EQUAL, email));
         List<Login> loginList = dao(Login.class.getSimpleName()).
                 read(daoParameter);
         return ((loginList != null) && (loginList.size() > 0))
@@ -427,9 +426,9 @@ public class LoginService extends BaseService {
         }
         DaoParameter daoParameter = new DaoParameter();
         daoParameter.setSetValueArray(new Update.SetValue(
-                Property.ATTEMPT_LEFT, attemptLeft));
+                LoginProperty.ATTEMPT_LEFT, attemptLeft));
         daoParameter.setWherePredicate(Where.Predicate.
-                get(Property.ID, PredicateOperator.EQUAL, loginId));
+                get(LoginProperty.ID, WherePredicateOperator.EQUAL, loginId));
         return dao(Login.class.getSimpleName()).update(daoParameter);
     }
 
@@ -444,13 +443,16 @@ public class LoginService extends BaseService {
         if (login == null) throw new AppException(NULL_NOT_ALLOWED);
         DaoParameter daoParameter = new DaoParameter();
         daoParameter.setSetValueArray(
-                new Update.SetValue(Property.SALT, login.getSalt()),
-                new Update.SetValue(Property.PASSWORD, login.getPassword()),
-                new Update.SetValue(Property.ATTEMPT_LEFT,
+                new Update.SetValue(LoginProperty.SALT, login.getSalt()),
+                new Update.SetValue(LoginProperty.PASSWORD,
+                        login.getPassword()),
+                new Update.SetValue(LoginProperty.ATTEMPT_LEFT,
                         login.getAttemptLeft()),
-                new Update.SetValue(Property.STATUS, login.getStatus()));
+                new Update.SetValue(LoginProperty.STATUS,
+                        login.getStatus()));
         daoParameter.setWherePredicate(Where.Predicate.
-                get(Property.ID, PredicateOperator.EQUAL, login.getId()));
+                get(LoginProperty.ID,
+                        WherePredicateOperator.EQUAL, login.getId()));
         return dao(Login.class.getSimpleName()).update(daoParameter);
     }
 
@@ -495,7 +497,7 @@ public class LoginService extends BaseService {
         for (Restore restore : restoreList) {
             DaoParameter daoParameter = new DaoParameter();
             daoParameter.setWherePredicate(Where.Predicate.
-                    get(Restore.Property.ID, PredicateOperator.EQUAL,
+                    get(RestoreProperty.ID, WherePredicateOperator.EQUAL,
                             restore.getId()));
             result += dao(Restore.class.getSimpleName()).
                     delete(daoParameter);
@@ -523,7 +525,7 @@ public class LoginService extends BaseService {
         if (login == NULL_LOGIN) return login;
         DaoParameter daoParameter = new DaoParameter();
         daoParameter.setWherePredicate(Where.Predicate.
-                get(Restore.Property.LOGIN_ID, PredicateOperator.EQUAL,
+                get(RestoreProperty.LOGIN_ID, WherePredicateOperator.EQUAL,
                         login.getId()));
         List<Restore> restoreList = dao(Restore.class.getSimpleName()).
                 read(daoParameter);
@@ -551,7 +553,7 @@ public class LoginService extends BaseService {
     public Long addActivate(Activate activate) throws AppException {
         DaoParameter daoParameter = new DaoParameter();
         daoParameter.setWherePredicate(Where.Predicate.
-                get(Activate.Property.EMAIL, PredicateOperator.EQUAL,
+                get(ActivateProperty.EMAIL, WherePredicateOperator.EQUAL,
                         activate.getEmail()));
         List<Activate> activateList = dao(Activate.class.getSimpleName()).
                 read(daoParameter);
@@ -575,7 +577,7 @@ public class LoginService extends BaseService {
         for (Activate activate : activateList) {
             DaoParameter daoParameter = new DaoParameter();
             daoParameter.setWherePredicate(Where.Predicate.
-                    get(Activate.Property.ID, PredicateOperator.EQUAL,
+                    get(ActivateProperty.ID, WherePredicateOperator.EQUAL,
                             activate.getId()));
             result += dao(Activate.class.getSimpleName()).
                     delete(daoParameter);
@@ -597,7 +599,7 @@ public class LoginService extends BaseService {
         }
         DaoParameter daoParameter = new DaoParameter();
         daoParameter.setWherePredicate(Where.Predicate.
-                get(Activate.Property.EMAIL, PredicateOperator.EQUAL,
+                get(ActivateProperty.EMAIL, WherePredicateOperator.EQUAL,
                         activationEmail));
         List<Activate> activateList = dao(Activate.class.getSimpleName()).
                 read(daoParameter);
@@ -634,7 +636,7 @@ public class LoginService extends BaseService {
         if (email == null) throw new AppException(NULL_NOT_ALLOWED);
         DaoParameter daoParameter = new DaoParameter();
         daoParameter.setWherePredicate(Where.Predicate.
-                get(Activate.Property.EMAIL, PredicateOperator.EQUAL,
+                get(ActivateProperty.EMAIL, WherePredicateOperator.EQUAL,
                         email));
         return dao(Activate.class.getSimpleName()).delete(daoParameter);
     }

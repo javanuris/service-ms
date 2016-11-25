@@ -1,13 +1,10 @@
 package com.epam.java.rt.lab.dao.h2.jdbc;
 
 import com.epam.java.rt.lab.dao.DaoParameter;
-import com.epam.java.rt.lab.dao.sql.Column;
+import com.epam.java.rt.lab.dao.sql.*;
 import com.epam.java.rt.lab.dao.sql.Insert.InsertValue;
-import com.epam.java.rt.lab.dao.sql.Select;
-import com.epam.java.rt.lab.dao.sql.Sql;
-import com.epam.java.rt.lab.dao.sql.Where;
 import com.epam.java.rt.lab.entity.business.Category;
-import com.epam.java.rt.lab.entity.business.Category.Property;
+import com.epam.java.rt.lab.entity.business.CategoryProperty;
 import com.epam.java.rt.lab.exception.AppException;
 
 import java.sql.Connection;
@@ -31,9 +28,12 @@ public class CategoryDao extends JdbcDao {
         if (daoParameter == null) throw new AppException(NULL_NOT_ALLOWED);
         Category category = (Category) daoParameter.getEntity();
         return Sql.insert(category).values(
-                new InsertValue(Property.CREATED, category.getCreated()),
-                new InsertValue(Property.PARENT_ID, category.getParentId()),
-                new InsertValue(Property.NAME, category.getName()));
+                new InsertValue(CategoryProperty.CREATED,
+                        category.getCreated()),
+                new InsertValue(CategoryProperty.PARENT_ID,
+                        category.getParentId()),
+                new InsertValue(CategoryProperty.NAME,
+                        category.getName()));
     }
 
     @Override
@@ -99,7 +99,8 @@ public class CategoryDao extends JdbcDao {
         if (id == null) throw new AppException(NULL_NOT_ALLOWED);
         DaoParameter daoParameter = new DaoParameter();
         daoParameter.setWherePredicate(Where.Predicate.
-                get(Property.ID, Where.Predicate.PredicateOperator.EQUAL, id));
+                get(CategoryProperty.ID,
+                        WherePredicateOperator.EQUAL, id));
         List<Category> categoryList = read(daoParameter);
         if (categoryList == null || categoryList.size() == 0) {
             return NULL_CATEGORY;

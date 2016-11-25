@@ -3,7 +3,7 @@ package com.epam.java.rt.lab.dao.sql;
 import com.epam.java.rt.lab.dao.DaoStatement;
 import com.epam.java.rt.lab.dao.factory.AbstractDaoFactory;
 import com.epam.java.rt.lab.dao.h2.jdbc.JdbcDao;
-import com.epam.java.rt.lab.entity.access.Login;
+import com.epam.java.rt.lab.entity.access.LoginProperty;
 import com.epam.java.rt.lab.exception.AppException;
 import com.epam.java.rt.lab.util.PropertyManager;
 import com.epam.java.rt.lab.util.TimestampManager;
@@ -12,7 +12,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class CriteriaTest {
 
@@ -44,7 +45,7 @@ public class CriteriaTest {
 
     @Test
     public void asc() throws Exception {
-        this.criteria = OrderBy.Criteria.asc(Login.Property.ID);
+        this.criteria = OrderBy.Criteria.asc(LoginProperty.ID);
         assertNotNull("Instantiating failed", this.criteria);
         assertEquals("asc() failed", LOGIN_ID.concat(" ASC"),
                 this.criteria.appendClause(new StringBuilder()).toString());
@@ -52,7 +53,7 @@ public class CriteriaTest {
 
     @Test
     public void desc() throws Exception {
-        this.criteria = OrderBy.Criteria.desc(Login.Property.ID);
+        this.criteria = OrderBy.Criteria.desc(LoginProperty.ID);
         assertNotNull("Instantiating failed", this.criteria);
         assertEquals("desc() failed", LOGIN_ID.concat(" DESC"),
                 this.criteria.appendClause(new StringBuilder()).toString());

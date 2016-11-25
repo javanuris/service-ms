@@ -3,8 +3,8 @@ package com.epam.java.rt.lab.dao.sql;
 import com.epam.java.rt.lab.dao.DaoStatement;
 import com.epam.java.rt.lab.dao.factory.AbstractDaoFactory;
 import com.epam.java.rt.lab.dao.h2.jdbc.JdbcDao;
-import com.epam.java.rt.lab.entity.access.Login;
-import com.epam.java.rt.lab.entity.access.Restore;
+import com.epam.java.rt.lab.entity.access.LoginProperty;
+import com.epam.java.rt.lab.entity.access.RestoreProperty;
 import com.epam.java.rt.lab.exception.AppException;
 import com.epam.java.rt.lab.util.PropertyManager;
 import com.epam.java.rt.lab.util.TimestampManager;
@@ -16,7 +16,8 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class WhereTest {
 
@@ -41,15 +42,15 @@ public class WhereTest {
         List<Where.Predicate> predicateList = new ArrayList<>();
         predicateList.add(
                 Where.Predicate.get(
-                        Login.Property.ID,
-                        Where.Predicate.PredicateOperator.EQUAL,
-                        Login.Property.EMAIL
+                        LoginProperty.ID,
+                        WherePredicateOperator.EQUAL,
+                        LoginProperty.EMAIL
                 )
         );
         predicateList.add(
                 Where.Predicate.get(
-                        Restore.Property.ID,
-                        Where.Predicate.PredicateOperator.EQUAL,
+                        RestoreProperty.ID,
+                        WherePredicateOperator.EQUAL,
                         100
                 )
         );

@@ -3,9 +3,11 @@ package com.epam.java.rt.lab.service;
 import com.epam.java.rt.lab.dao.DaoParameter;
 import com.epam.java.rt.lab.dao.sql.OrderBy.Criteria;
 import com.epam.java.rt.lab.dao.sql.Where.Predicate;
+import com.epam.java.rt.lab.dao.sql.WherePredicateOperator;
 import com.epam.java.rt.lab.entity.access.User;
+import com.epam.java.rt.lab.entity.access.UserProperty;
 import com.epam.java.rt.lab.entity.business.Application;
-import com.epam.java.rt.lab.entity.business.Application.Property;
+import com.epam.java.rt.lab.entity.business.ApplicationProperty;
 import com.epam.java.rt.lab.exception.AppException;
 import com.epam.java.rt.lab.util.TimestampManager;
 import com.epam.java.rt.lab.web.component.FormControlValue;
@@ -34,12 +36,13 @@ public class ApplicationService extends BaseService {
         page.setCountItems(dao(Application.class.getSimpleName()).
                 count(daoParameter));
         daoParameter = new DaoParameter();
-        daoParameter.setOrderByCriteriaArray(Criteria.desc(Property.CREATED));
+        daoParameter.setOrderByCriteriaArray(Criteria.
+                desc(ApplicationProperty.CREATED));
         daoParameter.setLimit((page.getCurrentPage() - 1)
                 * page.getItemsOnPage(), page.getItemsOnPage());
         if (AUTHORIZED.equals(user.getRole().getName())) {
             daoParameter.setWherePredicate(Predicate.
-                    get(User.Property.ID, Predicate.PredicateOperator.EQUAL,
+                    get(UserProperty.ID, WherePredicateOperator.EQUAL,
                             user.getId()));
         }
         return dao(Application.class.getSimpleName()).read(daoParameter);
@@ -51,16 +54,16 @@ public class ApplicationService extends BaseService {
         }
         DaoParameter daoParameter = new DaoParameter();
         Predicate applicationPredicate = Predicate.
-                get(Application.Property.ID,
-                        Predicate.PredicateOperator.EQUAL, id);
+                get(ApplicationProperty.ID,
+                        WherePredicateOperator.EQUAL, id);
         if (!AUTHORIZED.equals(user.getRole().getName())) {
             daoParameter.setWherePredicate(applicationPredicate );
         } else {
             daoParameter.setWherePredicate(Predicate.
                     get(applicationPredicate,
-                            Predicate.PredicateOperator.AND, Predicate.
-                                    get(User.Property.ID,
-                                            Predicate.PredicateOperator.EQUAL,
+                            WherePredicateOperator.AND, Predicate.
+                                    get(UserProperty.ID,
+                                            WherePredicateOperator.EQUAL,
                                             user.getId())));
         }
         List<Application> applicationList =

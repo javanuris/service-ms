@@ -279,7 +279,7 @@ public class Select extends Sql implements Iterable<Column> {
                     String[] split = StringCombiner.
                             splitSpaceLessNames(joinExpression, AMPERSAND);
                     Predicate predicate = new Predicate(Column.from(split[0]),
-                            Predicate.PredicateOperator.EQUAL,
+                            WherePredicateOperator.EQUAL,
                             Column.from(split[1]));
                     predicateList.add(predicate);
                 }

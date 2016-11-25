@@ -6,9 +6,10 @@ import com.epam.java.rt.lab.dao.sql.Insert.InsertValue;
 import com.epam.java.rt.lab.dao.sql.Select;
 import com.epam.java.rt.lab.dao.sql.Sql;
 import com.epam.java.rt.lab.dao.sql.Where.Predicate;
+import com.epam.java.rt.lab.dao.sql.WherePredicateOperator;
 import com.epam.java.rt.lab.entity.access.User;
 import com.epam.java.rt.lab.entity.business.Application;
-import com.epam.java.rt.lab.entity.business.Application.Property;
+import com.epam.java.rt.lab.entity.business.ApplicationProperty;
 import com.epam.java.rt.lab.entity.business.Category;
 import com.epam.java.rt.lab.exception.AppException;
 
@@ -33,13 +34,15 @@ public class ApplicationDao extends JdbcDao {
         if (daoParameter == null) throw new AppException(NULL_NOT_ALLOWED);
         Application application = (Application) daoParameter.getEntity();
         return Sql.insert(application).values(
-                new InsertValue(Property.CREATED, application.getCreated()),
-                new InsertValue(Property.USER_ID,
+                new InsertValue(ApplicationProperty.CREATED,
+                        application.getCreated()),
+                new InsertValue(ApplicationProperty.USER_ID,
                         application.getUser().getId()),
-                new InsertValue(Property.CATEGORY_ID,
+                new InsertValue(ApplicationProperty.CATEGORY_ID,
                         ((application.getCategory() == null) ? null
                                 : application.getCategory().getId())),
-                new InsertValue(Property.MESSAGE, application.getMessage()));
+                new InsertValue(ApplicationProperty.MESSAGE,
+                        application.getMessage()));
     }
 
     @Override
@@ -128,7 +131,8 @@ public class ApplicationDao extends JdbcDao {
         if (id == null) throw new AppException(NULL_NOT_ALLOWED);
         DaoParameter daoParameter = new DaoParameter();
         daoParameter.setWherePredicate(Predicate.
-                get(Property.ID, Predicate.PredicateOperator.EQUAL, id));
+                get(ApplicationProperty.ID,
+                        WherePredicateOperator.EQUAL, id));
         List<Application> applicationList = read(daoParameter);
         if (applicationList == null || applicationList.size() == 0) {
             return NULL_APPLICATION;

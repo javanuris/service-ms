@@ -3,9 +3,12 @@ package com.epam.java.rt.lab.service;
 import com.epam.java.rt.lab.dao.DaoParameter;
 import com.epam.java.rt.lab.dao.sql.OrderBy.Criteria;
 import com.epam.java.rt.lab.dao.sql.Where.Predicate;
+import com.epam.java.rt.lab.dao.sql.WherePredicateOperator;
 import com.epam.java.rt.lab.entity.access.User;
 import com.epam.java.rt.lab.entity.business.Comment;
+import com.epam.java.rt.lab.entity.business.CommentProperty;
 import com.epam.java.rt.lab.entity.business.Photo;
+import com.epam.java.rt.lab.entity.business.PhotoProperty;
 import com.epam.java.rt.lab.exception.AppException;
 import com.epam.java.rt.lab.util.TimestampManager;
 import com.epam.java.rt.lab.util.file.UploadManager;
@@ -30,9 +33,10 @@ public class CommentService extends BaseService {
         if (applicationId == null) throw new AppException(NULL_NOT_ALLOWED);
         DaoParameter daoParameter = new DaoParameter();
         daoParameter.setWherePredicate(Predicate.
-                get(Comment.Property.APPLICATION_ID, Predicate.PredicateOperator.EQUAL,
-                        applicationId));
-        daoParameter.setOrderByCriteriaArray(Criteria.desc(Comment.Property.CREATED));
+                get(CommentProperty.APPLICATION_ID,
+                        WherePredicateOperator.EQUAL, applicationId));
+        daoParameter.setOrderByCriteriaArray(Criteria.
+                desc(CommentProperty.CREATED));
         return dao(Comment.class.getSimpleName()).read(daoParameter);
     }
 
@@ -76,7 +80,7 @@ public class CommentService extends BaseService {
         }
         DaoParameter daoParameter = new DaoParameter();
         daoParameter.setWherePredicate(Predicate.
-                get(Photo.Property.ID, Predicate.PredicateOperator.EQUAL, id));
+                get(PhotoProperty.ID, WherePredicateOperator.EQUAL, id));
         List<Photo> photoList = dao(Photo.class.getSimpleName()).
                 read(daoParameter);
         if (photoList == null || photoList.size() == 0) return NULL_PHOTO;

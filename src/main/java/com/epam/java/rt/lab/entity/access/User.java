@@ -1,7 +1,6 @@
 package com.epam.java.rt.lab.entity.access;
 
 import com.epam.java.rt.lab.entity.BaseEntity;
-import com.epam.java.rt.lab.entity.EntityProperty;
 import com.epam.java.rt.lab.web.access.Role;
 
 import static com.epam.java.rt.lab.util.PropertyManager.SPACE;
@@ -13,21 +12,6 @@ public class User extends BaseEntity {
     private Login login;
     private Role role;
     private Long avatarId;
-
-    public enum Property implements EntityProperty {
-        ID,
-        FIRST_NAME,
-        MIDDLE_NAME,
-        LAST_NAME,
-        LOGIN_ID,
-        ROLE_NAME,
-        AVATAR_ID;
-
-        @Override
-        public Class getEntityClass() {
-            return User.class;
-        }
-    }
 
     public static final User NULL_USER = new User();
 

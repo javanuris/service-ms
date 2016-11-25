@@ -3,7 +3,7 @@ package com.epam.java.rt.lab.dao.sql;
 import com.epam.java.rt.lab.dao.DaoStatement;
 import com.epam.java.rt.lab.dao.factory.AbstractDaoFactory;
 import com.epam.java.rt.lab.dao.h2.jdbc.JdbcDao;
-import com.epam.java.rt.lab.entity.access.Login;
+import com.epam.java.rt.lab.entity.access.LoginProperty;
 import com.epam.java.rt.lab.exception.AppException;
 import com.epam.java.rt.lab.util.PropertyManager;
 import com.epam.java.rt.lab.util.TimestampManager;
@@ -45,7 +45,7 @@ public class PredicateTest {
         DaoStatement.initStatementMethodMap();
         this.predicate = new Where.Predicate(
                 Column.from("\"Login\".id"),
-                Where.Predicate.PredicateOperator.EQUAL,
+                WherePredicateOperator.EQUAL,
                 Column.from("\"Login\".email")
         );
         assertNotNull("Instantiating failed", this.predicate);
@@ -62,9 +62,9 @@ public class PredicateTest {
     @Test
     public void getEntityToEntity() throws Exception {
         this.predicate = Where.Predicate.get(
-                Login.Property.ID,
-                Where.Predicate.PredicateOperator.EQUAL,
-                Login.Property.EMAIL
+                LoginProperty.ID,
+                WherePredicateOperator.EQUAL,
+                LoginProperty.EMAIL
         );
         assertNotNull("Instantiating failed", this.predicate);
         assertEquals("get(EntityProperty) failed", LOGIN_ID_EQUAL_LOGIN_EMAIL,
@@ -74,8 +74,8 @@ public class PredicateTest {
     @Test
     public void getEntityToValue() throws Exception {
         this.predicate = Where.Predicate.get(
-                Login.Property.ID,
-                Where.Predicate.PredicateOperator.EQUAL,
+                LoginProperty.ID,
+                WherePredicateOperator.EQUAL,
                 100
         );
         assertNotNull("Instantiating failed", this.predicate);
@@ -90,15 +90,15 @@ public class PredicateTest {
     public void getPredicateToPredicate() throws Exception {
         this.predicate = Where.Predicate.get(
                 Where.Predicate.get(
-                        Login.Property.ID,
-                        Where.Predicate.PredicateOperator.EQUAL,
-                        Login.Property.EMAIL
+                        LoginProperty.ID,
+                        WherePredicateOperator.EQUAL,
+                        LoginProperty.EMAIL
                 ),
-                Where.Predicate.PredicateOperator.AND,
+                WherePredicateOperator.AND,
                 Where.Predicate.get(
-                        Login.Property.ID,
-                        Where.Predicate.PredicateOperator.EQUAL,
-                        Login.Property.EMAIL
+                        LoginProperty.ID,
+                        WherePredicateOperator.EQUAL,
+                        LoginProperty.EMAIL
                 )
         );
         assertNotNull("Instantiating failed", this.predicate);
@@ -111,15 +111,15 @@ public class PredicateTest {
     public void getPredicateToPredicateException() throws Exception {
         this.predicate = Where.Predicate.get(
                 Where.Predicate.get(
-                        Login.Property.ID,
-                        Where.Predicate.PredicateOperator.EQUAL,
-                        Login.Property.EMAIL
+                        LoginProperty.ID,
+                        WherePredicateOperator.EQUAL,
+                        LoginProperty.EMAIL
                 ),
-                Where.Predicate.PredicateOperator.EQUAL,
+                WherePredicateOperator.EQUAL,
                 Where.Predicate.get(
-                        Login.Property.ID,
-                        Where.Predicate.PredicateOperator.EQUAL,
-                        Login.Property.EMAIL
+                        LoginProperty.ID,
+                        WherePredicateOperator.EQUAL,
+                        LoginProperty.EMAIL
                 )
         );
         assertNotNull("Instantiating failed", this.predicate);
@@ -130,7 +130,7 @@ public class PredicateTest {
 
     @Test
     public void isNull() throws Exception {
-        this.predicate = Where.Predicate.isNull(Login.Property.ID);
+        this.predicate = Where.Predicate.isNull(LoginProperty.ID);
         assertNotNull("Instantiating failed", this.predicate);
         assertEquals("isNull() failed", LOGIN_ID_IS_NULL,
                 this.predicate.appendClause(new StringBuilder()).toString());
@@ -138,7 +138,7 @@ public class PredicateTest {
 
     @Test
     public void isNotNull() throws Exception {
-        this.predicate = Where.Predicate.isNotNull(Login.Property.ID);
+        this.predicate = Where.Predicate.isNotNull(LoginProperty.ID);
         assertNotNull("Instantiating failed", this.predicate);
         assertEquals("isNotNull() failed", LOGIN_ID_IS_NOT_NULL,
                 this.predicate.appendClause(new StringBuilder()).toString());
@@ -149,15 +149,15 @@ public class PredicateTest {
         List<Where.Predicate> joinPredicateList = new ArrayList<>();
         joinPredicateList.add(
                 Where.Predicate.get(
-                        Login.Property.ID,
-                        Where.Predicate.PredicateOperator.EQUAL,
-                        Login.Property.EMAIL
+                        LoginProperty.ID,
+                        WherePredicateOperator.EQUAL,
+                        LoginProperty.EMAIL
                 )
         );
         joinPredicateList.add(
                 Where.Predicate.get(
-                        Login.Property.ID,
-                        Where.Predicate.PredicateOperator.EQUAL,
+                        LoginProperty.ID,
+                        WherePredicateOperator.EQUAL,
                         100
                 )
         );

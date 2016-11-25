@@ -134,7 +134,8 @@ public class AppException extends Exception {
         try {
             message = exceptionBundle.getString(key);
         } catch (MissingResourceException e) {
-            //
+            // was empty
+            message = key;
         }
         return message + getDetailsString()
                 + ((super.getMessage() == null) ? ""

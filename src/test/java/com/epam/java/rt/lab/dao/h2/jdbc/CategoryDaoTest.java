@@ -8,8 +8,9 @@ import com.epam.java.rt.lab.dao.factory.DaoFactory;
 import com.epam.java.rt.lab.dao.sql.OrderBy;
 import com.epam.java.rt.lab.dao.sql.Sql;
 import com.epam.java.rt.lab.dao.sql.Where.Predicate;
+import com.epam.java.rt.lab.dao.sql.WherePredicateOperator;
 import com.epam.java.rt.lab.entity.business.Category;
-import com.epam.java.rt.lab.entity.business.Category.Property;
+import com.epam.java.rt.lab.entity.business.CategoryProperty;
 import com.epam.java.rt.lab.exception.AppException;
 import com.epam.java.rt.lab.util.PropertyManager;
 import com.epam.java.rt.lab.util.TimestampManager;
@@ -70,12 +71,14 @@ public class CategoryDaoTest {
         dao = daoFactory.createDao("Category");
         this.daoParameter = new DaoParameter();
         this.daoParameter.setWherePredicate(Predicate.
-                get(Property.ID, Predicate.PredicateOperator.EQUAL, 1L));
+                get(CategoryProperty.ID,
+                        WherePredicateOperator.EQUAL, 1L));
         assertEquals("getSqlRead(WHERE) failed", CATEGORY_READ_A,
                 ((CategoryDao) dao).getSqlRead(this.daoParameter).create());
         this.daoParameter = new DaoParameter();
         this.daoParameter.
-                setOrderByCriteriaArray(OrderBy.Criteria.asc(Property.NAME));
+                setOrderByCriteriaArray(OrderBy.Criteria.
+                        asc(CategoryProperty.NAME));
         assertEquals("getSqlRead(ORDER) failed", CATEGORY_READ_B,
                 ((CategoryDao) dao).getSqlRead(this.daoParameter).create());
         this.daoParameter = new DaoParameter().setLimit(0L, 10L);
@@ -88,7 +91,8 @@ public class CategoryDaoTest {
         dao = daoFactory.createDao("Category");
         this.daoParameter = new DaoParameter();
         this.daoParameter.setWherePredicate(Predicate.
-                get(Property.ID, Predicate.PredicateOperator.EQUAL, 1L));
+                get(CategoryProperty.ID,
+                        WherePredicateOperator.EQUAL, 1L));
         Sql sql = ((CategoryDao) dao).getSqlRead(this.daoParameter);
         PreparedStatement statement =
                 ((CategoryDao) dao).getConnection().

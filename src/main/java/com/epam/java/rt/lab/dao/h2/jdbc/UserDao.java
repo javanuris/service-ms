@@ -6,9 +6,10 @@ import com.epam.java.rt.lab.dao.sql.Insert.InsertValue;
 import com.epam.java.rt.lab.dao.sql.Select;
 import com.epam.java.rt.lab.dao.sql.Sql;
 import com.epam.java.rt.lab.dao.sql.Where.Predicate;
+import com.epam.java.rt.lab.dao.sql.WherePredicateOperator;
 import com.epam.java.rt.lab.entity.access.Login;
 import com.epam.java.rt.lab.entity.access.User;
-import com.epam.java.rt.lab.entity.access.User.Property;
+import com.epam.java.rt.lab.entity.access.UserProperty;
 import com.epam.java.rt.lab.exception.AppException;
 import com.epam.java.rt.lab.web.access.RoleFactory;
 
@@ -33,12 +34,15 @@ public class UserDao extends JdbcDao {
         if (daoParameter == null) throw new AppException(NULL_NOT_ALLOWED);
         User user = (User) daoParameter.getEntity();
         return Sql.insert(user).values(
-                new InsertValue(Property.FIRST_NAME, user.getFirstName()),
-                new InsertValue(Property.MIDDLE_NAME, user.getMiddleName()),
-                new InsertValue(Property.LAST_NAME, user.getLastName()),
-                new InsertValue(Property.LOGIN_ID, user.getLogin().getId()),
-                new InsertValue(Property.ROLE_NAME, user.getRole().getName()),
-                new InsertValue(Property.AVATAR_ID, user.getAvatarId()));
+                new InsertValue(UserProperty.FIRST_NAME, user.getFirstName()),
+                new InsertValue(UserProperty.MIDDLE_NAME,
+                        user.getMiddleName()),
+                new InsertValue(UserProperty.LAST_NAME, user.getLastName()),
+                new InsertValue(UserProperty.LOGIN_ID,
+                        user.getLogin().getId()),
+                new InsertValue(UserProperty.ROLE_NAME,
+                        user.getRole().getName()),
+                new InsertValue(UserProperty.AVATAR_ID, user.getAvatarId()));
     }
 
     @Override
@@ -116,7 +120,7 @@ public class UserDao extends JdbcDao {
         if (id == null) throw new AppException(NULL_NOT_ALLOWED);
         DaoParameter daoParameter = new DaoParameter();
         daoParameter.setWherePredicate(Predicate.
-                get(Property.ID, Predicate.PredicateOperator.EQUAL, id));
+                get(UserProperty.ID, WherePredicateOperator.EQUAL, id));
         List<User> userList = read(daoParameter);
         if (userList == null || userList.size() == 0) return NULL_USER;
         return userList.get(0);

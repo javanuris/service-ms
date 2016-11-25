@@ -3,7 +3,7 @@ package com.epam.java.rt.lab.dao.sql;
 import com.epam.java.rt.lab.dao.DaoStatement;
 import com.epam.java.rt.lab.dao.factory.AbstractDaoFactory;
 import com.epam.java.rt.lab.dao.h2.jdbc.JdbcDao;
-import com.epam.java.rt.lab.entity.access.Login;
+import com.epam.java.rt.lab.entity.access.LoginProperty;
 import com.epam.java.rt.lab.exception.AppException;
 import com.epam.java.rt.lab.util.PropertyManager;
 import com.epam.java.rt.lab.util.TimestampManager;
@@ -50,8 +50,8 @@ public class SelectTest {
     public void where() throws Exception {
         this.select.where(
                 Where.Predicate.get(
-                        Login.Property.ID,
-                        Where.Predicate.PredicateOperator.EQUAL,
+                        LoginProperty.ID,
+                        WherePredicateOperator.EQUAL,
                         100
                 )
         );

@@ -6,7 +6,7 @@ import com.epam.java.rt.lab.dao.sql.Insert.InsertValue;
 import com.epam.java.rt.lab.dao.sql.Select;
 import com.epam.java.rt.lab.dao.sql.Sql;
 import com.epam.java.rt.lab.entity.business.Photo;
-import com.epam.java.rt.lab.entity.business.Photo.Property;
+import com.epam.java.rt.lab.entity.business.PhotoProperty;
 import com.epam.java.rt.lab.exception.AppException;
 
 import java.sql.Connection;
@@ -29,10 +29,10 @@ public class PhotoDao extends JdbcDao {
         if (daoParameter == null) throw new AppException(NULL_NOT_ALLOWED);
         Photo photo = (Photo) daoParameter.getEntity();
         return Sql.insert(photo).values(
-                new InsertValue(Property.NAME, photo.getName()),
-                new InsertValue(Property.TYPE, photo.getType()),
-                new InsertValue(Property.FILE, photo.getFile()),
-                new InsertValue(Property.MODIFIED, photo.getModified()));
+                new InsertValue(PhotoProperty.NAME, photo.getName()),
+                new InsertValue(PhotoProperty.TYPE, photo.getType()),
+                new InsertValue(PhotoProperty.FILE, photo.getFile()),
+                new InsertValue(PhotoProperty.MODIFIED, photo.getModified()));
     }
 
     @Override

@@ -1,7 +1,6 @@
 package com.epam.java.rt.lab.entity.business;
 
 import com.epam.java.rt.lab.entity.BaseEntity;
-import com.epam.java.rt.lab.entity.EntityProperty;
 
 import java.sql.Timestamp;
 
@@ -10,18 +9,6 @@ public class Category extends BaseEntity {
     private Long parentId;
     private Timestamp created;
     private String name;
-
-    public enum Property implements EntityProperty {
-        ID,
-        PARENT_ID,
-        CREATED,
-        NAME;
-
-        @Override
-        public Class getEntityClass() {
-            return Category.class;
-        }
-    }
 
     public static final Category NULL_CATEGORY = new Category();
 

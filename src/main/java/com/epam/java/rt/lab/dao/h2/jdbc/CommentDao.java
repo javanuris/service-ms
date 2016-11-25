@@ -7,7 +7,7 @@ import com.epam.java.rt.lab.dao.sql.Select;
 import com.epam.java.rt.lab.dao.sql.Sql;
 import com.epam.java.rt.lab.entity.access.User;
 import com.epam.java.rt.lab.entity.business.Comment;
-import com.epam.java.rt.lab.entity.business.Comment.Property;
+import com.epam.java.rt.lab.entity.business.CommentProperty;
 import com.epam.java.rt.lab.exception.AppException;
 
 import java.sql.Connection;
@@ -30,12 +30,16 @@ public class CommentDao extends JdbcDao {
         if (daoParameter == null) throw new AppException(NULL_NOT_ALLOWED);
         Comment comment = (Comment) daoParameter.getEntity();
         return Sql.insert(comment).values(
-                new InsertValue(Property.USER_ID, comment.getUser().getId()),
-                new InsertValue(Property.CREATED, comment.getCreated()),
-                new InsertValue(Property.APPLICATION_ID,
+                new InsertValue(CommentProperty.USER_ID,
+                        comment.getUser().getId()),
+                new InsertValue(CommentProperty.CREATED,
+                        comment.getCreated()),
+                new InsertValue(CommentProperty.APPLICATION_ID,
                         comment.getApplicationId()),
-                new InsertValue(Property.PHOTO_ID, comment.getPhotoId()),
-                new InsertValue(Property.MESSAGE, comment.getMessage()));
+                new InsertValue(CommentProperty.PHOTO_ID,
+                        comment.getPhotoId()),
+                new InsertValue(CommentProperty.MESSAGE,
+                        comment.getMessage()));
     }
 
     @Override

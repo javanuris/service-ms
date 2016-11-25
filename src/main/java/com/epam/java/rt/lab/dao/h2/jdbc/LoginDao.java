@@ -6,8 +6,9 @@ import com.epam.java.rt.lab.dao.sql.Insert.InsertValue;
 import com.epam.java.rt.lab.dao.sql.Select;
 import com.epam.java.rt.lab.dao.sql.Sql;
 import com.epam.java.rt.lab.dao.sql.Where.Predicate;
+import com.epam.java.rt.lab.dao.sql.WherePredicateOperator;
 import com.epam.java.rt.lab.entity.access.Login;
-import com.epam.java.rt.lab.entity.access.Login.Property;
+import com.epam.java.rt.lab.entity.access.LoginProperty;
 import com.epam.java.rt.lab.exception.AppException;
 
 import java.sql.Connection;
@@ -31,11 +32,12 @@ public class LoginDao extends JdbcDao {
         if (daoParameter == null) throw new AppException(NULL_NOT_ALLOWED);
         Login login = (Login) daoParameter.getEntity();
         return Sql.insert(login).values(
-                new InsertValue(Property.EMAIL, login.getEmail()),
-                new InsertValue(Property.SALT, login.getSalt()),
-                new InsertValue(Property.PASSWORD, login.getPassword()),
-                new InsertValue(Property.ATTEMPT_LEFT, login.getAttemptLeft()),
-                new InsertValue(Property.STATUS, login.getStatus()));
+                new InsertValue(LoginProperty.EMAIL, login.getEmail()),
+                new InsertValue(LoginProperty.SALT, login.getSalt()),
+                new InsertValue(LoginProperty.PASSWORD, login.getPassword()),
+                new InsertValue(LoginProperty.ATTEMPT_LEFT,
+                        login.getAttemptLeft()),
+                new InsertValue(LoginProperty.STATUS, login.getStatus()));
     }
 
     @Override
@@ -100,7 +102,7 @@ public class LoginDao extends JdbcDao {
         if (id == null) throw new AppException(NULL_NOT_ALLOWED);
         DaoParameter daoParameter = new DaoParameter();
         daoParameter.setWherePredicate(Predicate.
-                get(Property.ID, Predicate.PredicateOperator.EQUAL, id));
+                get(LoginProperty.ID, WherePredicateOperator.EQUAL, id));
         List<Login> loginList = read(daoParameter);
         if (loginList == null || loginList.size() == 0) return NULL_LOGIN;
         return loginList.get(0);

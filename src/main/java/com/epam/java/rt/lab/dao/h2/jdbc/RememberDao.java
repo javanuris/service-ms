@@ -6,7 +6,7 @@ import com.epam.java.rt.lab.dao.sql.Insert.InsertValue;
 import com.epam.java.rt.lab.dao.sql.Select;
 import com.epam.java.rt.lab.dao.sql.Sql;
 import com.epam.java.rt.lab.entity.access.Remember;
-import com.epam.java.rt.lab.entity.access.Remember.Property;
+import com.epam.java.rt.lab.entity.access.RememberProperty;
 import com.epam.java.rt.lab.entity.access.User;
 import com.epam.java.rt.lab.exception.AppException;
 
@@ -30,11 +30,13 @@ public class RememberDao extends JdbcDao {
         if (daoParameter == null) throw new AppException(NULL_NOT_ALLOWED);
         Remember remember = (Remember) daoParameter.getEntity();
         return Sql.insert(remember).values(
-                new InsertValue(Property.USER_ID, remember.getUser().getId()),
-                new InsertValue(Property.COOKIE_NAME, remember.getCookieName()),
-                new InsertValue(Property.COOKIE_VALUE,
+                new InsertValue(RememberProperty.USER_ID,
+                        remember.getUser().getId()),
+                new InsertValue(RememberProperty.COOKIE_NAME,
+                        remember.getCookieName()),
+                new InsertValue(RememberProperty.COOKIE_VALUE,
                         remember.getCookieValue()),
-                new InsertValue(Property.VALID, remember.getValid()));
+                new InsertValue(RememberProperty.VALID, remember.getValid()));
     }
 
     @Override

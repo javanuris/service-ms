@@ -4,13 +4,12 @@ import com.epam.java.rt.lab.exception.AppException;
 import com.epam.java.rt.lab.util.PropertyManager;
 import com.epam.java.rt.lab.util.TimestampManager;
 import com.epam.java.rt.lab.web.validator.ValidatorFactory;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import static com.epam.java.rt.lab.util.PropertyManager.GET;
 import static com.epam.java.rt.lab.util.PropertyManager.HOME_PATH;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
 
 public class ActionFactoryTest {
 

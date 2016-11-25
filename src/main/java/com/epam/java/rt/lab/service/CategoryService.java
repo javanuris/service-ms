@@ -4,8 +4,9 @@ import com.epam.java.rt.lab.dao.DaoParameter;
 import com.epam.java.rt.lab.dao.sql.OrderBy.Criteria;
 import com.epam.java.rt.lab.dao.sql.Update.SetValue;
 import com.epam.java.rt.lab.dao.sql.Where.Predicate;
+import com.epam.java.rt.lab.dao.sql.WherePredicateOperator;
 import com.epam.java.rt.lab.entity.business.Category;
-import com.epam.java.rt.lab.entity.business.Category.Property;
+import com.epam.java.rt.lab.entity.business.CategoryProperty;
 import com.epam.java.rt.lab.exception.AppException;
 import com.epam.java.rt.lab.util.TimestampManager;
 import com.epam.java.rt.lab.web.component.FormControlValue;
@@ -37,7 +38,8 @@ public class CategoryService extends BaseService {
         page.setCountItems(dao(Category.class.getSimpleName()).
                 count(daoParameter));
         daoParameter = new DaoParameter();
-        daoParameter.setOrderByCriteriaArray(Criteria.asc(Property.NAME));
+        daoParameter.setOrderByCriteriaArray(Criteria.
+                asc(CategoryProperty.NAME));
         daoParameter.setLimit((page.getCurrentPage() - 1)
                 * page.getItemsOnPage(), page.getItemsOnPage());
         return dao(Category.class.getSimpleName()).read(daoParameter);
@@ -50,7 +52,8 @@ public class CategoryService extends BaseService {
      */
     public List<Category> getCategoryList() throws AppException {
         DaoParameter daoParameter = new DaoParameter();
-        daoParameter.setOrderByCriteriaArray(Criteria.asc(Property.NAME));
+        daoParameter.setOrderByCriteriaArray(Criteria.
+                asc(CategoryProperty.NAME));
         return dao(Category.class.getSimpleName()).read(daoParameter);
     }
 
@@ -66,7 +69,8 @@ public class CategoryService extends BaseService {
         }
         DaoParameter daoParameter = new DaoParameter();
         daoParameter.setWherePredicate(Predicate.
-                get(Property.ID, Predicate.PredicateOperator.EQUAL, id));
+                get(CategoryProperty.ID,
+                        WherePredicateOperator.EQUAL, id));
         List<Category> categoryList = dao(Category.class.getSimpleName()).
                 read(daoParameter);
         return ((categoryList != null) && (categoryList.size() > 0))
@@ -98,10 +102,11 @@ public class CategoryService extends BaseService {
         category.setName(nameValue.getValue());
         DaoParameter daoParameter = new DaoParameter();
         daoParameter.setSetValueArray(
-                new SetValue(Property.PARENT_ID, category.getParentId()),
-                new SetValue(Property.NAME, category.getName()));
+                new SetValue(CategoryProperty.PARENT_ID,
+                        category.getParentId()),
+                new SetValue(CategoryProperty.NAME, category.getName()));
         daoParameter.setWherePredicate(Predicate.
-                get(Property.ID, Predicate.PredicateOperator.EQUAL,
+                get(CategoryProperty.ID, WherePredicateOperator.EQUAL,
                         category.getId()));
         return (dao(Category.class.getSimpleName()).
                 update(daoParameter) > 0);

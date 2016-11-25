@@ -1,25 +1,10 @@
 package com.epam.java.rt.lab.entity.access;
 
 import com.epam.java.rt.lab.entity.BaseEntity;
-import com.epam.java.rt.lab.entity.EntityProperty;
 
 import java.sql.Timestamp;
 
 public class Activate extends BaseEntity {
-
-    public enum Property implements EntityProperty {
-        ID,
-        EMAIL,
-        SALT,
-        PASSWORD,
-        CODE,
-        VALID;
-
-        @Override
-        public Class getEntityClass() {
-            return Activate.class;
-        }
-    }
 
     private String email;
     private String salt;

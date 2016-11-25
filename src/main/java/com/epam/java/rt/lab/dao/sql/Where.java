@@ -41,7 +41,7 @@ public class Where implements Clause {
         if (join != null) joinPredicate = join.getPredicate();
         if (joinPredicate != null && predicate != null) {
             this.predicate = Predicate.get(joinPredicate,
-                    Predicate.PredicateOperator.AND, predicate);
+                    WherePredicateOperator.AND, predicate);
         } else if (predicate != null) {
             this.predicate = predicate;
         } else {
@@ -137,67 +137,48 @@ public class Where implements Clause {
         private static final String IS_NULL = " IS NULL";
         private static final String IS_NOT_NULL = " IS NOT NULL";
 
-        /**
-         * {@code Predicate} operator enumeration
-         */
-        public enum PredicateOperator {
-            EQUAL,
-            NOT_EQUAL,
-            MORE,
-            MORE_OR_EQUAL,
-            LESS,
-            LESS_OR_EQUAL,
-            IN,
-            OR,
-            AND,
-            BETWEEN,
-            LIKE,
-            IS_NULL,
-            IS_NOT_NULL
-        }
-
         private Column column;
         private Predicate predicate;
-        private PredicateOperator operator;
+        private WherePredicateOperator operator;
         WildValue[] wildValueArray;
         private Column compareColumn;
         private Predicate comparePredicate;
 
-        Predicate(Column column, PredicateOperator operator,
+        Predicate(Column column, WherePredicateOperator operator,
                   Column compareColumn) {
             this.column = column;
             this.operator = operator;
             this.compareColumn = compareColumn;
         }
 
-        private Predicate(Predicate predicate, PredicateOperator operator,
+        private Predicate(Predicate predicate, WherePredicateOperator operator,
                           Predicate comparePredicate) {
             this.predicate = predicate;
             this.operator = operator;
             this.comparePredicate = comparePredicate;
         }
 
-        private Predicate(Column column, PredicateOperator operator,
+        private Predicate(Column column, WherePredicateOperator operator,
                           WildValue[] wildValueArray) {
             this.column = column;
             this.operator = operator;
             this.wildValueArray = wildValueArray;
         }
 
-        Predicate(Column column, PredicateOperator operator) {
+        Predicate(Column column, WherePredicateOperator operator) {
             this.column = column;
             this.operator = operator;
         }
 
         public static Predicate get(EntityProperty entityProperty,
-                                    PredicateOperator operator,
+                                    WherePredicateOperator operator,
                                     EntityProperty joinEntityProperty)
                 throws AppException {
             if (entityProperty == null || joinEntityProperty == null
                     || operator == null) {
                 throw new AppException(NULL_NOT_ALLOWED);
             }
-            if (!PredicateOperator.EQUAL.equals(operator)) {
+            if (!WherePredicateOperator.EQUAL.equals(operator)) {
                 throw new AppException(PREDICATE_ONLY_EQUAL_ALLOWED);
             }
             return new Predicate(Sql.getColumn(entityProperty),
@@ -205,32 +186,32 @@ public class Where implements Clause {
         }
 
         public static Predicate get(Predicate predicate,
-                                    PredicateOperator operator,
+                                    WherePredicateOperator operator,
                                     Predicate comparePredicate)
                 throws AppException {
             if (predicate == null || comparePredicate == null
                     || operator == null) {
                 throw new AppException(NULL_NOT_ALLOWED);
             }
-            if (!PredicateOperator.AND.equals(operator)
-                    && !PredicateOperator.OR.equals(operator)) {
+            if (!WherePredicateOperator.AND.equals(operator)
+                    && !WherePredicateOperator.OR.equals(operator)) {
                 throw new AppException(PREDICATE_ONLY_AND_OR_ALLOWED);
             }
             return new Predicate(predicate, operator, comparePredicate);
         }
 
         public static <T> Predicate get(EntityProperty entityProperty,
-                                        PredicateOperator operator,
+                                        WherePredicateOperator operator,
                                         T... valArray)
                 throws AppException {
             if (entityProperty == null || operator == null) {
                 throw new AppException(NULL_NOT_ALLOWED);
             }
-            if (PredicateOperator.IS_NULL.equals(operator)
-                    || PredicateOperator.IS_NOT_NULL.equals(operator)
-                    || PredicateOperator.AND.equals(operator)
-                    || PredicateOperator.OR.equals(operator)
-                    || (PredicateOperator.BETWEEN.equals(operator)
+            if (WherePredicateOperator.IS_NULL.equals(operator)
+                    || WherePredicateOperator.IS_NOT_NULL.equals(operator)
+                    || WherePredicateOperator.AND.equals(operator)
+                    || WherePredicateOperator.OR.equals(operator)
+                    || (WherePredicateOperator.BETWEEN.equals(operator)
                     && valArray.length != 2) || valArray.length == 0) {
                 throw new AppException(PREDICATE_SPECIAL_ALLOWED);
             }
@@ -247,7 +228,7 @@ public class Where implements Clause {
                 throw new AppException(NULL_NOT_ALLOWED);
             }
             return new Predicate(Sql.getColumn(entityProperty),
-                    PredicateOperator.IS_NULL);
+                    WherePredicateOperator.IS_NULL);
         }
 
         static Predicate isNotNull(EntityProperty entityProperty)
@@ -256,7 +237,7 @@ public class Where implements Clause {
                 throw new AppException(NULL_NOT_ALLOWED);
             }
             return new Predicate(Sql.getColumn(entityProperty),
-                    PredicateOperator.IS_NOT_NULL);
+                    WherePredicateOperator.IS_NOT_NULL);
         }
 
         public static Predicate get(List<Predicate> joinPredicateList)
@@ -270,13 +251,13 @@ public class Where implements Clause {
             while (i > 0) {
                 i--;
                 lastPredicate = Predicate.get(joinPredicateList.get(i),
-                        PredicateOperator.AND, lastPredicate);
+                        WherePredicateOperator.AND, lastPredicate);
             }
             return lastPredicate;
         }
 
         private String getWildcard() throws AppException {
-            if (PredicateOperator.IN.equals(this.operator)) {
+            if (WherePredicateOperator.IN.equals(this.operator)) {
                 boolean first = true;
                 StringBuilder result = new StringBuilder();
                 for (WildValue aWildValueArray : this.wildValueArray) {
@@ -289,7 +270,7 @@ public class Where implements Clause {
                     result.append(aWildValueArray.makeWildcard());
                 }
                 return result.append(RIGHT_PARENTHESIS).toString();
-            } else if (PredicateOperator.BETWEEN.equals(this.operator)) {
+            } else if (WherePredicateOperator.BETWEEN.equals(this.operator)) {
                 return this.wildValueArray[0].makeWildcard()
                         + AND + this.wildValueArray[1].makeWildcard();
             } else {

@@ -3,7 +3,6 @@ package com.epam.java.rt.lab.web.validator;
 import com.epam.java.rt.lab.exception.AppException;
 import com.epam.java.rt.lab.util.PropertyManager;
 import com.epam.java.rt.lab.util.TimestampManager;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 

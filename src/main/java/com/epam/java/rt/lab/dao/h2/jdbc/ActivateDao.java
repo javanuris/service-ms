@@ -6,7 +6,7 @@ import com.epam.java.rt.lab.dao.sql.Insert.InsertValue;
 import com.epam.java.rt.lab.dao.sql.Select;
 import com.epam.java.rt.lab.dao.sql.Sql;
 import com.epam.java.rt.lab.entity.access.Activate;
-import com.epam.java.rt.lab.entity.access.Activate.Property;
+import com.epam.java.rt.lab.entity.access.ActivateProperty;
 import com.epam.java.rt.lab.exception.AppException;
 
 import java.sql.Connection;
@@ -29,11 +29,12 @@ public class ActivateDao extends JdbcDao {
         if (daoParameter == null) throw new AppException(NULL_NOT_ALLOWED);
         Activate activate = (Activate) daoParameter.getEntity();
         return Sql.insert(activate).values(
-                new InsertValue(Property.EMAIL, activate.getEmail()),
-                new InsertValue(Property.SALT, activate.getSalt()),
-                new InsertValue(Property.PASSWORD, activate.getPassword()),
-                new InsertValue(Property.CODE, activate.getCode()),
-                new InsertValue(Property.VALID, activate.getValid()));
+                new InsertValue(ActivateProperty.EMAIL, activate.getEmail()),
+                new InsertValue(ActivateProperty.SALT, activate.getSalt()),
+                new InsertValue(ActivateProperty.PASSWORD,
+                        activate.getPassword()),
+                new InsertValue(ActivateProperty.CODE, activate.getCode()),
+                new InsertValue(ActivateProperty.VALID, activate.getValid()));
     }
 
     @Override
